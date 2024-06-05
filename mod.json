@@ -1,0 +1,22 @@
+{
+	"geode": "3.0.0-alpha.1",
+	"gd": {
+		"win": "2.206",
+		"mac": "2.206",
+		"android": "2.206",
+		"ios": "2.206"
+	},
+	"version": "v1.0.0",
+	"id": "eclipse.menu",
+	"name": "Eclipse",
+	"developers": ["Eclipse Team"],
+	"description": "Ultimate mod menu for Geometry Dash",
+	"early-load": true,
+	"incompatibilities": [
+		{
+			"id": "prevter.openhack",
+			"version": "*",
+			"importance": "superseded"
+		}
+	]
+}
