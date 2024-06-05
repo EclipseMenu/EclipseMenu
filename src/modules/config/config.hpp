@@ -103,18 +103,18 @@ namespace eclipse::config {
             set(key, value);
     }
 
-    /// @brief Check if a key exists in the global variables.
+    /// @brief Check if a key exists in the temporary storage.
     /// @param key Key to check.
-    /// @return True if the key exists in the global variables.
+    /// @return True if the key exists in the temporary storage.
     inline bool hasTemp(const std::string &key) {
         return getTempStorage().contains(key);
     }
 
-    /// @brief Get a value by key from the global variables.
+    /// @brief Get a value by key from the temporary storage.
     /// @tparam T Type of the value to get.
     /// @param key Key to get the value from.
     /// @param defaultValue Default value to return if the key does not exist.
-    /// @return Value from the global variables or the default value if the key does not exist.
+    /// @return Value from the temporary storage or the default value if the key does not exist.
     template<typename T>
     inline T getTemp(const std::string &key, const T &defaultValue) {
         if (!hasTemp(key))
@@ -123,11 +123,11 @@ namespace eclipse::config {
         return getTempStorage().at(key).get<T>();
     }
 
-    /// @brief Get a value by key from the global variables.
+    /// @brief Get a value by key from the temporary storage.
     /// @note If the key does not exist, it will throw an exception.
     /// @tparam T Type of the value to get.
     /// @param key Key to get the value from.
-    /// @return Value from the global variables.
+    /// @return Value from the temporary storage.
     template<typename T>
     inline T getTemp(const std::string &key) {
         if (!hasTemp(key))
@@ -136,7 +136,7 @@ namespace eclipse::config {
         return getTempStorage().at(key).get<T>();
     }
 
-    /// @brief Set a value by key in the global variables.
+    /// @brief Set a value by key in the temporary storage.
     /// @tparam T Type of the value to set.
     /// @param key Key to set the value to.
     /// @param value Value to set.
@@ -144,14 +144,4 @@ namespace eclipse::config {
     inline void setTemp(const std::string &key, const T &value) {
         getTempStorage()[key] = value;
     }
-
-    /// @brief Set a value by key in the global variables.
-    /// @tparam T Type of the value to set.
-    /// @param key Key to set the value to.
-    /// @param value Value to set.
-    template<typename T>
-    inline void setGlobal(const std::string &key, const T &value) {
-        getStorage()[key] = value;
-    }
-
 }
