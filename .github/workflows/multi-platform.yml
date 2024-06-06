@@ -38,6 +38,8 @@ jobs:
           bindings: geode-sdk/bindings
           bindings-ref: main
           combine: true
+          # export-pdb: true
+          sdk: 'nightly' # remove after 3.0.0 is out
           target: ${{ matrix.config.target }}
 
   package:
