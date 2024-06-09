@@ -56,3 +56,7 @@ build-*/
 
 # Visual Studio
 .vs/
+
+# other
+build.sh
+compile_commands.json
