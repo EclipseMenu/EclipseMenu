@@ -3,6 +3,7 @@
 #include <utility>
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace eclipse::gui {
 
@@ -45,12 +46,99 @@ namespace eclipse::gui {
         void onInit() override {}
         void onUpdate() override {}
 
+        /// @brief Set a callback function to be called when the component value changes.
+        void callback(const std::function<void(bool)>& func) { m_callback = func; }
+
+        /// @brief Set toggle description.
+        ToggleComponent* setDescription(std::string description) {
+            m_description = std::move(description);
+            return this;
+        }
+
+        /// @brief Get the toggle value.
+        [[nodiscard]] bool getValue() const;
+
+        /// @brief Set the toggle value.
+        void setValue(bool value);
+
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+        [[nodiscard]] const std::string& getDescription() const { return m_description; }
+
+        void triggerCallback(bool value) {
+            if (m_callback) m_callback(value);
+        }
 
     private:
         std::string m_id;
         std::string m_title;
+        std::string m_description;
+        std::function<void(bool)> m_callback;
+    };
+
+    /// @brief Radio button component for selecting one of the options.
+    class RadioButtonComponent : public Component {
+    public:
+        explicit RadioButtonComponent(std::string id, std::string title, int value)
+            : m_id(std::move(id)), m_title(std::move(title)), m_value(value) {}
+
+        void onInit() override {}
+        void onUpdate() override {}
+
+        /// @brief Set a callback function to be called when the component value changes.
+        void callback(const std::function<void(int)>& func) { m_callback = func; }
+
+        /// @brief Get the radio button value.
+        [[nodiscard]] int getValue() const { return m_value; }
+
+        /// @brief Set the radio button value.
+        void setValue(int value) { m_value = value; }
+
+        [[nodiscard]] const std::string& getId() const override { return m_id; }
+        [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+
+        void triggerCallback(int value) {
+            if (m_callback) m_callback(value);
+        }
+
+    private:
+        std::string m_id;
+        std::string m_title;
+        int m_value;
+        std::function<void(int)> m_callback;
+    };
+
+    /// @brief Slider component to select a value from a range.
+    class SliderComponent : public Component {
+    public:
+        explicit SliderComponent(std::string title, std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f")
+            : m_title(std::move(title)), m_value(std::move(id)), m_min(min), m_max(max), m_format(std::move(format)) {}
+
+        void onInit() override {}
+        void onUpdate() override {}
+
+        /// @brief Set a callback function to be called when the component value changes.
+        void callback(const std::function<void(float)>& func) { m_callback = func; }
+
+        [[nodiscard]] const std::string& getId() const override { return m_id; }
+        [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+
+        [[nodiscard]] float getMin() const { return m_min; }
+        [[nodiscard]] float getMax() const { return m_max; }
+        [[nodiscard]] const std::string& getFormat() const { return m_format; }
+
+        void triggerCallback(float value) {
+            if (m_callback) m_callback(value);
+        }
+
+    private:
+        std::string m_id;
+        std::string m_title;
+        std::string m_format;
+        std::string m_value;
+        float m_min;
+        float m_max;
+        std::function<void(float)> m_callback;
     };
 
     /// @brief Contains a list of components and a title, to be passed into render engine.
@@ -59,18 +147,34 @@ namespace eclipse::gui {
         explicit MenuTab(std::string title) : m_title(std::move(title)) {}
 
         /// @brief Add a component to the tab.
-        void addComponent(Component* component) {
-            m_components.push_back(component);
-        }
+        void addComponent(Component* component);
 
         /// @brief Add a label to the tab.
-        void addLabel(const std::string& title) {
-            addComponent(new LabelComponent(title));
+        LabelComponent* addLabel(const std::string& title) {
+            auto* label = new LabelComponent(title);
+            addComponent(label);
+            return label;
         }
 
         /// @brief Add a checkbox to the tab.
-        void addToggle(const std::string& title, const std::string& id) {
-            addComponent(new ToggleComponent(id, title));
+        ToggleComponent* addToggle(const std::string& title, const std::string& id) {
+            auto* toggle = new ToggleComponent(id, title);
+            addComponent(toggle);
+            return toggle;
+        }
+
+        /// @brief Add a radio button to the tab.
+        RadioButtonComponent* addRadioButton(const std::string& title, const std::string& id, int value) {
+            auto* button = new RadioButtonComponent(id, title, value);
+            addComponent(button);
+            return button;
+        }
+
+        /// @brief Add a slider to the tab.
+        SliderComponent* addSlider(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f") {
+            auto* slider = new SliderComponent(title, id, min, max, format);
+            addComponent(slider);
+            return slider;
         }
 
         /// @brief Get the tab's title.

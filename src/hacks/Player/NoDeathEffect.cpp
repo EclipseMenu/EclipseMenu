@@ -13,15 +13,19 @@ namespace eclipse::hacks::Player {
         }
 
         void update() override {}
-        [[nodiscard]] bool isCheating() override { return false; }
         [[nodiscard]] const char* getId() const override { return "No Death Effect"; }
     };
 
     REGISTER_HACK(NoDeathEffect)
 
     class $modify(PlayerObject) {
+        static void onModify(auto& self) {
+            SAFE_PRIORITY("PlayerObject::playerDestroyed");
+        }
+
         void playerDestroyed(bool p0) {
-            if (!config::get<bool>("player.nodeatheffect", false)) return PlayerObject::playerDestroyed(p0);
+            if (!config::get<bool>("player.nodeatheffect", false))
+                return PlayerObject::playerDestroyed(p0);
         }
     };
 

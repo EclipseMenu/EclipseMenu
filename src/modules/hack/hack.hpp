@@ -1,7 +1,16 @@
 #pragma once
 #include <Geode/Geode.hpp>
 
-#define REGISTER_HACK(hackClass) $execute { eclipse::hack::Hack::registerHack(new hackClass()); }
+#define REGISTER_HACK(hackClass) $execute { eclipse::hack::Hack::registerHack<hackClass>(); }
+
+constexpr int32_t SAFE_HOOK_PRIORITY = -0x100000;
+
+#define SAFE_PRIORITY(name) do {                            \
+    if (!self.setHookPriority(name, SAFE_HOOK_PRIORITY)) {  \
+        geode::log::warn("Failed to set " name " hook priority!"); \
+    }                                                       \
+} while (0)
+
 
 namespace eclipse::hack {
 
@@ -10,6 +19,10 @@ namespace eclipse::hack {
     public:
         /// @brief Adds the hack to the list of hacks.
         static void registerHack(Hack* hack);
+
+        /// @brief Registers a hack by its type.
+        template<typename T, typename = std::enable_if_t<std::is_base_of_v<Hack, T>>>
+        static void registerHack() { registerHack(new T()); }
 
         /// @brief Finds a hack by its ID.
         [[nodiscard]] static Hack* find(const std::string& id);

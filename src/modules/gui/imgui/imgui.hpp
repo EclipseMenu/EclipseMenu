@@ -1,5 +1,6 @@
 #pragma once
 #include <modules/gui/gui.hpp>
+#include "window.hpp"
 
 namespace eclipse::gui::imgui {
 
@@ -13,11 +14,12 @@ namespace eclipse::gui::imgui {
         void draw();
 
         /// @brief Component visitor function.
-        void visit(Component* component);
+        static void visit(Component* component);
 
     private:
         bool m_initialized = false;
-        std::vector<MenuTab> m_tabs;
+        std::vector<MenuTab*> m_tabs;
+        std::vector<Window> m_windows;
     };
 
 }

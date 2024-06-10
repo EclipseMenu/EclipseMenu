@@ -1,7 +1,12 @@
 #include "imgui.hpp"
+
+#include <Geode/Geode.hpp>
+#include <imgui-cocos.hpp>
+
+#include <utils.hpp>
 #include <modules/config/config.hpp>
 
-#include <imgui-cocos.hpp>
+#include "window.hpp"
 
 namespace eclipse::gui::imgui {
 
@@ -22,35 +27,60 @@ namespace eclipse::gui::imgui {
         if (auto* label = dynamic_cast<LabelComponent*>(component)) {
             ImGui::TextWrapped("%s", label->getTitle().c_str());
         } else if (auto* checkbox = dynamic_cast<ToggleComponent*>(component)) {
-            bool value = config::get<bool>(checkbox->getId(), false);
+            bool value = checkbox->getValue();
             if (ImGui::Checkbox(checkbox->getTitle().c_str(), &value)) {
-                config::set(checkbox->getId(), value);
+                checkbox->setValue(value);
+                checkbox->triggerCallback(value);
+            }
+            if (!checkbox->getDescription().empty()) {
+                ImGui::SameLine();
+                ImGui::TextDisabled("(?)");
+                if (ImGui::IsItemHovered()) {
+                    ImGui::BeginTooltip();
+                    ImGui::TextUnformatted(checkbox->getDescription().c_str());
+                    ImGui::EndTooltip();
+                }
+            }
+        } else if (auto* slider = dynamic_cast<SliderComponent*>(component)) {
+            auto value = config::get<float>(slider->getId(), 0.0f);
+            if (ImGui::SliderFloat(slider->getTitle().c_str(), &value, slider->getMin(), slider->getMax(), slider->getFormat().c_str())) {
+                config::set(slider->getId(), value);
+                slider->triggerCallback(value);
+            }
+        } else if (auto* radio = dynamic_cast<RadioButtonComponent*>(component)) {
+            int value = config::get<int>(radio->getId(), radio->getValue());
+            if (ImGui::RadioButton(radio->getTitle().c_str(), &value, radio->getValue())) {
+                config::set(radio->getId(), value);
+                radio->triggerCallback(value);
             }
         }
     }
 
     void ImGuiEngine::draw() {
-        for (auto& tab : m_tabs) {
-            // TODO: Make this an actual window for better customization.
-            if (ImGui::Begin(tab.getTitle().c_str())) {
-                for (auto& element : tab.getComponents()) {
-                    visit(element);
-                }
-            }
-            ImGui::End();
+        for (auto& window : m_windows) {
+            window.draw();
         }
     }
 
     MenuTab* ImGuiEngine::findTab(const std::string& name) {
-        for (auto& tab : m_tabs) {
-            if (tab.getTitle() == name) {
-                return &tab;
+        for (const auto& tab : m_tabs) {
+            if (tab->getTitle() == name) {
+                return tab;
             }
         }
 
         // If the tab does not exist, create a new one.
-        m_tabs.emplace_back(name);
-        return &m_tabs.back();
+        auto* tab = new MenuTab(name);
+        m_tabs.push_back(tab);
+
+        // Create a new window for the tab.
+        m_windows.emplace_back(name, [tab]() {
+            for (auto& component : tab->getComponents()) {
+                visit(component);
+            }
+        });
+
+        return tab;
     }
 
 }

@@ -13,7 +13,6 @@ namespace eclipse::hacks::Player {
         }
 
         void update() override {}
-        [[nodiscard]] bool isCheating() override { return false; }
         [[nodiscard]] const char* getId() const override { return "Instant Respawn"; }
     };
 
