@@ -2,7 +2,7 @@
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
 
-#include "Bot.hpp"
+#include "bot.hpp"
 
 using namespace geode::prelude;
 
@@ -20,14 +20,12 @@ namespace eclipse::bot {
         m_inputIndex = 0;
     }
 
-    void Bot::removeInputsAfter(int frame)
-    {
+    void Bot::removeInputsAfter(int frame) {
         const auto check = [&](const gdr::Input &input) -> bool { return input.frame > frame; };
         m_replay.inputs.erase(std::remove_if (m_replay.inputs.begin(), m_replay.inputs.end(), check), m_replay.inputs.end());
     }
 
-    void Bot::recordInput(int frame, PlayerButton button, bool player2, bool pressed)
-    {
+    void Bot::recordInput(int frame, PlayerButton button, bool player2, bool pressed) {
         gdr::Input input(frame, (int)button, player2, pressed);
         m_replay.inputs.push_back(input);
     }

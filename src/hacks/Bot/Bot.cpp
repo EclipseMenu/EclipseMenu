@@ -1,8 +1,7 @@
 #include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
-
-#include "modules/bot/bot.hpp"
+#include <modules/bot/bot.hpp>
 
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
@@ -16,7 +15,6 @@ namespace eclipse::hacks::Bot {
 
     class Bot : public hack::Hack {
         void init() override {
-
             const auto updateBotState = [](int state) { s_bot.setState(bot::State(state)); };
 
             auto tab = gui::MenuTab::find("Bot");
@@ -37,16 +35,16 @@ namespace eclipse::hacks::Bot {
         void resetLevel() {
             PlayLayer::resetLevel();
 
-            if(s_bot.getState() == bot::State::RECORD) {
+            if (s_bot.getState() == bot::State::RECORD) {
                 s_bot.recordInput(m_gameState.m_currentProgress, PlayerButton::Jump, true, false);
                 s_bot.recordInput(m_gameState.m_currentProgress, PlayerButton::Jump, false, false);
             }
 
-            if(m_checkpointArray->count() > 0) return;
+            if (m_checkpointArray->count() > 0) return;
 
             s_bot.restart();
 
-            if(s_bot.getState() == bot::State::PLAYBACK) return;
+            if (s_bot.getState() == bot::State::PLAYBACK) return;
 
             s_bot.clearInputs();
         }
@@ -54,9 +52,9 @@ namespace eclipse::hacks::Bot {
         void loadFromCheckpoint(CheckpointObject* checkpoint) {
             PlayLayer* playLayer = PlayLayer::get();
 
-            if(s_bot.getState() != bot::State::RECORD || !playLayer)
+            if (s_bot.getState() != bot::State::RECORD || !playLayer)
                 return PlayLayer::loadFromCheckpoint(checkpoint);
-            
+
             s_bot.removeInputsAfter(checkpoint->m_gameState.m_currentProgress);
 
             PlayLayer::loadFromCheckpoint(checkpoint);
@@ -67,22 +65,22 @@ namespace eclipse::hacks::Bot {
         void processCommands(float dt) {
             GJBaseGameLayer::processCommands(dt);
 
-            if(s_bot.getState() != bot::State::PLAYBACK)
+            if (s_bot.getState() != bot::State::PLAYBACK)
                 return;
 
             std::optional<gdr::Input> input = std::nullopt;
 
-            while((input = s_bot.poll(m_gameState.m_currentProgress)) != std::nullopt)
-                GJBaseGameLayer::handleButton(input->down, (int)input->button, !input->player2);
+            while ((input = s_bot.poll(m_gameState.m_currentProgress)) != std::nullopt)
+                GJBaseGameLayer::handleButton(input->down, (int) input->button, !input->player2);
         }
 
         void handleButton(bool down, int button, bool player1) {
             GJBaseGameLayer::handleButton(down, button, player1);
 
-            if(s_bot.getState() != bot::State::RECORD)
+            if (s_bot.getState() != bot::State::RECORD)
                 return;
 
-            s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton)button, !player1, down);
+            s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !player1, down);
         }
     };
 

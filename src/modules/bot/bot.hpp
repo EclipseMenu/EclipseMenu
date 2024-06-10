@@ -12,7 +12,7 @@ namespace eclipse::bot {
     };
 
     struct BotReplay : public gdr::Replay<BotReplay, gdr::Input> {
-            BotReplay() : Replay("Bot", "1.0") {}
+        BotReplay() : Replay("Bot", "1.0") {}
     };
 
     class Bot {

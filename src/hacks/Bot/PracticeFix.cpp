@@ -253,7 +253,7 @@ namespace eclipse::Hacks::Bot {
         float unk_584;
         int unk_588;
         float m_rotationSpeed;
-	    float m_unk5dc;
+        float m_unk5dc;
         bool m_isRotating;
         bool m_unk5e1;
         bool m_hasGlow;
@@ -276,12 +276,12 @@ namespace eclipse::Hacks::Bot {
         bool m_unk65e;
         bool m_unk65f;
         float m_unk688;
-	    float m_unk68c;
+        float m_unk68c;
         bool m_gv0096;
-	    bool m_gv0100;
+        bool m_gv0100;
         int m_unk6c0;
         float m_unk70c;
-	    float m_unk710;
+        float m_unk710;
         int m_playerStreak;
         bool m_hasCustomGlowColor;
         bool m_isShip;
@@ -311,27 +311,27 @@ namespace eclipse::Hacks::Bot {
         bool m_unka2b;
         cocos2d::CCPoint m_lastGroundedPos;
         bool m_unk814;
-	    bool m_unk815;
+        bool m_unk815;
         bool m_gamevar0060;
-	    bool m_gamevar0061;
-	    bool m_gamevar0062;
+        bool m_gamevar0061;
+        bool m_gamevar0062;
         float m_unk838;
         bool m_isPlatformer;
-	    int m_unk8ec;
-	    int m_unk8f0;
-	    int m_unk8f4;
-	    int m_unk8f8;
-	    float m_gravityMod;
+        int m_unk8ec;
+        int m_unk8f0;
+        int m_unk8f4;
+        int m_unk8f8;
+        float m_gravityMod;
         cocos2d::CCPoint m_unk904;
         float m_unk918;
-	    float m_unk91c;
+        float m_unk91c;
         bool m_unk948;
         int m_iconRequestID;
         float m_unk974;
-	    bool m_unk978;
-	    bool m_unk979;
-	    bool m_unk97a;
-	    bool m_unk97b;
+        bool m_unk978;
+        bool m_unk979;
+        bool m_unk97a;
+        bool m_unk97b;
 
         gd::unordered_set<int> m_unk6a4;
         gd::unordered_set<int> m_unk828;
@@ -365,9 +365,9 @@ namespace eclipse::Hacks::Bot {
             m_checkpointPlayer1.apply(player1);
             m_checkpointPlayer2.apply(player2);
         }
-    
+
     private:
-        int m_frame;
+        int m_frame{};
         FixPlayerCheckpoint m_checkpointPlayer1;
         FixPlayerCheckpoint m_checkpointPlayer2;
     };
@@ -383,7 +383,7 @@ namespace eclipse::Hacks::Bot {
         }
 
         void resetLevel() {
-            if(m_checkpointArray->count() < 0)
+            if (m_checkpointArray->count() < 0)
                 m_fields->m_checkpoints.clear();
 
             PlayLayer::resetLevel();
@@ -402,7 +402,7 @@ namespace eclipse::Hacks::Bot {
 
             PlayLayer::loadFromCheckpoint(checkpoint);
         }
- 
+
     };
 
     class $modify(CheckpointObject) {
