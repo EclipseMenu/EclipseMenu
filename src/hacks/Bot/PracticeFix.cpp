@@ -356,7 +356,7 @@ namespace eclipse::Hacks::Bot {
     public:
         CheckpointData() = default;
 
-        CheckpointData(int frame, PlayerObject* player1, PlayerObject* player2) {
+        CheckpointData(PlayerObject* player1, PlayerObject* player2) {
             m_checkpointPlayer1 = FixPlayerCheckpoint(player1);
             m_checkpointPlayer2 = FixPlayerCheckpoint(player2);
         }
@@ -367,7 +367,6 @@ namespace eclipse::Hacks::Bot {
         }
 
     private:
-        int m_frame{};
         FixPlayerCheckpoint m_checkpointPlayer1;
         FixPlayerCheckpoint m_checkpointPlayer2;
     };
@@ -383,7 +382,7 @@ namespace eclipse::Hacks::Bot {
         }
 
         void resetLevel() {
-            if (m_checkpointArray->count() < 0)
+            if(m_checkpointArray->count() <= 0)
                 m_fields->m_checkpoints.clear();
 
             PlayLayer::resetLevel();
@@ -393,8 +392,9 @@ namespace eclipse::Hacks::Bot {
             FixPlayLayer* playLayer = ((FixPlayLayer*)FixPlayLayer::get());
 
             if(config::get<bool>("bot.practicefix", false) && playLayer->m_fields->m_checkpoints.contains(checkpoint)) {
-                CheckpointData data = playLayer->m_fields->m_checkpoints[checkpoint];
                 PlayLayer::loadFromCheckpoint(checkpoint);
+
+                CheckpointData data = playLayer->m_fields->m_checkpoints[checkpoint];
                 data.apply(playLayer->m_player1, playLayer->m_player2);
 
                 return;
@@ -409,14 +409,13 @@ namespace eclipse::Hacks::Bot {
         bool init() {
             bool result = CheckpointObject::init();
 
-            if (!config::get<bool>("bot.practicefix", false)) {
+            if (!config::get<bool>("bot.practicefix", false))
                 return result;
-            }
 
             FixPlayLayer* playLayer = ((FixPlayLayer*)FixPlayLayer::get());
 
             if(playLayer->m_gameState.m_currentProgress > 0) {
-                CheckpointData data(playLayer->m_gameState.m_currentProgress, playLayer->m_player1, playLayer->m_player2);
+                CheckpointData data(playLayer->m_player1, playLayer->m_player2);
                 playLayer->m_fields->m_checkpoints[this] = data;
             }
 

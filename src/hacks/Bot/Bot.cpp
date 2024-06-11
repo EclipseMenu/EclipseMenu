@@ -12,6 +12,7 @@ using namespace geode::prelude;
 namespace eclipse::hacks::Bot {
 
     static bot::Bot s_bot;
+    bool resetFrame = false;
 
     class Bot : public hack::Hack {
         void init() override {
@@ -33,11 +34,13 @@ namespace eclipse::hacks::Bot {
     class $modify(PlayLayer) {
 
         void resetLevel() {
+            resetFrame = true;
             PlayLayer::resetLevel();
+            resetFrame = false;
 
-            if (s_bot.getState() == bot::State::RECORD) {
-                s_bot.recordInput(m_gameState.m_currentProgress, PlayerButton::Jump, true, false);
-                s_bot.recordInput(m_gameState.m_currentProgress, PlayerButton::Jump, false, false);
+            if(s_bot.getState() == bot::State::RECORD) {
+                s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, true, false);
+                s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, false, false);
             }
 
             if (m_checkpointArray->count() > 0) return;
@@ -77,7 +80,7 @@ namespace eclipse::hacks::Bot {
         void handleButton(bool down, int button, bool player1) {
             GJBaseGameLayer::handleButton(down, button, player1);
 
-            if (s_bot.getState() != bot::State::RECORD)
+            if (s_bot.getState() != bot::State::RECORD || resetFrame)
                 return;
 
             s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !player1, down);
