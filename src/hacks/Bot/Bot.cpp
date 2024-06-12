@@ -40,7 +40,8 @@ namespace eclipse::hacks::Bot {
 
             if(s_bot.getState() == bot::State::RECORD) {
                 s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, true, false);
-                s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, false, false);
+                if(m_gameState.m_isDualMode)
+                    s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, false, false);
             }
 
             if (m_checkpointArray->count() > 0) return;
