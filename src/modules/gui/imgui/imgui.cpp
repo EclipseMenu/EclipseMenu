@@ -50,6 +50,19 @@ namespace eclipse::gui::imgui {
         m_initialized = true;
     }
 
+    void updateCursorState(bool isOpened) {
+        bool canShowInLevel = true;
+        if (auto* playLayer = PlayLayer::get()) {
+            canShowInLevel = playLayer->m_hasCompletedLevel ||
+                             playLayer->m_isPaused ||
+                             GameManager::sharedState()->getGameVariable("0024");
+        }
+        if (isOpened || canShowInLevel)
+            PlatformToolbox::showCursor();
+        else
+            PlatformToolbox::hideCursor();
+    }
+
     void ImGuiEngine::toggle() {
         m_isOpened = !m_isOpened;
 
@@ -67,7 +80,7 @@ namespace eclipse::gui::imgui {
             m_actions.push_back(window.animateTo(target, duration, easing));
         }
 
-        // TODO: show/hide cursor
+        updateCursorState(m_isOpened);
 
         m_isAnimating = true;
     }
@@ -128,6 +141,8 @@ namespace eclipse::gui::imgui {
         }), m_actions.end());
 
         if (!shouldRender()) return;
+
+        updateCursorState(m_isOpened);
 
         // Render windows
         for (auto& window : m_windows) {
