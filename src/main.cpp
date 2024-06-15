@@ -5,6 +5,7 @@
 #include <modules/config/config.hpp>
 #include <modules/gui/imgui/imgui.hpp>
 #include <modules/hack/hack.hpp>
+#include <modules/keybinds/manager.hpp>
 
 using namespace eclipse;
 
@@ -25,6 +26,7 @@ class $modify(cocos2d::CCScheduler) {
         for (auto hack : hack::Hack::getHacks()) {
             hack->update();
         }
+        keybinds::Manager::get()->update();
     }
 };
 

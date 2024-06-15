@@ -1,5 +1,5 @@
 {
-	"geode": "3.0.0-alpha.2",
+	"geode": "3.0.0-beta.1",
 	"gd": {
 		"win": "2.206",
 		"mac": "2.206",
@@ -15,6 +15,16 @@
 	"incompatibilities": [
 		{
 			"id": "prevter.openhack",
+			"version": "*",
+			"importance": "superseded"
+		},
+		{
+			"id": "maxnu.gd_mega_overlay",
+			"version": "*",
+			"importance": "superseded"
+		},
+		{
+			"id": "ninxout.crystal_client",
 			"version": "*",
 			"importance": "superseded"
 		}
