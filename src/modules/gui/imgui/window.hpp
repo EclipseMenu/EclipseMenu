@@ -5,6 +5,8 @@
 #include <functional>
 #include <utility>
 #include <imgui.h>
+#include "animation/easing.hpp"
+#include "animation/move-action.hpp"
 
 namespace eclipse::gui::imgui {
 
@@ -50,6 +52,17 @@ namespace eclipse::gui::imgui {
 
         [[nodiscard]] const ImVec2& getSize() const;
         void setSize(const ImVec2& size);
+
+        /// @brief Create new `MoveAction` instance for the window
+        /// @param target Target position
+        /// @param duration How long the animation should last in seconds
+        /// @param easing Easing mode (see "animation/easing.hpp")
+        /// @param useRealPosition Whether to change the actual position of the window
+        animation::MoveAction* animateTo(
+                const ImVec2& target,
+                double duration,
+                animation::EasingFunction easing,
+                bool useRealPosition = false);
 
     private:
         std::string m_title; // Window title

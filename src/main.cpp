@@ -9,12 +9,28 @@
 
 using namespace eclipse;
 
+static bool s_isInitialized = false;
+
 class $modify(MenuLayer) {
     bool init() override {
         if (!MenuLayer::init()) return false;
 
+        if (s_isInitialized) return true;
+
         // Initialize the GUI engine.
         gui::Engine::get()->init();
+
+        // Register the keybind
+        auto& key = keybinds::Manager::get()->registerKeybind("menu.toggle", "Toggle UI", []() {
+            gui::Engine::get()->toggle();
+            config::save();
+        });
+        key.setKey(keybinds::Keys::Tab);
+        key.setInitialized(true);
+
+        // TODO: Load saved keybind states
+
+        s_isInitialized = true;
 
         return true;
     }

@@ -18,6 +18,8 @@ namespace eclipse::hacks::Bot {
         void init() override {
             const auto updateBotState = [](int state) { s_bot.setState(bot::State(state)); };
 
+            config::setIfEmpty("bot.state", 0);
+
             auto tab = gui::MenuTab::find("Bot");
             tab->addRadioButton("Disabled", "bot.state", 0)->callback(updateBotState);
             tab->addRadioButton("Record", "bot.state", 1)->callback(updateBotState);

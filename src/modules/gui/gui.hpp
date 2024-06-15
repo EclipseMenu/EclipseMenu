@@ -200,6 +200,9 @@ namespace eclipse::gui {
         /// @brief Initialize the UI engine.
         virtual void init() = 0;
 
+        /// @brief Toggle the UI visibility.
+        virtual void toggle() = 0;
+
         /// @brief Find a tab by name.
         virtual MenuTab* findTab(const std::string& name) = 0;
     };

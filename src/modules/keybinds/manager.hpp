@@ -69,31 +69,39 @@ namespace eclipse::keybinds {
     /// @brief A keybind that can be used to execute a callback when a key is pressed.
     class Keybind {
     public:
-        Keybind(Keys key, const std::function<void()>& callback) : m_key(key), m_callback(callback) {}
+        /// @brief Construct a keybind.
+        /// @param key The key of the keybind.
+        /// @param id The ID of the keybind.
+        /// @param title The title of the keybind.
+        /// @param callback The callback to execute when the keybind is pressed.
+        Keybind(Keys key, std::string id, std::string title, std::function<void()> callback)
+            : m_key(key), m_id(std::move(id)), m_title(std::move(title)), m_callback(std::move(callback)) {}
 
         /// @brief Get the key of the keybind.
         [[nodiscard]] Keys getKey() const { return m_key; }
 
-        /// @brief Get the callback of the keybind.
-        [[nodiscard]] const std::function<void()>& getCallback() const { return m_callback; }
+        /// @brief Execute the keybind's callback.
+        void execute() { m_callback(); }
 
-        /// @brief Check if the keybind has been initialized.
+        /// @brief Get the ID of the keybind.
+        [[nodiscard]] const std::string& getId() const { return m_id; }
+
+        /// @brief Get the title of the keybind.
+        [[nodiscard]] const std::string& getTitle() const { return m_title; }
+
+        /// @brief Check if the keybind is initialized.
         [[nodiscard]] bool isInitialized() const { return m_initialized; }
 
-        /// @brief Disable the keybind.
-        void disable() { m_initialized = false; }
-
-        /// @brief Enable the keybind.
-        void enable() { m_initialized = true; }
+        /// @brief Set the keybind as initialized.
+        void setInitialized(bool initialized) { m_initialized = initialized; }
 
         /// @brief Set the key of the keybind.
         void setKey(Keys key) { m_key = key; }
 
-        /// @brief Execute the keybind's callback.
-        void execute() { m_callback(); }
-
     private:
         Keys m_key;
+        std::string m_id;
+        std::string m_title;
         std::function<void()> m_callback;
         bool m_initialized = false;
     };
@@ -106,8 +114,9 @@ namespace eclipse::keybinds {
 
         /// @brief Register a keybind to the manager (in case the keybind will be later used)
         /// @param id The ID of the keybind.
+        /// @param title The title of the keybind.
         /// @param callback The callback to execute when the keybind is pressed.
-        void registerKeybind(const std::string& id, const std::function<void()>& callback);
+        Keybind& registerKeybind(const std::string& id, const std::string& title, const std::function<void()>& callback);
 
         /// @brief Update the keybinds. This should be called every frame.
         void update();
@@ -115,6 +124,11 @@ namespace eclipse::keybinds {
         /// @brief Get all keybinds.
         /// @return All keybinds.
         [[nodiscard]] const std::vector<Keybind>& getKeybinds() const { return m_keybinds; }
+
+        /// @brief Set whether a keybind is enabled or not.
+        /// @param id The ID of the keybind.
+        /// @param state The state of the keybind.
+        void setKeybindState(const std::string& id, bool state);
 
         /// @brief Register a key press.
         /// @note This function is called from the key callback hook.

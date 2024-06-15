@@ -6,9 +6,37 @@
 #include <utils.hpp>
 #include <modules/config/config.hpp>
 
+#include "animation/easing.hpp"
 #include "window.hpp"
 
 namespace eclipse::gui::imgui {
+
+    /// @brief Calculate a random window position outside the screen.
+    ImVec2 randomWindowPosition(Window &window) {
+        // Calculate target position randomly to be outside the screen
+        auto screenSize = ImGui::GetIO().DisplaySize;
+        auto windowSize = window.getSize();
+        ImVec2 target;
+
+        // Pick a random side of the screen
+        auto side = utils::random(3);
+        switch (side) {
+            case 0:
+                target = ImVec2(utils::random(screenSize.x - windowSize.x), -windowSize.y);
+                break;
+            case 1:
+                target = ImVec2(utils::random(screenSize.x - windowSize.x), screenSize.y);
+                break;
+            case 2:
+                target = ImVec2(-windowSize.x, utils::random(screenSize.y - windowSize.y));
+                break;
+            default:
+                target = ImVec2(screenSize.x, utils::random(screenSize.y - windowSize.y));
+                break;
+        }
+
+        return target;
+    }
 
     void ImGuiEngine::init() {
         if (m_initialized) return;
@@ -20,6 +48,33 @@ namespace eclipse::gui::imgui {
                 draw();
             });
         m_initialized = true;
+    }
+
+    void ImGuiEngine::toggle() {
+        m_isOpened = !m_isOpened;
+
+        if (!m_isOpened) {
+            // TODO: save window positions
+        }
+
+        double duration = config::get("menu.animationDuration", 0.3);
+        auto easingType = config::get("menu.animationEasingType", animation::Easing::Quadratic);
+        auto easingMode = config::get("menu.animationEasingMode", animation::EasingMode::EaseInOut);
+        auto easing = animation::getEasingFunction(easingType, easingMode);
+
+        for (auto& window : m_windows) {
+            auto target = m_isOpened ? window.getPosition() : randomWindowPosition(window);
+            m_actions.push_back(window.animateTo(target, duration, easing));
+        }
+
+        // TODO: show/hide cursor
+
+        m_isAnimating = true;
+    }
+
+    bool ImGuiEngine::shouldRender() {
+        // If the GUI is not opened and there are no actions, do not render
+        return m_isOpened || !m_actions.empty();
     }
 
     void ImGuiEngine::visit(Component* component) {
@@ -57,6 +112,24 @@ namespace eclipse::gui::imgui {
     }
 
     void ImGuiEngine::draw() {
+        // Run move actions
+        auto deltaTime = ImGui::GetIO().DeltaTime;
+        for (auto &action: m_actions) {
+            action->update(deltaTime);
+        }
+
+        // Remove finished actions
+        m_actions.erase(std::remove_if(m_actions.begin(), m_actions.end(), [](auto action) {
+            if (action->isFinished()) {
+                delete action;
+                return true;
+            }
+            return false;
+        }), m_actions.end());
+
+        if (!shouldRender()) return;
+
+        // Render windows
         for (auto& window : m_windows) {
             window.draw();
         }

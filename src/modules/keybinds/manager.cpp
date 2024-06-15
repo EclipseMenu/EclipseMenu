@@ -151,14 +151,40 @@ namespace eclipse::keybinds {
         return &s_manager;
     }
 
+    Keybind& Manager::registerKeybind(const std::string& id, const std::string& title, const std::function<void()>& callback) {
+        // check if this id already exists
+        for (auto& keybind : m_keybinds) {
+            if (keybind.getId() == id) {
+                return keybind;
+            }
+        }
+
+        m_keybinds.emplace_back(Keys::None, id, title, callback);
+        return m_keybinds.back();
+    }
+
     void Manager::update() {
         for (auto& key: m_keyStates) {
             m_lastKeyStates.insert_or_assign(key.first, key.second);
         }
     }
 
+    void Manager::setKeybindState(const std::string& id, bool state) {
+        for (auto& keybind : m_keybinds) {
+            if (keybind.getId() == id) {
+                keybind.setInitialized(state);
+            }
+        }
+    }
+
     void Manager::registerKeyPress(Keys key) {
         m_keyStates[key] = true;
+
+        for (auto& keybind : m_keybinds) {
+            if (keybind.getKey() == key && keybind.isInitialized()) {
+                keybind.execute();
+            }
+        }
     }
 
     void Manager::registerKeyRelease(Keys key) {
