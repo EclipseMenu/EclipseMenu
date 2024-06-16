@@ -340,7 +340,7 @@ namespace eclipse::hacks::Player {
         void collisionCheckObjects(PlayerObject* p0, gd::vector<GameObject*>* vec, int p2, float p3) {
             if (s_simulation.isSimulating()) {
                 gd::vector<GameObject*> extra = *vec;
-                
+
                 auto new_end = std::remove_if(vec->begin(), vec->end(), [&](GameObject* p1) {
                     bool result = p1->m_objectType != GameObjectType::Solid &&
                                 p1->m_objectType != GameObjectType::Hazard &&

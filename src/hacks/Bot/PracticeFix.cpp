@@ -117,8 +117,16 @@ namespace eclipse::Hacks::Bot {
             m_unk97a = player->m_unk97a;
             m_unk97b = player->m_unk97b;
 
+#ifndef GEODE_IS_ANDROID
             m_unk6a4 = player->m_unk6a4;
             m_unk828 = player->m_unk828;
+#else
+            // gd::set, gd::unordered_set and gd::unordered_map are just type aliases of arrays of void* on android
+            // until that is fixed, this is a workaround
+
+            std::copy(std::begin(player->m_unk6a4), std::end(player->m_unk6a4), std::begin(m_unk6a4));
+            std::copy(std::begin(player->m_unk828), std::end(player->m_unk828), std::begin(m_unk828));
+#endif
             m_unk880 = player->m_unk880;
             m_unk910 = player->m_unk910;
             m_unk924 = player->m_unk924;
@@ -224,8 +232,13 @@ namespace eclipse::Hacks::Bot {
             player->m_unk97a = m_unk97a;
             player->m_unk97b = m_unk97b;
 
+#ifndef GEODE_IS_ANDROID
             player->m_unk6a4 = m_unk6a4;
             player->m_unk828 = m_unk828;
+#else
+            std::copy(std::begin(m_unk6a4), std::end(m_unk6a4), std::begin(player->m_unk6a4));
+            std::copy(std::begin(m_unk828), std::end(m_unk828), std::begin(player->m_unk828));
+#endif
             player->m_unk880 = m_unk880;
             player->m_unk910 = m_unk910;
             player->m_unk924 = m_unk924;
