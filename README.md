@@ -17,3 +17,13 @@
       <img src="https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?logo=buy-me-a-coffee" alt="Buy Me A Coffee">
     </a>
 </div>
+<br>
+<div align="center">
+   <a href="https://github.com/EclipseMenu/EclipseMenu">
+      <img src="logo.png" alt="Logo" width="80" height="80">
+   </a>
+   <h3 align="center">Eclipse</h3>
+   <p align="center">
+      A new improved utility interface for Geometry Dash, which adds features such as Noclip, Show Trajectory, and a macro recorder.
+   </p>
+</div>
