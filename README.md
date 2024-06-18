@@ -7,7 +7,7 @@
     <a href="LICENSE">
       <img src="https://img.shields.io/github/license/EclipseMenu/EclipseMenu" alt="License">
     </a>
-    <a href="https://github.com/EclipseMenu/issues">
+    <a href="https://github.com/EclipseMenu/EclipseMenu/issues">
       <img src="https://img.shields.io/github/issues/EclipseMenu/EclipseMenu" alt="Issues">
     </a>
     <a href="">
