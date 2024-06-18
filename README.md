@@ -24,6 +24,6 @@
    </a>
    <h3 align="center">Eclipse</h3>
    <p align="center">
-      A new improved utility interface for Geometry Dash, which adds features such as Noclip, Show Trajectory, and a macro recorder.
+      A new and improved utility interface for Geometry Dash, which adds features such as Noclip, Show Trajectory, and a macro recorder.
    </p>
 </div>
