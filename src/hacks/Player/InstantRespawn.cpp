@@ -9,7 +9,7 @@ namespace eclipse::hacks::Player {
     class InstantRespawn : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
-            tab->addToggle("Instant Respawn", "player.instantrespawn");
+            tab->addToggle("Instant Respawn", "player.instantrespawn")->setDescription("Makes the player respawn instantly after death");
         }
 
         void update() override {}
