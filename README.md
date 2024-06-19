@@ -13,9 +13,6 @@
     <a href="">
       <img src="https://img.shields.io/discord/0?label=discord&logo=discord" alt="Discord">
     </a>
-    <a href="https://www.buymeacoffee.com">
-      <img src="https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?logo=buy-me-a-coffee" alt="Buy Me A Coffee">
-    </a>
 </div>
 <br>
 <div align="center">
