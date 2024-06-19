@@ -31,11 +31,6 @@
 			"id": "ninxout.crystal_client",
 			"version": "*",
 			"importance": "superseded"
-		},
-		{
-			"id": "firee.prism",
-			"version": "*",
-			"importance": "superseded"
 		}
 	]
 }
