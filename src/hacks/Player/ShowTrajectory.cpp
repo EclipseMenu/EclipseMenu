@@ -82,8 +82,8 @@ namespace eclipse::hacks::Player {
 
             cocos2d::CCRect rect1 = player->getObjectRect();
             cocos2d::CCRect rect2 = player->getObjectRect(0.25f, 0.25f);
-            drawRectangleHitbox(rect1, cocos2d::ccColor4B(255, 0, 0, 0), cocos2d::ccColor4B(255, 0, 0, 255));
-            drawRectangleHitbox(rect2, cocos2d::ccColor4B(0, 255, 0, 0), cocos2d::ccColor4B(0, 255, 0, 255));
+            drawRectangleHitbox(rect1, { 255, 0, 0, 0 }, { 255, 0, 0, 255 });
+            drawRectangleHitbox(rect2, { 0, 255, 0, 0 }, { 0, 255, 0, 255 });
         }
 
         void resetCollisionLog(PlayerObject* self) {
@@ -119,8 +119,11 @@ namespace eclipse::hacks::Player {
                 //player->updateSpecial(m_frameDt);
                 player->updateRotation(m_frameDt);
 
-                getDrawNode()->drawSegment(initialPlayerPosition, player->getPosition(), 0.65f,
-                    down ? cocos2d::ccColor4F(0.f, 1.f, 0.1f, 1.f) : cocos2d::ccColor4F(1.f, 0.f, 0.1f, 1.f));
+                getDrawNode()->drawSegment(
+                    initialPlayerPosition,
+                    player->getPosition(), 0.65f,
+                    down ? cocos2d::ccColor4F{ 0.f, 1.f, 0.1f, 1.f } : cocos2d::ccColor4F{ 1.f, 0.f, 0.1f, 1.f }
+                );
             }
             
             drawForPlayer(player);
