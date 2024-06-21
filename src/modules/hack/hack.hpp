@@ -30,6 +30,9 @@ namespace eclipse::hack {
         /// @brief Get all registered hacks.
         [[nodiscard]] static const std::vector<Hack*>& getHacks();
 
+        /// @brief Initializes all hacks.
+        static void initializeHacks();
+
         /// @brief Initializes the hack. Used to add GUI elements.
         virtual void init() = 0;
 

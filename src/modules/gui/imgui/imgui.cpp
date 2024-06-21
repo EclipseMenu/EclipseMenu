@@ -129,6 +129,30 @@ namespace eclipse::gui::imgui {
     }
 
     void ImGuiEngine::draw() {
+        // Setup windows on first draw
+        static int frame = 0;
+        switch (frame) {
+            case 0:
+                // Render windows once, to get the correct size
+                ImGui::GetStyle().Alpha = 0.f;
+                for (auto& window : m_windows) {
+                    window.draw();
+                }
+                frame = 1;
+                break;
+            case 1:
+                // Move windows outside the screen to prepare for animation
+                for (auto& window : m_windows) {
+                    window.draw();
+                    window.setDrawPosition(randomWindowPosition(window));
+                }
+                ImGui::GetStyle().Alpha = 1.f;
+                frame = 2;
+                break;
+            default:
+                break;
+        }
+
         // Run move actions
         auto deltaTime = ImGui::GetIO().DeltaTime;
         for (auto &action: m_actions) {
