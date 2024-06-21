@@ -10,6 +10,7 @@ namespace eclipse::gui::imgui {
         void init() override;
         void toggle() override;
         MenuTab* findTab(const std::string& name) override;
+        bool isToggled() override;
 
     private:
         /// @brief ImGui draw function.

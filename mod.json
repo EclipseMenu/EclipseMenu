@@ -1,5 +1,5 @@
 {
-	"geode": "3.0.0-beta.1",
+	"geode": "3.0.0-beta.4",
 	"gd": {
 		"win": "2.206",
 		"mac": "2.206",
@@ -32,5 +32,10 @@
 			"version": "*",
 			"importance": "superseded"
 		}
-	]
+	],
+    "resources": {
+        "files": [
+            "resources/*.glsl"
+        ]
+    }
 }

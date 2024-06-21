@@ -63,6 +63,10 @@ namespace eclipse::gui::imgui {
             PlatformToolbox::hideCursor();
     }
 
+    bool ImGuiEngine::isToggled() {
+        return m_isOpened;
+    }
+
     void ImGuiEngine::toggle() {
         m_isOpened = !m_isOpened;
 
