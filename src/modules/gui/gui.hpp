@@ -112,7 +112,7 @@ namespace eclipse::gui {
     class SliderComponent : public Component {
     public:
         explicit SliderComponent(std::string title, std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f")
-            : m_title(std::move(title)), m_value(std::move(id)), m_min(min), m_max(max), m_format(std::move(format)) {}
+            : m_title(std::move(title)), m_id(std::move(id)), m_min(min), m_max(max), m_format(std::move(format)) {}
 
         void onInit() override {}
         void onUpdate() override {}
@@ -135,7 +135,6 @@ namespace eclipse::gui {
         std::string m_id;
         std::string m_title;
         std::string m_format;
-        std::string m_value;
         float m_min;
         float m_max;
         std::function<void(float)> m_callback;
