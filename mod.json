@@ -28,5 +28,10 @@
 			"version": "*",
 			"importance": "superseded"
 		}
-	]
+	],
+    "resources": {
+        "files": [
+            "resources/*.glsl"
+        ]
+    }
 }
