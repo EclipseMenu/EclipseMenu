@@ -20,6 +20,10 @@ namespace eclipse::hacks::Cosmetic {
     REGISTER_HACK(DisableShaders)
 
     class $modify(ShaderLayer) {
+        static void onModify(auto& self) {
+            SAFE_PRIORITY("ShaderLayer::performCalculations");
+        }
+        
         void performCalculations() {
             if (!config::get<bool>("cosmetic.disableshaders", false)) return ShaderLayer::performCalculations();
         }
