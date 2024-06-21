@@ -49,4 +49,7 @@ class $modify(cocos2d::CCScheduler) {
 $on_mod(Loaded) {
     // Load the configuration file.
     config::load();
+
+    // Initialize the hacks.
+    hack::Hack::initializeHacks();
 }

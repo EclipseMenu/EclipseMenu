@@ -5,6 +5,7 @@
 namespace eclipse::hack {
 
     static std::vector<Hack*> hacks;
+    static bool s_lateInit = false;
 
     const std::vector<Hack*>& Hack::getHacks() {
         return hacks;
@@ -12,7 +13,9 @@ namespace eclipse::hack {
 
     void Hack::registerHack(Hack* hack) {
         hacks.push_back(hack);
-        hack->init();
+        if (s_lateInit) {
+            hack->init();
+        }
     }
 
     Hack* Hack::find(const std::string& id) {
@@ -22,6 +25,13 @@ namespace eclipse::hack {
             }
         }
         return nullptr;
+    }
+
+    void Hack::initializeHacks() {
+        for (Hack* hack : hacks) {
+            hack->init();
+        }
+        s_lateInit = true;
     }
 
 }
