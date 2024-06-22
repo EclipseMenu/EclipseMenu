@@ -1,5 +1,5 @@
 {
-	"geode": "3.0.0-beta.5",
+	"geode": "3.0.0",
 	"gd": {
 		"win": "2.206",
 		"mac": "2.206",
@@ -9,7 +9,7 @@
 	"version": "v1.0.0",
 	"id": "eclipse.menu",
 	"name": "Eclipse",
-	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee"],
+	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev"],
 	"description": "Ultimate mod menu for Geometry Dash",
 	"early-load": true,
 	"incompatibilities": [
