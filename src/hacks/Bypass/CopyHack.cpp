@@ -9,7 +9,7 @@ namespace eclipse::hacks::Bypass {
     class CopyBypass : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
-            tab->addToggle("Copy Bypass", "bypass.copybypass");
+            tab->addToggle("Copy Bypass", "bypass.copybypass")->setDescription("Allows for unrestricted copying of any level");
         }
 
         void update() override {}
