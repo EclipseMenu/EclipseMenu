@@ -19,14 +19,9 @@ namespace eclipse::hacks::Bypass {
     REGISTER_HACK(VerifyHack)
 
     class $modify(EditLevelLayer) {
-        // Verify Hack, No (C) Mark
-        void onShare(CCObject* sender) {
-        if (!config::get<bool>("creator.verifyhack", false) && !config::get<bool>("creator.nocopymark", false)) return EditLevelLayer::onShare(sender);
-        if (config::get<bool>("creator.verifyhack", false)) {
-            this->m_level->m_isVerified = true;
-        }
-            EditLevelLayer::onShare(sender);
+        bool init(GJGameLevel* gl) {
+            if (config::get<bool>("bypass.verifyhack", false)) gl->m_isVerified = true;
+            return EditLevelLayer::init(gl);
         }
     };
-
 };
