@@ -34,4 +34,10 @@ namespace eclipse::hack {
         s_lateInit = true;
     }
 
+    void Hack::lateInitializeHacks() {
+        for (Hack* hack : hacks) {
+            hack->lateInit();
+        }
+    }
+
 }

@@ -13,6 +13,7 @@ namespace eclipse::hacks::Player {
         }
 
         void update() override {}
+        void lateInit() override {}
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.noclip", false); }
         [[nodiscard]] const char* getId() const override { return "Noclip"; }
     };

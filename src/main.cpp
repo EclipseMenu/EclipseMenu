@@ -28,6 +28,8 @@ class $modify(MenuLayer) {
         key.setKey(keybinds::Keys::Tab);
         key.setInitialized(true);
 
+        hack::Hack::lateInitializeHacks();
+
         // TODO: Load saved keybind states
 
         s_isInitialized = true;

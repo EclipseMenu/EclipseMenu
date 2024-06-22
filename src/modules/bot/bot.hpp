@@ -43,6 +43,14 @@ namespace eclipse::bot {
         /// @return The next input from the currently loaded replay, if available.
         [[nodiscard]] std::optional<gdr::Input> poll(int frame);
 
+        /// @brief Saves the current replay.
+        /// @param path Path to save the replay to.
+        void save(std::filesystem::path path);
+
+        /// @brief Loads a replay from the given path.
+        /// @param path Path to load the replay from.
+        bool load(std::filesystem::path path);
+
     protected:
         State m_state = State::DISABLED;
         BotReplay m_replay;

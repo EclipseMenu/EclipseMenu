@@ -33,8 +33,14 @@ namespace eclipse::hack {
         /// @brief Initializes all hacks.
         static void initializeHacks();
 
+        /// @brief Late initializes all hacks.
+        static void lateInitializeHacks();
+
         /// @brief Initializes the hack. Used to add GUI elements.
         virtual void init() = 0;
+
+        /// @brief Late initialization. Used to run logic after the game has loaded.
+        virtual void lateInit() = 0;
 
         /// @brief Callback for CCSchedule::update, called every frame.
         virtual void update() = 0;

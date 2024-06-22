@@ -17,6 +17,7 @@ namespace eclipse::Hacks::Bot {
         }
 
         void update() override {}
+        void lateInit() override {}
         [[nodiscard]] bool isCheating() override { return false; }
         [[nodiscard]] const char* getId() const override { return "Practice Fix"; }
     };
