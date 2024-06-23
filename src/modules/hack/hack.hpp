@@ -3,7 +3,7 @@
 
 #define REGISTER_HACK(hackClass) $execute { eclipse::hack::Hack::registerHack<hackClass>(); }
 
-constexpr int32_t SAFE_HOOK_PRIORITY = -0x100000;
+constexpr int32_t SAFE_HOOK_PRIORITY = 0x500000;
 
 #define SAFE_PRIORITY(name) do {                            \
     if (!self.setHookPriority(name, SAFE_HOOK_PRIORITY)) {  \

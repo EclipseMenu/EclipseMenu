@@ -37,7 +37,7 @@ namespace eclipse::hacks::Level {
             }
 
             currentStartPosIndex = index;
-            playLayer->m_unkCheckpointObject = nullptr;
+            playLayer->m_currentCheckpoint = nullptr;
 
             auto* startPos = index >= 0 ? startPosObjects[index] : nullptr;
             playLayer->setStartPosObject(startPos);
