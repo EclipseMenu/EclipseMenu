@@ -12,8 +12,6 @@ namespace eclipse::hacks::Bypass {
             tab->addToggle("Level Copy Bypass", "bypass.copybypass");
         }
 
-        void update() override {}
-        void lateInit() override {}
         [[nodiscard]] const char* getId() const override { return "Level Copy Bypass"; }
     };
 

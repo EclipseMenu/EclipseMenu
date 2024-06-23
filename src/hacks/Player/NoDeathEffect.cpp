@@ -12,8 +12,6 @@ namespace eclipse::hacks::Player {
             tab->addToggle("No Death Effect", "player.nodeatheffect");
         }
 
-        void update() override {}
-        void lateInit() override {}
         [[nodiscard]] const char* getId() const override { return "No Death Effect"; }
     };
 

@@ -12,8 +12,6 @@ namespace eclipse::hacks::Player {
             tab->addToggle("Instant Respawn", "player.instantrespawn");
         }
 
-        void update() override {}
-        void lateInit() override {}
         [[nodiscard]] const char* getId() const override { return "Instant Respawn"; }
     };
 

@@ -12,7 +12,6 @@ namespace eclipse::hacks::Player {
             tab->addToggle("No Short Numbers", "global.noshortnumbers");
         }
 
-        void update() override {}
         [[nodiscard]] const char* getId() const override { return "No Short Numbers"; }
     };
 

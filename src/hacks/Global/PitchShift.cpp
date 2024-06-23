@@ -50,7 +50,6 @@ namespace eclipse::hacks::Global {
                 setPitch(config::get<float>("global.pitchshift"));
         }
 
-        void update() override {}
         [[nodiscard]] const char* getId() const override { return "Pitch Shift"; }
     };
 

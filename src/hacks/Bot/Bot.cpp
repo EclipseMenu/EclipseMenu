@@ -45,8 +45,6 @@ namespace eclipse::hacks::Bot {
             tab->addButton("Load")->callback(loadReplay);
         }
 
-        void update() override {}
-        void lateInit() override {}
         [[nodiscard]] bool isCheating() override { return false; }
         [[nodiscard]] const char* getId() const override { return "Bot"; }
     };

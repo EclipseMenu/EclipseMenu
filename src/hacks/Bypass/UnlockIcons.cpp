@@ -12,8 +12,6 @@ namespace eclipse::hacks::Bypass {
             tab->addToggle("Unlock Icons", "bypass.unlockicons");
         }
 
-        void update() override {}
-        void lateInit() override {}
         [[nodiscard]] const char* getId() const override { return "Unlock Icons"; }
     };
 

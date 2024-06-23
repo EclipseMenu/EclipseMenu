@@ -12,8 +12,6 @@ namespace eclipse::hacks::Bypass {
             tab->addToggle("Verify Bypass", "bypass.verifyhack");
         }
 
-        void update() override {}
-        void lateInit() override {}
         [[nodiscard]] const char* getId() const override { return "Verify Bypass"; }
     };
 

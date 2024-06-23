@@ -18,8 +18,6 @@ namespace eclipse::hacks::Player {
             tab->addToggle("Show Trajectory", "player.showtrajectory");
         }
 
-        void update() override {}
-        void lateInit() override {}
         [[nodiscard]] const char* getId() const override { return "Show Trajectory"; }
     };
 

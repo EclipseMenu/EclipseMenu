@@ -64,7 +64,6 @@ namespace eclipse::hacks::Level {
                 pickStartPos(playLayer, currentStartPosIndex + 1);
             }
         }
-        void lateInit() override {}
 
         [[nodiscard]] const char* getId() const override { return "StartPos Switcher"; }
     };

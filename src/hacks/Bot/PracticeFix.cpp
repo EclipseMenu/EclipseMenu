@@ -16,8 +16,6 @@ namespace eclipse::Hacks::Bot {
             tab->addToggle("Practice Fix", "bot.practicefix");
         }
 
-        void update() override {}
-        void lateInit() override {}
         [[nodiscard]] bool isCheating() override { return false; }
         [[nodiscard]] const char* getId() const override { return "Practice Fix"; }
     };

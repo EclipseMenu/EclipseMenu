@@ -12,8 +12,6 @@ namespace eclipse::hacks::Player {
             tab->addToggle("Noclip", "player.noclip")->setDescription("Disables player death");
         }
 
-        void update() override {}
-        void lateInit() override {}
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.noclip", false); }
         [[nodiscard]] const char* getId() const override { return "Noclip"; }
     };

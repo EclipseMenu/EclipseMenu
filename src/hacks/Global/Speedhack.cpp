@@ -16,8 +16,6 @@ namespace eclipse::hacks::Global {
             tab->addFloatToggle("Speedhack", "global.speedhack", 0.0001f, 1000.f, "%.4f");
         }
 
-        void update() override {}
-        void lateInit() override {}
         [[nodiscard]] const char* getId() const override { return "Speedhack"; }
     };
 

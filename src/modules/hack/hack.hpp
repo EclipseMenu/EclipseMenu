@@ -40,10 +40,10 @@ namespace eclipse::hack {
         virtual void init() = 0;
 
         /// @brief Late initialization. Used to run logic after the game has loaded.
-        virtual void lateInit() = 0;
+        virtual void lateInit() {}
 
         /// @brief Callback for CCSchedule::update, called every frame.
-        virtual void update() = 0;
+        virtual void update() {}
 
         /// @brief Returns whether the hack should be considered cheating and is enabled.
         [[nodiscard]] virtual bool isCheating() { return false; }
