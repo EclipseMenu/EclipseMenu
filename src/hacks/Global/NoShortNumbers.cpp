@@ -4,7 +4,7 @@
 
 #include <Geode/modify/GameToolbox.hpp>
 
-namespace eclipse::hacks::Player {
+namespace eclipse::hacks::Global {
 
     class NoShortNumbers : public hack::Hack {
         void init() override {
