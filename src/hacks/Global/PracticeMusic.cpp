@@ -18,15 +18,18 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(PracticeMusic)
 
     class $modify(GameStatsManager) {
-        bool isItemUnlocked(UnlockType p0, int p1) {
-            if (p0 != UnlockType::GJItem || p1 != 17) return GameStatsManager::isItemUnlocked(p0, p1);
+        static void onModify(auto& self) {
+            SAFE_PRIORITY("GameStatsManager::isItemUnlocked");
+        }
 
-            if (!config::get<bool>("global.practicemusic", false)) {
-                return GameStatsManager::isItemUnlocked(p0, p1);
-            }
+        bool isItemUnlocked(UnlockType type, int key) {
+            if (GameStatsManager::isItemUnlocked(type, key))
+                return true;
 
-            GameStatsManager::isItemUnlocked(p0, p1);
-            return true;
+            if (config::get<bool>("global.practicemusic", false))
+                return type == UnlockType::GJItem && key == 17;
+            
+            return false;
         }
     };
 }
