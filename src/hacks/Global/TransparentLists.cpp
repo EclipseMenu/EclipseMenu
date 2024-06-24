@@ -4,11 +4,11 @@
 
 #include <Geode/modify/CCLayerColor.hpp>
 
-namespace eclipse::hacks::Universal {
+namespace eclipse::hacks::Global {
     class TransparentLists : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Universal");
-            tab->addToggle("Transparent Lists", "universal.transparentlists")->setDescription("Makes list backgrounds transparent");
+            tab->addToggle("Transparent Lists", "global.transparentlists")->setDescription("Makes list backgrounds transparent");
         }
 
         void update() override {}
@@ -19,7 +19,7 @@ namespace eclipse::hacks::Universal {
     using namespace geode::prelude;
     class $modify(CCLayerColor) {
 	bool initWithColor(cocos2d::_ccColor4B const& yk, float f1, float f2) {
-		if (config::get<bool>("universal.transparentlists", false)) {
+		if (config::get<bool>("global.transparentlists", false)) {
 			return CCLayerColor::initWithColor(ccc4(0, 0, 0, 0), 0, 0);
 		} else {
 			return CCLayerColor::initWithColor(yk, f1, f2);
