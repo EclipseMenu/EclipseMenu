@@ -40,4 +40,35 @@ namespace eclipse::bot {
         return std::nullopt;
     }
 
+    void Bot::save(std::filesystem::path path) {
+        m_replay.author = GJAccountManager::sharedState()->m_username;
+        m_replay.duration = m_replay.inputs[m_replay.inputs.size() - 1].frame / m_replay.framerate;
+
+        geode::ByteVector data = m_replay.exportData();
+        std::ofstream file(path, std::ios::binary);
+        file.write((const char*)data.data(), data.size());
+        file.close();
+    }
+
+    bool Bot::load(std::filesystem::path path) {
+        std::ifstream f(path, std::ios::binary);
+
+        if (!f) {
+            f.close();
+            return false;
+        }
+
+        f.seekg(0, std::ios::end);
+        size_t fileSize = f.tellg();
+        f.seekg(0, std::ios::beg);
+
+        geode::ByteVector data(fileSize);
+        f.read(reinterpret_cast<char *>(data.data()), fileSize);
+        f.close();
+
+        m_replay = BotReplay::importData(data);
+
+        return true;
+    }
+
 }

@@ -12,7 +12,6 @@ namespace eclipse::hacks::Player {
             tab->addToggle("Instant Respawn", "player.instantrespawn")->setDescription("Makes the player respawn instantly after death");
         }
 
-        void update() override {}
         [[nodiscard]] const char* getId() const override { return "Instant Respawn"; }
     };
 

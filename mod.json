@@ -9,10 +9,10 @@
 	"version": "v1.0.0",
 	"id": "eclipse.menu",
 	"name": "Eclipse",
-   	"links": {
+   "links": {
 		"source": "https://github.com/EclipseMenu/EclipseMenu"
 	},
-    	"tags": ["cheats", "gameplay", "utility", "customization", "interface"],
+   "tags": ["cheats", "gameplay", "utility", "customization", "interface"],
 	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev"],
 	"description": "Ultimate mod menu for Geometry Dash",
 	"early-load": true,

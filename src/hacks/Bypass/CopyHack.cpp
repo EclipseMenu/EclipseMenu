@@ -12,7 +12,6 @@ namespace eclipse::hacks::Bypass {
             tab->addToggle("Copy Bypass", "bypass.copybypass")->setDescription("Shows the copy password for copyable levels");
         }
 
-        void update() override {}
         [[nodiscard]] const char* getId() const override { return "Level Copy Bypass"; }
     };
 

@@ -16,7 +16,6 @@ namespace eclipse::Hacks::Bot {
             tab->addToggle("Practice Fix", "bot.practicefix")->setDescription("Properly saves the player\'s velocity when respawning from a checkpoint.");
         }
 
-        void update() override {}
         [[nodiscard]] bool isCheating() override { return false; }
         [[nodiscard]] const char* getId() const override { return "Practice Fix"; }
     };
