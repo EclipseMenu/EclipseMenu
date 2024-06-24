@@ -25,6 +25,7 @@ namespace eclipse::hacks::Global {
                 return GameStatsManager::isItemUnlocked(p0, p1);
             }
 
+            GameStatsManager::isItemUnlocked(p0, p1);
             return true;
         }
     };
