@@ -8,7 +8,7 @@ namespace eclipse::hacks::Cosmetic {
 
     class PracticeMusic : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Global");
+            auto tab = gui::MenuTab::find("Cosmetic");
             tab->addToggle("Practice Music Sync", "cosmetic.practicemusic");
         }
 
