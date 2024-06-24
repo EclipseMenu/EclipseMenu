@@ -24,15 +24,17 @@ namespace eclipse::hacks::Bypass {
         }
 
         bool isColorUnlocked(int key, UnlockType type) {
-            if (config::get<bool>("bypass.unlockicons", false))
+            if (GameManager::isColorUnlocked(key, type))
                 return true;
-            return GameManager::isColorUnlocked(key, type);
+
+            return config::get<bool>("bypass.unlockicons", false);
         }
 
         bool isIconUnlocked(int key, IconType type) {
-            if (config::get<bool>("bypass.unlockicons", false))
+            if (GameManager::isIconUnlocked(key, type))
                 return true;
-            return GameManager::isIconUnlocked(key, type);
+
+            return config::get<bool>("bypass.unlockicons", false);
         }
     };
 

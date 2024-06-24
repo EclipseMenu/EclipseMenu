@@ -8,6 +8,8 @@ namespace eclipse::hacks::Global {
 
     void setPitch(float pitch) {
         static FMOD::DSP* pitchShifter = nullptr;
+        
+        pitch = config::get<bool>("global.pitchshift.toggle", false) ? pitch : 1.f;
 
         FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
         FMOD::ChannelGroup* group;
