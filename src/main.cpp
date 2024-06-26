@@ -3,7 +3,7 @@
 #include <Geode/modify/CCScheduler.hpp>
 
 #include <modules/config/config.hpp>
-#include <modules/gui/imgui/imgui.hpp>
+#include <modules/gui/themes/megahack/megahack.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
 

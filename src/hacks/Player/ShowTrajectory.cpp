@@ -116,7 +116,7 @@ namespace eclipse::hacks::Player {
 
                 player->update(m_frameDt);
                 //player->updateSpecial(m_frameDt);
-                player->updateRotation(m_frameDt);
+                //player->updateRotation(m_frameDt);
 
                 getDrawNode()->drawSegment(
                     initialPlayerPosition,

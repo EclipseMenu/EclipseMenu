@@ -1,4 +1,4 @@
-#include "imgui.hpp"
+#include "crystal.hpp"
 
 #include <Geode/Geode.hpp>
 #include <imgui-cocos.hpp>
@@ -7,39 +7,8 @@
 #include <utils.hpp>
 #include <modules/config/config.hpp>
 
-#include "animation/easing.hpp"
-#include "window.hpp"
-
-namespace eclipse::gui::imgui {
-
-    /// @brief Calculate a random window position outside the screen.
-    ImVec2 randomWindowPosition(Window &window) {
-        // Calculate target position randomly to be outside the screen
-        auto screenSize = ImGui::GetIO().DisplaySize;
-        auto windowSize = window.getSize();
-        ImVec2 target;
-
-        // Pick a random side of the screen
-        auto side = utils::random(3);
-        switch (side) {
-            case 0:
-                target = ImVec2(utils::random(screenSize.x - windowSize.x), -windowSize.y);
-                break;
-            case 1:
-                target = ImVec2(utils::random(screenSize.x - windowSize.x), screenSize.y);
-                break;
-            case 2:
-                target = ImVec2(-windowSize.x, utils::random(screenSize.y - windowSize.y));
-                break;
-            default:
-                target = ImVec2(screenSize.x, utils::random(screenSize.y - windowSize.y));
-                break;
-        }
-
-        return target;
-    }
-
-    void ImGuiEngine::init() {
+/*namespace eclipse::gui::imgui {
+    void CrystalEngine::init() {
         if (m_initialized) return;
         ImGuiCocos::get()
             .setup([]() {
@@ -64,25 +33,15 @@ namespace eclipse::gui::imgui {
             PlatformToolbox::hideCursor();
     }
 
-    bool ImGuiEngine::isToggled() {
+    bool CrystalEngine::isToggled() {
         return m_isOpened;
     }
 
-    void ImGuiEngine::toggle() {
+    void CrystalEngine::toggle() {
         m_isOpened = !m_isOpened;
 
         if (!m_isOpened) {
             // TODO: save window positions
-        }
-
-        double duration = config::get("menu.animationDuration", 0.3);
-        auto easingType = config::get("menu.animationEasingType", animation::Easing::Quadratic);
-        auto easingMode = config::get("menu.animationEasingMode", animation::EasingMode::EaseInOut);
-        auto easing = animation::getEasingFunction(easingType, easingMode);
-
-        for (auto& window : m_windows) {
-            auto target = m_isOpened ? window.getPosition() : randomWindowPosition(window);
-            m_actions.push_back(window.animateTo(target, duration, easing));
         }
 
         updateCursorState(m_isOpened);
@@ -90,12 +49,12 @@ namespace eclipse::gui::imgui {
         m_isAnimating = true;
     }
 
-    bool ImGuiEngine::shouldRender() {
+    bool CrystalEngine::shouldRender() {
         // If the GUI is not opened and there are no actions, do not render
-        return m_isOpened || !m_actions.empty();
+        return m_isOpened;
     }
 
-    void ImGuiEngine::visit(Component* component) {
+    void CrystalEngine::visit(Component* component) {
         // TODO: Move this to a separate file for easier theme customization.
         if (auto* label = dynamic_cast<LabelComponent*>(component)) {
             ImGui::TextWrapped("%s", label->getTitle().c_str());
@@ -175,48 +134,7 @@ namespace eclipse::gui::imgui {
         }
     }
 
-    void ImGuiEngine::draw() {
-        // Setup windows on first draw
-        static int frame = 0;
-        switch (frame) {
-            case 0:
-                // Render windows once, to get the correct size
-                ImGui::GetStyle().Alpha = 0.f;
-                for (auto& window : m_windows) {
-                    window.draw();
-                }
-                frame = 1;
-                break;
-            case 1:
-                // Move windows outside the screen to prepare for animation
-                for (auto& window : m_windows) {
-                    window.draw();
-                    window.setDrawPosition(randomWindowPosition(window));
-                }
-                ImGui::GetStyle().Alpha = 1.f;
-                frame = 2;
-                break;
-            default:
-                break;
-        }
-
-        // Run move actions
-        auto deltaTime = ImGui::GetIO().DeltaTime;
-        for (auto &action: m_actions) {
-            action->update(deltaTime);
-        }
-
-        // Remove finished actions
-        m_actions.erase(std::remove_if(m_actions.begin(), m_actions.end(), [](auto action) {
-            if (action->isFinished()) {
-                delete action;
-                return true;
-            }
-            return false;
-        }), m_actions.end());
-
-        if (!shouldRender()) return;
-
+    void CrystalEngine::draw() {
         updateCursorState(m_isOpened);
 
         // Render windows
@@ -225,7 +143,7 @@ namespace eclipse::gui::imgui {
         }
     }
 
-    MenuTab* ImGuiEngine::findTab(const std::string& name) {
+    MenuTab* CrystalEngine::findTab(const std::string& name) {
         for (const auto& tab : m_tabs) {
             if (tab->getTitle() == name) {
                 return tab;
@@ -246,4 +164,4 @@ namespace eclipse::gui::imgui {
         return tab;
     }
 
-}
+}*/

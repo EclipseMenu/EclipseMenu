@@ -5,8 +5,8 @@
 #include <functional>
 #include <utility>
 #include <imgui.h>
-#include "animation/easing.hpp"
-#include "animation/move-action.hpp"
+#include "../animation/easing.hpp"
+#include "../animation/move-action.hpp"
 
 namespace eclipse::gui::imgui {
 
