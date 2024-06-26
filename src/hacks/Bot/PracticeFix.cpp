@@ -118,8 +118,8 @@ namespace eclipse::Hacks::Bot {
             m_unk97b = player->m_unk97b;
 
 #ifndef GEODE_IS_ANDROID
-            //m_unk6a4 = player->m_unk6a4;
-            //m_unk828 = player->m_unk828;
+            m_unk6a4 = player->m_unk6a4;
+            m_unk828 = player->m_unk828;
 #else
             // gd::set, gd::unordered_set and gd::unordered_map are just type aliases of arrays of void* on android
             // until that is fixed, this is a workaround
@@ -127,9 +127,9 @@ namespace eclipse::Hacks::Bot {
             std::copy(std::begin(player->m_unk6a4), std::end(player->m_unk6a4), std::begin(m_unk6a4));
             std::copy(std::begin(player->m_unk828), std::end(player->m_unk828), std::begin(m_unk828));
 #endif
-            //m_unk880 = player->m_unk880;
-            //m_unk910 = player->m_unk910;
-            //m_unk924 = player->m_unk924;
+            m_unk880 = player->m_unk880;
+            m_unk910 = player->m_unk910;
+            m_unk924 = player->m_unk924;
 
             m_xVelocity = player->m_platformerXVelocity;
             m_yVelocity = player->m_yVelocity;
@@ -140,6 +140,7 @@ namespace eclipse::Hacks::Bot {
             m_wasOnSlope = player->m_wasOnSlope;
             m_isOnSlope = player->m_isOnSlope;
             m_lastSnappedTo = player->m_objectSnappedTo;
+            m_blackOrbRelated = player->m_blackOrbRelated;
         }
 
         void apply(PlayerObject* player) {
@@ -233,15 +234,15 @@ namespace eclipse::Hacks::Bot {
             player->m_unk97b = m_unk97b;
 
 #ifndef GEODE_IS_ANDROID
-            //player->m_unk6a4 = m_unk6a4;
-            //player->m_unk828 = m_unk828;
+            player->m_unk6a4 = m_unk6a4;
+            player->m_unk828 = m_unk828;
 #else
             std::copy(std::begin(m_unk6a4), std::end(m_unk6a4), std::begin(player->m_unk6a4));
             std::copy(std::begin(m_unk828), std::end(m_unk828), std::begin(player->m_unk828));
 #endif
-            //player->m_unk880 = m_unk880;
-            //player->m_unk910 = m_unk910;
-            //player->m_unk924 = m_unk924;
+            player->m_unk880 = m_unk880;
+            player->m_unk910 = m_unk910;
+            player->m_unk924 = m_unk924;
 
             player->m_platformerXVelocity = m_xVelocity;
             player->m_yVelocity = m_yVelocity;
@@ -254,6 +255,7 @@ namespace eclipse::Hacks::Bot {
             player->m_wasOnSlope = m_wasOnSlope;
             player->m_isOnSlope = m_isOnSlope;
             player->m_objectSnappedTo = m_lastSnappedTo;
+            player->m_blackOrbRelated = m_blackOrbRelated;
         }
 
     private:
@@ -357,6 +359,7 @@ namespace eclipse::Hacks::Bot {
         float m_xPosition;
         float m_yPosition;
         float m_rotation;
+        float m_blackOrbRelated;
 
         GameObject* m_lastSnappedTo = nullptr;
         GameObject* m_lastSnappedTo2 = nullptr;
@@ -371,7 +374,8 @@ namespace eclipse::Hacks::Bot {
 
         CheckpointData(PlayerObject* player1, PlayerObject* player2) {
             m_checkpointPlayer1 = FixPlayerCheckpoint(player1);
-            m_checkpointPlayer2 = FixPlayerCheckpoint(player2);
+            if(player2)
+                m_checkpointPlayer2 = FixPlayerCheckpoint(player2);
         }
 
         void apply(PlayerObject* player1, PlayerObject* player2) {
@@ -439,7 +443,7 @@ namespace eclipse::Hacks::Bot {
             FixPlayLayer* playLayer = ((FixPlayLayer*)FixPlayLayer::get());
 
             if(playLayer->m_gameState.m_currentProgress > 0) {
-                CheckpointData data(playLayer->m_player1, playLayer->m_player2);
+                CheckpointData data(playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr);
                 playLayer->m_fields->m_checkpoints[this] = data;
             }
 
