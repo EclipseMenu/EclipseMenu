@@ -31,7 +31,8 @@
 	],
     "resources": {
         "files": [
-            "resources/*.glsl"
+            "resources/*.glsl",
+			"resources/Rubik-Regular.ttf"
         ]
     }
 }

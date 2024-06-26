@@ -230,6 +230,9 @@ namespace eclipse::gui::imgui {
         colors[ImGuiCol_Header] = config::get<Color>("menu.color.primary", Color(0.11f, 0.11f, 0.11f, 1.0f));
         colors[ImGuiCol_HeaderHovered] = config::get<Color>("menu.color.hovered", Color(0.3f, 0.76f, 0.6f, 1.0f));
         colors[ImGuiCol_HeaderActive] = config::get<Color>("menu.color.clicked", Color(0.22f, 0.55f, 0.44f, 1.0f));
+
+        ImFont* fnt = ImGui::GetIO().Fonts->AddFontFromFileTTF(geode::prelude::string::wideToUtf8((geode::Mod::get()->getResourcesDir() / "Rubik-Regular.ttf").wstring()).c_str(), 15.0f);
+        ImGui::GetIO().FontDefault = fnt;
     }
 
     void MegahackEngine::draw() {
