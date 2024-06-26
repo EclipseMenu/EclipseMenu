@@ -124,7 +124,7 @@ namespace eclipse::gui::imgui {
             }
             ImGui::PopItemWidth();
         } else if (auto* inputfloat = dynamic_cast<InputFloatComponent*>(component)) {
-            auto value = config::get<float>(slider->getId(), 0.0f);
+            auto value = config::get<float>(inputfloat->getId(), 0.0f);
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.3f);
             if (ImGui::InputFloat(inputfloat->getTitle().c_str(), &value, 0, 0, inputfloat->getFormat().c_str())) {
 

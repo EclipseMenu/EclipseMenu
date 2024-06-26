@@ -4,6 +4,7 @@
 
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/CheckpointObject.hpp>
 
 using namespace geode::prelude;
@@ -415,6 +416,17 @@ namespace eclipse::Hacks::Bot {
             PlayLayer::loadFromCheckpoint(checkpoint);
         }
 
+    };
+
+    class $modify(LevelEditorLayer) {
+        bool init(GJGameLevel* level, bool unk) {
+            bool result = LevelEditorLayer::init(level, unk);
+            FixPlayLayer* playLayer = ((FixPlayLayer*)FixPlayLayer::get());
+            if(playLayer)
+                playLayer->m_fields->m_checkpoints.clear();
+            
+            return result;
+        }
     };
 
     class $modify(CheckpointObject) {
