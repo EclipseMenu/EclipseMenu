@@ -380,7 +380,8 @@ namespace eclipse::Hacks::Bot {
 
         void apply(PlayerObject* player1, PlayerObject* player2) {
             m_checkpointPlayer1.apply(player1);
-            m_checkpointPlayer2.apply(player2);
+            if(player2)
+                m_checkpointPlayer2.apply(player2);
         }
 
     private:
@@ -412,7 +413,7 @@ namespace eclipse::Hacks::Bot {
                 PlayLayer::loadFromCheckpoint(checkpoint);
 
                 CheckpointData data = playLayer->m_fields->m_checkpoints[checkpoint];
-                data.apply(playLayer->m_player1, playLayer->m_player2);
+                data.apply(playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr);
 
                 return;
             }
