@@ -141,6 +141,10 @@ namespace eclipse::Hacks::Bot {
             m_isOnSlope = player->m_isOnSlope;
             m_lastSnappedTo = player->m_objectSnappedTo;
             m_blackOrbRelated = player->m_blackOrbRelated;
+            m_affectedByForces = player->m_affectedByForces;
+            m_holdingRight = player->m_holdingRight;
+            m_holdingLeft = player->m_holdingLeft;
+            m_platformerVelocityRelated = player->m_platformerVelocityRelated;
         }
 
         void apply(PlayerObject* player) {
@@ -256,6 +260,10 @@ namespace eclipse::Hacks::Bot {
             player->m_isOnSlope = m_isOnSlope;
             player->m_objectSnappedTo = m_lastSnappedTo;
             player->m_blackOrbRelated = m_blackOrbRelated;
+            player->m_affectedByForces = m_affectedByForces;
+            player->m_holdingRight = m_holdingRight;
+            player->m_holdingLeft = m_holdingLeft;
+            player->m_platformerVelocityRelated = m_platformerVelocityRelated;
         }
 
     private:
@@ -360,12 +368,16 @@ namespace eclipse::Hacks::Bot {
         float m_yPosition;
         float m_rotation;
         float m_blackOrbRelated;
+        float m_platformerVelocityRelated;
 
         GameObject* m_lastSnappedTo = nullptr;
         GameObject* m_lastSnappedTo2 = nullptr;
 
         bool m_isOnSlope;
         bool m_wasOnSlope;
+        bool m_affectedByForces;
+        bool m_holdingRight;
+        bool m_holdingLeft;
     };
 
     class CheckpointData {
