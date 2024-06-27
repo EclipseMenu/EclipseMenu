@@ -4,6 +4,8 @@ using namespace geode::prelude;
 
 // COMPLETELY stolen from cgytrus/SimplePatchLoader (with permission)
 
+#ifdef GEODE_IS_DESKTOP
+
 Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath) {
     auto vertexSource = file::readString(vertexPath);
         if (!vertexSource)
@@ -318,3 +320,5 @@ class $modify(CCScheduler) {
             return;
     }
 };
+
+#endif

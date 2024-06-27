@@ -2,8 +2,10 @@
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
 #include <modules/bot/bot.hpp>
+#include <modules/keybinds/manager.hpp>
 
 #include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/CheckpointObject.hpp>
 
@@ -51,12 +53,47 @@ namespace eclipse::hacks::Bot {
 
     REGISTER_HACK(Bot)
 
+    //temporary, player->m_isDead is wrong
+    class $modify(BotPlayerObject, PlayerObject) {
+        struct Fields {
+            bool m_isDead = false;
+        };
+
+        void playerDestroyed(bool idk) {
+            m_fields->m_isDead = true;
+            PlayerObject::playerDestroyed(idk);
+        }
+    };
+
     class $modify(PlayLayer) {
 
         void resetLevel() {
             resetFrame = true;
             PlayLayer::resetLevel();
             resetFrame = false;
+
+            /* if (m_player1->m_isPlatformer)
+			{
+				if ((keybinds::isKeyDown(keybinds::Keys::Right) || keybinds::isKeyDown(keybinds::Keys::D)) &&
+					!(keybinds::isKeyDown(keybinds::Keys::Left) || keybinds::isKeyDown(keybinds::Keys::A)))
+					m_player1->pushButton(PlayerButton::Right);
+				else if (!(keybinds::isKeyDown(keybinds::Keys::Right) || keybinds::isKeyDown(keybinds::Keys::D)) &&
+						(keybinds::isKeyDown(keybinds::Keys::Left) || keybinds::isKeyDown(keybinds::Keys::A)))
+					m_player1->pushButton(PlayerButton::Left);
+			}
+            if (m_player2->m_isPlatformer)
+			{
+				if ((keybinds::isKeyDown(keybinds::Keys::Right) || keybinds::isKeyDown(keybinds::Keys::D)) &&
+					!(keybinds::isKeyDown(keybinds::Keys::Left) || keybinds::isKeyDown(keybinds::Keys::A)))
+					m_player2->pushButton(PlayerButton::Right);
+				else if (!(keybinds::isKeyDown(keybinds::Keys::Right) || keybinds::isKeyDown(keybinds::Keys::D)) &&
+						(keybinds::isKeyDown(keybinds::Keys::Left) || keybinds::isKeyDown(keybinds::Keys::A)))
+					m_player2->pushButton(PlayerButton::Left);
+			} */
+
+            //temporary, player->m_isDead is wrong
+            ((BotPlayerObject*) m_player1)->m_fields->m_isDead = false;
+            ((BotPlayerObject*) m_player2)->m_fields->m_isDead = false;
 
             if(s_bot.getState() == bot::State::RECORD) {
                 s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, true, false);
@@ -71,6 +108,13 @@ namespace eclipse::hacks::Bot {
             if (s_bot.getState() == bot::State::PLAYBACK) return;
 
             s_bot.clearInputs();
+        }
+
+        CheckpointObject* markCheckpoint() {
+            if (s_bot.getState() == bot::State::RECORD && (((BotPlayerObject*) m_player1)->m_fields->m_isDead || ((BotPlayerObject*) m_player2)->m_fields->m_isDead))
+                return nullptr;
+
+            return PlayLayer::markCheckpoint();
         }
 
         void loadFromCheckpoint(CheckpointObject* checkpoint) {

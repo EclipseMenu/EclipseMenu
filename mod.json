@@ -1,5 +1,5 @@
 {
-	"geode": "3.0.0",
+	"geode": "3.1.1",
 	"gd": {
 		"win": "2.206",
 		"mac": "2.206",
@@ -7,7 +7,7 @@
 		"ios": "2.206"
 	},
 	"version": "v1.0.0",
-	"id": "eclipse.menu",
+	"id": "eclipse.eclipse-menu",
 	"name": "Eclipse",
    	"links": {
 		"source": "https://github.com/EclipseMenu/EclipseMenu"
@@ -35,7 +35,8 @@
 	],
     "resources": {
         "files": [
-            "resources/*.glsl"
+            "resources/*.glsl",
+			"resources/Rubik-Regular.ttf"
         ]
     }
 }
