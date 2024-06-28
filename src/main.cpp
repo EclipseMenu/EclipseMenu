@@ -11,9 +11,21 @@ using namespace eclipse;
 
 static bool s_isInitialized = false;
 
-class $modify(MenuLayer) {
+class $modify(MyMenuLayer, MenuLayer) {
     bool init() override {
         if (!MenuLayer::init()) return false;
+
+#ifdef GEODE_IS_ANDROID
+        // Temporarily add a button to toggle the GUI on android. (This will be removed later)
+        auto androidButton = CCMenuItemSpriteExtra::create(
+            cocos2d::CCSprite::createWithSpriteFrameName("GJ_everyplayBtn_001.png"),
+            this, menu_selector(MyMenuLayer::onToggleUI)
+        );
+        androidButton->setID("toggle"_spr);
+        auto menu = this->getChildByID("bottom-menu");
+        menu->addChild(androidButton);
+        menu->updateLayout();
+#endif
 
         if (s_isInitialized) return true;
 
@@ -25,7 +37,7 @@ class $modify(MenuLayer) {
             gui::Engine::get()->toggle();
             config::save();
         });
-        key.setKey(keybinds::Keys::Tab);
+        key.setKey(config::get<keybinds::Keys>("menu.toggleKey", keybinds::Keys::Tab));
         key.setInitialized(true);
 
         hack::Hack::lateInitializeHacks();
@@ -35,6 +47,11 @@ class $modify(MenuLayer) {
         s_isInitialized = true;
 
         return true;
+    }
+
+    void onToggleUI(CCObject* sender) {
+        gui::Engine::get()->toggle();
+        config::save();
     }
 };
 
