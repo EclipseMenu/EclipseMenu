@@ -8,13 +8,13 @@
 namespace eclipse::keybinds {
 
     class $modify(cocos2d::CCTouchDispatcher) {
-        void touches(CCSet* touches, CCEvent* event, unsigned int type) {
+        void touches(cocos2d::CCSet* touches, cocos2d::CCEvent* event, unsigned int type) {
             if (!touches) return cocos2d::CCTouchDispatcher::touches(touches, event, type);
 
             auto* manager = Manager::get();
-            if (type == CCTOUCHBEGAN) {
+            if (type == cocos2d::CCTOUCHBEGAN) {
                 manager->registerKeyPress(Keys::MouseLeft);
-            } else if (type == CCTOUCHENDED) {
+            } else if (type == cocos2d::CCTOUCHENDED) {
                 manager->registerKeyRelease(Keys::MouseLeft);
             }
 
