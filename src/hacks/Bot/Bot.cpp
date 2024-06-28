@@ -72,25 +72,6 @@ namespace eclipse::hacks::Bot {
             PlayLayer::resetLevel();
             resetFrame = false;
 
-            /* if (m_player1->m_isPlatformer)
-			{
-				if ((keybinds::isKeyDown(keybinds::Keys::Right) || keybinds::isKeyDown(keybinds::Keys::D)) &&
-					!(keybinds::isKeyDown(keybinds::Keys::Left) || keybinds::isKeyDown(keybinds::Keys::A)))
-					m_player1->pushButton(PlayerButton::Right);
-				else if (!(keybinds::isKeyDown(keybinds::Keys::Right) || keybinds::isKeyDown(keybinds::Keys::D)) &&
-						(keybinds::isKeyDown(keybinds::Keys::Left) || keybinds::isKeyDown(keybinds::Keys::A)))
-					m_player1->pushButton(PlayerButton::Left);
-			}
-            if (m_player2->m_isPlatformer)
-			{
-				if ((keybinds::isKeyDown(keybinds::Keys::Right) || keybinds::isKeyDown(keybinds::Keys::D)) &&
-					!(keybinds::isKeyDown(keybinds::Keys::Left) || keybinds::isKeyDown(keybinds::Keys::A)))
-					m_player2->pushButton(PlayerButton::Right);
-				else if (!(keybinds::isKeyDown(keybinds::Keys::Right) || keybinds::isKeyDown(keybinds::Keys::D)) &&
-						(keybinds::isKeyDown(keybinds::Keys::Left) || keybinds::isKeyDown(keybinds::Keys::A)))
-					m_player2->pushButton(PlayerButton::Left);
-			} */
-
             //temporary, player->m_isDead is wrong
             ((BotPlayerObject*) m_player1)->m_fields->m_isDead = false;
             ((BotPlayerObject*) m_player2)->m_fields->m_isDead = false;

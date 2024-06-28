@@ -129,7 +129,6 @@ namespace eclipse::Hacks::Bot {
 #endif
             m_unk880 = player->m_unk880;
             m_unk910 = player->m_unk910;
-            m_unk924 = player->m_unk924;
 
             m_xVelocity = player->m_platformerXVelocity;
             m_yVelocity = player->m_yVelocity;
@@ -140,11 +139,9 @@ namespace eclipse::Hacks::Bot {
             m_wasOnSlope = player->m_wasOnSlope;
             m_isOnSlope = player->m_isOnSlope;
             m_lastSnappedTo = player->m_objectSnappedTo;
-            //m_blackOrbRelated = player->m_blackOrbRelated;
             m_unk3c0 = player->m_unk3c0;
             m_unk3c8 = player->m_unk3c8;
             m_unk3d0 = player->m_unk3d0;
-            m_unk3d8 = player->m_unk3d8;
             m_unk3e0 = player->m_unk3e0;
             m_unk3e1 = player->m_unk3e1;
             m_unk3e2 = player->m_unk3e2;
@@ -153,6 +150,8 @@ namespace eclipse::Hacks::Bot {
             m_holdingRight = player->m_holdingRight;
             m_holdingLeft = player->m_holdingLeft;
             m_platformerVelocityRelated = player->m_platformerVelocityRelated;
+            m_slopeRelated = player->m_slopeRelated;
+            m_slopeVelocityRelated = player->m_slopeVelocityRelated;
         }
 
         void apply(PlayerObject* player) {
@@ -254,7 +253,6 @@ namespace eclipse::Hacks::Bot {
 #endif
             player->m_unk880 = m_unk880;
             player->m_unk910 = m_unk910;
-            player->m_unk924 = m_unk924;
 
             player->m_platformerXVelocity = m_xVelocity;
             player->m_yVelocity = m_yVelocity;
@@ -267,11 +265,9 @@ namespace eclipse::Hacks::Bot {
             player->m_wasOnSlope = m_wasOnSlope;
             player->m_isOnSlope = m_isOnSlope;
             player->m_objectSnappedTo = m_lastSnappedTo;
-            //player->m_blackOrbRelated = m_blackOrbRelated;
             player->m_unk3c0 = m_unk3c0;
             player->m_unk3c8 = m_unk3c8;
             player->m_unk3d0 = m_unk3d0;
-            player->m_unk3d8 = m_unk3d8;
             player->m_unk3e0 = m_unk3e0;
             player->m_unk3e1 = m_unk3e1;
             player->m_unk3e2 = m_unk3e2;
@@ -280,6 +276,8 @@ namespace eclipse::Hacks::Bot {
             player->m_holdingRight = m_holdingRight;
             player->m_holdingLeft = m_holdingLeft;
             player->m_platformerVelocityRelated = m_platformerVelocityRelated;
+            player->m_slopeRelated = m_slopeRelated;
+            player->m_slopeVelocityRelated = m_slopeVelocityRelated;
         }
 
     private:
@@ -376,23 +374,22 @@ namespace eclipse::Hacks::Bot {
         gd::unordered_set<int> m_unk828;
         gd::vector<float> m_unk880;
         gd::map<int, bool> m_unk910;
-        gd::map<int, bool> m_unk924;
+        //gd::map<int, bool> m_unk924; // THE CULPRIT
 
         double m_xVelocity;
         double m_yVelocity;
         float m_xPosition;
         float m_yPosition;
         float m_rotation;
-        //float m_blackOrbRelated;
         double m_unk3c0;
         double m_unk3c8;
         double m_unk3d0;
-        double m_unk3d8;
         bool m_unk3e0;
         bool m_unk3e1;
         bool m_unk3e2;
         bool m_unk3e3;
         float m_platformerVelocityRelated;
+        float m_slopeVelocityRelated;
 
         GameObject* m_lastSnappedTo = nullptr;
         GameObject* m_lastSnappedTo2 = nullptr;
@@ -402,6 +399,7 @@ namespace eclipse::Hacks::Bot {
         bool m_affectedByForces;
         bool m_holdingRight;
         bool m_holdingLeft;
+        bool m_slopeRelated;
     };
 
     class CheckpointData {
@@ -448,7 +446,7 @@ namespace eclipse::Hacks::Bot {
             if(config::get<bool>("bot.practicefix", false) && playLayer->m_fields->m_checkpoints.contains(checkpoint)) {
                 PlayLayer::loadFromCheckpoint(checkpoint);
 
-                CheckpointData data = playLayer->m_fields->m_checkpoints[checkpoint];
+                CheckpointData& data = playLayer->m_fields->m_checkpoints[checkpoint];
                 data.apply(playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr);
 
                 return;
@@ -471,8 +469,13 @@ namespace eclipse::Hacks::Bot {
     };
 
     class $modify(CheckpointObject) {
+#ifdef GEODE_IS_ANDROID
+        static CheckpointObject* create() { // this is so dumb
+            auto result = CheckpointObject::create();
+#else 
         bool init() {
-            bool result = CheckpointObject::init();
+            auto result = CheckpointObject::init();
+#endif
 
             if (!config::get<bool>("bot.practicefix", false))
                 return result;
@@ -481,7 +484,11 @@ namespace eclipse::Hacks::Bot {
 
             if(playLayer->m_gameState.m_currentProgress > 0) {
                 CheckpointData data(playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr);
+#ifdef GEODE_IS_ANDROID
+                playLayer->m_fields->m_checkpoints[result] = data;
+#else
                 playLayer->m_fields->m_checkpoints[this] = data;
+#endif
             }
 
             return result;

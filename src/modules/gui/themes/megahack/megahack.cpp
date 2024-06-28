@@ -1,20 +1,16 @@
 #include "megahack.hpp"
 
-#include <Geode/Geode.hpp>
-#include <imgui-cocos.hpp>
-#include <misc/cpp/imgui_stdlib.h>
+#include "window/window.hpp"
+#include "animation/move-action.hpp"
 
 #include <utils.hpp>
 #include <modules/config/config.hpp>
 
-#include "animation/easing.hpp"
-#include "window/window.hpp"
-#include <modules/gui/color.hpp>
+#include <misc/cpp/imgui_stdlib.h>
 
 namespace eclipse::gui::imgui {
-
     /// @brief Calculate a random window position outside the screen.
-    ImVec2 randomWindowPosition(Window &window) {
+    ImVec2 WindowLayout::randomWindowPosition(Window &window) {
         // Calculate target position randomly to be outside the screen
         auto screenSize = ImGui::GetIO().DisplaySize;
         auto windowSize = window.getSize();
@@ -40,39 +36,10 @@ namespace eclipse::gui::imgui {
         return target;
     }
 
-    void MegahackEngine::init() {
-        if (m_initialized) return;
-        ImGuiCocos::get()
-            .setup([&]() {
-                setup();
-            })
-            .draw([&]() {
-                draw();
-            });
-        m_initialized = true;
-    }
+    void WindowLayout::toggle() {
+        m_isToggled = !m_isToggled;
 
-    void updateCursorState(bool isOpened) {
-        bool canShowInLevel = true;
-        if (auto* playLayer = PlayLayer::get()) {
-            canShowInLevel = playLayer->m_hasCompletedLevel ||
-                             playLayer->m_isPaused ||
-                             GameManager::sharedState()->getGameVariable("0024");
-        }
-        if (isOpened || canShowInLevel)
-            PlatformToolbox::showCursor();
-        else
-            PlatformToolbox::hideCursor();
-    }
-
-    bool MegahackEngine::isToggled() {
-        return m_isOpened;
-    }
-
-    void MegahackEngine::toggle() {
-        m_isOpened = !m_isOpened;
-
-        if (!m_isOpened) {
+        if (!m_isToggled) {
             // TODO: save window positions
         }
 
@@ -82,21 +49,21 @@ namespace eclipse::gui::imgui {
         auto easing = animation::getEasingFunction(easingType, easingMode);
 
         for (auto& window : m_windows) {
-            auto target = m_isOpened ? window.getPosition() : randomWindowPosition(window);
+            auto target = m_isToggled ? window.getPosition() : randomWindowPosition(window);
             m_actions.push_back(window.animateTo(target, duration, easing));
         }
 
-        updateCursorState(m_isOpened);
+        //updateCursorState(m_isToggled);
 
         m_isAnimating = true;
     }
 
-    bool MegahackEngine::shouldRender() {
+    bool WindowLayout::shouldRender() {
         // If the GUI is not opened and there are no actions, do not render
-        return m_isOpened || !m_actions.empty();
+        return m_isToggled || !m_actions.empty();
     }
 
-    void MegahackEngine::visit(Component* component) {
+    void WindowLayout::visit(Component* component) {
         // TODO: Move this to a separate file for easier theme customization.
         if (auto* label = dynamic_cast<LabelComponent*>(component)) {
             ImGui::TextWrapped("%s", label->getTitle().c_str());
@@ -176,66 +143,7 @@ namespace eclipse::gui::imgui {
         }
     }
 
-    void MegahackEngine::setup() {
-        auto &style = ImGui::GetStyle();
-        style.WindowPadding = ImVec2(4, 4);
-        style.WindowRounding = config::get<float>("menu.windowRounding", 0.f);
-        style.FramePadding = ImVec2(4, 2);
-        style.FrameRounding = config::get<float>("menu.frameRounding", 0.f);
-        style.PopupRounding = config::get<float>("menu.frameRounding", 0.f);
-        style.ItemSpacing = ImVec2(12, 2);
-        style.ItemInnerSpacing = ImVec2(8, 6);
-        style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
-        style.IndentSpacing = 25.0f;
-        style.ScrollbarSize = 15.0f;
-        style.ScrollbarRounding = 9.0f;
-        style.GrabMinSize = 5.0f;
-        style.GrabRounding = 3.0f;
-        style.WindowBorderSize = config::get<float>("menu.borderSize", 0.f);
-        style.WindowMinSize = ImVec2(32, 32);
-        style.DisplayWindowPadding = ImVec2(0, 0);
-        //style.ScaleAllSizes(config::get<float>("UIScale"));
-        style.WindowMenuButtonPosition = ImGuiDir_Left;
-
-        auto &colors = style.Colors;
-        colors[ImGuiCol_Text] = config::get<Color>("menu.color.text", Color(1.0f, 1.0f, 1.0f, 1.0f));
-        colors[ImGuiCol_TextDisabled] = config::get<Color>("menu.color.textDisabled", Color(0.49f, 0.5f, 0.5f, 1.0f));
-
-        colors[ImGuiCol_WindowBg] = config::get<Color>("menu.color.background", Color(0.16f, 0.16f, 0.16f, 1.0f));
-        colors[ImGuiCol_FrameBg] = config::get<Color>("menu.color.secondary", Color(0.13f, 0.13f, 0.13f, 1.0f));
-        colors[ImGuiCol_TitleBg] =
-        colors[ImGuiCol_TitleBgActive] =
-        colors[ImGuiCol_TitleBgCollapsed] =
-                config::get<Color>("menu.color.accent", Color(0.3f, 0.75f, 0.61f, 1.0f));
-
-        colors[ImGuiCol_Button] = config::get<Color>("menu.color.primary", Color(0.11f, 0.11f, 0.11f, 1.0f));
-        colors[ImGuiCol_ButtonHovered] = config::get<Color>("menu.color.hovered", Color(0.3f, 0.76f, 0.6f, 1.0f));
-        colors[ImGuiCol_ButtonActive] = config::get<Color>("menu.color.clicked", Color(0.22f, 0.55f, 0.44f, 1.0f));
-
-        colors[ImGuiCol_FrameBgHovered] = config::get<Color>("menu.color.secondary", Color(0.13f, 0.13f, 0.13f, 1.0f));
-
-        colors[ImGuiCol_ScrollbarBg] = config::get<Color>("menu.color.secondary", Color(0.13f, 0.13f, 0.13f, 1.0f));
-        colors[ImGuiCol_ScrollbarGrab] = config::get<Color>("menu.color.primary", Color(0.11f, 0.11f, 0.11f, 1.0f));
-        colors[ImGuiCol_ScrollbarGrabHovered] = config::get<Color>("menu.color.hovered", Color(0.3f, 0.76f, 0.6f, 1.0f));
-        colors[ImGuiCol_ScrollbarGrabActive] = config::get<Color>("menu.color.clicked", Color(0.22f, 0.55f, 0.44f, 1.0f));
-
-        colors[ImGuiCol_CheckMark] = config::get<Color>("menu.color.primary", Color(0.11f, 0.11f, 0.11f, 1.0f));
-        colors[ImGuiCol_SliderGrab] = config::get<Color>("menu.color.primary", Color(0.11f, 0.11f, 0.11f, 1.0f));
-        colors[ImGuiCol_SliderGrabActive] = config::get<Color>("menu.color.clicked", Color(0.22f, 0.55f, 0.44f, 1.0f));
-
-        colors[ImGuiCol_Border] = config::get<Color>("menu.color.border", Color(0.0f, 0.0f, 0.0f, 1.0f));
-        colors[ImGuiCol_BorderShadow] = config::get<Color>("menu.color.border", Color(0.0f, 0.0f, 0.0f, 1.0f));
-
-        colors[ImGuiCol_PopupBg] = config::get<Color>("menu.color.background", Color(0.16f, 0.16f, 0.16f, 1.0f));
-        colors[ImGuiCol_Header] = config::get<Color>("menu.color.primary", Color(0.11f, 0.11f, 0.11f, 1.0f));
-        colors[ImGuiCol_HeaderHovered] = config::get<Color>("menu.color.hovered", Color(0.3f, 0.76f, 0.6f, 1.0f));
-        colors[ImGuiCol_HeaderActive] = config::get<Color>("menu.color.clicked", Color(0.22f, 0.55f, 0.44f, 1.0f));
-
-        ImFont* fnt = ImGui::GetIO().Fonts->AddFontFromFileTTF((geode::Mod::get()->getResourcesDir() / "Rubik-Regular.ttf").c_str(), 15.0f);
-        ImGui::GetIO().FontDefault = fnt;
-    }
-
-    void MegahackEngine::draw() {
+    void WindowLayout::draw() {
         // Setup windows on first draw
         static int frame = 0;
         switch (frame) {
@@ -277,7 +185,7 @@ namespace eclipse::gui::imgui {
 
         if (!shouldRender()) return;
 
-        updateCursorState(m_isOpened);
+        //updateCursorState(m_isOpened);
 
         // Render windows
         for (auto& window : m_windows) {
@@ -285,7 +193,7 @@ namespace eclipse::gui::imgui {
         }
     }
 
-    MenuTab* MegahackEngine::findTab(const std::string& name) {
+    MenuTab* WindowLayout::findTab(const std::string& name) {
         for (const auto& tab : m_tabs) {
             if (tab->getTitle() == name) {
                 return tab;
@@ -297,7 +205,7 @@ namespace eclipse::gui::imgui {
         m_tabs.push_back(tab);
 
         // Create a new window for the tab.
-        m_windows.emplace_back(name, [tab]() {
+        m_windows.emplace_back(name, [this, tab]() {
             for (auto& component : tab->getComponents()) {
                 visit(component);
             }
@@ -305,5 +213,4 @@ namespace eclipse::gui::imgui {
 
         return tab;
     }
-
 }

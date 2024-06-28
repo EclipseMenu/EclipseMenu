@@ -336,6 +336,47 @@ namespace eclipse::gui {
         std::vector<Component*> m_components;
     };
 
+    class Layout {
+    public:
+        explicit Layout() : m_isToggled(false) {}
+
+        /// @brief Draw the UI.
+        virtual void draw() {}
+
+        /// @brief Handle the component.
+        virtual void visit(Component* component) {}
+
+        /// @brief Toggle the menu.
+        virtual void toggle() {
+            m_isToggled = !m_isToggled;
+        }
+
+        /// @brief Get if the menu is toggled.
+        [[nodiscard]] bool isToggled() { return m_isToggled; }
+
+    protected:
+        bool m_isToggled;
+        // this'll also handle the window positions and all the imgui components
+    };
+
+    class Theme {
+    public:
+        explicit Theme(Layout* lay) : m_layout(lay) {}
+
+        /// @brief Save the theme to a file.
+        void saveToFile(const std::filesystem::path& path) {}
+
+        /// @brief Set up the UI.
+        virtual void setup() {}
+
+        /// @brief Get the layout of the theme.
+        [[nodiscard]] Layout* getLayout() { return m_layout; }
+
+    private:
+        Layout* m_layout;
+        // plus like colors and settings that the user can change (also theme saving to file)
+    };
+
     /// @brief Abstract class, that wraps all UI function calls.
     class Engine {
     public:

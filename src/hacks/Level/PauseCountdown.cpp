@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/PauseLayer.hpp>
 
 using namespace geode::prelude;
 
@@ -53,18 +54,10 @@ namespace eclipse::hacks::Level {
             }
     };
 
-    class $modify(GJBaseGameLayer) {
+    class $modify(PauseBGL, GJBaseGameLayer) {
         struct Fields {
             float pausedt = 0.f;
         };
-
-        void preResumeGame() {
-            GJBaseGameLayer::preResumeGame();
-            if (!PlayLayer::get()) return;
-            if (PlayLayer::get()->m_gameState.m_currentProgress == 0) return;
-            m_fields->pausedt = 3.f;
-            if (config::get<bool>("level.pausecount", false)) addChild(PauseCountdown::create());
-        }
 
         void update(float dt) {
             if (!PlayLayer::get()) return GJBaseGameLayer::update(dt);
@@ -72,6 +65,19 @@ namespace eclipse::hacks::Level {
             if (m_fields->pausedt <= 0.5f || !config::get<bool>("level.pausecount", false)) {
                 GJBaseGameLayer::update(dt);
             }
+        }
+    };
+
+    class $modify(PauseLayer) {
+        void onResume(cocos2d::CCObject* sender) {
+            PauseLayer::onResume(sender);
+
+            PauseBGL* bg = static_cast<PauseBGL*>(PauseBGL::get());
+
+            if (!PlayLayer::get() || !bg) return;
+            if (bg->m_gameState.m_currentProgress == 0) return;
+            bg->m_fields->pausedt = 3.f;
+            if (config::get<bool>("level.pausecount", false)) bg->addChild(PauseCountdown::create());
         }
     };
 }
