@@ -476,7 +476,6 @@ namespace eclipse::Hacks::Bot {
         bool init() {
             auto result = CheckpointObject::init();
 #endif
-            bool result = CheckpointObject::init();
 
             if (!config::get<bool>("bot.practicefix", false))
                 return result;
