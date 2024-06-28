@@ -129,7 +129,6 @@ namespace eclipse::Hacks::Bot {
 #endif
             m_unk880 = player->m_unk880;
             m_unk910 = player->m_unk910;
-            m_unk924 = player->m_unk924;
 
             m_xVelocity = player->m_platformerXVelocity;
             m_yVelocity = player->m_yVelocity;
@@ -254,7 +253,6 @@ namespace eclipse::Hacks::Bot {
 #endif
             player->m_unk880 = m_unk880;
             player->m_unk910 = m_unk910;
-            player->m_unk924 = m_unk924;
 
             player->m_platformerXVelocity = m_xVelocity;
             player->m_yVelocity = m_yVelocity;
@@ -376,7 +374,7 @@ namespace eclipse::Hacks::Bot {
         gd::unordered_set<int> m_unk828;
         gd::vector<float> m_unk880;
         gd::map<int, bool> m_unk910;
-        gd::map<int, bool> m_unk924;
+        //gd::map<int, bool> m_unk924; // THE CULPRIT
 
         double m_xVelocity;
         double m_yVelocity;
@@ -448,7 +446,7 @@ namespace eclipse::Hacks::Bot {
             if(config::get<bool>("bot.practicefix", false) && playLayer->m_fields->m_checkpoints.contains(checkpoint)) {
                 PlayLayer::loadFromCheckpoint(checkpoint);
 
-                CheckpointData data = playLayer->m_fields->m_checkpoints[checkpoint];
+                CheckpointData& data = playLayer->m_fields->m_checkpoints[checkpoint];
                 data.apply(playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr);
 
                 return;
@@ -471,7 +469,13 @@ namespace eclipse::Hacks::Bot {
     };
 
     class $modify(CheckpointObject) {
+#ifdef GEODE_IS_ANDROID
+        static CheckpointObject* create() { // this is so dumb
+            auto result = CheckpointObject::create();
+#else 
         bool init() {
+            auto result = CheckpointObject::init();
+#endif
             bool result = CheckpointObject::init();
 
             if (!config::get<bool>("bot.practicefix", false))
@@ -481,7 +485,11 @@ namespace eclipse::Hacks::Bot {
 
             if(playLayer->m_gameState.m_currentProgress > 0) {
                 CheckpointData data(playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr);
+#ifdef GEODE_IS_ANDROID
+                playLayer->m_fields->m_checkpoints[result] = data;
+#else
                 playLayer->m_fields->m_checkpoints[this] = data;
+#endif
             }
 
             return result;
