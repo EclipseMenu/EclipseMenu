@@ -41,6 +41,9 @@ namespace eclipse::keybinds {
         // Modifier keys
         LeftShift, LeftControl, LeftAlt, LeftSuper, RightShift, RightControl, RightAlt, RightSuper,
 
+        // Mouse buttons
+        MouseLeft, MouseRight, MouseMiddle, MouseButton4, MouseButton5,
+
         // System keys
         MenuKey, LastKey
     };
