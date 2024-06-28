@@ -143,7 +143,7 @@ namespace eclipse::Hacks::Bot {
             m_unk3c0 = player->m_unk3c0;
             m_unk3c8 = player->m_unk3c8;
             m_unk3d0 = player->m_unk3d0;
-            m_unk3d8 = player->m_unk3d8;
+            m_blackOrbRelated = player->m_blackOrbRelated;
             m_unk3e0 = player->m_unk3e0;
             m_unk3e1 = player->m_unk3e1;
             m_unk3e2 = player->m_unk3e2;
@@ -269,7 +269,7 @@ namespace eclipse::Hacks::Bot {
             player->m_unk3c0 = m_unk3c0;
             player->m_unk3c8 = m_unk3c8;
             player->m_unk3d0 = m_unk3d0;
-            player->m_unk3d8 = m_unk3d8;
+            player->m_blackOrbRelated = m_blackOrbRelated;
             player->m_unk3e0 = m_unk3e0;
             player->m_unk3e1 = m_unk3e1;
             player->m_unk3e2 = m_unk3e2;
@@ -385,7 +385,7 @@ namespace eclipse::Hacks::Bot {
         double m_unk3c0;
         double m_unk3c8;
         double m_unk3d0;
-        double m_unk3d8;
+        double m_blackOrbRelated;
         bool m_unk3e0;
         bool m_unk3e1;
         bool m_unk3e2;

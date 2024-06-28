@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "themes/megahack/megahack.hpp"
+#include "imgui.hpp"
 
 namespace eclipse::gui {
 
@@ -26,7 +27,7 @@ namespace eclipse::gui {
     Engine* Engine::get() {
         // TODO: Make this return the correct engine based on platform,
         // or even switch between engines at runtime.
-        static imgui::MegahackEngine instance;
+        static imgui::ImGuiEngine instance;
         return &instance;
     }
 
