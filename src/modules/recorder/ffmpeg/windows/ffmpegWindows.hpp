@@ -1,5 +1,5 @@
 #pragma once
-#ifndef GEODE_IS_ANDROID
+#ifdef GEODE_IS_WINDOWS
 #include "../ffmpegcli.hpp"
 #include <subprocess.hpp>
 

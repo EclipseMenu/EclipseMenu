@@ -1,5 +1,5 @@
 #include "ffmpegWindows.hpp"
-#ifndef GEODE_IS_ANDROID
+#ifdef GEODE_IS_WINDOWS
 namespace eclipse::recorder {
 
     void ffmpegWindows::open(const std::string& cmd) {
