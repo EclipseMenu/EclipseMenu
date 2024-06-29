@@ -1,5 +1,5 @@
 #include "recorder.hpp"
-#ifdef GEODE_IS_WINDOWS
+#ifndef GEODE_IS_ANDROID
 
 #include <Geode/Geode.hpp>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef GEODE_IS_WINDOWS
+#ifndef GEODE_IS_ANDROID
 #include "rendertexture.hpp"
 #include "ffmpeg/ffmpegcli.hpp"
 
