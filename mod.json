@@ -9,7 +9,7 @@
 	"version": "v1.0.0",
 	"id": "eclipse.eclipse-menu",
 	"name": "Eclipse",
-	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev"],
+	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev", "Viper"],
 	"description": "Ultimate mod menu for Geometry Dash",
 	"early-load": true,
 	"incompatibilities": [
@@ -33,6 +33,11 @@
         "files": [
             "resources/*.glsl",
 			"resources/Rubik-Regular.ttf"
-        ]
+        ],
+		"spritesheets": {
+			"SafemodeSheet": [
+					"resources/safemode/*.png"
+			]
+	}
     }
 }
