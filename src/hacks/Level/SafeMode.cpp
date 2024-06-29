@@ -39,6 +39,7 @@ namespace eclipse::hacks::Level {
 
     class safemode : public hack::Hack {
         void init() override {
+            config::setIfEmpty("level.safemode.legacy", false);
             auto tab = gui::MenuTab::find("Level");
             auto tav = tab->addToggle("Safe Mode", "level.safemode");
             tav->setDescription("Allows you to not save progress when enabled!");
@@ -77,6 +78,11 @@ class $modify(PlayLayer) {
     };
     void levelComplete() {
         if (config::get<bool>("level.safemode", true)) {
+            if (config::get<bool>("level.safemode.legacy", true)) {
+            PlayLayer::get()->onQuit();
+            return;
+         };
+
             PlayLayer::get()->m_isTestMode = true;  // gd doesn't save in test mode
             Sm_Mod = true;  
         } else {
