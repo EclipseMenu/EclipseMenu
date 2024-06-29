@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef GEODE_IS_WINDOWS
 #include <string>
 
 namespace eclipse::recorder {
@@ -12,3 +13,4 @@ namespace eclipse::recorder {
     };
 
 };
+#endif

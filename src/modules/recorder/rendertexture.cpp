@@ -5,6 +5,7 @@
 namespace eclipse::recorder {
 
     void RenderTexture::begin() {
+#ifdef GEODE_IS_WINDOWS
         glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &m_old_fbo);
 
         m_texture = new cocos2d::CCTexture2D;
@@ -28,6 +29,7 @@ namespace eclipse::recorder {
 
         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, m_old_rbo);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_old_fbo);
+#endif
     }
 
     void RenderTexture::end() {
@@ -35,6 +37,7 @@ namespace eclipse::recorder {
     }
 
     void RenderTexture::capture(std::mutex &lock, std::vector<uint8_t> &data, volatile bool &hasDataFlag) {
+#ifdef GEODE_IS_WINDOWS
         auto director = cocos2d::CCDirector::sharedDirector();
 
         glViewport(0, 0, m_width, m_height);
@@ -52,6 +55,7 @@ namespace eclipse::recorder {
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_old_fbo);
         director->setViewport();
+#endif
     }
 
 };

@@ -1,7 +1,6 @@
 #pragma once
-
+#ifdef GEODE_IS_WINDOWS
 #include "../ffmpegcli.hpp"
-
 #include <subprocess.hpp>
 
 namespace eclipse::recorder {
@@ -16,3 +15,4 @@ namespace eclipse::recorder {
     };
 
 }
+#endif

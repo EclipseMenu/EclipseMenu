@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef GEODE_IS_WINDOWS
 #include "rendertexture.hpp"
 #include "ffmpeg/ffmpegcli.hpp"
 
@@ -64,3 +65,4 @@ namespace eclipse::recorder {
 
     };
 };
+#endif

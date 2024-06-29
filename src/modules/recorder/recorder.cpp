@@ -1,4 +1,5 @@
 #include "recorder.hpp"
+#ifdef GEODE_IS_WINDOWS
 
 #include <Geode/Geode.hpp>
 
@@ -126,3 +127,4 @@ namespace eclipse::recorder {
         std::filesystem::rename(tempPath,m_renderPath);
     }
 };
+#endif
