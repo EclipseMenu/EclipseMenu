@@ -114,7 +114,10 @@ namespace eclipse::hacks::Recorder {
             auto tab = gui::MenuTab::find("Internal Recorder");
 
             tab->addButton("Start Recording")->callback(start);
-            tab->addButton("Stop Recording")->callback(stop);
+            tab->addButton("Stop Recording")->callback([] {
+                stop();
+                stopAudio();
+            });
 
             config::setIfEmpty("recorder.fps", 60.f);
             config::setIfEmpty("recorder.endscreen", 5.f);
@@ -267,6 +270,7 @@ namespace eclipse::hacks::Recorder {
         void onQuit()
         {
             if (s_recorder.isRecording()) stop();
+            if(s_recorder.isRecordingAudio()) stopAudio();
             PlayLayer::onQuit();
         }
 
