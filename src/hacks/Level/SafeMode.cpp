@@ -63,7 +63,6 @@ namespace eclipse::hacks::Level {
 
    class $modify(GJGameLevel) {
     void savePercentage(int p0, bool p1, int p2, int p3, bool p4) {
-         log::debug("savePercentage {}",!config::get<bool>("level.safemode", true));
         if (!config::get<bool>("level.safemode")) {
             GJGameLevel::savePercentage(p0, p1, p2, p3, p4);
         }
