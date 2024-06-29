@@ -15,10 +15,6 @@ namespace eclipse::recorder {
         m_ffmpegPath = ffmpegPath;
     }
 
-    Recorder::~Recorder() {
-
-    }
-
     void Recorder::start(std::filesystem::path renderPath) {
         m_currentFrame.resize(m_renderSettings.m_width * m_renderSettings.m_height * 3, 0);
         m_renderTexture.m_width = m_renderSettings.m_width;

@@ -31,7 +31,6 @@ namespace eclipse::recorder {
     class Recorder {
     public:
         Recorder(std::string ffmpegPath);
-        ~Recorder();
 
         void start(std::filesystem::path renderPath);
         void stop();
@@ -49,7 +48,6 @@ namespace eclipse::recorder {
 
     private:
         void recordThread();
-        void ffmpegCommand();
 
     private:
         bool m_recording;
