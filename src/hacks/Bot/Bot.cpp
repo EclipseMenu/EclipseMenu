@@ -67,6 +67,12 @@ namespace eclipse::hacks::Bot {
 
     class $modify(PlayLayer) {
 
+        bool init(GJGameLevel *gj, bool p1, bool p2) {
+            bool result = PlayLayer::init(gj, p1, p2);
+            s_bot.setLevelInfo(gdr::Level(gj->m_levelName, gj->m_levelID.value()));
+            return result;
+        }
+
         void resetLevel() {
             resetFrame = true;
             PlayLayer::resetLevel();

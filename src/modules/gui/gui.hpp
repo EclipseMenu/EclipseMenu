@@ -172,6 +172,36 @@ namespace eclipse::gui {
         std::function<void(float)> m_callback;
     };
 
+    /// @brief Input int component to input a value from a range.
+    class InputIntComponent : public Component {
+    public:
+        explicit InputIntComponent(std::string title, std::string id, int min = INT_MIN, int max = INT_MAX)
+            : m_title(std::move(title)), m_id(std::move(id)), m_min(min), m_max(max) {}
+
+        void onInit() override {}
+        void onUpdate() override {}
+
+        /// @brief Set a callback function to be called when the component value changes.
+        void callback(const std::function<void(int)>& func) { m_callback = func; }
+
+        [[nodiscard]] const std::string& getId() const override { return m_id; }
+        [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+
+        [[nodiscard]] int getMin() const { return m_min; }
+        [[nodiscard]] int getMax() const { return m_max; }
+
+        void triggerCallback(int value) {
+            if (m_callback) m_callback(value);
+        }
+
+    private:
+        std::string m_id;
+        std::string m_title;
+        int m_min;
+        int m_max;
+        std::function<void(int)> m_callback;
+    };
+
     /// @brief Input float component to input a value from a range. Can be toggled .
     class FloatToggleComponent : public Component {
     public:
@@ -299,6 +329,13 @@ namespace eclipse::gui {
             auto* inputfloat = new InputFloatComponent(title, id, min, max, format);
             addComponent(inputfloat);
             return inputfloat;
+        }
+
+        /// @brief Add an input int to the tab.
+        InputIntComponent* addInputInt(const std::string& title, const std::string& id, int min = INT_MIN, int max = INT_MAX) {
+            auto* inputint = new InputIntComponent(title, id, min, max);
+            addComponent(inputint);
+            return inputint;
         }
 
         /// @brief Add an float toggle to the tab.

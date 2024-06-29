@@ -51,6 +51,10 @@ namespace eclipse::bot {
         /// @param path Path to load the replay from.
         bool load(std::filesystem::path path);
 
+        /// @brief Sets the level info.
+        /// @param levelInfo The level info.
+        void setLevelInfo(gdr::Level levelInfo);
+
     protected:
         State m_state = State::DISABLED;
         BotReplay m_replay;
