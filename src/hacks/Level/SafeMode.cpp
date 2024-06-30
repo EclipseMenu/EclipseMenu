@@ -63,7 +63,7 @@ namespace eclipse::hacks::Level {
         [[nodiscard]] const char* getId() const override { return "Auto Safe Mode"; }
     };
 
-    REGISTER_HACK(safemode)
+    REGISTER_HACK(autosafemode)
 
 
     bool Cheats() {
