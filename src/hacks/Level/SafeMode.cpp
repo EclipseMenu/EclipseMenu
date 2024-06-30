@@ -79,17 +79,9 @@ namespace eclipse::hacks::Level {
     bool savedata() {
         if (config::get<bool>("level.autosafemode")) {
            // safemode doesn't override auto
-            if (Cheats()) {
-                return false;
-            } else {
-                return true;
-            }
+            return !Cheats();
         }
-         if (!config::get<bool>("level.safemode") ) {
-            return true;
-         } else {
-            return false;
-         }
+        return !config::get<bool>("level.safemode");
     }
    class $modify(GJGameLevel) {
     void savePercentage(int p0, bool p1, int p2, int p3, bool p4) {
@@ -146,8 +138,8 @@ static void onModify(auto & self)
         }
          cocos2d::CCNode* endcompletetext = nullptr;
          if (nodeidsloaded) {
-            endcompletetext = Layer->getChildByID("practice-complete-text");
-            if (!endcompletetext) { endcompletetext =  Layer->getChildByID("level-complete-text"); };
+            endcompletetext = Layer->getChildByIDRecursive("practice-complete-text");
+            if (!endcompletetext) { endcompletetext =  Layer->getChildByIDRecursive("level-complete-text"); };
         } else {
             if(auto LevelComplete = getChildBySpriteFrameName_1(Layer, "GJ_levelComplete_001.png")) {
         		endcompletetext = LevelComplete;
@@ -160,6 +152,7 @@ static void onModify(auto & self)
         
 
         if (endcompletetext) {
+            log::debug("Found");
 			endcompletetext->setVisible(false);
             CCSprite* SafeMode = nullptr;
             if (Cheats()) {
@@ -175,7 +168,7 @@ static void onModify(auto & self)
 		}
         CCNode* CompleteText = nullptr;
          if (nodeidsloaded) {
-            CompleteText = Layer->getChildByID("complete-message");
+            CompleteText = Layer->getChildByIDRecursive("complete-message");
          } else {
              CompleteText = geode::cocos::getChildOfType<TextArea>(Layer, 0);
          }
