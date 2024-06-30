@@ -98,7 +98,7 @@ class $modify(PlayLayer) {
           }
     };
     void levelComplete() {
-        if (savedata()) {
+        if (!savedata()) {
             if (config::get<bool>("level.safemode.legacy", true)) {
             PlayLayer::get()->onQuit();
             return;
