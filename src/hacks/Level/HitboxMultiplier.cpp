@@ -72,15 +72,19 @@ namespace eclipse::hacks::Level {
             auto tab = gui::MenuTab::find("Level");
 
             config::setIfEmpty("level.hitbox_multiplier", false);
-            tab->addToggle("Hitbox Multiplier", "level.hitbox_multiplier")->callback([](bool){forceHitboxRecalculation();});
-
             config::setIfEmpty("level.hitbox_multiplier.player", 1.f);
             config::setIfEmpty("level.hitbox_multiplier.solid", 1.f);
             config::setIfEmpty("level.hitbox_multiplier.hazard", 1.f);
 
-            tab->addInputFloat("Player Multiplier", "level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx")->callback([](float){forceHitboxRecalculation();});
-            tab->addInputFloat("Solid Multiplier", "level.hitbox_multiplier.solid", 0.01f, 10.f, "%.2fx")->callback([](float){forceHitboxRecalculation();});
-            tab->addInputFloat("Hazard Multiplier", "level.hitbox_multiplier.hazard", 0.01f, 10.f, "%.2fx")->callback([](float){forceHitboxRecalculation();});
+            tab->addToggle("Hitbox Multiplier", "level.hitbox_multiplier")
+                ->callback([](bool){forceHitboxRecalculation();})
+                ->addSubComponent((new gui::InputFloatComponent("Player Multiplier", "level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx"))->callback([](float){forceHitboxRecalculation();}))
+                ->addSubComponent((new gui::InputFloatComponent("Solid Multiplier", "level.hitbox_multiplier.solid", 0.01f, 10.f, "%.2fx"))->callback([](float){forceHitboxRecalculation();}))
+                ->addSubComponent((new gui::InputFloatComponent("Hazard Multiplier", "level.hitbox_multiplier.hazard", 0.01f, 10.f, "%.2fx"))->callback([](float){forceHitboxRecalculation();}));
+
+            //tab->addInputFloat("Player Multiplier", "level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx")->callback([](float){forceHitboxRecalculation();});
+            //tab->addInputFloat("Solid Multiplier", "level.hitbox_multiplier.solid", 0.01f, 10.f, "%.2fx")->callback([](float){forceHitboxRecalculation();});
+            //tab->addInputFloat("Hazard Multiplier", "level.hitbox_multiplier.hazard", 0.01f, 10.f, "%.2fx")->callback([](float){forceHitboxRecalculation();});
         }
 
         void update() override {}

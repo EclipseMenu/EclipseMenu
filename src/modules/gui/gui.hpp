@@ -47,7 +47,10 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        void callback(const std::function<void(bool)>& func) { m_callback = func; }
+        ToggleComponent* callback(const std::function<void(bool)>& func) { 
+            m_callback = func; 
+            return this;
+        }
 
         /// @brief Set toggle description.
         ToggleComponent* setDescription(std::string description) {
@@ -55,6 +58,12 @@ namespace eclipse::gui {
             return this;
         }
 
+        /// @brief Add sub-component to toggle.
+        ToggleComponent* addSubComponent(Component* comp) {
+            m_subComponents.push_back(comp);
+            return this;
+        }
+        
         /// @brief Get the toggle value.
         [[nodiscard]] bool getValue() const;
 
@@ -64,6 +73,7 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] const std::string& getDescription() const { return m_description; }
+        [[nodiscard]] const std::vector<Component*>& getSubComponents() const { return m_subComponents; }
 
         void triggerCallback(bool value) {
             if (m_callback) m_callback(value);
@@ -74,6 +84,7 @@ namespace eclipse::gui {
         std::string m_title;
         std::string m_description;
         std::function<void(bool)> m_callback;
+        std::vector<Component*> m_subComponents;
     };
 
     /// @brief Radio button component for selecting one of the options.
@@ -86,7 +97,10 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        void callback(const std::function<void(int)>& func) { m_callback = func; }
+        RadioButtonComponent* callback(const std::function<void(int)>& func) { 
+            m_callback = func; 
+            return this;
+        }
 
         /// @brief Get the radio button value.
         [[nodiscard]] int getValue() const { return m_value; }
@@ -118,7 +132,10 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        void callback(const std::function<void(float)>& func) { m_callback = func; }
+        SliderComponent* callback(const std::function<void(float)>& func) { 
+            m_callback = func; 
+            return this;
+        }
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
@@ -150,7 +167,10 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        void callback(const std::function<void(float)>& func) { m_callback = func; }
+        InputFloatComponent* callback(const std::function<void(float)>& func) {
+            m_callback = func;
+            return this;
+        }
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
@@ -182,7 +202,10 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        void callback(const std::function<void(int)>& func) { m_callback = func; }
+        InputIntComponent* callback(const std::function<void(int)>& func) { 
+            m_callback = func; 
+            return this;
+        }
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
@@ -212,8 +235,14 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        void toggleCallback(const std::function<void()>& func) { m_toggleCallback = func; }
-        void valueCallback(const std::function<void(float)>& func) { m_valueCallback = func; }
+        FloatToggleComponent* toggleCallback(const std::function<void()>& func) { 
+            m_toggleCallback = func; 
+            return this;
+        }
+        FloatToggleComponent* valueCallback(const std::function<void(float)>& func) { 
+            m_valueCallback = func; 
+            return this;
+        }
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
@@ -249,7 +278,10 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        void callback(const std::function<void(std::string)>& func) { m_callback = func; }
+        InputTextComponent* callback(const std::function<void(std::string)>& func) { 
+            m_callback = func; 
+            return this;
+        }
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
@@ -274,7 +306,10 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        void callback(const std::function<void()>& func) { m_callback = func; }
+        ButtonComponent* callback(const std::function<void()>& func) { 
+            m_callback = func; 
+            return this;
+        }
 
         [[nodiscard]] const std::string& getId() const override { return m_title; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }

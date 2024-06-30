@@ -9,7 +9,7 @@
 #include <Geode/modify/ShaderLayer.hpp>
 #include <Geode/modify/CCScheduler.hpp>
 
-#ifdef GEODE_IS_DESKTOP
+#ifdef GEODE_IS_WINDOWS
 
 namespace eclipse::hacks::Recorder {
 
