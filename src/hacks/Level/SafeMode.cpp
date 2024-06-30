@@ -51,6 +51,21 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(safemode)
 
+
+    class autosafemode : public hack::Hack {
+        void init() override {
+            auto tab = gui::MenuTab::find("Level");
+            auto tav = tab->addToggle("Auto Safe Mode", "level.autosafemode");
+            tav->setDescription("Auto enables safe mode if cheats are on!");
+            // someone add options for legacy (aka kick on loading endscreen)
+        }
+
+        [[nodiscard]] const char* getId() const override { return "Auto Safe Mode"; }
+    };
+
+    REGISTER_HACK(safemode)
+
+
     bool Cheats() {
         bool cheats = false;
         for (eclipse::hack::Hack* hack : eclipse::hack::Hack::getHacks()) {
@@ -61,10 +76,24 @@ namespace eclipse::hacks::Level {
         }
         return cheats;
     }
-
+    bool savedata() {
+        if config::get<bool>("level.autosafemode") {
+           // safemode doesn't override auto
+            if (Cheats()) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+         if (!config::get<bool>("level.safemode") ) {
+            return true;
+         } else {
+            return false;
+         }
+    }
    class $modify(GJGameLevel) {
     void savePercentage(int p0, bool p1, int p2, int p3, bool p4) {
-        if (!config::get<bool>("level.safemode")) {
+        if (savedata()) {
             GJGameLevel::savePercentage(p0, p1, p2, p3, p4);
         }
     }
@@ -72,12 +101,12 @@ namespace eclipse::hacks::Level {
 
 class $modify(PlayLayer) {
     void showNewBest(bool po, int p1, int p2, bool p3, bool p4, bool p5) {
-           if (!config::get<bool>("level.safemode", true)) {
+           if (savedata()) {
             PlayLayer::showNewBest(po, p1, p2 , p3 , p4 , p5);
           }
     };
     void levelComplete() {
-        if (config::get<bool>("level.safemode", true)) {
+        if (savedata()) {
             if (config::get<bool>("level.safemode.legacy", true)) {
             PlayLayer::get()->onQuit();
             return;
