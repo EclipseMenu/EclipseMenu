@@ -14,7 +14,7 @@ namespace eclipse::Hacks::Bot {
     class PracticeFix : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bot");
-            tab->addToggle("Practice Fix", "bot.practicefix");
+            tab->addToggle("Practice Fix", "bot.practicefix")->setDescription("Properly saves the player\'s velocity when respawning from a checkpoint.");
         }
 
         [[nodiscard]] bool isCheating() override { return false; }
