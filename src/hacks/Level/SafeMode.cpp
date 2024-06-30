@@ -152,8 +152,7 @@ static void onModify(auto & self)
         
 
         if (endcompletetext) {
-            log::debug("Found");
-			endcompletetext->setVisible(false);
+		endcompletetext->setVisible(false);
             CCSprite* SafeMode = nullptr;
             if (Cheats()) {
                 SafeMode = CCSprite::createWithSpriteFrameName("SafeModeCheats.png"_spr);
