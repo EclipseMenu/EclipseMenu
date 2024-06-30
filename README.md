@@ -1,4 +1,13 @@
 <div align="center">
+   <a href="https://github.com/EclipseMenu/EclipseMenu">
+      <img src="logo.png" alt="Logo" width="120" height="120">
+   </a>
+   <h1 align="center">Eclipse</h1>
+   <p align="center">
+      A next-generation mod menu for Geometry Dash.
+   </p>
+</div>
+<div align="center">
     <a href="https://github.com/EclipseMenu/EclipseMenu/latest">
           <img src="https://img.shields.io/github/v/release/EclipseMenu/EclipseMenu" alt="Release version">
     </a>
@@ -15,12 +24,3 @@
     </a>
 </div>
 <br>
-<div align="center">
-   <a href="https://github.com/EclipseMenu/EclipseMenu">
-      <img src="logo.png" alt="Logo" width="80" height="80">
-   </a>
-   <h3 align="center">Eclipse</h3>
-   <p align="center">
-      A new and improved utility interface for Geometry Dash, which adds features such as Noclip, Show Trajectory, and a macro recorder.
-   </p>
-</div>

@@ -21,7 +21,8 @@ namespace eclipse::hacks::Bypass {
         bool init(GJGameLevel *gj, bool p1, bool p2) {
             if (!PlayLayer::init(gj, p1, p2)) return false;
 
-            if (config::get<bool>("bypass.instantcomplete", false)) PlayLayer::playEndAnimationToPos({2,2});
+            if (config::get<bool>("bypass.instantcomplete", false))
+                PlayLayer::playEndAnimationToPos({2,2});
 
             return true;
         }

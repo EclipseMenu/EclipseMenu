@@ -1,4 +1,3 @@
-//from prism its superseded anyways im lazy
 #include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
@@ -20,11 +19,10 @@ namespace eclipse::hacks::Creator {
     REGISTER_HACK(NoCopyMark)
 
     class $modify(EditLevelLayer) {
-        // Verify Hack, No (C) Mark
         void onShare(CCObject* sender) {
-        if (config::get<bool>("creator.nocopymark", false)) {
-            this->m_level->m_originalLevel = 0;
-        }
+            if (config::get<bool>("creator.nocopymark", false)) {
+                this->m_level->m_originalLevel = 0;
+            }
             EditLevelLayer::onShare(sender);
         }
     };

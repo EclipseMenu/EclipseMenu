@@ -38,10 +38,11 @@ namespace eclipse::hacks::Recorder {
         reinterpret_cast<void(__stdcall *)(GLint, GLint, GLsizei, GLsizei)>(glViewportAddress)(a, b, c, d);
     }
 
-    $execute
-    {
+    $execute {
         glViewportAddress = geode::addresser::getNonVirtual(glViewport);
-        geode::Mod::get()->hook(reinterpret_cast<void *>(glViewportAddress), &glViewportHook, "glViewport");
+        auto result = geode::Mod::get()->hook(reinterpret_cast<void *>(glViewportAddress), &glViewportHook, "glViewport");
+        if (result.isErr())
+            geode::log::error("Failed to hook glViewport");
     }
 
     void start() {
@@ -176,7 +177,7 @@ namespace eclipse::hacks::Recorder {
 
     class $modify(cocos2d::CCScheduler) {
         static void onModify(auto& self) {
-            self.setHookPriority("cocos2d::CCScheduler::update", -0x500000);
+            FIRST_PRIORITY("cocos2d::CCScheduler::update");
         }
 
         void update(float dt) {
