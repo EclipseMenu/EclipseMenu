@@ -77,7 +77,7 @@ namespace eclipse::hacks::Level {
         return cheats;
     }
     bool savedata() {
-        if config::get<bool>("level.autosafemode") {
+        if (config::get<bool>("level.autosafemode")) {
            // safemode doesn't override auto
             if (Cheats()) {
                 return false;
