@@ -9,7 +9,7 @@ namespace eclipse::hacks::Level {
     class NoShader : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
-            tab->addToggle("No Shaders", "level.noshader");
+            tab->addToggle("No Shaders", "level.noshader")->setDescription("Disables shaders");
         }
 
         [[nodiscard]] const char* getId() const override { return "No Shaders"; }
@@ -19,7 +19,8 @@ namespace eclipse::hacks::Level {
 
     class $modify(ShaderLayer) {
         void visit() {
-            if (config::get<bool>("level.noshader", false)) return CCNode::visit();
+            if (config::get<bool>("level.noshader", false))
+                return CCNode::visit();
             ShaderLayer::visit();
         }
     };
