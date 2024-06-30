@@ -14,7 +14,7 @@
 	},
    	"tags": ["cheats", "gameplay", "utility", "customization", "interface"],
 	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev"],
-	"description": "A next-generation mod menu",
+	"description": "A next-generation mod menu for Geometry Dash.",
 	"early-load": true,
 	"incompatibilities": [
 		{
