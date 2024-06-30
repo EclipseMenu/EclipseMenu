@@ -1,5 +1,5 @@
 {
-	"geode": "3.1.1",
+	"geode": "3.2.0",
 	"gd": {
 		"win": "2.206",
 		"mac": "2.206",
@@ -9,7 +9,11 @@
 	"version": "v1.0.0",
 	"id": "eclipse.eclipse-menu",
 	"name": "Eclipse",
-	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev", "Viper"],
+   	"links": {
+		"source": "https://github.com/EclipseMenu/EclipseMenu"
+	},
+   	"tags": ["cheats", "gameplay", "utility", "customization", "interface"],
+	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev","Viper"],
 	"description": "Ultimate mod menu for Geometry Dash",
 	"early-load": true,
 	"incompatibilities": [

@@ -102,6 +102,18 @@ namespace eclipse::gui::imgui {
                 inputfloat->triggerCallback(value);
             }
             ImGui::PopItemWidth();
+        } else if (auto* inputInt = dynamic_cast<InputIntComponent*>(component)) {
+            int value = config::get<int>(inputInt->getId(), 0);
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.3f);
+            if (ImGui::InputInt(inputInt->getTitle().c_str(), &value, 0, 0)) {
+
+                if(value < inputInt->getMin()) value = inputInt->getMin();
+                if(value > inputInt->getMax()) value = inputInt->getMax();
+
+                config::set(inputInt->getId(), value);
+                inputInt->triggerCallback(value);
+            }
+            ImGui::PopItemWidth();
         } else if (auto* floattoggle = dynamic_cast<FloatToggleComponent*>(component)) {
             float value = config::get<float>(floattoggle->getId(), 0.0f);
             bool toggle = config::get<bool>(floattoggle->getId() + ".toggle", false);

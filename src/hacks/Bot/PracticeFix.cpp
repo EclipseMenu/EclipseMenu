@@ -14,7 +14,7 @@ namespace eclipse::Hacks::Bot {
     class PracticeFix : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bot");
-            tab->addToggle("Practice Fix", "bot.practicefix");
+            tab->addToggle("Practice Fix", "bot.practicefix")->setDescription("Properly saves the player\'s velocity when respawning from a checkpoint.");
         }
 
         [[nodiscard]] bool isCheating() override { return false; }
@@ -64,6 +64,7 @@ namespace eclipse::Hacks::Bot {
             m_gv0096 = player->m_gv0096;
             m_gv0100 = player->m_gv0100;
             m_unk6c0 = player->m_unk6c0;
+            m_unk328 = player->m_unk328;
             m_unk70c = player->m_unk70c;
             m_unk710 = player->m_unk710;
             m_playerStreak = player->m_playerStreak;
@@ -191,6 +192,7 @@ namespace eclipse::Hacks::Bot {
             player->m_gv0096 = m_gv0096;
             player->m_gv0100 = m_gv0100;
             player->m_unk6c0 = m_unk6c0;
+            player->m_unk328 = m_unk328;
             player->m_unk70c = m_unk70c;
             player->m_unk710 = m_unk710;
             player->m_playerStreak = m_playerStreak;
@@ -316,7 +318,8 @@ namespace eclipse::Hacks::Bot {
         float m_unk68c;
         bool m_gv0096;
         bool m_gv0100;
-        int m_unk6c0;
+        CheckpointObject* m_unk6c0;
+        int m_unk328;
         float m_unk70c;
         float m_unk710;
         int m_playerStreak;
