@@ -82,7 +82,7 @@ namespace eclipse::gui::imgui {
                     ImGui::EndTooltip();
                 }
             }
-            if (!checkbox->getSubComponents().empty()) {
+            if (checkbox->getOptions()) {
                 ImGui::PushItemWidth(-1);
                 auto availWidth = ImGui::GetContentRegionAvail().x;
                 auto buttonSize = ImVec2(availWidth * 0.885f, 0);
@@ -97,7 +97,7 @@ namespace eclipse::gui::imgui {
                     ImGui::OpenPopup(popupName.c_str());
 
                 if (ImGui::BeginPopup(popupName.c_str())) {
-                    for (Component* comp : checkbox->getSubComponents()) {
+                    for (Component* comp : checkbox->getOptions()->getComponents()) {
                         visit(comp);
                     }
                     ImGui::EndPopup();

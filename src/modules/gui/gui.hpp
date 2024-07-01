@@ -7,6 +7,8 @@
 
 namespace eclipse::gui {
 
+    class MenuTab;
+
     class Component {
     public:
         /// @brief Initialize the component.
@@ -59,10 +61,7 @@ namespace eclipse::gui {
         }
 
         /// @brief Add sub-component to toggle.
-        ToggleComponent* addSubComponent(Component* comp) {
-            m_subComponents.push_back(comp);
-            return this;
-        }
+        void addOptions(std::function<void(MenuTab*)> options);
         
         /// @brief Get the toggle value.
         [[nodiscard]] bool getValue() const;
@@ -73,7 +72,7 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] const std::string& getDescription() const { return m_description; }
-        [[nodiscard]] const std::vector<Component*>& getSubComponents() const { return m_subComponents; }
+        [[nodiscard]] MenuTab* getOptions() const { return m_options; }
 
         void triggerCallback(bool value) {
             if (m_callback) m_callback(value);
@@ -84,7 +83,7 @@ namespace eclipse::gui {
         std::string m_title;
         std::string m_description;
         std::function<void(bool)> m_callback;
-        std::vector<Component*> m_subComponents;
+        MenuTab* m_options = nullptr;
     };
 
     /// @brief Radio button component for selecting one of the options.

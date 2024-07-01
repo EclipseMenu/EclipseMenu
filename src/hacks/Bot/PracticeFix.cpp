@@ -63,8 +63,8 @@ namespace eclipse::Hacks::Bot {
             m_unk68c = player->m_unk68c;
             m_gv0096 = player->m_gv0096;
             m_gv0100 = player->m_gv0100;
-            m_unk6c0 = player->m_unk6c0;
-            m_unk328 = player->m_unk328;
+            /* m_unk6c0 = player->m_unk6c0;
+            m_unk328 = player->m_unk328; */
             m_unk70c = player->m_unk70c;
             m_unk710 = player->m_unk710;
             m_playerStreak = player->m_playerStreak;
@@ -191,8 +191,8 @@ namespace eclipse::Hacks::Bot {
             player->m_unk68c = m_unk68c;
             player->m_gv0096 = m_gv0096;
             player->m_gv0100 = m_gv0100;
-            player->m_unk6c0 = m_unk6c0;
-            player->m_unk328 = m_unk328;
+            /* player->m_unk6c0 = m_unk6c0;
+            player->m_unk328 = m_unk328; */
             player->m_unk70c = m_unk70c;
             player->m_unk710 = m_unk710;
             player->m_playerStreak = m_playerStreak;

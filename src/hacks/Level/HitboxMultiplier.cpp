@@ -78,13 +78,11 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("Hitbox Multiplier", "level.hitbox_multiplier")
                 ->callback([](bool){forceHitboxRecalculation();})
-                ->addSubComponent((new gui::InputFloatComponent("Player Multiplier", "level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx"))->callback([](float){forceHitboxRecalculation();}))
-                ->addSubComponent((new gui::InputFloatComponent("Solid Multiplier", "level.hitbox_multiplier.solid", 0.01f, 10.f, "%.2fx"))->callback([](float){forceHitboxRecalculation();}))
-                ->addSubComponent((new gui::InputFloatComponent("Hazard Multiplier", "level.hitbox_multiplier.hazard", 0.01f, 10.f, "%.2fx"))->callback([](float){forceHitboxRecalculation();}));
-
-            //tab->addInputFloat("Player Multiplier", "level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx")->callback([](float){forceHitboxRecalculation();});
-            //tab->addInputFloat("Solid Multiplier", "level.hitbox_multiplier.solid", 0.01f, 10.f, "%.2fx")->callback([](float){forceHitboxRecalculation();});
-            //tab->addInputFloat("Hazard Multiplier", "level.hitbox_multiplier.hazard", 0.01f, 10.f, "%.2fx")->callback([](float){forceHitboxRecalculation();});
+                ->addOptions([] (gui::MenuTab* options) {
+                    options->addInputFloat("Player Multiplier", "level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx");
+                    options->addInputFloat("Solid Multiplier", "level.hitbox_multiplier.solid", 0.01f, 10.f, "%.2fx");
+                    options->addInputFloat("Hazard Multiplier", "level.hitbox_multiplier.hazard", 0.01f, 10.f, "%.2fx");
+                });
         }
 
         void update() override {}
