@@ -82,6 +82,27 @@ namespace eclipse::gui::imgui {
                     ImGui::EndTooltip();
                 }
             }
+            if (checkbox->getOptions()) {
+                ImGui::PushItemWidth(-1);
+                auto availWidth = ImGui::GetContentRegionAvail().x;
+                auto buttonSize = ImVec2(availWidth * 0.885f, 0);
+                auto arrowSize = ImVec2(availWidth * 0.115f, 0);
+                ImGui::SameLine(availWidth - 10, 0);
+                ImGui::SetNextItemWidth(arrowSize.x);
+                bool openPopup = ImGui::ArrowButton((std::string("##open_") + checkbox->getTitle()).c_str(), ImGuiDir_Right);
+                ImGui::PopItemWidth();
+
+                std::string popupName = std::string("##") + checkbox->getTitle().c_str();
+                if (openPopup)
+                    ImGui::OpenPopup(popupName.c_str());
+
+                if (ImGui::BeginPopup(popupName.c_str())) {
+                    for (Component* comp : checkbox->getOptions()->getComponents()) {
+                        visit(comp);
+                    }
+                    ImGui::EndPopup();
+                }
+            }
         } else if (auto* slider = dynamic_cast<SliderComponent*>(component)) {
             auto value = config::get<float>(slider->getId(), 0.0f);
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.4f);
