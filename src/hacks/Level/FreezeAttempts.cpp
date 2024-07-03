@@ -9,7 +9,7 @@ namespace eclipse::hacks::Level {
     class FreezeAttempts : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
-            tab->addToggle("Freeze Attempts", "level.freezeatts");
+            tab->addToggle("Freeze Attempts", "level.freezeatts")->setDescription("Freezes the attempt counter, preventing any new attempts from being saved");
         }
 
         [[nodiscard]] const char* getId() const override { return "Freeze Attempts"; }
