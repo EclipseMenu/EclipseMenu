@@ -37,6 +37,9 @@
         "files": [
             "resources/*.glsl",
 			"resources/Rubik-Regular.ttf"
-        ]
+        ],
+		"sprites": [
+			"resources/ECLIPSE-android.png"
+		]
     }
 }
