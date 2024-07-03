@@ -9,7 +9,7 @@ namespace eclipse::hacks::Bypass {
     class CommentHistory : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
-            tab->addToggle("Comment History Bypass", "bypass.commenthistory")->setDescription("Allows you to see any users comment history");
+            tab->addToggle("Comment History Bypass", "bypass.commenthistory")->setDescription("Allows you to see any user\'s comment history");
         }
 
         [[nodiscard]] const char* getId() const override { return "Comment History Bypass"; }
