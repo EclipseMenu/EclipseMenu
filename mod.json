@@ -13,7 +13,7 @@
 		"source": "https://github.com/EclipseMenu/EclipseMenu"
 	},
    	"tags": ["cheats", "gameplay", "utility", "customization", "interface"],
-	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev"],
+	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev","Viper"],
 	"description": "A next-generation mod menu for Geometry Dash.",
 	"early-load": true,
 	"incompatibilities": [
@@ -40,6 +40,11 @@
         ],
 		"sprites": [
 			"resources/ECLIPSE-android.png"
-		]
+		],
+	    "spritesheets": {
+			"SafemodeSheet": [
+					"resources/safemode/*.png"
+			]
+	    }
     }
 }
