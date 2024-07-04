@@ -13,7 +13,7 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.autoclick.toggle", false);
             config::setIfEmpty("player.autoclick", 1.f);
 
-            tab->addFloatToggle("AutoClicker", "player.autoclick", 0.f, 10.f, "%.3f");
+            tab->addFloatToggle("AutoClicker", "player.autoclick", 0.f, 10.f, "%.3f s.");
         }
 
         [[nodiscard]] const char* getId() const override { return "AutoClicker"; }
