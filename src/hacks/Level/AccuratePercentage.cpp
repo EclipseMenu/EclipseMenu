@@ -40,7 +40,7 @@ namespace eclipse::hacks::Global {
             return PlayLayer::getCurrentPercent();
         }
 
-	    void updateProgressbar() {
+        void updateProgressbar() {
             PlayLayer::updateProgressbar();
             if (!config::get<bool>("level.accuratepercentage", false)) return;
             if (m_percentageLabel == nullptr) return;
