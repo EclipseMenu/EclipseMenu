@@ -18,6 +18,7 @@ namespace eclipse::hacks::Player {
             tab->addToggle("Show Trajectory", "player.showtrajectory")->setDescription("Shows where the player will be if they click/don\'t click.");
         }
 
+        [[nodiscard]] bool isCheating() override { return config::get<bool>("player.showtrajectory", false); }
         [[nodiscard]] const char* getId() const override { return "Show Trajectory"; }
     };
 

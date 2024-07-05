@@ -12,6 +12,7 @@ namespace eclipse::hacks::Bypass {
             tab->addToggle("Instant Complete", "bypass.instantcomplete");
         }
 
+        [[nodiscard]] bool isCheating() override { return config::get<bool>("bypass.instantcomplete", false); }
         [[nodiscard]] const char* getId() const override { return "Instant Complete"; }
     };
 
@@ -21,6 +22,7 @@ namespace eclipse::hacks::Bypass {
         bool init(GJGameLevel *gj, bool p1, bool p2) {
             if (!PlayLayer::init(gj, p1, p2)) return false;
 
+            // TODO: this causes roberts ac to trigger
             if (config::get<bool>("bypass.instantcomplete", false))
                 PlayLayer::playEndAnimationToPos({2,2});
 

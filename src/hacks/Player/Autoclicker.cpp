@@ -12,6 +12,7 @@ namespace eclipse::hacks::Player {
             tab->addToggle("AutoClicker", "player.autoclick");
         }
 
+        [[nodiscard]] bool isCheating() override { return config::get<bool>("player.autoclick", false); }
         [[nodiscard]] const char* getId() const override { return "AutoClicker"; }
     };
 
