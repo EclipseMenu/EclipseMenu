@@ -34,7 +34,4 @@ namespace eclipse::hacks::Global {
             }
         }
     };
-
-
-
 }
