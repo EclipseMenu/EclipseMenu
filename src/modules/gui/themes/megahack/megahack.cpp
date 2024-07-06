@@ -161,6 +161,21 @@ namespace eclipse::gui::imgui {
                 config::set(radio->getId(), value);
                 radio->triggerCallback(value);
             }
+        } else if (auto* combo = dynamic_cast<ComboComponent*>(component)) {
+            std::vector<std::string> items = combo->getItems();
+            int value = config::get<int>(combo->getId(), combo->getValue());
+            if (ImGui::BeginCombo(combo->getTitle().c_str(), items[value].c_str())) {
+                for (int n = 0; n < items.size(); n++) {
+                    const bool is_selected = (value == n);
+                    if (ImGui::Selectable(items[n].c_str(), is_selected)) {
+                        config::set(combo->getId(), n);
+                        combo->triggerCallback(n);
+                    }
+
+                    if (is_selected) ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
         } else if (auto* inputtext = dynamic_cast<InputTextComponent*>(component)) {
             std::string value = config::get<std::string>(inputtext->getId(), "");
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);

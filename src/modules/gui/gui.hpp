@@ -121,6 +121,45 @@ namespace eclipse::gui {
         std::function<void(int)> m_callback;
     };
 
+    /// @brief Combo component for selecting one of the options.
+    class ComboComponent : public Component {
+    public:
+        explicit ComboComponent(std::string id, std::string title, std::vector<std::string> items, int value)
+            : m_id(std::move(id)), m_title(std::move(title)), m_items(items), m_value(value) {}
+
+        void onInit() override {}
+        void onUpdate() override {}
+
+        /// @brief Set a callback function to be called when the component value changes.
+        ComboComponent* callback(const std::function<void(int)>& func) { 
+            m_callback = func; 
+            return this;
+        }
+
+        /// @brief Get the combo value.
+        [[nodiscard]] int getValue() const { return m_value; }
+
+        /// @brief Get the combo items.
+        [[nodiscard]] std::vector<std::string> getItems() const { return m_items; }
+
+        /// @brief Set the combo button value.
+        void setValue(int value) { m_value = value; }
+
+        [[nodiscard]] const std::string& getId() const override { return m_id; }
+        [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+
+        void triggerCallback(int value) {
+            if (m_callback) m_callback(value);
+        }
+
+    private:
+        std::string m_id;
+        std::string m_title;
+        int m_value;
+        std::vector<std::string> m_items;
+        std::function<void(int)> m_callback;
+    };
+
     /// @brief Slider component to select a value from a range.
     class SliderComponent : public Component {
     public:
@@ -349,6 +388,13 @@ namespace eclipse::gui {
             auto* button = new RadioButtonComponent(id, title, value);
             addComponent(button);
             return button;
+        }
+
+        /// @brief Add a radio button to the tab.
+        ComboComponent* addCombo(const std::string& title, const std::string& id, std::vector<std::string> items, int value) {
+            auto* combo = new ComboComponent(id, title, items, value);
+            addComponent(combo);
+            return combo;
         }
 
         /// @brief Add a slider to the tab.
