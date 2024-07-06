@@ -4,12 +4,23 @@
 #include <imgui_internal.h>
 #include <string>
 #include <cmath>
-#include <stdio.h>
+#include <cstdio>
+#include <nlohmann/json.hpp>
 
 #include <fmt/format.h>
 
 namespace eclipse::gui {
     struct Color {
+        // Define default colors
+        static const Color WHITE;
+        static const Color BLACK;
+        static const Color RED;
+        static const Color GREEN;
+        static const Color BLUE;
+        static const Color YELLOW;
+        static const Color CYAN;
+        static const Color MAGENTA;
+
         float r, g, b, a;
 
         Color() : r(0), g(0), b(0), a(1.0f) {}
@@ -112,14 +123,19 @@ namespace eclipse::gui {
             uint32_t c = toInt();
             return fmt::format("{:08X}", c);
         }
+
+        /// @brief Converts the color to a CCColor3B
+        /// @return CCColor3B color
+        [[nodiscard]] cocos2d::ccColor3B toCCColor3B() const {
+            return {
+                static_cast<uint8_t>(r * 255),
+                static_cast<uint8_t>(g * 255),
+                static_cast<uint8_t>(b * 255)
+            };
+        }
     };
 
-    void to_json(nlohmann::json &j, const Color &e) {
-        auto str = e.toString();
-        j = str;
-    }
+    void to_json(nlohmann::json &j, const Color &e);
+    void from_json(const nlohmann::json &j, Color &e);
 
-    void from_json(const nlohmann::json &j, Color &e) {
-        e = Color::fromString(j.get<std::string>().c_str());
-    }
 }

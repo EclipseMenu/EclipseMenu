@@ -18,14 +18,16 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(HidePause)
 
     class $modify(HPMPauseLayer, PauseLayer) {
-        static PauseLayer* create(bool b) {
-            PauseLayer* pm = PauseLayer::create(b);
-            pm->schedule(schedule_selector(HPMPauseLayer::updatePauseMenu));
-            return pm;
+        bool init(bool p0) {
+            if (!PauseLayer::init(p0)) return false;
+            this->schedule(schedule_selector(HPMPauseLayer::updatePauseMenu));
+            this->setVisible(!config::get<bool>("level.hidepause", false));
+            return true;
         }
 
         void updatePauseMenu(float dt) {
-            if (config::get<bool>("level.hidepause", false) == this->isVisible()) this->setVisible(!config::get<bool>("level.hidepause", false));
+            if (config::get<bool>("level.hidepause", false) == this->isVisible())
+                this->setVisible(!config::get<bool>("level.hidepause", false));
         }
     };
 }
