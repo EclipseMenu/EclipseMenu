@@ -42,20 +42,19 @@ namespace eclipse::hacks::Level {
 
             auto* startPos = index >= 0 ? startPosObjects[index] : nullptr;
             playLayer->setStartPosObject(startPos);
+            playLayer->m_isTestMode = index >= 0;
 
             if (playLayer->m_isPracticeMode)
                 playLayer->resetLevelFromStart();
 
             playLayer->resetLevel();
             playLayer->startMusic();
+            playLayer->updateTestModeLabel();
         }
 
         void update() override {
             auto* playLayer = PlayLayer::get();
-            if (!playLayer) {
-                // TODO: cleanup
-                return;
-            }
+            if (!playLayer) return;
 
             if (!config::get<bool>("level.startpos_switcher", false)) return;
 
@@ -74,16 +73,7 @@ namespace eclipse::hacks::Level {
     class $modify(PlayLayer) {
         bool init(GJGameLevel *level, bool useReplay, bool dontCreateObjects) {
             startPosObjects.clear();
-
-            if (!PlayLayer::init(level, useReplay, dontCreateObjects))
-                return false;
-
-            auto count = static_cast<int32_t>(startPosObjects.size());
-            currentStartPosIndex = m_isTestMode ? count - 1 : -1;
-
-            // TODO: Spawn label
-
-            return true;
+            return PlayLayer::init(level, useReplay, dontCreateObjects);
         }
 
         void resetLevel() {
@@ -104,6 +94,24 @@ namespace eclipse::hacks::Level {
             if (id == 31) {
                 startPosObjects.push_back(geode::cast::typeinfo_cast<StartPosObject*>(object));
             }
+        }
+
+        void createObjectsFromSetupFinished() {
+            PlayLayer::createObjectsFromSetupFinished();
+
+            std::sort(startPosObjects.begin(), startPosObjects.end(), [](GameObject *a, GameObject *b) {
+                return a->getPositionX() < b->getPositionX();
+            });
+
+            currentStartPosIndex = -1;
+            if(m_startPosObject) {
+                auto it = std::find(startPosObjects.begin(), startPosObjects.end(), m_startPosObject);
+                if (it != startPosObjects.end()) {
+                    currentStartPosIndex = static_cast<int32_t>(std::distance(startPosObjects.begin(), it));
+                }
+            }
+
+            // TODO: Spawn label
         }
     };
 

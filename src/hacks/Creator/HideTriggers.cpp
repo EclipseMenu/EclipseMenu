@@ -29,7 +29,7 @@ namespace eclipse::hacks::Creator {
     class $modify(EditorUI) {
         void onPlaytest(cocos2d::CCObject* sender) {
             EditorUI::onPlaytest(sender);
-            if (!config::get<bool>("creator.hidetriggers")) return;
+            if (!config::get<bool>("creator.hidetriggers", false)) return;
             
             auto* editorLayer = LevelEditorLayer::get();
             if (!editorLayer) return;
@@ -48,7 +48,7 @@ namespace eclipse::hacks::Creator {
     class $modify(LevelEditorLayer) {
         void onStopPlaytest() {
             LevelEditorLayer::onStopPlaytest();
-            if (!config::get<bool>("creator.hidetriggers")) return;
+            if (!config::get<bool>("creator.hidetriggers", false)) return;
 
             // Show all triggers
             for (auto obj : s_editorTriggers) {
@@ -59,7 +59,7 @@ namespace eclipse::hacks::Creator {
 
         void updateVisibility(float dt) {
             LevelEditorLayer::updateVisibility(dt);
-            if (!config::get<bool>("creator.hidetriggers")) return;
+            if (!config::get<bool>("creator.hidetriggers", false)) return;
 
             // Hide all triggers
             for (auto obj : s_editorTriggers) {
