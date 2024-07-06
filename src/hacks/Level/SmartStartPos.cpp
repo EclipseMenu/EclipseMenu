@@ -111,8 +111,7 @@ namespace eclipse::hacks::Level {
             }
         }
 
-        bool init(GJGameLevel* level, bool unk1, bool unk2)
-        {
+        bool init(GJGameLevel* level, bool unk1, bool unk2) {
             m_fields->m_dualPortals.clear();
             m_fields->m_gamemodePortals.clear();
             m_fields->m_miniPortals.clear();
@@ -124,8 +123,7 @@ namespace eclipse::hacks::Level {
             return PlayLayer::init(level, unk1, unk2);
         }
 
-        void resetLevel()
-        {
+        void resetLevel() {
             if(config::get<bool>("level.smartstartpos", false)) {
                 for(StartPosObject* obj : m_fields->m_startPositions)
                     setupStartPos(obj);
@@ -134,8 +132,7 @@ namespace eclipse::hacks::Level {
             PlayLayer::resetLevel();
         }
 
-        void addObject(GameObject* obj)
-        {
+        void addObject(GameObject* obj) {
             PlayLayer::addObject(obj);
 
             switch(obj->m_objectID)
