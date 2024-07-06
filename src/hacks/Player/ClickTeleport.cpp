@@ -4,6 +4,8 @@
 #include <modules/keybinds/manager.hpp>
 #include <imgui.h>
 
+#ifndef GEODE_IS_ANDROID
+
 namespace eclipse::hacks::Player {
 
     double degToRad(double degrees) {
@@ -77,3 +79,5 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(ClickTeleport)
 
 }
+
+#endif

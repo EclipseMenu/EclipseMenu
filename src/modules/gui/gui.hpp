@@ -142,7 +142,7 @@ namespace eclipse::gui {
         [[nodiscard]] int getValue() const { return m_value; }
 
         /// @brief Get the combo items.
-        [[nodiscard]] std::vector<std::string> getItems() const { return m_items; }
+        [[nodiscard]] const std::vector<std::string>& getItems() const { return m_items; }
 
         /// @brief Set the combo button value.
         void setValue(int value) { m_value = value; }

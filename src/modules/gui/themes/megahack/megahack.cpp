@@ -97,6 +97,7 @@ namespace eclipse::gui::imgui {
                 if (openPopup)
                     ImGui::OpenPopup(popupName.c_str());
 
+                ImGui::SetNextWindowSizeConstraints(ImVec2(200, 0), ImVec2(FLT_MAX, FLT_MAX));
                 if (ImGui::BeginPopup(popupName.c_str())) {
                     for (Component* comp : checkbox->getOptions()->getComponents()) {
                         visit(comp);
@@ -163,7 +164,7 @@ namespace eclipse::gui::imgui {
                 radio->triggerCallback(value);
             }
         } else if (auto* combo = dynamic_cast<ComboComponent*>(component)) {
-            std::vector<std::string> items = combo->getItems();
+            auto& items = combo->getItems();
             int value = config::get<int>(combo->getId(), combo->getValue());
             if (ImGui::BeginCombo(combo->getTitle().c_str(), items[value].c_str())) {
                 for (int n = 0; n < items.size(); n++) {
@@ -178,7 +179,7 @@ namespace eclipse::gui::imgui {
                 ImGui::EndCombo();
             }
         } else if (auto* inputtext = dynamic_cast<InputTextComponent*>(component)) {
-            std::string value = config::get<std::string>(inputtext->getId(), "");
+            auto value = config::get<std::string>(inputtext->getId(), "");
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
             if (ImGui::InputText(inputtext->getTitle().c_str(), &value)) {
                 config::set(inputtext->getId(), value);
