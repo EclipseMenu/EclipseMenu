@@ -7,6 +7,7 @@
 #include <modules/config/config.hpp>
 
 #include <misc/cpp/imgui_stdlib.h>
+#include <imgui-cocos.hpp>
 
 namespace eclipse::gui::imgui {
     /// @brief Calculate a random window position outside the screen.
@@ -188,6 +189,101 @@ namespace eclipse::gui::imgui {
             if (ImGui::Button(button->getTitle().c_str())) {
                 button->triggerCallback();
             }
+        } else if (auto* keybind = dynamic_cast<KeybindComponent*>(component)) {
+            auto& title = keybind->getTitle();
+            auto canDelete = keybind->canDelete();
+
+            ImGui::PushItemWidth(-1);
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
+
+            // truncate title if it's too long
+            auto availWidth = ImGui::GetContentRegionAvail().x;
+            auto labelMaxWidth = availWidth * (canDelete ? 0.5f : 0.6f);
+            auto labelSize = ImGui::CalcTextSize(title.c_str());
+
+            if (labelSize.x > labelMaxWidth) {
+                auto labelEnd = 0;
+                while (labelEnd != title.size()) {
+                    auto labelStr = title.substr(0, labelEnd) + "...";
+                    auto newSize = ImGui::CalcTextSize(labelStr.c_str());
+                    if (newSize.x > labelMaxWidth - 20)
+                        break;
+                    labelEnd++;
+                }
+                auto truncatedLabel = title.substr(0, labelEnd) + "...";
+                ImGui::Button(truncatedLabel.c_str(), ImVec2(labelMaxWidth, 0));
+                // TODO: Add a tooltip on hover
+            } else {
+                ImGui::Button(title.c_str(), ImVec2(labelMaxWidth, 0));
+            }
+
+            ImGui::SameLine(0, 0);
+
+            ImGui::PopStyleColor(3);
+            ImGui::PopStyleVar(2);
+            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0.25f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
+
+            auto key = config::get<keybinds::Keys>(keybind->getId(), keybinds::Keys::None);
+            auto keyName = keybinds::keyToString(key);
+            bool changed = ImGui::Button(keyName.c_str(), ImVec2(availWidth * 0.4f, 0));
+            ImGui::PopStyleColor(3);
+            ImGui::PopStyleVar();
+
+            auto popupName = fmt::format("##{}-popup", keybind->getId());
+            if (changed) ImGui::OpenPopup(popupName.c_str());
+
+            if (ImGui::BeginPopup(popupName.c_str())) {
+                ImGuiCocos::get().setInputMode(ImGuiCocos::InputMode::Blocking);
+                ImGui::Text("%s", "Press any key to change the keybind...");
+                ImGui::Separator();
+
+                ImGui::Text("%s", "Press ESC to clear the cancel.");
+
+                if (keybinds::isKeyDown(keybinds::Keys::Escape)) {
+                    geode::log::info("Escape key pressed");
+                    ImGui::CloseCurrentPopup();
+                } else {
+                    auto from = keybinds::Keys::A;
+                    auto to = keybinds::Keys::LastKey;
+                    for (auto i = from; i < to; i++) {
+                        if (keybinds::isKeyDown(i)) {
+                            geode::log::info("Key pressed: {}", keybinds::keyToString(i));
+                            config::set(keybind->getId(), i);
+                            keybind->triggerCallback(i);
+                            ImGui::CloseCurrentPopup();
+                            break;
+                        }
+                    }
+                }
+
+                ImGui::EndPopup();
+            }
+
+            bool deleteClicked = false;
+            if (canDelete) {
+                ImGui::SameLine(0, 0);
+                ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
+                deleteClicked = ImGui::Button("X", ImVec2(availWidth * 0.1f, 0));
+                ImGui::PopStyleColor(3);
+                ImGui::PopStyleVar();
+                if (deleteClicked) {
+                    config::set(keybind->getId(), keybinds::Keys::None);
+                    keybind->triggerCallback(keybinds::Keys::None);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            ImGui::PopItemWidth();
         }
     }
 

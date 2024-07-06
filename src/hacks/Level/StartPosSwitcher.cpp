@@ -18,12 +18,13 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.startpos_switcher.next", keybinds::Keys::E);
 
             auto tab = gui::MenuTab::find("Level");
-            auto startposSwitcher = tab->addToggle("StartPos Switcher", "level.startpos_switcher");
-            startposSwitcher->setDescription("Allows you to switch between StartPos objects");
-            // TODO: Implement options for widgets
-            // startposSwitcher->addOptions([](auto* options) {
-            //
-            // });
+            tab->addToggle("StartPos Switcher", "level.startpos_switcher")
+                ->setDescription("Allows you to switch between StartPos objects")
+                ->addOptions([](auto* options) {
+                    options->addKeybind("Previous StartPos", "level.startpos_switcher.previous");
+                    options->addKeybind("Next StartPos", "level.startpos_switcher.next");
+                    options->addToggle("Reset Camera", "level.startpos_switcher.reset_camera");
+                });
         }
 
         static void pickStartPos(PlayLayer* playLayer, int32_t index) {

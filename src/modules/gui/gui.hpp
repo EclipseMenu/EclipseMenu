@@ -1,5 +1,7 @@
 #pragma once
 
+#include <modules/keybinds/manager.hpp>
+
 #include <utility>
 #include <string>
 #include <vector>
@@ -361,6 +363,36 @@ namespace eclipse::gui {
         std::function<void()> m_callback;
     };
 
+    /// @brief Component for picking a keybind.
+    class KeybindComponent : public Component {
+    public:
+        explicit KeybindComponent(std::string title, std::string id, bool canDelete = false) :
+            m_title(std::move(title)), m_id(std::move(id)), m_canDelete(canDelete) {}
+
+        void onInit() override {}
+        void onUpdate() override {}
+
+        /// @brief Set a callback function to be called when the component value changes.
+        KeybindComponent* callback(const std::function<void(keybinds::Keys)>& func) {
+            m_callback = func;
+            return this;
+        }
+
+        [[nodiscard]] const std::string& getId() const override { return m_id; }
+        [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+        [[nodiscard]] bool canDelete() const { return m_canDelete; }
+
+        void triggerCallback(keybinds::Keys key) {
+            if (m_callback) m_callback(key);
+        }
+
+    private:
+        std::string m_id;
+        std::string m_title;
+        bool m_canDelete;
+        std::function<void(keybinds::Keys)> m_callback;
+    };
+
     /// @brief Contains a list of components and a title, to be passed into render engine.
     class MenuTab {
     public:
@@ -437,6 +469,13 @@ namespace eclipse::gui {
             auto* button = new ButtonComponent(title);
             addComponent(button);
             return button;
+        }
+
+        /// @brief Add a keybind to the tab.
+        KeybindComponent* addKeybind(const std::string& title, const std::string& id, bool canDelete = false) {
+            auto* keybind = new KeybindComponent(title, id, canDelete);
+            addComponent(keybind);
+            return keybind;
         }
 
         /// @brief Get the tab's title.
