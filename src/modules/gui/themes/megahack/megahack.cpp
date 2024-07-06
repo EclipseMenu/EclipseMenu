@@ -41,7 +41,14 @@ namespace eclipse::gui::imgui {
         m_isToggled = !m_isToggled;
 
         if (!m_isToggled) {
-            // TODO: save window positions
+            // Save window states
+            std::vector<nlohmann::json> windowStates;
+            for (auto& window : m_windows) {
+                nlohmann::json windowState;
+                to_json(windowState, window);
+                windowStates.push_back(windowState);
+            }
+            config::set("windows", windowStates);
         }
 
         double duration = config::get("menu.animationDuration", 0.3);
@@ -295,6 +302,18 @@ namespace eclipse::gui::imgui {
                 ImGui::GetStyle().Alpha = 0.f;
                 for (auto& window : m_windows) {
                     window.draw();
+                }
+                {
+                    // Load window states
+                    auto windowStates = config::get("windows", std::vector<nlohmann::json>());
+                    for (auto& windowState : windowStates) {
+                        auto title = windowState.at("title").get<std::string>();
+                        auto window = std::find_if(m_windows.begin(), m_windows.end(), [&title](const Window& window) {
+                            return window.getTitle() == title;
+                        });
+                        if (window != m_windows.end())
+                            from_json(windowState, *window);
+                    }
                 }
                 frame = 1;
                 break;
