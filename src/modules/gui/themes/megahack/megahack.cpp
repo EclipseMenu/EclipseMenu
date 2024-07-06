@@ -248,14 +248,12 @@ namespace eclipse::gui::imgui {
                 ImGui::Text("%s", "Press ESC to clear the cancel.");
 
                 if (keybinds::isKeyDown(keybinds::Keys::Escape)) {
-                    geode::log::info("Escape key pressed");
                     ImGui::CloseCurrentPopup();
                 } else {
                     auto from = keybinds::Keys::A;
                     auto to = keybinds::Keys::LastKey;
                     for (auto i = from; i < to; i++) {
                         if (keybinds::isKeyDown(i)) {
-                            geode::log::info("Key pressed: {}", keybinds::keyToString(i));
                             config::set(keybind->getId(), i);
                             keybind->triggerCallback(i);
                             ImGui::CloseCurrentPopup();
