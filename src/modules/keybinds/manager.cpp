@@ -1,11 +1,84 @@
 #include "manager.hpp"
 
+#include <modules/config/config.hpp>
+#include <modules/hack/hack.hpp>
+#include <modules/gui/gui.hpp>
+
 #include <Geode/modify/CCEGLView.hpp>
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 
 using namespace geode::prelude;
 
 namespace eclipse::keybinds {
+
+    Keys& operator++(Keys& key) {
+        key = static_cast<Keys>(static_cast<int>(key) + 1);
+        return key;
+    }
+
+    Keys operator++(Keys& key, int) {
+        Keys result = key;
+        ++key;
+        return result;
+    }
+
+    std::string keyToString(Keys key) {
+#define CASE(key, name) case Keys:: key: return name
+        switch (key) {
+            CASE(None, "-");
+
+            CASE(A, "A"); CASE(B, "B"); CASE(C, "C"); CASE(D, "D");
+            CASE(E, "E"); CASE(F, "F"); CASE(G, "G"); CASE(H, "H");
+            CASE(I, "I"); CASE(J, "J"); CASE(K, "K"); CASE(L, "L");
+            CASE(M, "M"); CASE(N, "N"); CASE(O, "O"); CASE(P, "P");
+            CASE(Q, "Q"); CASE(R, "R"); CASE(S, "S"); CASE(T, "T");
+            CASE(U, "U"); CASE(V, "V"); CASE(W, "W"); CASE(X, "X");
+            CASE(Y, "Y"); CASE(Z, "Z");
+
+            CASE(Space, "Space"); CASE(Apostrophe, "'"); CASE(Comma, ",");
+            CASE(Minus, "-"); CASE(Period, "."); CASE(Slash, "/"); CASE(Semicolon, ";");
+            CASE(Equal, "="); CASE(LeftBracket, "["); CASE(Backslash, "\\");
+            CASE(RightBracket, "]"); CASE(GraveAccent, "`"); CASE(World1, "World1");
+            CASE(World2, "World2");
+
+            CASE(Num0, "0"); CASE(Num1, "1"); CASE(Num2, "2"); CASE(Num3, "3");
+            CASE(Num4, "4"); CASE(Num5, "5"); CASE(Num6, "6"); CASE(Num7, "7");
+            CASE(Num8, "8"); CASE(Num9, "9");
+
+            CASE(F1, "F1"); CASE(F2, "F2"); CASE(F3, "F3"); CASE(F4, "F4");
+            CASE(F5, "F5"); CASE(F6, "F6"); CASE(F7, "F7"); CASE(F8, "F8");
+            CASE(F9, "F9"); CASE(F10, "F10"); CASE(F11, "F11"); CASE(F12, "F12");
+            CASE(F13, "F13"); CASE(F14, "F14"); CASE(F15, "F15"); CASE(F16, "F16");
+            CASE(F17, "F17"); CASE(F18, "F18"); CASE(F19, "F19"); CASE(F20, "F20");
+            CASE(F21, "F21"); CASE(F22, "F22"); CASE(F23, "F23"); CASE(F24, "F24");
+            CASE(F25, "F25");
+
+            CASE(NumPad0, "Num 0"); CASE(NumPad1, "Num 1"); CASE(NumPad2, "Num 2");
+            CASE(NumPad3, "Num 3"); CASE(NumPad4, "Num 4"); CASE(NumPad5, "Num 5");
+            CASE(NumPad6, "Num 6"); CASE(NumPad7, "Num 7"); CASE(NumPad8, "Num 8");
+            CASE(NumPad9, "Num 9"); CASE(NumPadDecimal, "Num ."); CASE(NumPadDivide, "Num /");
+            CASE(NumPadMultiply, "Num *"); CASE(NumPadSubtract, "Num -"); CASE(NumPadAdd, "Num +");
+            CASE(NumPadEnter, "Num Enter"); CASE(NumPadEqual, "Num =");
+
+            CASE(Menu, "Menu"); CASE(Escape, "Escape"); CASE(Enter, "Enter"); CASE(Tab, "Tab");
+            CASE(Backspace, "Backspace"); CASE(Insert, "Insert"); CASE(Delete, "Delete");
+            CASE(Home, "Home"); CASE(End, "End"); CASE(PageUp, "Page Up"); CASE(PageDown, "Page Down");
+            CASE(CapsLock, "Caps Lock"); CASE(ScrollLock, "Scroll Lock"); CASE(NumLock, "Num Lock");
+            CASE(PrintScreen, "Print Screen"); CASE(Pause, "Pause");
+
+            CASE(Up, "Up"); CASE(Down, "Down"); CASE(Left, "Left"); CASE(Right, "Right");
+
+            CASE(LeftShift, "Shift"); CASE(LeftControl, "Ctrl"); CASE(LeftAlt, "Alt"); CASE(LeftSuper, "Super");
+            CASE(RightShift, "RShift"); CASE(RightControl, "RCtrl"); CASE(RightAlt, "RAlt"); CASE(RightSuper, "RSuper");
+
+            CASE(MouseLeft, "LMB"); CASE(MouseRight, "RMB"); CASE(MouseMiddle, "MMB");
+            CASE(MouseButton4, "Mouse 4"); CASE(MouseButton5, "Mouse 5");
+
+            CASE(MenuKey, "Menu Key"); CASE(LastKey, "Last Key");
+            default: return "Unknown";
+        }
+#undef CASE
+    }
 
 #ifdef GEODE_IS_WINDOWS
     Keys convertGlfwKey(int key) {
@@ -135,14 +208,18 @@ namespace eclipse::keybinds {
     }
 
     class $modify(cocos2d::CCEGLView) {
-        void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-            CCEGLView::onGLFWKeyCallback(window, key, scancode, action, mods);
+        static void onModify(auto& self) {
+            FIRST_PRIORITY("cocos2d::CCEGLView::onGLFWKeyCallback");
+        }
 
+        void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
             if (action == GLFW_PRESS) {
                 Manager::get()->registerKeyPress(convertGlfwKey(key));
             } else if (action == GLFW_RELEASE) {
                 Manager::get()->registerKeyRelease(convertGlfwKey(key));
             }
+
+            CCEGLView::onGLFWKeyCallback(window, key, scancode, action, mods);
         }
     };
 #else
@@ -273,6 +350,10 @@ namespace eclipse::keybinds {
     }
 
     class $modify(cocos2d::CCKeyboardDispatcher) {
+        static void onModify(auto& self) {
+            FIRST_PRIORITY("cocos2d::CCKeyboardDispatcher::dispatchKeyboardMSG");
+        }
+
         bool dispatchKeyboardMSG(cocos2d::enumKeyCodes key, bool down, bool idk) {
             if (down) {
                 Manager::get()->registerKeyPress(convertCocosKey(key));
@@ -284,6 +365,8 @@ namespace eclipse::keybinds {
         }
     };
 #endif
+
+    static std::map<std::string, gui::KeybindComponent*> s_keybindComponents;
 
     Manager* Manager::get() {
         static Manager s_manager;
@@ -312,8 +395,31 @@ namespace eclipse::keybinds {
         for (auto& keybind : m_keybinds) {
             if (keybind.getId() == id) {
                 keybind.setInitialized(state);
+
+                auto* tab = gui::MenuTab::find("Keybinds");
+                config::set(fmt::format("keybind.{}.active", id), state);
+                if (state) {
+                    // Add the keybind to the GUI
+                    auto* keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", id), true);
+                    keybindComponent->callback([tab, keybindComponent, id](Keys key) {
+                        if (key == Keys::None)
+                            tab->removeComponent(keybindComponent);
+
+                        Manager::get()->getKeybind(id)->setKey(key);
+                    });
+                    s_keybindComponents[id] = keybindComponent;
+                } else {
+                    // Remove the keybind from the GUI
+                    if (auto* keybindComponent = s_keybindComponents[id]; keybindComponent) {
+                        tab->removeComponent(keybindComponent);
+                    }
+                }
+
+                return;
             }
         }
+
+        geode::log::warn("Keybind with ID '{}' not found", id);
     }
 
     void Manager::registerKeyPress(Keys key) {
@@ -324,6 +430,15 @@ namespace eclipse::keybinds {
                 keybind.execute();
             }
         }
+    }
+
+    Keybind* Manager::getKeybind(const std::string& id) {
+        for (auto& keybind : m_keybinds) {
+            if (keybind.getId() == id) {
+                return &keybind;
+            }
+        }
+        return nullptr;
     }
 
     void Manager::registerKeyRelease(Keys key) {
@@ -349,6 +464,20 @@ namespace eclipse::keybinds {
             return !manager->m_keyStates[key];
         }
         return false;
+    }
+
+    void Manager::setupTab() {
+        auto* tab = gui::MenuTab::find("Keybinds");
+        tab->addKeybind("Open Menu", "menu.toggleKey")->callback([](Keys key) {
+            if (key == Keys::MouseLeft) {
+                // Reset it back to the default keybind (LMB softlocks the menu)
+                key = Keys::Tab;
+                config::set("menu.toggleKey", Keys::Tab);
+            }
+
+            auto* keybind = Manager::get()->getKeybind("menu.toggle");
+            keybind->setKey(key);
+        });
     }
 
 }

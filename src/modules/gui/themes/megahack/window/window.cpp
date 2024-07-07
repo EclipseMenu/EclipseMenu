@@ -86,4 +86,19 @@ namespace eclipse::gui::imgui {
             m_position = target;
         return action;
     }
+
+    void to_json(nlohmann::json &j, const Window& e) {
+        auto pos = nlohmann::json{{"x", e.getPosition().x}, {"y", e.getPosition().y}};
+        j = nlohmann::json{{"pos",   pos},
+                           {"open",  e.isOpen()},
+                           {"title", e.getTitle()}};
+    }
+
+    void from_json(const nlohmann::json &j, Window& e) {
+        auto pos = j.at("pos");
+        e.setPosition({pos.at("x").get<float>(), pos.at("y").get<float>()});
+        e.setOpen(j.at("open").get<bool>());
+        e.setTitle(j.at("title").get<std::string>());
+    }
+
 }

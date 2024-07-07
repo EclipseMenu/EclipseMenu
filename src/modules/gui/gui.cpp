@@ -21,10 +21,20 @@ namespace eclipse::gui {
             m_options = new MenuTab("Options");
         options(m_options);
     }
-        
+
+    ToggleComponent* ToggleComponent::handleKeybinds() {
+        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
+            setValue(!getValue());
+        });
+        return this;
+    }
 
     void MenuTab::addComponent(Component* component) {
         m_components.push_back(component);
+    }
+
+    void MenuTab::removeComponent(Component* component) {
+        m_components.erase(std::remove(m_components.begin(), m_components.end(), component), m_components.end());
     }
 
     MenuTab* MenuTab::find(const std::string& name) {

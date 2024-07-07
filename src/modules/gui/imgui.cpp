@@ -5,9 +5,9 @@
 
 #include <utils.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/color.hpp>
 
 #include "themes/megahack/megahack.hpp"
-#include <modules/gui/color.hpp>
 
 namespace eclipse::gui::imgui {
 
@@ -19,6 +19,7 @@ namespace eclipse::gui::imgui {
                 getTheme()->setup();
             })
             .draw([&]() {
+                ImGuiCocos::get().setInputMode(ImGuiCocos::InputMode::Default);
                 getTheme()->getLayout()->draw();
             });
         m_initialized = true;

@@ -55,6 +55,7 @@ namespace eclipse::hacks::Global {
         }
 
         [[nodiscard]] const char* getId() const override { return "Audio Speed"; }
+        [[nodiscard]] int32_t getPriority() const override { return -9; }
     };
 
     REGISTER_HACK(AudioSpeed)

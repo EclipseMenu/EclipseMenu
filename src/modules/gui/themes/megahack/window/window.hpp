@@ -5,6 +5,7 @@
 #include <functional>
 #include <utility>
 #include <imgui.h>
+#include <nlohmann/json.hpp>
 #include "../animation/easing.hpp"
 #include "../animation/move-action.hpp"
 
@@ -75,5 +76,7 @@ namespace eclipse::gui::imgui {
         std::function<void()> m_drawCallback; // Callback which will be called when the window is drawn
     };
 
+    void to_json(nlohmann::json &j, const Window& e);
+    void from_json(const nlohmann::json &j, Window& e);
 
 }

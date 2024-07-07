@@ -48,17 +48,20 @@ namespace eclipse::keybinds {
         MenuKey, LastKey
     };
 
+    Keys& operator++(Keys& key);
+    Keys operator++(Keys& key, int);
+
     static constexpr int KEY_COUNT = static_cast<int>(Keys::LastKey);
 
     /// @brief Convert a key to a string.
     /// @param key Key to convert.
     /// @return String representation of the key.
-    [[nodiscard]] static const std::string& keyToString(Keys key);
+    [[nodiscard]] std::string keyToString(Keys key);
 
     /// @brief Convert a string to a key.
     /// @param key String to convert.
     /// @return Key representation of the string.
-    [[nodiscard]] static Keys stringToKey(const std::string& key);
+    [[nodiscard]] Keys stringToKey(const std::string& key);
 
     /// @brief Check if a key is currently being pressed.
     bool isKeyDown(Keys key);
@@ -121,12 +124,23 @@ namespace eclipse::keybinds {
         /// @param callback The callback to execute when the keybind is pressed.
         Keybind& registerKeybind(const std::string& id, const std::string& title, const std::function<void()>& callback);
 
+        /// @brief Load keybinds from config.
+        void init();
+
+        /// @brief Sets up the keybind manager UI tab.
+        void setupTab();
+
         /// @brief Update the keybinds. This should be called every frame.
         void update();
 
         /// @brief Get all keybinds.
         /// @return All keybinds.
         [[nodiscard]] const std::vector<Keybind>& getKeybinds() const { return m_keybinds; }
+
+        /// @brief Get a keybind by its ID.
+        /// @param id The ID of the keybind.
+        /// @return The keybind with the given ID.
+        [[nodiscard]] Keybind* getKeybind(const std::string& id);
 
         /// @brief Set whether a keybind is enabled or not.
         /// @param id The ID of the keybind.

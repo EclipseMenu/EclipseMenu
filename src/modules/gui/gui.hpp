@@ -1,5 +1,7 @@
 #pragma once
 
+#include <modules/keybinds/manager.hpp>
+
 #include <utility>
 #include <string>
 #include <vector>
@@ -69,6 +71,9 @@ namespace eclipse::gui {
         /// @brief Set the toggle value.
         void setValue(bool value);
 
+        /// @brief Allows to set keybinds for the toggle.
+        ToggleComponent* handleKeybinds();
+
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] const std::string& getDescription() const { return m_description; }
@@ -118,6 +123,45 @@ namespace eclipse::gui {
         std::string m_id;
         std::string m_title;
         int m_value;
+        std::function<void(int)> m_callback;
+    };
+
+    /// @brief Combo component for selecting one of the options.
+    class ComboComponent : public Component {
+    public:
+        explicit ComboComponent(std::string id, std::string title, std::vector<std::string> items, int value)
+            : m_id(std::move(id)), m_title(std::move(title)), m_items(items), m_value(value) {}
+
+        void onInit() override {}
+        void onUpdate() override {}
+
+        /// @brief Set a callback function to be called when the component value changes.
+        ComboComponent* callback(const std::function<void(int)>& func) { 
+            m_callback = func; 
+            return this;
+        }
+
+        /// @brief Get the combo value.
+        [[nodiscard]] int getValue() const { return m_value; }
+
+        /// @brief Get the combo items.
+        [[nodiscard]] const std::vector<std::string>& getItems() const { return m_items; }
+
+        /// @brief Set the combo button value.
+        void setValue(int value) { m_value = value; }
+
+        [[nodiscard]] const std::string& getId() const override { return m_id; }
+        [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+
+        void triggerCallback(int value) {
+            if (m_callback) m_callback(value);
+        }
+
+    private:
+        std::string m_id;
+        std::string m_title;
+        int m_value;
+        std::vector<std::string> m_items;
         std::function<void(int)> m_callback;
     };
 
@@ -322,6 +366,36 @@ namespace eclipse::gui {
         std::function<void()> m_callback;
     };
 
+    /// @brief Component for picking a keybind.
+    class KeybindComponent : public Component {
+    public:
+        explicit KeybindComponent(std::string title, std::string id, bool canDelete = false) :
+            m_title(std::move(title)), m_id(std::move(id)), m_canDelete(canDelete) {}
+
+        void onInit() override {}
+        void onUpdate() override {}
+
+        /// @brief Set a callback function to be called when the component value changes.
+        KeybindComponent* callback(const std::function<void(keybinds::Keys)>& func) {
+            m_callback = func;
+            return this;
+        }
+
+        [[nodiscard]] const std::string& getId() const override { return m_id; }
+        [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+        [[nodiscard]] bool canDelete() const { return m_canDelete; }
+
+        void triggerCallback(keybinds::Keys key) {
+            if (m_callback) m_callback(key);
+        }
+
+    private:
+        std::string m_id;
+        std::string m_title;
+        bool m_canDelete;
+        std::function<void(keybinds::Keys)> m_callback;
+    };
+
     /// @brief Contains a list of components and a title, to be passed into render engine.
     class MenuTab {
     public:
@@ -329,6 +403,9 @@ namespace eclipse::gui {
 
         /// @brief Add a component to the tab.
         void addComponent(Component* component);
+
+        /// @brief Remove a component from the tab.
+        void removeComponent(Component* component);
 
         /// @brief Add a label to the tab.
         LabelComponent* addLabel(const std::string& title) {
@@ -349,6 +426,13 @@ namespace eclipse::gui {
             auto* button = new RadioButtonComponent(id, title, value);
             addComponent(button);
             return button;
+        }
+
+        /// @brief Add a radio button to the tab.
+        ComboComponent* addCombo(const std::string& title, const std::string& id, std::vector<std::string> items, int value) {
+            auto* combo = new ComboComponent(id, title, items, value);
+            addComponent(combo);
+            return combo;
         }
 
         /// @brief Add a slider to the tab.
@@ -391,6 +475,13 @@ namespace eclipse::gui {
             auto* button = new ButtonComponent(title);
             addComponent(button);
             return button;
+        }
+
+        /// @brief Add a keybind to the tab.
+        KeybindComponent* addKeybind(const std::string& title, const std::string& id, bool canDelete = false) {
+            auto* keybind = new KeybindComponent(title, id, canDelete);
+            addComponent(keybind);
+            return keybind;
         }
 
         /// @brief Get the tab's title.

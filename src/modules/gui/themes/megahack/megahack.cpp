@@ -7,6 +7,7 @@
 #include <modules/config/config.hpp>
 
 #include <misc/cpp/imgui_stdlib.h>
+#include <imgui-cocos.hpp>
 
 namespace eclipse::gui::imgui {
     /// @brief Calculate a random window position outside the screen.
@@ -40,7 +41,14 @@ namespace eclipse::gui::imgui {
         m_isToggled = !m_isToggled;
 
         if (!m_isToggled) {
-            // TODO: save window positions
+            // Save window states
+            std::vector<nlohmann::json> windowStates;
+            for (auto& window : m_windows) {
+                nlohmann::json windowState;
+                to_json(windowState, window);
+                windowStates.push_back(windowState);
+            }
+            config::set("windows", windowStates);
         }
 
         double duration = config::get("menu.animationDuration", 0.3);
@@ -96,6 +104,7 @@ namespace eclipse::gui::imgui {
                 if (openPopup)
                     ImGui::OpenPopup(popupName.c_str());
 
+                ImGui::SetNextWindowSizeConstraints(ImVec2(200, 0), ImVec2(FLT_MAX, FLT_MAX));
                 if (ImGui::BeginPopup(popupName.c_str())) {
                     for (Component* comp : checkbox->getOptions()->getComponents()) {
                         visit(comp);
@@ -161,8 +170,23 @@ namespace eclipse::gui::imgui {
                 config::set(radio->getId(), value);
                 radio->triggerCallback(value);
             }
+        } else if (auto* combo = dynamic_cast<ComboComponent*>(component)) {
+            auto& items = combo->getItems();
+            int value = config::get<int>(combo->getId(), combo->getValue());
+            if (ImGui::BeginCombo(combo->getTitle().c_str(), items[value].c_str())) {
+                for (int n = 0; n < items.size(); n++) {
+                    const bool is_selected = (value == n);
+                    if (ImGui::Selectable(items[n].c_str(), is_selected)) {
+                        config::set(combo->getId(), n);
+                        combo->triggerCallback(n);
+                    }
+
+                    if (is_selected) ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
         } else if (auto* inputtext = dynamic_cast<InputTextComponent*>(component)) {
-            std::string value = config::get<std::string>(inputtext->getId(), "");
+            auto value = config::get<std::string>(inputtext->getId(), "");
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
             if (ImGui::InputText(inputtext->getTitle().c_str(), &value)) {
                 config::set(inputtext->getId(), value);
@@ -173,6 +197,99 @@ namespace eclipse::gui::imgui {
             if (ImGui::Button(button->getTitle().c_str())) {
                 button->triggerCallback();
             }
+        } else if (auto* keybind = dynamic_cast<KeybindComponent*>(component)) {
+            auto& title = keybind->getTitle();
+            auto canDelete = keybind->canDelete();
+
+            ImGui::PushItemWidth(-1);
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
+
+            // truncate title if it's too long
+            auto availWidth = ImGui::GetContentRegionAvail().x;
+            auto labelMaxWidth = availWidth * (canDelete ? 0.5f : 0.6f);
+            auto labelSize = ImGui::CalcTextSize(title.c_str());
+
+            if (labelSize.x > labelMaxWidth) {
+                auto labelEnd = 0;
+                while (labelEnd != title.size()) {
+                    auto labelStr = title.substr(0, labelEnd) + "...";
+                    auto newSize = ImGui::CalcTextSize(labelStr.c_str());
+                    if (newSize.x > labelMaxWidth - 20)
+                        break;
+                    labelEnd++;
+                }
+                auto truncatedLabel = title.substr(0, labelEnd) + "...";
+                ImGui::Button(truncatedLabel.c_str(), ImVec2(labelMaxWidth, 0));
+                // TODO: Add a tooltip on hover
+            } else {
+                ImGui::Button(title.c_str(), ImVec2(labelMaxWidth, 0));
+            }
+
+            ImGui::SameLine(0, 0);
+
+            ImGui::PopStyleColor(3);
+            ImGui::PopStyleVar(2);
+            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0.25f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
+
+            auto key = config::get<keybinds::Keys>(keybind->getId(), keybinds::Keys::None);
+            auto keyName = keybinds::keyToString(key);
+            bool changed = ImGui::Button(keyName.c_str(), ImVec2(availWidth * 0.4f, 0));
+            ImGui::PopStyleColor(3);
+            ImGui::PopStyleVar();
+
+            auto popupName = fmt::format("##{}-popup", keybind->getId());
+            if (changed) ImGui::OpenPopup(popupName.c_str());
+
+            if (ImGui::BeginPopup(popupName.c_str())) {
+                ImGuiCocos::get().setInputMode(ImGuiCocos::InputMode::Blocking);
+                ImGui::Text("%s", "Press any key to change the keybind...");
+                ImGui::Separator();
+
+                ImGui::Text("%s", "Press ESC to clear the cancel.");
+
+                if (keybinds::isKeyDown(keybinds::Keys::Escape)) {
+                    ImGui::CloseCurrentPopup();
+                } else {
+                    auto from = keybinds::Keys::A;
+                    auto to = keybinds::Keys::LastKey;
+                    for (auto i = from; i < to; i++) {
+                        if (keybinds::isKeyDown(i)) {
+                            config::set(keybind->getId(), i);
+                            keybind->triggerCallback(i);
+                            ImGui::CloseCurrentPopup();
+                            break;
+                        }
+                    }
+                }
+
+                ImGui::EndPopup();
+            }
+
+            bool deleteClicked = false;
+            if (canDelete) {
+                ImGui::SameLine(0, 0);
+                ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
+                deleteClicked = ImGui::Button("X", ImVec2(availWidth * 0.1f, 0));
+                ImGui::PopStyleColor(3);
+                ImGui::PopStyleVar();
+                if (deleteClicked) {
+                    config::set(keybind->getId(), keybinds::Keys::None);
+                    keybind->triggerCallback(keybinds::Keys::None);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            ImGui::PopItemWidth();
         }
     }
 
@@ -185,6 +302,18 @@ namespace eclipse::gui::imgui {
                 ImGui::GetStyle().Alpha = 0.f;
                 for (auto& window : m_windows) {
                     window.draw();
+                }
+                {
+                    // Load window states
+                    auto windowStates = config::get("windows", std::vector<nlohmann::json>());
+                    for (auto& windowState : windowStates) {
+                        auto title = windowState.at("title").get<std::string>();
+                        auto window = std::find_if(m_windows.begin(), m_windows.end(), [&title](const Window& window) {
+                            return window.getTitle() == title;
+                        });
+                        if (window != m_windows.end())
+                            from_json(windowState, *window);
+                    }
                 }
                 frame = 1;
                 break;
