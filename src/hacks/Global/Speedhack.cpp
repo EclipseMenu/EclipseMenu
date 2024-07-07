@@ -18,6 +18,7 @@ namespace eclipse::hacks::Global {
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("global.speedhack.toggle", false); }
         [[nodiscard]] const char* getId() const override { return "Speedhack"; }
+        [[nodiscard]] int32_t getPriority() const override { return -10; }
     };
 
     REGISTER_HACK(Speedhack)

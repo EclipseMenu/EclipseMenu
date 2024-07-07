@@ -1,6 +1,7 @@
 #include "hack.hpp"
 
 #include <Geode/Geode.hpp>
+#include <modules/gui/gui.hpp>
 
 namespace eclipse::hack {
 
@@ -28,6 +29,16 @@ namespace eclipse::hack {
     }
 
     void Hack::initializeHacks() {
+        // Sort hacks by priority (and then ID)
+        std::sort(hacks.begin(), hacks.end(), [](Hack* a, Hack* b) {
+            if (a->getPriority() == b->getPriority()) {
+                std::string aId = a->getId();
+                std::string bId = b->getId();
+                return aId < bId;
+            }
+            return a->getPriority() < b->getPriority();
+        });
+
         for (Hack* hack : hacks) {
             hack->init();
         }

@@ -56,6 +56,9 @@ namespace eclipse::hack {
 
         /// @brief Get the hack's ID. (unique identifier)
         [[nodiscard]] virtual const char* getId() const = 0;
+
+        /// @brief Get hack's position priority (used for sorting)
+        [[nodiscard]] virtual int32_t getPriority() const { return 0; }
     };
 
 }
