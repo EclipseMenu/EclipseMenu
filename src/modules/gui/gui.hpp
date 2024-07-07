@@ -71,6 +71,9 @@ namespace eclipse::gui {
         /// @brief Set the toggle value.
         void setValue(bool value);
 
+        /// @brief Allows to set keybinds for the toggle.
+        ToggleComponent* handleKeybinds();
+
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] const std::string& getDescription() const { return m_description; }
@@ -400,6 +403,9 @@ namespace eclipse::gui {
 
         /// @brief Add a component to the tab.
         void addComponent(Component* component);
+
+        /// @brief Remove a component from the tab.
+        void removeComponent(Component* component);
 
         /// @brief Add a label to the tab.
         LabelComponent* addLabel(const std::string& title) {

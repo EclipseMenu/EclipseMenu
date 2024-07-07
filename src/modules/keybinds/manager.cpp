@@ -1,6 +1,8 @@
 #include "manager.hpp"
 
+#include <modules/config/config.hpp>
 #include <modules/hack/hack.hpp>
+#include <modules/gui/gui.hpp>
 
 #include <Geode/modify/CCEGLView.hpp>
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
@@ -364,6 +366,8 @@ namespace eclipse::keybinds {
     };
 #endif
 
+    static std::map<std::string, gui::KeybindComponent*> s_keybindComponents;
+
     Manager* Manager::get() {
         static Manager s_manager;
         return &s_manager;
@@ -391,8 +395,31 @@ namespace eclipse::keybinds {
         for (auto& keybind : m_keybinds) {
             if (keybind.getId() == id) {
                 keybind.setInitialized(state);
+
+                auto* tab = gui::MenuTab::find("Keybinds");
+                config::set(fmt::format("keybind.{}.active", id), state);
+                if (state) {
+                    // Add the keybind to the GUI
+                    auto* keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", id), true);
+                    keybindComponent->callback([tab, keybindComponent, id](Keys key) {
+                        if (key == Keys::None)
+                            tab->removeComponent(keybindComponent);
+
+                        Manager::get()->getKeybind(id)->setKey(key);
+                    });
+                    s_keybindComponents[id] = keybindComponent;
+                } else {
+                    // Remove the keybind from the GUI
+                    if (auto* keybindComponent = s_keybindComponents[id]; keybindComponent) {
+                        tab->removeComponent(keybindComponent);
+                    }
+                }
+
+                return;
             }
         }
+
+        geode::log::warn("Keybind with ID '{}' not found", id);
     }
 
     void Manager::registerKeyPress(Keys key) {
@@ -403,6 +430,15 @@ namespace eclipse::keybinds {
                 keybind.execute();
             }
         }
+    }
+
+    Keybind* Manager::getKeybind(const std::string& id) {
+        for (auto& keybind : m_keybinds) {
+            if (keybind.getId() == id) {
+                return &keybind;
+            }
+        }
+        return nullptr;
     }
 
     void Manager::registerKeyRelease(Keys key) {
@@ -428,6 +464,20 @@ namespace eclipse::keybinds {
             return !manager->m_keyStates[key];
         }
         return false;
+    }
+
+    void Manager::setupTab() {
+        auto* tab = gui::MenuTab::find("Keybinds");
+        tab->addKeybind("Open Menu", "menu.toggleKey")->callback([](Keys key) {
+            if (key == Keys::MouseLeft) {
+                // Reset it back to the default keybind (LMB softlocks the menu)
+                key = Keys::Tab;
+                config::set("menu.toggleKey", Keys::Tab);
+            }
+
+            auto* keybind = Manager::get()->getKeybind("menu.toggle");
+            keybind->setKey(key);
+        });
     }
 
 }

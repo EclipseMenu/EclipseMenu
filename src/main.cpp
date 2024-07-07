@@ -37,7 +37,8 @@ class $modify(MyMenuLayer, MenuLayer) {
             gui::Engine::get()->toggle();
             config::save();
         });
-        key.setKey(config::get<keybinds::Keys>("menu.toggleKey", keybinds::Keys::Tab));
+        config::setIfEmpty("menu.toggleKey", keybinds::Keys::Tab);
+        key.setKey(config::get<keybinds::Keys>("menu.toggleKey"));
         key.setInitialized(true);
 
         hack::Hack::lateInitializeHacks();
@@ -68,6 +69,9 @@ class $modify(cocos2d::CCScheduler) {
 $on_mod(Loaded) {
     // Load the configuration file.
     config::load();
+
+    // Load keybinds UI
+    keybinds::Manager::get()->setupTab();
 
     // Initialize the hacks.
     hack::Hack::initializeHacks();
