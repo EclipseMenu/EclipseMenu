@@ -42,6 +42,8 @@ namespace eclipse::gui::imgui {
             m_position = ImGui::GetWindowPos();
 
             m_drawPosition = m_position;
+
+            config::setTemp("draggingWindow", true);
         }
 
         m_size = ImGui::GetWindowSize();
