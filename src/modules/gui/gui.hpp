@@ -1,6 +1,7 @@
 #pragma once
 
 #include <modules/keybinds/manager.hpp>
+#include <modules/gui/color.hpp>
 
 #include <utility>
 #include <string>
@@ -339,6 +340,34 @@ namespace eclipse::gui {
         std::function<void(std::string)> m_callback;
     };
 
+    /// @brief Input text component to get user input as a string.
+    class ColorComponent : public Component {
+    public:
+        explicit ColorComponent(std::string title, std::string id)
+            : m_title(std::move(title)), m_id(std::move(id)) {}
+
+        void onInit() override {};
+        void onUpdate() override {}
+
+        /// @brief Set a callback function to be called when the component value changes.
+        ColorComponent* callback(const std::function<void(gui::Color)>& func) { 
+            m_callback = func; 
+            return this;
+        }
+
+        [[nodiscard]] const std::string& getId() const override { return m_id; }
+        [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+
+        void triggerCallback(gui::Color value) {
+            if (m_callback) m_callback(value);
+        }
+
+    private:
+        std::string m_id;
+        std::string m_title;
+        std::function<void(gui::Color)> m_callback;
+    };
+
     /// @brief Button component to execute an action when pressed.
     class ButtonComponent : public Component {
     public:
@@ -475,6 +504,13 @@ namespace eclipse::gui {
             auto* button = new ButtonComponent(title);
             addComponent(button);
             return button;
+        }
+
+        /// @brief Add a color picker to the tab.
+        ColorComponent* addColorComponent(const std::string& title, const std::string& id) {
+            auto* color = new ColorComponent(title, id);
+            addComponent(color);
+            return color;
         }
 
         /// @brief Add a keybind to the tab.

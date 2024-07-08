@@ -1,4 +1,5 @@
 #include "megahack.hpp"
+#include "modules/gui/color.hpp"
 
 #include "window/window.hpp"
 #include "animation/move-action.hpp"
@@ -168,7 +169,7 @@ namespace eclipse::gui::imgui {
                 auto availWidth = ImGui::GetContentRegionAvail().x;
                 auto buttonSize = ImVec2(availWidth * 0.885f, 0);
                 auto arrowSize = ImVec2(availWidth * 0.115f, 0);
-                ImGui::SameLine(availWidth - 10, 0);
+                ImGui::SameLine(availWidth - (arrowSize.x / 2.f), 0);
                 ImGui::SetNextItemWidth(arrowSize.x);
                 bool openPopup = ImGui::ArrowButton((std::string("##open_") + checkbox->getTitle()).c_str(), ImGuiDir_Right);
                 ImGui::PopItemWidth();
@@ -178,7 +179,7 @@ namespace eclipse::gui::imgui {
                     ImGui::OpenPopup(popupName.c_str());
 
                 ImGui::SetNextWindowSizeConstraints(ImVec2(200, 0), ImVec2(FLT_MAX, FLT_MAX));
-                if (ImGui::BeginPopup(popupName.c_str())) {
+                if (ImGui::BeginPopup(popupName.c_str(), ImGuiWindowFlags_NoMove)) {
                     for (Component* comp : checkbox->getOptions()->getComponents()) {
                         visit(comp);
                     }
@@ -269,6 +270,13 @@ namespace eclipse::gui::imgui {
         } else if (auto* button = dynamic_cast<ButtonComponent*>(component)) {
             if (ImGui::Button(button->getTitle().c_str())) {
                 button->triggerCallback();
+            }
+        }
+        else if (auto* color = dynamic_cast<ColorComponent*>(component)) {
+            auto value = config::get<gui::Color>(color->getId(), {1, 1, 1, 1});
+            if(ImGui::ColorEdit3(color->getTitle().c_str(), (float*)&value, ImGuiColorEditFlags_NoInputs)) {
+                config::set(color->getId(), value);
+                color->triggerCallback(value);
             }
         } else if (auto* keybind = dynamic_cast<KeybindComponent*>(component)) {
             auto& title = keybind->getTitle();
