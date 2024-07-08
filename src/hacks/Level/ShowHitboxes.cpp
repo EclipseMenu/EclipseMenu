@@ -22,6 +22,10 @@ namespace eclipse::hacks::Level {
             auto tab = gui::MenuTab::find("Level");
             gui::ToggleComponent* toggle = tab->addToggle("Show Hitboxes", "level.showhitboxes");
 
+            toggle->callback([](bool value) {
+                if(PlayLayer::get()) PlayLayer::get()->updateProgressbar();
+            });
+
             config::setIfEmpty<float>("level.showhitboxes.bordersize", 0.25f);
             config::setIfEmpty<float>("level.showhitboxes.fillalpha", 0.25f);
             config::setIfEmpty<float>("level.showhitboxes.traillength", 240.0f);
@@ -229,8 +233,8 @@ namespace eclipse::hacks::Level {
     };
 
     class $modify(PlayLayer) {
-        void updateVisibility(float dt) {
-            PlayLayer::updateVisibility(dt);
+        void updateProgressbar() {
+            PlayLayer::updateProgressbar();
 
             if(config::get<bool>("level.showhitboxes", false)) {
                 s_updateDebugDraw = true;
