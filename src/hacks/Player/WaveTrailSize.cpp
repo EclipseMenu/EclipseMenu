@@ -16,6 +16,7 @@ namespace eclipse::hacks::Player {
             tab->addFloatToggle("Wave Trail Size", "player.wavetrailsize", 0.f, 3.f, "%.2f");
         }
 
+        [[nodiscard]] int32_t getPriority() const override { return 2; }
         [[nodiscard]] bool isCheating() override { return false; }
         [[nodiscard]] const char* getId() const override { return "Wave Trail Size"; }
     };
