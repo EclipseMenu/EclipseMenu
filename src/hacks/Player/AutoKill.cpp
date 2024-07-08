@@ -28,7 +28,7 @@ namespace eclipse::hacks::Player {
             if (config::get<bool>("player.autokill.toggle", false)) {
                 auto killPercent = config::get<float>("player.autokill");
                 float currentPercent = playLayer->getCurrentPercent();
-                if (currentPercent >= killPercent && playLayer != nullptr) {
+                if (currentPercent >= killPercent && playLayer != nullptr && playLayer->m_player1->m_isPlatformer == false) {
                     playLayer->resetLevel();
                 }
             }
