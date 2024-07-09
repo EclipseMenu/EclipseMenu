@@ -17,6 +17,7 @@ namespace eclipse::hacks::Player {
             tab->addFloatToggle("Respawn Delay", "player.respawndelay", 0.f, 120.f, "%.2f s.");
         }
 
+        [[nodiscard]] int32_t getPriority() const override { return 1; }
         [[nodiscard]] const char* getId() const override { return "Respawn Delay"; }
     };
 

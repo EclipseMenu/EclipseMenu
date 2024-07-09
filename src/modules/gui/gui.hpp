@@ -1,11 +1,13 @@
 #pragma once
 
 #include <modules/keybinds/manager.hpp>
+#include <modules/gui/color.hpp>
 
 #include <utility>
 #include <string>
 #include <vector>
 #include <functional>
+#include "color.hpp"
 
 namespace eclipse::gui {
 
@@ -339,6 +341,34 @@ namespace eclipse::gui {
         std::function<void(std::string)> m_callback;
     };
 
+    /// @brief Input text component to get user input as a string.
+    class ColorComponent : public Component {
+    public:
+        explicit ColorComponent(std::string title, std::string id)
+            : m_title(std::move(title)), m_id(std::move(id)) {}
+
+        void onInit() override {};
+        void onUpdate() override {}
+
+        /// @brief Set a callback function to be called when the component value changes.
+        ColorComponent* callback(const std::function<void(gui::Color)>& func) { 
+            m_callback = func; 
+            return this;
+        }
+
+        [[nodiscard]] const std::string& getId() const override { return m_id; }
+        [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+
+        void triggerCallback(gui::Color value) {
+            if (m_callback) m_callback(value);
+        }
+
+    private:
+        std::string m_id;
+        std::string m_title;
+        std::function<void(gui::Color)> m_callback;
+    };
+
     /// @brief Button component to execute an action when pressed.
     class ButtonComponent : public Component {
     public:
@@ -477,6 +507,13 @@ namespace eclipse::gui {
             return button;
         }
 
+        /// @brief Add a color picker to the tab.
+        ColorComponent* addColorComponent(const std::string& title, const std::string& id) {
+            auto* color = new ColorComponent(title, id);
+            addComponent(color);
+            return color;
+        }
+
         /// @brief Add a keybind to the tab.
         KeybindComponent* addKeybind(const std::string& title, const std::string& id, bool canDelete = false) {
             auto* keybind = new KeybindComponent(title, id, canDelete);
@@ -523,19 +560,91 @@ namespace eclipse::gui {
 
     class Theme {
     public:
-        explicit Theme(Layout* lay) : m_layout(lay) {}
+        explicit Theme(const std::filesystem::path& path, Layout* lay) {
+            loadFromFile(path);
+            m_layout = lay;
+        }
+
+        /// @brief Load the theme.
+        void loadFromFile(const std::filesystem::path& path) {
+            std::ifstream ifs(path.c_str());
+            nlohmann::json jf = nlohmann::json::parse(ifs);
+            if (jf.contains("colors")) {
+                std::map<int, Color> m = jf.at("colors").get<std::map<int, Color>>();
+                for (auto[k, v] : m) {
+                    m_colors[k] = v;
+                }
+            }
+            if (jf.contains("floats")) {
+                std::map<int, float> m2 = jf.at("floats").get<std::map<int, float>>();
+                for (auto[k, v] : m2) {
+                    m_floats[k] = v;
+                }
+            }
+        }
 
         /// @brief Save the theme to a file.
-        void saveToFile(const std::filesystem::path& path) {}
+        void saveToFile(const std::filesystem::path& path) {
+            nlohmann::json j;
+            for (auto[k, v] : m_colors) {
+                j["colors"][k] = v;
+            }
+            for (auto[k, v] : m_floats) {
+                j["floats"][k] = v;
+            }
+            std::ofstream file(path.c_str());
+            file << j;
+        }
 
         /// @brief Set up the UI.
-        virtual void setup() {}
+        virtual void setup() {
+            auto &style = ImGui::GetStyle();
+            auto &colors = style.Colors;
+
+            for (auto[k, v] : m_colors) {
+                colors[static_cast<ImGuiCol_>(k)] = v;
+            }
+            for (auto[k, v] : m_floats) {
+                switch (k) {
+                    case 1:
+                        style.WindowRounding = v;
+                        break;
+                    case 2:
+                        style.FrameRounding = v;
+                        break;
+                    case 3:
+                        style.PopupRounding = v;
+                        break;
+                    case 4:
+                        style.IndentSpacing = v;
+                        break;
+                    case 5:
+                        style.ScrollbarSize = v;
+                        break;
+                    case 6:
+                        style.ScrollbarRounding = v;
+                        break;
+                    case 7:
+                        style.GrabMinSize = v;
+                        break;
+                    case 8:
+                        style.GrabRounding = v;
+                        break;
+                    case 9:
+                        style.WindowBorderSize = v;
+                        break;
+                }
+            }
+        }
 
         /// @brief Get the layout of the theme.
         [[nodiscard]] Layout* getLayout() { return m_layout; }
 
     private:
         Layout* m_layout;
+        std::map<int, Color> m_colors;
+        std::map<int, float> m_floats;
+        std::map<int, ImVec2> m_vecs;
         // plus like colors and settings that the user can change (also theme saving to file)
     };
 

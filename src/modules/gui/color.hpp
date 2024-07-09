@@ -105,7 +105,7 @@ namespace eclipse::gui {
         /// @brief Converts the color to an integer
         /// @return Integer color
         [[nodiscard]] int toInt() const {
-            return ((int) (r * 255) << 16) | ((int) (g * 255) << 8) | (int) (b * 255) | ((int) (a * 255) << 24);
+            return ((int) (r * 255) << 24) | ((int) (g * 255) << 16) | (int) (b * 255) << 8 | ((int) (a * 255));
         }
 
         /// @brief Creates a new color from a string

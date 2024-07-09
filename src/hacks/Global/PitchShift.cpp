@@ -13,10 +13,9 @@ namespace eclipse::hacks::Global {
 
         FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
         FMOD::ChannelGroup* group;
-        system->getMasterChannelGroup(&group);
 
         if (pitchShifter) {
-            group->removeDSP(pitchShifter);
+            FMODAudioEngine::sharedEngine()->m_backgroundMusicChannel->removeDSP(pitchShifter);
             pitchShifter->release();
             pitchShifter = nullptr;
         }
@@ -27,7 +26,7 @@ namespace eclipse::hacks::Global {
         system->createDSPByType(FMOD_DSP_TYPE_PITCHSHIFT, &pitchShifter);
         pitchShifter->setParameterFloat(FMOD_DSP_PITCHSHIFT_FFTSIZE, 4096);
         pitchShifter->setParameterFloat(FMOD_DSP_PITCHSHIFT_PITCH, pitch);
-        group->addDSP(0, pitchShifter);
+        FMODAudioEngine::sharedEngine()->m_backgroundMusicChannel->addDSP(0, pitchShifter);
     }
 
     class PitchShift : public hack::Hack {

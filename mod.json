@@ -35,8 +35,9 @@
 	],
     "resources": {
         "files": [
-            "resources/*.glsl",
-			"resources/Rubik-Regular.ttf"
+            "resources/Blur/*.glsl",
+			"resources/Rubik-Regular.ttf",
+			"resources/Themes/*.json"
         ],
 		"sprites": [
 			"resources/ECLIPSE-android.png"

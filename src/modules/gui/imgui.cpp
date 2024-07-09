@@ -55,7 +55,8 @@ namespace eclipse::gui::imgui {
     }
 
     Theme* ImGuiEngine::getTheme() {
-        if (!m_theme) m_theme = new Theme(new WindowLayout());
+        // TODO: change this for theme picker
+        if (!m_theme) m_theme = new Theme(geode::Mod::get()->getResourcesDir() / "basic.json", new WindowLayout()); 
         return m_theme;
     }
 
