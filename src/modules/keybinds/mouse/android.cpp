@@ -1,11 +1,16 @@
 #ifdef GEODE_IS_ANDROID
 #include <modules/keybinds/manager.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/CCTouchDispatcher.hpp>
 
 namespace eclipse::keybinds {
 
     class $modify(cocos2d::CCTouchDispatcher) {
+        static void onModify(auto& self) {
+            FIRST_PRIORITY("cocos2d::CCTouchDispatcher::touches");
+        }
+
         void touches(cocos2d::CCSet* touches, cocos2d::CCEvent* event, unsigned int type) {
             if (!touches) return CCTouchDispatcher::touches(touches, event, type);
             auto* touch = static_cast<cocos2d::CCTouch*>(touches->anyObject());

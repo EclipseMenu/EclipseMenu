@@ -91,36 +91,68 @@ namespace eclipse::gui {
             return fromHSV(hsv.x, hsv.y, hsv.z, hsv.w);
         }
 
+        enum class IntType {
+            RGBA, ARGB,
+            ABGR, BGRA
+        };
+
         /// @brief Gets the color from an integer
         /// @param color Integer color
+        /// @param type Integer type to convert from
         /// @return New color
-        static Color fromInt(int color) {
-            return {
-                    (float) ((color >> 16) & 0xFF) / 255.0f,
-                    (float) ((color >> 8) & 0xFF) / 255.0f,
-                    (float) (color & 0xFF) / 255.0f,
-                    (float) ((color >> 24) & 0xFF) / 255.0f};
+        static Color fromInt(int color, IntType type = IntType::RGBA) {
+            float v1, v2, v3, v4;
+            v1 = (float) ((color >> 24) & 0xFF) / 255.0f;
+            v2 = (float) ((color >> 16) & 0xFF) / 255.0f;
+            v3 = (float) ((color >> 8) & 0xFF) / 255.0f;
+            v4 = (float) (color & 0xFF) / 255.0f;
+            switch (type) {
+                default:
+                    return {v1, v2, v3, v4};
+                case IntType::ARGB:
+                    return {v2, v3, v4, v1};
+                case IntType::ABGR:
+                    return {v4, v3, v2, v1};
+                case IntType::BGRA:
+                    return {v3, v2, v1, v4};
+            }
         }
 
         /// @brief Converts the color to an integer
+        /// @param type Integer type to convert to
         /// @return Integer color
-        [[nodiscard]] int toInt() const {
-            return ((int) (r * 255) << 24) | ((int) (g * 255) << 16) | (int) (b * 255) << 8 | ((int) (a * 255));
+        [[nodiscard]] int toInt(IntType type = IntType::RGBA) const {
+            int rv, gv, bv, av;
+            rv = static_cast<int>(this->r * 255);
+            gv = static_cast<int>(this->g * 255);
+            bv = static_cast<int>(this->b * 255);
+            av = static_cast<int>(this->a * 255);
+            switch (type) {
+                default:
+                    return (rv << 24) | (gv << 16) | (bv << 8) | av;
+                case IntType::ARGB:
+                    return (av << 24) | (rv << 16) | (gv << 8) | bv;
+                case IntType::ABGR:
+                    return (av << 24) | (bv << 16) | (gv << 8) | rv;
+                case IntType::BGRA:
+                    return (bv << 24) | (gv << 16) | (rv << 8) | av;
+            }
         }
 
         /// @brief Creates a new color from a string
-        /// @param color String color in format "RRGGBBAA"
+        /// @param color String color in proper format
+        /// @param type Integer type to convert from
         /// @return New color
-        static Color fromString(const char *color) {
-            uint32_t c;
-            sscanf(color, "%X", &c);
-            return fromInt(c);
+        static Color fromString(const std::string& color, IntType type = IntType::RGBA) {
+            uint32_t c = std::strtoul(color.c_str(), nullptr, 16);
+            return fromInt(c, type);
         }
 
         /// @brief Converts the color to a string
+        /// @param type Integer type to convert to
         /// @return String color in format "RRGGBBAA"
-        [[nodiscard]] std::string toString() const {
-            uint32_t c = toInt();
+        [[nodiscard]] std::string toString(IntType type = IntType::RGBA) const {
+            uint32_t c = toInt(type);
             return fmt::format("{:08X}", c);
         }
 
