@@ -13,7 +13,6 @@ namespace eclipse::hacks::Level {
 
     static bool s_isDead = false;
     static bool s_skipDrawHook = false;
-    static bool s_updateDebugDraw = false;
 
     static std::deque<std::pair<cocos2d::CCRect, cocos2d::CCRect>> s_playerTrail1, s_playerTrail2;
 
@@ -24,6 +23,10 @@ namespace eclipse::hacks::Level {
 
             toggle->callback([](bool value) {
                 if(PlayLayer::get()) PlayLayer::get()->updateProgressbar();
+                if(LevelEditorLayer::get()) {
+                    LevelEditorLayer::get()->updateEditor(0);
+                    LevelEditorLayer::get()->updateOptions();
+                }
             });
 
             config::setIfEmpty<float>("level.showhitboxes.bordersize", 0.25f);
@@ -218,17 +221,10 @@ namespace eclipse::hacks::Level {
             LevelEditorLayer::updateEditor(dt);
 
             if(config::get<bool>("level.showhitboxes", false)) {
-                s_updateDebugDraw = true;
                 LevelEditorLayer::updateDebugDraw();
-                s_updateDebugDraw = false;
             }
 
             forceDraw(this, true);
-        }
-
-        void updateDebugDraw() {
-            if(s_updateDebugDraw)
-                LevelEditorLayer::updateDebugDraw();
         }
     };
 
@@ -237,9 +233,7 @@ namespace eclipse::hacks::Level {
             PlayLayer::updateProgressbar();
 
             if(config::get<bool>("level.showhitboxes", false)) {
-                s_updateDebugDraw = true;
                 PlayLayer::updateDebugDraw();
-                s_updateDebugDraw = false;
             }
             
             forceDraw(this, false);
@@ -264,10 +258,6 @@ namespace eclipse::hacks::Level {
     };
 
     class $modify(GJBaseGameLayer) {
-        void updateDebugDraw() {
-            if(s_updateDebugDraw)
-                GJBaseGameLayer::updateDebugDraw();
-        }
 
         void processCommands(float dt) {
             GJBaseGameLayer::processCommands(dt);

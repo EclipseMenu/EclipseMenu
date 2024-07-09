@@ -12,7 +12,6 @@ namespace eclipse::hacks::Global {
         pitch = config::get<bool>("global.pitchshift.toggle", false) ? pitch : 1.f;
 
         FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
-        FMOD::ChannelGroup* group;
 
         if (pitchShifter) {
             FMODAudioEngine::sharedEngine()->m_backgroundMusicChannel->removeDSP(pitchShifter);
