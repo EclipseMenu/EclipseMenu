@@ -4,7 +4,9 @@
 #include <modules/hack/hack.hpp>
 #include <modules/gui/gui.hpp>
 
+#ifdef GEODE_IS_WINDOWS
 #include <Geode/modify/CCEGLView.hpp>
+#endif
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 
 using namespace geode::prelude;
@@ -333,10 +335,10 @@ namespace eclipse::keybinds {
             case KEY_Numlock: return Keys::NumLock;
             case KEY_PrintScreen: return Keys::PrintScreen;
             case KEY_Pause: return Keys::Pause;
-            case KEY_Up: return Keys::Up;
-            case KEY_Down: return Keys::Down;
-            case KEY_Left: return Keys::Left;
-            case KEY_Right: return Keys::Right;
+            case KEY_ArrowUp: return Keys::Up;
+            case KEY_ArrowDown: return Keys::Down;
+            case KEY_ArrowLeft: return Keys::Left;
+            case KEY_ArrowRight: return Keys::Right;
             case KEY_LeftShift: return Keys::LeftShift;
             case KEY_LeftControl: return Keys::LeftControl;
             //case KEY_LeftAlt: return Keys::LeftAlt;
