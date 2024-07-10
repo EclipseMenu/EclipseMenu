@@ -26,7 +26,7 @@ namespace eclipse::hacks::Level {
         }
 #else
         static PauseLayer* create(bool p0) {
-            auto* pauseLayer = PauseLayer::create(p0)
+            auto* pauseLayer = PauseLayer::create(p0);
             if (pauseLayer) HPMPauseLayer::createHideScheduler(pauseLayer);
             return pauseLayer;
         }
