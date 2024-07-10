@@ -42,8 +42,6 @@ namespace eclipse::hacks::Global {
             floatToggle->toggleCallback(updateChannels);
         }
 
-        void lateInit() override {}
-
         void update() override {
             if(!config::get<bool>("global.audiospeed.toggle", false))
                 return;

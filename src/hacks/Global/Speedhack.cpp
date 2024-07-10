@@ -16,7 +16,10 @@ namespace eclipse::hacks::Global {
             tab->addFloatToggle("Speedhack", "global.speedhack", 0.0001f, 1000.f, "%.4f");
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("global.speedhack.toggle", false); }
+        [[nodiscard]] bool isCheating() override { 
+            return config::get<bool>("global.speedhack.toggle", false) && 
+                   config::get<float>("global.speedhack", 1.f) != 1.f;
+        }
         [[nodiscard]] const char* getId() const override { return "Speedhack"; }
         [[nodiscard]] int32_t getPriority() const override { return -10; }
     };

@@ -85,8 +85,7 @@ namespace eclipse::hacks::Level {
                 });
         }
 
-        void update() override {}
-        void lateInit() override {}
+        [[nodiscard]] bool isCheating() override { return config::get<bool>("level.hitbox_multiplier", false); }
         [[nodiscard]] const char* getId() const override { return "Hitbox Multiplier"; }
     };
 

@@ -12,6 +12,7 @@ namespace eclipse::hacks::Level {
             tab->addToggle("No Shaders", "level.noshader")->setDescription("Disables shaders");
         }
 
+        [[nodiscard]] bool isCheating() override { return config::get<bool>("level.noshader", false); }
         [[nodiscard]] const char* getId() const override { return "No Shaders"; }
     };
 

@@ -11,7 +11,6 @@ namespace eclipse::hacks::Global {
             tab->addToggle("Transparent Lists", "global.transparentlists")->setDescription("Makes list backgrounds transparent");
         }
 
-        void update() override {}
         [[nodiscard]] const char* getId() const override { return "Transparent Lists"; }
     };
 

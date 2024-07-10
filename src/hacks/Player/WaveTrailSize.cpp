@@ -17,7 +17,6 @@ namespace eclipse::hacks::Player {
         }
 
         [[nodiscard]] int32_t getPriority() const override { return 2; }
-        [[nodiscard]] bool isCheating() override { return false; }
         [[nodiscard]] const char* getId() const override { return "Wave Trail Size"; }
     };
 

@@ -12,7 +12,6 @@ namespace eclipse::hacks::Creator {
             tab->addToggle("No (C) Mark", "creator.nocopymark")->setDescription("Removes the copy mark from your levels when uploading");
         }
 
-        void update() override {}
         [[nodiscard]] const char* getId() const override { return "No (C) Mark"; }
     };
 
