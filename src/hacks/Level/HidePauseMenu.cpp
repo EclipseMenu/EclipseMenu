@@ -18,11 +18,23 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(HidePause)
 
     class $modify(HPMPauseLayer, PauseLayer) {
+#ifndef GEODE_IS_ANDROID
         bool init(bool p0) {
             if (!PauseLayer::init(p0)) return false;
-            this->schedule(schedule_selector(HPMPauseLayer::updatePauseMenu));
-            this->setVisible(!config::get<bool>("level.hidepause", false));
+            HPMPauseLayer::createHideScheduler(this);
             return true;
+        }
+#else
+        static PauseLayer* create(bool p0) {
+            auto* pauseLayer = PauseLayer::create(p0)
+            if (pauseLayer) HPMPauseLayer::createHideScheduler(pauseLayer);
+            return pauseLayer;
+        }
+#endif
+
+        static void createHideScheduler(PauseLayer* pauseLayer) {
+            pauseLayer->schedule(schedule_selector(HPMPauseLayer::updatePauseMenu));
+            pauseLayer->setVisible(!config::get<bool>("level.hidepause", false));
         }
 
         void updatePauseMenu(float dt) {

@@ -22,12 +22,12 @@ namespace eclipse::hacks::Bot {
         if (!std::filesystem::exists(replayDirectory))
 		    std::filesystem::create_directory(replayDirectory);
 
-        std::filesystem::path replayPath = replayDirectory / (config::get<std::string>("bot.replayname") + ".gdr");
+        std::filesystem::path replayPath = replayDirectory / (config::get<std::string>("bot.replayname", "temp") + ".gdr");
         s_bot.save(replayPath);
     }
 
     void loadReplay() {
-        std::filesystem::path replayPath = Mod::get()->getSaveDir() / "replays" / (config::get<std::string>("bot.replayname") + ".gdr");
+        std::filesystem::path replayPath = Mod::get()->getSaveDir() / "replays" / (config::get<std::string>("bot.replayname", "temp") + ".gdr");
         s_bot.load(replayPath);
     }
 

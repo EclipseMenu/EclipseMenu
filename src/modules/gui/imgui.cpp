@@ -14,6 +14,7 @@ namespace eclipse::gui::imgui {
     void ImGuiEngine::init() {
         // TODO: swap layouts and themes at some point
         if (m_initialized) return;
+        GEODE_ANDROID(ImGuiCocos::get().setForceLegacy(true);) // fixes some random crashes on android
         ImGuiCocos::get()
             .setup([&]() {
                 getTheme()->setup();
