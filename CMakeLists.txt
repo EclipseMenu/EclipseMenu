@@ -4,11 +4,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_OSX_ARCHITECTURES "arm64")
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-project(EclipseMenu VERSION 1.0.0)
+project(EclipseMenu VERSION 1.0.0 LANGUAGES CXX OBJCXX)
 
 # Sources
 file(GLOB_RECURSE SOURCES src/*.cpp)
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES} src/modules/keybinds/mouse/macos.mm)
 
 if (WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
@@ -16,6 +16,7 @@ endif()
 
 # Make sure we can include headers from src
 target_include_directories(${PROJECT_NAME} PRIVATE src)
+set_source_files_properties(src/platform/Mac.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
 # Add Geode
 if (NOT DEFINED ENV{GEODE_SDK})
