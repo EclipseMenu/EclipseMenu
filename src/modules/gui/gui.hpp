@@ -344,8 +344,8 @@ namespace eclipse::gui {
     /// @brief Input text component to get user input as a string.
     class ColorComponent : public Component {
     public:
-        explicit ColorComponent(std::string title, std::string id)
-            : m_title(std::move(title)), m_id(std::move(id)) {}
+        explicit ColorComponent(std::string title, std::string id, bool hasOpacity = false)
+            : m_title(std::move(title)), m_id(std::move(id)), m_hasOpacity(hasOpacity) {}
 
         void onInit() override {};
         void onUpdate() override {}
@@ -358,6 +358,7 @@ namespace eclipse::gui {
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+        [[nodiscard]] bool hasOpacity() const { return m_hasOpacity; }
 
         void triggerCallback(gui::Color value) {
             if (m_callback) m_callback(value);
@@ -366,6 +367,7 @@ namespace eclipse::gui {
     private:
         std::string m_id;
         std::string m_title;
+        bool m_hasOpacity;
         std::function<void(gui::Color)> m_callback;
     };
 
@@ -508,8 +510,8 @@ namespace eclipse::gui {
         }
 
         /// @brief Add a color picker to the tab.
-        ColorComponent* addColorComponent(const std::string& title, const std::string& id) {
-            auto* color = new ColorComponent(title, id);
+        ColorComponent* addColorComponent(const std::string& title, const std::string& id, bool hasOpacity = false) {
+            auto* color = new ColorComponent(title, id, hasOpacity);
             addComponent(color);
             return color;
         }

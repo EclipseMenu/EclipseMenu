@@ -37,6 +37,10 @@ namespace eclipse::gui {
             return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
         }
 
+        operator cocos2d::ccColor4F() const {
+            return {r, g, b, a};
+        }
+
         /// @brief Returns a pointer to the color data
         /// @return Pointer to the color data
         float *data() {
