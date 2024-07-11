@@ -535,9 +535,20 @@ namespace eclipse::gui {
         std::vector<Component*> m_components;
     };
 
+    class Style {
+    public:
+        explicit Style() {}
+
+        /// @brief Draw a custom title bar (or just return false if there is none).
+        virtual bool titlebar() { return false; }
+
+        /// @brief Handle the component.
+        virtual void visit(Component* component) {}
+    };
+
     class Layout {
     public:
-        explicit Layout() : m_isToggled(false) {}
+        explicit Layout() : m_isToggled(false), m_style(nullptr) {}
 
         /// @brief Draw the UI.
         virtual void draw() {}
@@ -550,12 +561,17 @@ namespace eclipse::gui {
             m_isToggled = !m_isToggled;
         }
 
+        Layout* setStyle(Style* st) { 
+            m_style = st;
+            return this;
+        }
+
         /// @brief Get if the menu is toggled.
         [[nodiscard]] bool isToggled() { return m_isToggled; }
 
     protected:
         bool m_isToggled;
-        // this'll also handle the window positions and all the imgui components
+        Style* m_style;
     };
 
     class Theme {

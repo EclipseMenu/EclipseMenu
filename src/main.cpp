@@ -3,7 +3,7 @@
 #include <Geode/modify/CCScheduler.hpp>
 
 #include <modules/config/config.hpp>
-#include <modules/gui/themes/megahack/megahack.hpp>
+#include <modules/gui/layouts/window/window.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
 
@@ -42,8 +42,6 @@ class $modify(MyMenuLayer, MenuLayer) {
         key.setInitialized(true);
 
         hack::Hack::lateInitializeHacks();
-
-        // TODO: Load saved keybind states
 
         s_isInitialized = true;
 

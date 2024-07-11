@@ -8,7 +8,6 @@ namespace eclipse::gui::imgui {
     class WindowLayout : public Layout {
     public:
         void toggle() override;
-        void visit(Component* component) override;
         void draw() override;
 
         bool shouldRender();

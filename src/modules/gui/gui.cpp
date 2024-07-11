@@ -3,7 +3,7 @@
 #include <modules/config/config.hpp>
 #include <algorithm>
 
-#include "themes/megahack/megahack.hpp"
+#include "layouts/window/window.hpp"
 #include "imgui.hpp"
 
 namespace eclipse::gui {
