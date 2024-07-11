@@ -48,4 +48,23 @@ namespace eclipse::gui {
         return &instance;
     }
 
+#define SUPPORT_COMPONENT(type) (auto* component##__LINE__ = dynamic_cast<type*>(component)) this->visit(component##__LINE__)
+    
+    void Style::visit(Component* component) {
+      if SUPPORT_COMPONENT(ToggleComponent);
+      else if SUPPORT_COMPONENT(SliderComponent);
+      else if SUPPORT_COMPONENT(LabelComponent);
+      else if SUPPORT_COMPONENT(InputFloatComponent);
+      else if SUPPORT_COMPONENT(InputIntComponent);
+      else if SUPPORT_COMPONENT(InputTextComponent);
+      else if SUPPORT_COMPONENT(FloatToggleComponent);
+      else if SUPPORT_COMPONENT(RadioButtonComponent);
+      else if SUPPORT_COMPONENT(ComboComponent);
+      else if SUPPORT_COMPONENT(ButtonComponent);
+      else if SUPPORT_COMPONENT(ColorComponent);
+      else if SUPPORT_COMPONENT(KeybindComponent);
+    }
+
+#undef SUPPORT_COMPONENT
+
 }

@@ -542,8 +542,23 @@ namespace eclipse::gui {
         /// @brief Draw a custom title bar (or just return false if there is none).
         virtual bool titlebar() { return false; }
 
+        // Component visitors
+
+        virtual void visit(LabelComponent* label) {};
+        virtual void visit(ToggleComponent* toggle) {};
+        virtual void visit(RadioButtonComponent* radio) {};
+        virtual void visit(ComboComponent* combo) {};
+        virtual void visit(SliderComponent* slider) {};
+        virtual void visit(InputFloatComponent* input) {};
+        virtual void visit(InputTextComponent* input) {};
+        virtual void visit(InputIntComponent* input) {};
+        virtual void visit(FloatToggleComponent* floatToggle) {};
+        virtual void visit(ButtonComponent* button) {};
+        virtual void visit(ColorComponent* color) {};
+        virtual void visit(KeybindComponent* keybind) {};
+
         /// @brief Handle the component.
-        virtual void visit(Component* component) {}
+        void visit(Component* component);
     };
 
     class Layout {
