@@ -63,10 +63,7 @@ namespace eclipse::hacks::Player {
             if (keybinds::isKeyPressed(keybinds::Keys::MouseRight)) {
                 auto playLayer = PlayLayer::get();
                 if (!playLayer) return;
-
-                auto mousePos = ImGui::GetMousePos();
-                auto framePos = screenToFrame(mousePos);
-                auto gamePos = screenToGame(framePos, playLayer);
+                auto gamePos = screenToGame(geode::cocos::getMousePos(), playLayer);
 
                 playLayer->m_player1->m_position = gamePos;
             }
