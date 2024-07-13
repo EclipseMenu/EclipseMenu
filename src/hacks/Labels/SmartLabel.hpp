@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include "Label.hpp"
 
 #include <rift.hpp>
@@ -31,4 +31,4 @@ namespace eclipse::hacks::Labels {
     };
 
 
-}
+}*/

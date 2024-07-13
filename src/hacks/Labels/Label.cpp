@@ -1,3 +1,4 @@
+/*
 #include "Label.hpp"
 #include <utility>
 
@@ -48,4 +49,4 @@ namespace eclipse::hacks::Labels {
         return m_label->getContentSize().height * m_heightMultiplier;
     }
 
-}
+}*/

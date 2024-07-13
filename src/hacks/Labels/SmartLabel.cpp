@@ -1,4 +1,4 @@
-#include "SmartLabel.hpp"
+/*#include "SmartLabel.hpp"
 
 namespace eclipse::hacks::Labels {
 
@@ -14,4 +14,4 @@ namespace eclipse::hacks::Labels {
         }
     }
 
-}
+}*/

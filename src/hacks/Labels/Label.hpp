@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include <Geode/Geode.hpp>
 #include <modules/gui/color.hpp>
 
@@ -68,4 +68,4 @@ namespace eclipse::hacks::Labels {
         void update();
     };
 
-}
+}*/

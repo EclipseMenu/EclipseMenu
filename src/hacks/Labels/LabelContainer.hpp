@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 
 #include "Label.hpp"
 
@@ -61,4 +61,4 @@ namespace eclipse::hacks::Labels {
         bool m_visible = true;
     };
 
-}
+}*/

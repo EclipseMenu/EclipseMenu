@@ -1,4 +1,4 @@
-#include <modules/gui/gui.hpp>
+/*#include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
 
@@ -19,4 +19,4 @@ namespace eclipse::hacks::Labels {
     class $modify(PlayLayer) {
 
     };
-}
+}*/
