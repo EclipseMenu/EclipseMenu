@@ -80,6 +80,7 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] const std::string& getDescription() const { return m_description; }
         [[nodiscard]] MenuTab* getOptions() const { return m_options; }
+        [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
 
         void triggerCallback(bool value) {
             if (m_callback) m_callback(value);
@@ -91,6 +92,7 @@ namespace eclipse::gui {
         std::string m_description;
         std::function<void(bool)> m_callback;
         MenuTab* m_options = nullptr;
+        bool m_hasKeybind = false;
     };
 
     /// @brief Radio button component for selecting one of the options.

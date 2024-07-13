@@ -10,6 +10,7 @@ namespace eclipse::hacks::Bypass {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
             tab->addToggle("Unlock Shops", "bypass.unlockshops")
+                ->handleKeybinds()
                 ->setDescription("Unlock all shops in the game");
         }
 

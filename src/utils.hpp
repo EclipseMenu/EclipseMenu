@@ -21,8 +21,9 @@ namespace eclipse::utils {
         } else if constexpr (std::is_floating_point_v<T>) {
             std::uniform_real_distribution<T> dist(min, max);
             return dist(getRng());
+        } else {
+            static_assert(false, "T must be an integral or floating point type.");
         }
-        return T();
     }
 
     /// @brief Generates a random number between 0 and max.
@@ -32,6 +33,11 @@ namespace eclipse::utils {
     template<typename T>
     inline T random(T max) {
         return random<T>(0, max);
+    }
+
+    template<typename T>
+    constexpr T& memberByOffset(void* ptr, size_t offset) {
+        return *reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(ptr) + offset);
     }
 
 }

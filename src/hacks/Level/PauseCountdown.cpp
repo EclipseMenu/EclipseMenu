@@ -14,9 +14,11 @@ namespace eclipse::hacks::Level {
             auto tab = gui::MenuTab::find("Level");
             config::setIfEmpty("level.pausecount.time", 3.f);
 
-            tab->addToggle("Pause Countdown", "level.pausecount")->addOptions([] (gui::MenuTab* options) {
-                options->addInputFloat("Countdown Time", "level.pausecount.time", 0.1f, 15.f, "%.2fs");
-            });
+            tab->addToggle("Pause Countdown", "level.pausecount")
+                ->handleKeybinds()
+                ->addOptions([] (gui::MenuTab* options) {
+                    options->addInputFloat("Countdown Time", "level.pausecount.time", 0.1f, 15.f, "%.2fs");
+                });
         }
 
         [[nodiscard]] const char* getId() const override { return "Pause Countdown"; }

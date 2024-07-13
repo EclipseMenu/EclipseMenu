@@ -9,7 +9,7 @@ namespace eclipse::hacks::Player {
     class NoDeathEffect : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
-            tab->addToggle("No Death Effect", "player.nodeatheffect")->setDescription("Disables player death effect");
+            tab->addToggle("No Death Effect", "player.nodeatheffect")->setDescription("Disables player death effect")->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "No Death Effect"; }

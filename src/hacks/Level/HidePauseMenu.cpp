@@ -9,7 +9,7 @@ namespace eclipse::hacks::Level {
     class HidePause : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
-            tab->addToggle("Hide Pause Menu", "level.hidepause");
+            tab->addToggle("Hide Pause Menu", "level.hidepause")->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Hide Pause Menu"; }

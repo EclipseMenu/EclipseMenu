@@ -19,7 +19,7 @@ namespace eclipse::hacks::Level {
     class ShowHitboxes : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
-            gui::ToggleComponent* toggle = tab->addToggle("Show Hitboxes", "level.showhitboxes");
+            gui::ToggleComponent* toggle = tab->addToggle("Show Hitboxes", "level.showhitboxes")->handleKeybinds();
 
             toggle->callback([](bool value) {
                 if(PlayLayer::get()) PlayLayer::get()->updateProgressbar();

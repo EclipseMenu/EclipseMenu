@@ -12,13 +12,15 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("level.accuratepercent.normal_mode", true);
             config::setIfEmpty("level.accuratepercent.bugfix", true);
             config::setIfEmpty("level.accuratepercent.show_minutes", true);
-            tab->addToggle("Accurate Percentage", "level.accuratepercentage")->setDescription("Allows for more decimals in a level percentage.")
-            ->addOptions([] (gui::MenuTab* options) {
-                options->addToggle("Normal Mode", "level.accuratepercent.normal_mode");
-                options->addInputInt("Decimal Places", "level.accuratepercent.amount", 0, 15);
-                options->addToggle("Fix 0% bug", "level.accuratepercent.bugfix");
-                options->addToggle("Show Minutes", "level.accuratepercent.show_minutes");
-            });
+            tab->addToggle("Accurate Percentage", "level.accuratepercentage")
+                ->setDescription("Allows for more decimals in a level percentage.")
+                ->handleKeybinds()
+                ->addOptions([] (gui::MenuTab* options) {
+                    options->addToggle("Normal Mode", "level.accuratepercent.normal_mode");
+                    options->addInputInt("Decimal Places", "level.accuratepercent.amount", 0, 15);
+                    options->addToggle("Fix 0% bug", "level.accuratepercent.bugfix");
+                    options->addToggle("Show Minutes", "level.accuratepercent.show_minutes");
+                });
         }
 
         [[nodiscard]] const char* getId() const override { return "Accurate Percentage"; }

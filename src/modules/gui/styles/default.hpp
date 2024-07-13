@@ -17,6 +17,26 @@ namespace eclipse::gui::imgui {
         checkbox->triggerCallback(value);
       }
 
+      if (checkbox->hasKeybind()) {
+        // Open context menu on either Right click or Shift+Click
+        if (ImGui::IsItemClicked(1) || (ImGui::IsItemClicked(0) && ImGui::GetIO().KeyShift)) {
+          ImGui::OpenPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str());
+        }
+
+        if (ImGui::BeginPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str())) {
+          auto* keybinds = keybinds::Manager::get();
+          auto* keybind = keybinds->getKeybind(checkbox->getId());
+
+          if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
+            keybinds->setKeybindState(checkbox->getId(), true);
+          } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
+            keybinds->setKeybindState(checkbox->getId(), false);
+          }
+
+          ImGui::EndPopup();
+        }
+      }
+
       if (!checkbox->getDescription().empty()) {
         ImGui::SameLine();
         ImGui::TextDisabled("(?)");
@@ -155,6 +175,7 @@ namespace eclipse::gui::imgui {
       auto& title = keybind->getTitle();
       auto canDelete = keybind->canDelete();
 
+      ImGui::PushID(title.c_str());
       ImGui::PushItemWidth(-1);
       ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
       ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
@@ -244,6 +265,7 @@ namespace eclipse::gui::imgui {
       }
 
       ImGui::PopItemWidth();
+      ImGui::PopID();
     }
   };
 }

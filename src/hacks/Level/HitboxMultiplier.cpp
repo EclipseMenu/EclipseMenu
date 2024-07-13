@@ -77,6 +77,7 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.hitbox_multiplier.hazard", 1.f);
 
             tab->addToggle("Hitbox Multiplier", "level.hitbox_multiplier")
+                ->handleKeybinds()
                 ->callback([](bool){forceHitboxRecalculation();})
                 ->addOptions([] (gui::MenuTab* options) {
                     options->addInputFloat("Player Multiplier", "level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx");

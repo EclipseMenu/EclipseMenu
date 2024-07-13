@@ -24,8 +24,11 @@ namespace eclipse::gui {
 
     ToggleComponent* ToggleComponent::handleKeybinds() {
         keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
-            setValue(!getValue());
+            bool value = !getValue();
+            setValue(value);
+            this->triggerCallback(value);
         });
+        m_hasKeybind = true;
         return this;
     }
 

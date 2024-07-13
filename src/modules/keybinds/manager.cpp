@@ -404,10 +404,15 @@ namespace eclipse::keybinds {
                     // Add the keybind to the GUI
                     auto* keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", id), true);
                     keybindComponent->callback([tab, keybindComponent, id](Keys key) {
-                        if (key == Keys::None)
-                            tab->removeComponent(keybindComponent);
+                        auto keybind = Manager::get()->getKeybind(id);
 
-                        Manager::get()->getKeybind(id)->setKey(key);
+                        if (key == Keys::None) {
+                            config::set(fmt::format("keybind.{}.active", id), false);
+                            keybind->setInitialized(false);
+                            tab->removeComponent(keybindComponent);
+                        }
+
+                        keybind->setKey(key);
                     });
                     s_keybindComponents[id] = keybindComponent;
                 } else {

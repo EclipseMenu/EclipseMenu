@@ -15,7 +15,9 @@ namespace eclipse::hacks::Player {
     class ShowTrajectory : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
-            tab->addToggle("Show Trajectory", "player.showtrajectory")->setDescription("Shows where the player will be if they click/don\'t click.");
+            tab->addToggle("Show Trajectory", "player.showtrajectory")
+                ->setDescription("Shows where the player will be if they click/don\'t click.")
+                ->handleKeybinds();
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.showtrajectory", false); }

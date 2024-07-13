@@ -24,7 +24,7 @@ namespace eclipse::hacks::Global {
         void init() override {
             auto tab = gui::MenuTab::find("Global");
             config::setIfEmpty("global.autosafemode", true);
-            tab->addToggle("Auto Safe Mode", "global.autosafemode");
+            tab->addToggle("Auto Safe Mode", "global.autosafemode")->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Auto Safe Mode"; }
@@ -33,7 +33,7 @@ namespace eclipse::hacks::Global {
     class SafeMode : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Global");
-            tab->addToggle("Safe Mode", "global.safemode");
+            tab->addToggle("Safe Mode", "global.safemode")->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Safe Mode"; }

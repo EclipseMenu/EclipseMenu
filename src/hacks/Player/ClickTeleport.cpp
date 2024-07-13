@@ -51,7 +51,8 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
             tab->addToggle("Click Teleport", "player.clicktp")
-                ->setDescription("Teleport to the mouse position when right clicking.");
+                ->setDescription("Teleport to the mouse position when right clicking.")
+                ->handleKeybinds();
         }
 
         void update() override {

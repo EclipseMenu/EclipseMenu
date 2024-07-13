@@ -9,7 +9,7 @@ namespace eclipse::hacks::Cosmetic {
     class PracticeMusic : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Cosmetic");
-            tab->addToggle("Practice Music Sync", "cosmetic.practicemusic");
+            tab->addToggle("Practice Music Sync", "cosmetic.practicemusic")->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Practice Music Sync"; }

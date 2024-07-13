@@ -34,6 +34,7 @@ namespace eclipse::hacks::Player {
             auto tab = gui::MenuTab::find("Player");
             tab->addToggle("Frame Stepper", "player.framestepper")
                 ->setDescription("Allows you to step through the game frame by frame.")
+                ->handleKeybinds()
                 ->addOptions([] (auto* options) {
                     options->addKeybind("Step Key", "player.framestepper.step_key");
                     options->addToggle("Enable Hold", "player.framestepper.hold");

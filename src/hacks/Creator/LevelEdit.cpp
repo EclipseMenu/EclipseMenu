@@ -13,6 +13,7 @@ namespace eclipse::hacks::Creator {
         void init() override {
             auto tab = gui::MenuTab::find("Creator");
             tab->addToggle("Level Edit", "creator.leveledit")
+                ->handleKeybinds()
                 ->setDescription("Allows you to access the level editor from the pause menu in any level.");
         }
 
