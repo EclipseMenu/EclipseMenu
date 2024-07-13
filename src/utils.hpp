@@ -22,7 +22,7 @@ namespace eclipse::utils {
             std::uniform_real_distribution<T> dist(min, max);
             return dist(getRng());
         } else {
-            static_assert(false, "T must be an integral or floating point type.");
+            static_assert(!sizeof(T*), "T must be an integral or floating point type.");
         }
     }
 
