@@ -387,6 +387,15 @@ namespace eclipse::keybinds {
         return m_keybinds.back();
     }
 
+    void Manager::init() {
+        setupTab();
+
+        for (auto& keybind : m_keybinds) {
+            keybind.setKey(config::get<Keys>(fmt::format("keybind.{}.key", keybind.getId()), Keys::None));
+            this->setKeybindState(keybind.getId(), config::get<bool>(fmt::format("keybind.{}.active", keybind.getId()), false));
+        }
+    }
+
     void Manager::update() {
         for (auto& key: m_keyStates) {
             m_lastKeyStates.insert_or_assign(key.first, key.second);
@@ -397,9 +406,9 @@ namespace eclipse::keybinds {
         for (auto& keybind : m_keybinds) {
             if (keybind.getId() == id) {
                 keybind.setInitialized(state);
+                config::set(fmt::format("keybind.{}.active", id), state);
 
                 auto* tab = gui::MenuTab::find("Keybinds");
-                config::set(fmt::format("keybind.{}.active", id), state);
                 if (state) {
                     // Add the keybind to the GUI
                     auto* keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", id), true);

@@ -81,9 +81,9 @@ $on_mod(Loaded) {
     // Load the configuration file.
     config::load();
 
-    // Load keybinds UI
-    keybinds::Manager::get()->setupTab();
-
     // Initialize the hacks.
     hack::Hack::initializeHacks();
+
+    // Load keybinds
+    keybinds::Manager::get()->init();
 }
