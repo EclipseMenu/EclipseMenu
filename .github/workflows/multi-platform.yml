@@ -35,8 +35,8 @@ jobs:
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          bindings: EclipseMenu/bindings
-          bindings-ref: main
+          bindings: SpaghettDev/bindings
+          bindings-ref: latest
           combine: true
           export-pdb: true
           #sdk: 'nightly' # remove after 3.0.0 is out
