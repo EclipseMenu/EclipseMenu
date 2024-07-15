@@ -1,5 +1,3 @@
-#include "Geode/binding/GJGameLevel.hpp"
-#include "Geode/binding/PlayLayer.hpp"
 #include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
