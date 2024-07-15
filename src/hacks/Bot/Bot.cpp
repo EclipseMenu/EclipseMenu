@@ -79,12 +79,12 @@ namespace eclipse::hacks::Bot {
             resetFrame = false;
 
             //temporary, player->m_isDead is wrong
-            ((BotPlayerObject*) m_player1)->m_fields->m_isDead = false;
-            ((BotPlayerObject*) m_player2)->m_fields->m_isDead = false;
+            static_cast<BotPlayerObject*>(m_player1)->m_fields->m_isDead = false;
+            static_cast<BotPlayerObject*>(m_player2)->m_fields->m_isDead = false;
 
-            if(s_bot.getState() == bot::State::RECORD) {
+            if (s_bot.getState() == bot::State::RECORD) {
                 s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, true, false);
-                if(m_gameState.m_isDualMode)
+                if (m_gameState.m_isDualMode)
                     s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, false, false);
             }
 

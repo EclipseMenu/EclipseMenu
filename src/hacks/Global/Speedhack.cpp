@@ -33,7 +33,7 @@ namespace eclipse::hacks::Global {
             float speedhack =
             config::get<bool>("global.speedhack.toggle", false) ? config::get<float>("global.speedhack", 1.f) : 1.f;
 
-            if(speedhack <= 0)
+            if (speedhack <= 0)
                 speedhack = 1.f;
 
             dt *= speedhack;

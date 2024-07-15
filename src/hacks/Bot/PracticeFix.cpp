@@ -14,7 +14,8 @@ namespace eclipse::Hacks::Bot {
     class PracticeFix : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bot");
-            tab->addToggle("Practice Fix", "bot.practicefix")->setDescription("Properly saves the player\'s velocity when respawning from a checkpoint.");
+            tab->addToggle("Practice Fix", "bot.practicefix")
+                ->setDescription("Properly saves the player's velocity when respawning from a checkpoint.");
         }
 
         [[nodiscard]] bool isCheating() override { return false; }
@@ -411,13 +412,13 @@ namespace eclipse::Hacks::Bot {
 
         CheckpointData(PlayerObject* player1, PlayerObject* player2) {
             m_checkpointPlayer1 = FixPlayerCheckpoint(player1);
-            if(player2)
+            if (player2)
                 m_checkpointPlayer2 = FixPlayerCheckpoint(player2);
         }
 
         void apply(PlayerObject* player1, PlayerObject* player2) {
             m_checkpointPlayer1.apply(player1);
-            if(player2)
+            if (player2)
                 m_checkpointPlayer2.apply(player2);
         }
 
@@ -437,16 +438,16 @@ namespace eclipse::Hacks::Bot {
         }
 
         void resetLevel() {
-            if(m_checkpointArray->count() <= 0)
+            if (m_checkpointArray->count() <= 0)
                 m_fields->m_checkpoints.clear();
 
             PlayLayer::resetLevel();
         }
 
         void loadFromCheckpoint(CheckpointObject* checkpoint) {
-            FixPlayLayer* playLayer = ((FixPlayLayer*)FixPlayLayer::get());
+            FixPlayLayer* playLayer = static_cast<FixPlayLayer*>(FixPlayLayer::get());
 
-            if(config::get<bool>("bot.practicefix", false) && playLayer->m_fields->m_checkpoints.contains(checkpoint)) {
+            if (config::get<bool>("bot.practicefix", false) && playLayer->m_fields->m_checkpoints.contains(checkpoint)) {
                 PlayLayer::loadFromCheckpoint(checkpoint);
 
                 CheckpointData& data = playLayer->m_fields->m_checkpoints[checkpoint];
@@ -463,8 +464,7 @@ namespace eclipse::Hacks::Bot {
     class $modify(LevelEditorLayer) {
         bool init(GJGameLevel* level, bool unk) {
             bool result = LevelEditorLayer::init(level, unk);
-            FixPlayLayer* playLayer = ((FixPlayLayer*)FixPlayLayer::get());
-            if(playLayer)
+            if (auto* playLayer = static_cast<FixPlayLayer*>(FixPlayLayer::get()))
                 playLayer->m_fields->m_checkpoints.clear();
             
             return result;
@@ -483,9 +483,9 @@ namespace eclipse::Hacks::Bot {
             if (!config::get<bool>("bot.practicefix", false))
                 return result;
 
-            FixPlayLayer* playLayer = ((FixPlayLayer*)FixPlayLayer::get());
+            FixPlayLayer* playLayer = static_cast<FixPlayLayer*>(FixPlayLayer::get());
 
-            if(playLayer->m_gameState.m_currentProgress > 0) {
+            if (playLayer->m_gameState.m_currentProgress > 0) {
                 CheckpointData data(playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr);
 #ifdef GEODE_IS_ANDROID
                 playLayer->m_fields->m_checkpoints[result] = data;

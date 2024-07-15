@@ -17,7 +17,7 @@ namespace eclipse::gui {
     }
 
     void ToggleComponent::addOptions(std::function<void(MenuTab*)> options) {
-        if(!m_options)
+        if (!m_options)
             m_options = new MenuTab("Options");
         options(m_options);
     }

@@ -21,9 +21,9 @@ namespace eclipse::hacks::Creator {
 
     class $modify(EditLevelLayer) {
         void onShare(CCObject* sender) {
-            if (config::get<bool>("creator.nocopymark", false)) {
+            if (config::get<bool>("creator.nocopymark", false))
                 this->m_level->m_originalLevel = 0;
-            }
+
             EditLevelLayer::onShare(sender);
         }
     };

@@ -24,7 +24,7 @@ namespace eclipse::hacks::Player {
 
     class $modify(HardStreak) {
         void updateStroke(float dt) {
-            if(config::get<bool>("player.wavetrailsize.toggle", false)) {
+            if (config::get<bool>("player.wavetrailsize.toggle", false)) {
                 float trailSize = config::get<float>("player.wavetrailsize", 0.f);
                 this->m_pulseSize = trailSize;
             }

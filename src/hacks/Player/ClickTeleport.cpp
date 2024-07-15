@@ -37,7 +37,7 @@ namespace eclipse::hacks::Player {
     }
 
     cocos2d::CCPoint screenToFrame(const ImVec2& pos) {
-        auto *director = cocos2d::CCDirector::sharedDirector();
+        auto* director = cocos2d::CCDirector::sharedDirector();
         const auto frameSize = director->getOpenGLView()->getFrameSize();
         const auto winSize = director->getWinSize();
 
@@ -56,7 +56,7 @@ namespace eclipse::hacks::Player {
         }
 
         void update() override {
-            if(!config::get<bool>("player.clicktp", false)) return;
+            if (!config::get<bool>("player.clicktp", false)) return;
 
             // Force the cursor to be visible
             PlatformToolbox::showCursor();

@@ -165,7 +165,7 @@ namespace eclipse::gui::imgui {
 
     void visit(ColorComponent* color) override {
       auto value = config::get<gui::Color>(color->getId(), {1, 1, 1, 1});
-      if(ImGui::ColorEdit3(color->getTitle().c_str(), value.data(), ImGuiColorEditFlags_NoInputs)) {
+      if (ImGui::ColorEdit3(color->getTitle().c_str(), value.data(), ImGuiColorEditFlags_NoInputs)) {
         config::set(color->getId(), value);
         color->triggerCallback(value);
       }

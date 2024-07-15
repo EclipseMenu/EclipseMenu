@@ -38,7 +38,7 @@ namespace eclipse::hacks::Global {
             auto floatToggle = tab->addFloatToggle("Pitch Shift", "global.pitchshift", 0.5f, 2.f, "%.2f");
             floatToggle->valueCallback(setPitch);
             floatToggle->toggleCallback([] {
-                if(config::get<bool>("global.pitchshift.toggle", false))
+                if (config::get<bool>("global.pitchshift.toggle", false))
                     setPitch(config::get<float>("global.pitchshift"));
                 else
                     setPitch(1.f);
@@ -46,7 +46,7 @@ namespace eclipse::hacks::Global {
         }
 
         void lateInit() override {
-            if(config::get<bool>("global.pitchshift.toggle", false))
+            if (config::get<bool>("global.pitchshift.toggle", false))
                 setPitch(config::get<float>("global.pitchshift"));
         }
 

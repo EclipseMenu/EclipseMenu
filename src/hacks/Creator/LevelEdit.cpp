@@ -51,7 +51,7 @@ namespace eclipse::hacks::Creator {
         }
     };
 
-// due to some mysterious reason, this will crash in Debug mode
+// due to some mysterious reason, this will crash in Debug mode (probably because of std::move dum dum)
 #ifdef NDEBUG
     class $modify(LevelTools) {
         static void onModify(auto& self) {

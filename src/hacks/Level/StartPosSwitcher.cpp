@@ -46,11 +46,10 @@ namespace eclipse::hacks::Level {
             if (startPosObjects.empty()) return;
 
             auto count = static_cast<int32_t>(startPosObjects.size());
-            if (index >= count) {
+            if (index >= count)
                 index = -1;
-            } else if (index < -1) {
+            else if (index < -1)
                 index = count - 1;
-            }
 
             currentStartPosIndex = index;
             playLayer->m_currentCheckpoint = nullptr;
@@ -73,11 +72,10 @@ namespace eclipse::hacks::Level {
 
             if (!config::get<bool>("level.startpos_switcher", false)) return;
 
-            if (keybinds::isKeyPressed(config::get<keybinds::Keys>("level.startpos_switcher.previous"))) {
+            if (keybinds::isKeyPressed(config::get<keybinds::Keys>("level.startpos_switcher.previous")))
                 pickStartPos(playLayer, currentStartPosIndex - 1);
-            } else if (keybinds::isKeyPressed(config::get<keybinds::Keys>("level.startpos_switcher.next"))) {
+            else if (keybinds::isKeyPressed(config::get<keybinds::Keys>("level.startpos_switcher.next")))
                 pickStartPos(playLayer, currentStartPosIndex + 1);
-            }
         }
 
         [[nodiscard]] const char* getId() const override { return "StartPos Switcher"; }
@@ -197,6 +195,7 @@ namespace eclipse::hacks::Level {
                 m_timeSinceAction = 0.f;
             }
         }
+
     private:
         CCMenuItemSpriteExtra* m_previous;
         CCMenuItemSpriteExtra* m_next;
@@ -207,7 +206,7 @@ namespace eclipse::hacks::Level {
     };
 
     class $modify(PlayLayer) {
-        bool init(GJGameLevel *level, bool useReplay, bool dontCreateObjects) {
+        bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
             startPosObjects.clear();
             return PlayLayer::init(level, useReplay, dontCreateObjects);
         }
@@ -216,18 +215,16 @@ namespace eclipse::hacks::Level {
             PlayLayer::resetLevel();
 
             // Reset camera
-            if (currentStartPosIndex >= 0 && config::get<bool>("level.startpos_switcher.reset_camera", true)) {
+            if (currentStartPosIndex >= 0 && config::get<bool>("level.startpos_switcher.reset_camera", true))
                 this->resetCamera();
-            }
         }
 
         void addObject(GameObject *object) {
             PlayLayer::addObject(object);
 
             uint32_t id = object->m_objectID;
-            if (id == 31) {
+            if (id == 31)
                 startPosObjects.push_back(geode::cast::typeinfo_cast<StartPosObject*>(object));
-            }
         }
 
         void createObjectsFromSetupFinished() {
@@ -239,11 +236,10 @@ namespace eclipse::hacks::Level {
             });
 
             currentStartPosIndex = -1;
-            if(m_startPosObject) {
+            if (m_startPosObject) {
                 auto it = std::find(startPosObjects.begin(), startPosObjects.end(), m_startPosObject);
-                if (it != startPosObjects.end()) {
+                if (it != startPosObjects.end())
                     currentStartPosIndex = static_cast<int32_t>(std::distance(startPosObjects.begin(), it));
-                }
             }
 
             auto* switcher = StartposSwitcherNode::create(this);

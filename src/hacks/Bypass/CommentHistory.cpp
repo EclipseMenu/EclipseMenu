@@ -23,9 +23,8 @@ namespace eclipse::hacks::Bypass {
         void loadPageFromUserInfo(GJUserScore* score) {
             auto originalCommentHistory = score->m_commentHistoryStatus;
 
-            if (config::get<bool>("bypass.commenthistory", false)) {
+            if (config::get<bool>("bypass.commenthistory", false))
                 score->m_commentHistoryStatus = 0;
-            }
 
             ProfilePage::loadPageFromUserInfo(score);
 
