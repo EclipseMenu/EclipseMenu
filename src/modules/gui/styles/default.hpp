@@ -2,6 +2,8 @@
 
 #include <modules/gui/gui.hpp>
 #include <misc/cpp/imgui_stdlib.h>
+#include <modules/config/config.hpp>
+#include <imgui-cocos.hpp>
 
 namespace eclipse::gui::imgui {
   class DefaultStyle : public Style {

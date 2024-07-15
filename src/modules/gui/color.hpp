@@ -4,7 +4,6 @@
 #include <imgui_internal.h>
 #include <string>
 #include <cmath>
-#include <cstdio>
 #include <nlohmann/json.hpp>
 
 #include <fmt/format.h>

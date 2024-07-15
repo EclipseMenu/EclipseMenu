@@ -1,9 +1,7 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include <functional>
-#include <utility>
 #include <imgui.h>
 #include <nlohmann/json.hpp>
 #include "../animation/easing.hpp"

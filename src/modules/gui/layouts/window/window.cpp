@@ -1,5 +1,4 @@
 #include "window.hpp"
-#include "modules/gui/color.hpp"
 
 #include "window/window.hpp"
 #include "animation/move-action.hpp"

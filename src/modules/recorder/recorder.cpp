@@ -1,4 +1,6 @@
 #include "recorder.hpp"
+#include <thread>
+
 #ifndef GEODE_IS_ANDROID
 
 #include <Geode/Geode.hpp>

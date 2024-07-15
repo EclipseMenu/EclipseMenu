@@ -4,7 +4,6 @@
 #include "rendertexture.hpp"
 #include "ffmpeg/ffmpegcli.hpp"
 
-#include <thread>
 #include <mutex>
 
 namespace eclipse::recorder {

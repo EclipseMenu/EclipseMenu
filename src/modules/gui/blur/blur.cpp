@@ -6,6 +6,17 @@ using namespace geode::prelude;
 
 #ifdef GEODE_IS_DESKTOP
 
+RenderTexture ppRt0;
+RenderTexture ppRt1;
+GLuint ppVao = 0;
+GLuint ppVbo = 0;
+Shader ppShader;
+GLint ppShaderFast = 0;
+GLint ppShaderFirst = 0;
+GLint ppShaderRadius = 0;
+
+float blurTimer = 0.f;
+
 Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath) {
     auto vertexSource = file::readString(vertexPath);
         if (!vertexSource)
@@ -232,6 +243,7 @@ void cleanupPostProcess() {
 #include <Geode/modify/CCScheduler.hpp>
 #include <Geode/modify/CCNode.hpp>
 #include <imgui-cocos.hpp>
+#include <numbers>
 
 class $modify(CCNode) {
     void visit() {
