@@ -3,7 +3,6 @@
 #include <modules/config/config.hpp>
 #include <algorithm>
 
-#include "layouts/window/window.hpp"
 #include "imgui.hpp"
 
 namespace eclipse::gui {

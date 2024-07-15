@@ -1,6 +1,5 @@
 #pragma once
 
-#include <numbers>
 #include <Geode/Geode.hpp>
 #include <modules/gui/gui.hpp>
 
@@ -25,13 +24,3 @@ struct RenderTexture {
     void cleanup();
 };
 
-RenderTexture ppRt0;
-RenderTexture ppRt1;
-GLuint ppVao = 0;
-GLuint ppVbo = 0;
-Shader ppShader;
-GLint ppShaderFast = 0;
-GLint ppShaderFirst = 0;
-GLint ppShaderRadius = 0;
-
-float blurTimer = 0.f;
