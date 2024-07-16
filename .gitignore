@@ -60,3 +60,6 @@ build-*/
 # other
 build.sh
 compile_commands.json
+
+# CLion
+/cmake-*/
