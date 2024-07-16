@@ -31,9 +31,9 @@ namespace eclipse::hacks::Cosmetic {
     	and now it finds a new home in eclipsemenu
     	*/
         static CustomListView* create(cocos2d::CCArray* a, TableViewCellDelegate* b, float c, float d, int e, BoomListType f, float g) {
-            if (f == BoomListType::Level2 && config::get<bool>("cosmetic.compacteditorlevels", true)) {
+            if (f == BoomListType::Level2 && config::get<bool>("cosmetic.compacteditorlevels")) {
                 f = BoomListType::Level4; // Level4 = compact level view
-            } else if (f == BoomListType::Comment4 && config::get<bool>("cosmetic.compactprofilecomments", true)) {
+            } else if (f == BoomListType::Comment4 && config::get<bool>("cosmetic.compactprofilecomments")) {
                 f = BoomListType::Comment2; // Comment2 = compact comment view
             }
             return CustomListView::create(a, b, c, d, e, f, g);
@@ -43,7 +43,7 @@ namespace eclipse::hacks::Cosmetic {
 	class $modify(EclipseLevelCell, LevelCell) {
 		void onClick(CCObject* sender) {
 			// hooking this function is necessary in order for the "view" button to work while compact mode is active in "my levels"
-			if (this->m_level->m_levelType == GJLevelType::Editor && config::get<bool>("cosmetic.compacteditorlevels", true)) {
+			if (this->m_level->m_levelType == GJLevelType::Editor && config::get<bool>("cosmetic.compacteditorlevels")) {
 				const auto scene = cocos2d::CCScene::create();
 				scene->addChild(EditLevelLayer::create(m_level));
 				cocos2d::CCDirector::sharedDirector()->replaceScene(cocos2d::CCTransitionFade::create(0.5f, scene));
@@ -51,7 +51,7 @@ namespace eclipse::hacks::Cosmetic {
 		}
 		void loadLocalLevelCell() {
 			LevelCell::loadLocalLevelCell();
-			if (config::get<bool>("cosmetic.compacteditorlevels", false)) { return; }
+			if (!config::get<bool>("cosmetic.compacteditorlevels")) { return; }
 			if (const auto localLevelname = geode::cast::typeinfo_cast<cocos2d::CCLabelBMFont*>(getChildByIDRecursive("level-name"))) {
 				localLevelname->limitLabelWidth(200.f, .6f, .01f);
 			}
