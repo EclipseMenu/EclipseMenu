@@ -36,6 +36,14 @@ namespace eclipse::gui {
             return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
         }
 
+        ImVec4 operator=(Color col2) {
+            return {r, g, b, a};
+        }
+
+        Color operator=(ImVec4 col2) {
+            return {col2.x, col2.y, col2.z, col2.w};
+        }
+
         operator cocos2d::ccColor4F() const {
             return {r, g, b, a};
         }

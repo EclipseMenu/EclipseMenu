@@ -5,5 +5,9 @@
         [2, "292929ff"],
         [7, "212121ff"]
     ],
-    "floats": []
+    "floats": [],
+    "options": {
+        "style": 1,
+        "layout": 0
+    }
 }

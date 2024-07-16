@@ -8,7 +8,7 @@
 #include <modules/gui/color.hpp>
 
 #include "layouts/window/window.hpp"
-#include "styles/default.hpp"
+#include "styles/megahack.hpp"
 
 namespace eclipse::gui::imgui {
 
@@ -57,7 +57,7 @@ namespace eclipse::gui::imgui {
 
     Theme* ImGuiEngine::getTheme() {
         // TODO: change this for theme picker
-        if (!m_theme) m_theme = new Theme(geode::Mod::get()->getResourcesDir() / "basic.json", (new WindowLayout())->setStyle(new DefaultStyle())); 
+        if (!m_theme) m_theme = new Theme(geode::Mod::get()->getResourcesDir() / "basic.json"); 
         return m_theme;
     }
 }
