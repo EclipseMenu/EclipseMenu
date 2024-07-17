@@ -9,7 +9,9 @@ namespace eclipse::hacks::Bypass {
     class CommentHistory : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
-            tab->addToggle("Comment History Bypass", "bypass.commenthistory")->setDescription("Allows you to see any user\'s comment history");
+            tab->addToggle("Comment History Bypass", "bypass.commenthistory")
+                ->handleKeybinds()
+                ->setDescription("Allows you to see any user\'s comment history");
         }
 
         [[nodiscard]] const char* getId() const override { return "Comment History Bypass"; }
@@ -21,9 +23,8 @@ namespace eclipse::hacks::Bypass {
         void loadPageFromUserInfo(GJUserScore* score) {
             auto originalCommentHistory = score->m_commentHistoryStatus;
 
-            if (config::get<bool>("bypass.commenthistory", false)) {
+            if (config::get<bool>("bypass.commenthistory", false))
                 score->m_commentHistoryStatus = 0;
-            }
 
             ProfilePage::loadPageFromUserInfo(score);
 

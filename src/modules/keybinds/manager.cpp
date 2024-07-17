@@ -387,6 +387,15 @@ namespace eclipse::keybinds {
         return m_keybinds.back();
     }
 
+    void Manager::init() {
+        setupTab();
+
+        for (auto& keybind : m_keybinds) {
+            keybind.setKey(config::get<Keys>(fmt::format("keybind.{}.key", keybind.getId()), Keys::None));
+            this->setKeybindState(keybind.getId(), config::get<bool>(fmt::format("keybind.{}.active", keybind.getId()), false));
+        }
+    }
+
     void Manager::update() {
         for (auto& key: m_keyStates) {
             m_lastKeyStates.insert_or_assign(key.first, key.second);
@@ -397,17 +406,22 @@ namespace eclipse::keybinds {
         for (auto& keybind : m_keybinds) {
             if (keybind.getId() == id) {
                 keybind.setInitialized(state);
+                config::set(fmt::format("keybind.{}.active", id), state);
 
                 auto* tab = gui::MenuTab::find("Keybinds");
-                config::set(fmt::format("keybind.{}.active", id), state);
                 if (state) {
                     // Add the keybind to the GUI
                     auto* keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", id), true);
                     keybindComponent->callback([tab, keybindComponent, id](Keys key) {
-                        if (key == Keys::None)
-                            tab->removeComponent(keybindComponent);
+                        auto keybind = Manager::get()->getKeybind(id);
 
-                        Manager::get()->getKeybind(id)->setKey(key);
+                        if (key == Keys::None) {
+                            config::set(fmt::format("keybind.{}.active", id), false);
+                            keybind->setInitialized(false);
+                            tab->removeComponent(keybindComponent);
+                        }
+
+                        keybind->setKey(key);
                     });
                     s_keybindComponents[id] = keybindComponent;
                 } else {

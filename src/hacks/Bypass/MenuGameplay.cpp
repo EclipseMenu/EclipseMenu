@@ -10,7 +10,7 @@ namespace eclipse::hacks::Bypass {
     class MenuGameplay : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
-            tab->addToggle("Menu Gameplay", "bypass.menugameplay");
+            tab->addToggle("Menu Gameplay", "bypass.menugameplay")->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Menu Gameplay"; }

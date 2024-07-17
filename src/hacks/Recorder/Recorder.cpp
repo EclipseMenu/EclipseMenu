@@ -46,7 +46,7 @@ namespace eclipse::hacks::Recorder {
     }
 
     void start() {
-        if(!PlayLayer::get()) return;
+        if (!PlayLayer::get()) return;
 
         visiting = false;
         levelDone = false;
@@ -88,7 +88,7 @@ namespace eclipse::hacks::Recorder {
         auto lvl = PlayLayer::get()->m_level;
         std::filesystem::path renderPath = geode::Mod::get()->getSaveDir() / "renders" / lvl->m_levelName / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
 
-        if(!std::filesystem::exists(renderPath)) {
+        if (!std::filesystem::exists(renderPath)) {
             geode::log::error("Render {} not found", renderPath);
             return;
         }
@@ -213,26 +213,26 @@ namespace eclipse::hacks::Recorder {
                     uint32_t channelTime = 0;
                     audioChannel->getPosition(&channelTime, FMOD_TIMEUNIT_MS);
 
-                    if(channelTime <= 0)
+                    if (channelTime <= 0)
                         continue;
 
-                    if(channelTime - songTime > 0.05f)
+                    if (channelTime - songTime > 0.05f)
                         audioChannel->setPosition(songTime, FMOD_TIMEUNIT_MS);
                 }
             }
         }
 
         void update(float dt) {
-            if((!s_recorder.isRecording() && !s_recorder.isRecordingAudio()) || m_gameState.m_currentProgress <= 0) return GJBaseGameLayer::update(dt);
+            if ((!s_recorder.isRecording() && !s_recorder.isRecordingAudio()) || m_gameState.m_currentProgress <= 0) return GJBaseGameLayer::update(dt);
 
             float endscreen = config::get<float>("recorder.endscreen", 5.f);
 
-            if(levelDone) {
-                if(afterEndTimer > endscreen) {
+            if (levelDone) {
+                if (afterEndTimer > endscreen) {
 
-                    if(s_recorder.isRecording())
+                    if (s_recorder.isRecording())
                         startAudio();
-                    else if(s_recorder.isRecordingAudio())
+                    else if (s_recorder.isRecordingAudio())
                         stopAudio();
                     
                     return GJBaseGameLayer::update(dt);
@@ -241,7 +241,7 @@ namespace eclipse::hacks::Recorder {
                     afterEndTimer += dt;
             }
 
-            if(!s_recorder.isRecording()) return GJBaseGameLayer::update(dt);
+            if (!s_recorder.isRecording()) return GJBaseGameLayer::update(dt);
 
             float fps = config::get<float>("recorder.fps", 60.f);
             float timewarp = m_gameState.m_timeWarp;
@@ -251,7 +251,7 @@ namespace eclipse::hacks::Recorder {
             double frameDt = 1. / (double)fps * timewarp;
             double time = totalTime + extraTime - lastFrameTime;
 
-            if(time >= frameDt) {
+            if (time >= frameDt) {
                 extraTime = time - frameDt;
                 lastFrameTime = totalTime;
 
@@ -271,7 +271,7 @@ namespace eclipse::hacks::Recorder {
         void onQuit()
         {
             if (s_recorder.isRecording()) stop();
-            if(s_recorder.isRecordingAudio()) stopAudio();
+            if (s_recorder.isRecordingAudio()) stopAudio();
             PlayLayer::onQuit();
         }
 

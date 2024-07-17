@@ -3,7 +3,7 @@
 #include <Geode/modify/CCScheduler.hpp>
 
 #include <modules/config/config.hpp>
-#include <modules/gui/themes/megahack/megahack.hpp>
+#include <modules/gui/layouts/window/window.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
 
@@ -43,8 +43,6 @@ class $modify(MyMenuLayer, MenuLayer) {
 
         hack::Hack::lateInitializeHacks();
 
-        // TODO: Load saved keybind states
-
         s_isInitialized = true;
 
         return true;
@@ -57,11 +55,24 @@ class $modify(MyMenuLayer, MenuLayer) {
 };
 
 class $modify(cocos2d::CCScheduler) {
+    static void onModify(auto& self) {
+        FIRST_PRIORITY("cocos2d::CCScheduler::update");
+    }
+
     void update(float dt) override {
         cocos2d::CCScheduler::update(dt);
         for (auto hack : hack::Hack::getHacks()) {
             hack->update();
         }
+
+        // Add ability for ImGui to capture right click
+        auto &io = ImGui::GetIO();
+        if (keybinds::isKeyPressed(keybinds::Keys::MouseRight)) {
+            io.AddMouseButtonEvent(1, true);
+        } else if (keybinds::isKeyReleased(keybinds::Keys::MouseRight)) {
+            io.AddMouseButtonEvent(1, false);
+        }
+
         keybinds::Manager::get()->update();
     }
 };
@@ -70,9 +81,9 @@ $on_mod(Loaded) {
     // Load the configuration file.
     config::load();
 
-    // Load keybinds UI
-    keybinds::Manager::get()->setupTab();
-
     // Initialize the hacks.
     hack::Hack::initializeHacks();
+
+    // Load keybinds
+    keybinds::Manager::get()->init();
 }

@@ -80,6 +80,7 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] const std::string& getDescription() const { return m_description; }
         [[nodiscard]] MenuTab* getOptions() const { return m_options; }
+        [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
 
         void triggerCallback(bool value) {
             if (m_callback) m_callback(value);
@@ -91,6 +92,7 @@ namespace eclipse::gui {
         std::string m_description;
         std::function<void(bool)> m_callback;
         MenuTab* m_options = nullptr;
+        bool m_hasKeybind = false;
     };
 
     /// @brief Radio button component for selecting one of the options.
@@ -344,8 +346,8 @@ namespace eclipse::gui {
     /// @brief Input text component to get user input as a string.
     class ColorComponent : public Component {
     public:
-        explicit ColorComponent(std::string title, std::string id)
-            : m_title(std::move(title)), m_id(std::move(id)) {}
+        explicit ColorComponent(std::string title, std::string id, bool hasOpacity = false)
+            : m_title(std::move(title)), m_id(std::move(id)), m_hasOpacity(hasOpacity) {}
 
         void onInit() override {};
         void onUpdate() override {}
@@ -358,6 +360,7 @@ namespace eclipse::gui {
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+        [[nodiscard]] bool hasOpacity() const { return m_hasOpacity; }
 
         void triggerCallback(gui::Color value) {
             if (m_callback) m_callback(value);
@@ -366,6 +369,7 @@ namespace eclipse::gui {
     private:
         std::string m_id;
         std::string m_title;
+        bool m_hasOpacity;
         std::function<void(gui::Color)> m_callback;
     };
 
@@ -508,8 +512,8 @@ namespace eclipse::gui {
         }
 
         /// @brief Add a color picker to the tab.
-        ColorComponent* addColorComponent(const std::string& title, const std::string& id) {
-            auto* color = new ColorComponent(title, id);
+        ColorComponent* addColorComponent(const std::string& title, const std::string& id, bool hasOpacity = false) {
+            auto* color = new ColorComponent(title, id, hasOpacity);
             addComponent(color);
             return color;
         }
@@ -535,9 +539,35 @@ namespace eclipse::gui {
         std::vector<Component*> m_components;
     };
 
+    class Style {
+    public:
+        explicit Style() {}
+
+        /// @brief Draw a custom title bar (or just return false if there is none).
+        virtual bool titlebar() { return false; }
+
+        // Component visitors
+
+        virtual void visit(LabelComponent* label) {};
+        virtual void visit(ToggleComponent* toggle) {};
+        virtual void visit(RadioButtonComponent* radio) {};
+        virtual void visit(ComboComponent* combo) {};
+        virtual void visit(SliderComponent* slider) {};
+        virtual void visit(InputFloatComponent* input) {};
+        virtual void visit(InputTextComponent* input) {};
+        virtual void visit(InputIntComponent* input) {};
+        virtual void visit(FloatToggleComponent* floatToggle) {};
+        virtual void visit(ButtonComponent* button) {};
+        virtual void visit(ColorComponent* color) {};
+        virtual void visit(KeybindComponent* keybind) {};
+
+        /// @brief Handle the component.
+        void visit(Component* component);
+    };
+
     class Layout {
     public:
-        explicit Layout() : m_isToggled(false) {}
+        explicit Layout() : m_isToggled(false), m_style(nullptr) {}
 
         /// @brief Draw the UI.
         virtual void draw() {}
@@ -550,102 +580,20 @@ namespace eclipse::gui {
             m_isToggled = !m_isToggled;
         }
 
+        Layout* setStyle(Style* st) { 
+            m_style = st;
+            return this;
+        }
+
         /// @brief Get if the menu is toggled.
         [[nodiscard]] bool isToggled() { return m_isToggled; }
 
+        /// @brief Get the layout's component style.
+        [[nodiscard]] Style* getStyle() { return m_style; }
+
     protected:
         bool m_isToggled;
-        // this'll also handle the window positions and all the imgui components
-    };
-
-    class Theme {
-    public:
-        explicit Theme(const std::filesystem::path& path, Layout* lay) {
-            loadFromFile(path);
-            m_layout = lay;
-        }
-
-        /// @brief Load the theme.
-        void loadFromFile(const std::filesystem::path& path) {
-            std::ifstream ifs(path.c_str());
-            nlohmann::json jf = nlohmann::json::parse(ifs);
-            if (jf.contains("colors")) {
-                std::map<int, Color> m = jf.at("colors").get<std::map<int, Color>>();
-                for (auto[k, v] : m) {
-                    m_colors[k] = v;
-                }
-            }
-            if (jf.contains("floats")) {
-                std::map<int, float> m2 = jf.at("floats").get<std::map<int, float>>();
-                for (auto[k, v] : m2) {
-                    m_floats[k] = v;
-                }
-            }
-        }
-
-        /// @brief Save the theme to a file.
-        void saveToFile(const std::filesystem::path& path) {
-            nlohmann::json j;
-            for (auto[k, v] : m_colors) {
-                j["colors"][k] = v;
-            }
-            for (auto[k, v] : m_floats) {
-                j["floats"][k] = v;
-            }
-            std::ofstream file(path.c_str());
-            file << j;
-        }
-
-        /// @brief Set up the UI.
-        virtual void setup() {
-            auto &style = ImGui::GetStyle();
-            auto &colors = style.Colors;
-
-            for (auto[k, v] : m_colors) {
-                colors[static_cast<ImGuiCol_>(k)] = v;
-            }
-            for (auto[k, v] : m_floats) {
-                switch (k) {
-                    case 1:
-                        style.WindowRounding = v;
-                        break;
-                    case 2:
-                        style.FrameRounding = v;
-                        break;
-                    case 3:
-                        style.PopupRounding = v;
-                        break;
-                    case 4:
-                        style.IndentSpacing = v;
-                        break;
-                    case 5:
-                        style.ScrollbarSize = v;
-                        break;
-                    case 6:
-                        style.ScrollbarRounding = v;
-                        break;
-                    case 7:
-                        style.GrabMinSize = v;
-                        break;
-                    case 8:
-                        style.GrabRounding = v;
-                        break;
-                    case 9:
-                        style.WindowBorderSize = v;
-                        break;
-                }
-            }
-        }
-
-        /// @brief Get the layout of the theme.
-        [[nodiscard]] Layout* getLayout() { return m_layout; }
-
-    private:
-        Layout* m_layout;
-        std::map<int, Color> m_colors;
-        std::map<int, float> m_floats;
-        std::map<int, ImVec2> m_vecs;
-        // plus like colors and settings that the user can change (also theme saving to file)
+        Style* m_style;
     };
 
     /// @brief Abstract class, that wraps all UI function calls.

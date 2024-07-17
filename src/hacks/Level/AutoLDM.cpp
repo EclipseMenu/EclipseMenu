@@ -10,7 +10,7 @@ namespace eclipse::hacks::Level {
     class AutoLDM : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
-            tab->addToggle("Auto LDM", "level.autoldm");
+            tab->addToggle("Auto LDM", "level.autoldm")->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Auto LDM"; }

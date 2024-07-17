@@ -31,11 +31,10 @@ namespace eclipse::keybinds {
             auto* manager = Manager::get();
             auto key = convertMouseKey(button);
 
-            if(action == GLFW_PRESS) {
+            if (action == GLFW_PRESS)
                 manager->registerKeyPress(key);
-            } else if(action == GLFW_RELEASE) {
+            else if (action == GLFW_RELEASE)
                 manager->registerKeyRelease(key);
-            }
         }
     };
 

@@ -37,7 +37,7 @@ namespace eclipse::hacks::Player {
     }
 
     cocos2d::CCPoint screenToFrame(const ImVec2& pos) {
-        auto *director = cocos2d::CCDirector::sharedDirector();
+        auto* director = cocos2d::CCDirector::sharedDirector();
         const auto frameSize = director->getOpenGLView()->getFrameSize();
         const auto winSize = director->getWinSize();
 
@@ -51,11 +51,12 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
             tab->addToggle("Click Teleport", "player.clicktp")
-                ->setDescription("Teleport to the mouse position when right clicking.");
+                ->setDescription("Teleport to the mouse position when right clicking.")
+                ->handleKeybinds();
         }
 
         void update() override {
-            if(!config::get<bool>("player.clicktp", false)) return;
+            if (!config::get<bool>("player.clicktp", false)) return;
 
             // Force the cursor to be visible
             PlatformToolbox::showCursor();
@@ -63,10 +64,7 @@ namespace eclipse::hacks::Player {
             if (keybinds::isKeyPressed(keybinds::Keys::MouseRight)) {
                 auto playLayer = PlayLayer::get();
                 if (!playLayer) return;
-
-                auto mousePos = ImGui::GetMousePos();
-                auto framePos = screenToFrame(mousePos);
-                auto gamePos = screenToGame(framePos, playLayer);
+                auto gamePos = screenToGame(geode::cocos::getMousePos(), playLayer);
 
                 playLayer->m_player1->m_position = gamePos;
             }

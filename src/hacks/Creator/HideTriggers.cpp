@@ -13,7 +13,8 @@ namespace eclipse::hacks::Creator {
         void init() override {
             auto tab = gui::MenuTab::find("Creator");
             tab->addToggle("Hide Triggers", "creator.hidetriggers")
-               ->setDescription("Hides all triggers while playtesting the level in editor.");
+                ->handleKeybinds()
+                ->setDescription("Hides all triggers while playtesting the level in editor.");
         }
 
         [[nodiscard]] const char* getId() const override { return "Hide Triggers"; }

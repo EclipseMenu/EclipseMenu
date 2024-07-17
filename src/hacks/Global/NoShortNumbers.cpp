@@ -9,7 +9,7 @@ namespace eclipse::hacks::Global {
     class NoShortNumbers : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Global");
-            tab->addToggle("No Short Numbers", "global.noshortnumbers");
+            tab->addToggle("No Short Numbers", "global.noshortnumbers")->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "No Short Numbers"; }

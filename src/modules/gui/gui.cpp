@@ -3,7 +3,6 @@
 #include <modules/config/config.hpp>
 #include <algorithm>
 
-#include "themes/megahack/megahack.hpp"
 #include "imgui.hpp"
 
 namespace eclipse::gui {
@@ -17,15 +16,18 @@ namespace eclipse::gui {
     }
 
     void ToggleComponent::addOptions(std::function<void(MenuTab*)> options) {
-        if(!m_options)
+        if (!m_options)
             m_options = new MenuTab("Options");
         options(m_options);
     }
 
     ToggleComponent* ToggleComponent::handleKeybinds() {
         keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
-            setValue(!getValue());
+            bool value = !getValue();
+            setValue(value);
+            this->triggerCallback(value);
         });
+        m_hasKeybind = true;
         return this;
     }
 
@@ -47,5 +49,24 @@ namespace eclipse::gui {
         static imgui::ImGuiEngine instance;
         return &instance;
     }
+
+#define SUPPORT_COMPONENT(type) (auto* component##__LINE__ = dynamic_cast<type*>(component)) this->visit(component##__LINE__)
+    
+    void Style::visit(Component* component) {
+      if SUPPORT_COMPONENT(ToggleComponent);
+      else if SUPPORT_COMPONENT(SliderComponent);
+      else if SUPPORT_COMPONENT(LabelComponent);
+      else if SUPPORT_COMPONENT(InputFloatComponent);
+      else if SUPPORT_COMPONENT(InputIntComponent);
+      else if SUPPORT_COMPONENT(InputTextComponent);
+      else if SUPPORT_COMPONENT(FloatToggleComponent);
+      else if SUPPORT_COMPONENT(RadioButtonComponent);
+      else if SUPPORT_COMPONENT(ComboComponent);
+      else if SUPPORT_COMPONENT(ButtonComponent);
+      else if SUPPORT_COMPONENT(ColorComponent);
+      else if SUPPORT_COMPONENT(KeybindComponent);
+    }
+
+#undef SUPPORT_COMPONENT
 
 }

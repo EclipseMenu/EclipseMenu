@@ -9,7 +9,9 @@ namespace eclipse::hacks::Level {
     class SmartStartPos : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
-            tab->addToggle("Smart StartPos", "level.smartstartpos")->setDescription("Makes the start positions automatically pick the correct gamemode and speed\nOnly works in levels without direction changes");
+            tab->addToggle("Smart StartPos", "level.smartstartpos")
+                ->handleKeybinds()
+                ->setDescription("Makes the start positions automatically pick the correct gamemode and speed\nOnly works in levels without direction changes");
         }
 
         [[nodiscard]] const char* getId() const override { return "Smart StartPos"; }
@@ -31,9 +33,9 @@ namespace eclipse::hacks::Level {
             });
 
             for(auto obj : vec) {
-                if(obj->getPositionX() - 10 > startPos->getPositionX())
+                if (obj->getPositionX() - 10 > startPos->getPositionX())
                     break;
-                else if(obj->getPositionX() - 10 < startPos->getPositionX())
+                else if (obj->getPositionX() - 10 < startPos->getPositionX())
                     closest = obj;
             }
 
@@ -50,12 +52,12 @@ namespace eclipse::hacks::Level {
             startPosSettings->m_startSpeed = levelSettings->m_startSpeed;
 
             GameObject* obj = getClosestObject(m_fields->m_dualPortals, startPos);
-            if(obj)
+            if (obj)
                 startPosSettings->m_startDual = obj->m_objectID == 286;
 
             obj = getClosestObject(m_fields->m_gamemodePortals, startPos);
 
-            if(obj) {
+            if (obj) {
                 switch(obj->m_objectID) {
                     case 12:
                         startPosSettings->m_startMode = 0;
@@ -86,11 +88,11 @@ namespace eclipse::hacks::Level {
 
             obj = getClosestObject(m_fields->m_miniPortals, startPos);
 
-            if(obj)
+            if (obj)
                 startPosSettings->m_startMini = obj->m_objectID == 101;
 
             obj = getClosestObject(m_fields->m_speedChanges, startPos);
-            if(obj) {
+            if (obj) {
                 switch(obj->m_objectID) {
                     case 200:
                         startPosSettings->m_startSpeed = Speed::Slow;
@@ -124,7 +126,7 @@ namespace eclipse::hacks::Level {
         }
 
         void resetLevel() {
-            if(config::get<bool>("level.smartstartpos", false)) {
+            if (config::get<bool>("level.smartstartpos", false)) {
                 for(StartPosObject* obj : m_fields->m_startPositions)
                     setupStartPos(obj);
             }

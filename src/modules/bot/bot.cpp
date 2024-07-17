@@ -31,10 +31,10 @@ namespace eclipse::bot {
     }
 
     std::optional<gdr::Input> Bot::poll(int frame) {
-        if(m_inputIndex >= m_replay.inputs.size())
+        if (m_inputIndex >= m_replay.inputs.size())
             return std::nullopt;
 
-        if(m_replay.inputs[m_inputIndex].frame <= frame)
+        if (m_replay.inputs[m_inputIndex].frame <= frame)
             return m_replay.inputs[m_inputIndex++];
         
         return std::nullopt;

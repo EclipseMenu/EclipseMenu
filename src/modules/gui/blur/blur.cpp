@@ -6,6 +6,17 @@ using namespace geode::prelude;
 
 #ifdef GEODE_IS_DESKTOP
 
+RenderTexture ppRt0;
+RenderTexture ppRt1;
+GLuint ppVao = 0;
+GLuint ppVbo = 0;
+Shader ppShader;
+GLint ppShaderFast = 0;
+GLint ppShaderFirst = 0;
+GLint ppShaderRadius = 0;
+
+float blurTimer = 0.f;
+
 Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath) {
     auto vertexSource = file::readString(vertexPath);
         if (!vertexSource)
@@ -35,7 +46,7 @@ Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, con
         auto vertexLog = getShaderLog(vertex);
 
         glGetShaderiv(vertex, GL_COMPILE_STATUS, &res);
-        if(!res) {
+        if (!res) {
             glDeleteShader(vertex);
             vertex = 0;
             return Err("vertex shader compilation failed:\n{}", vertexLog);
@@ -48,7 +59,7 @@ Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, con
         auto fragmentLog = getShaderLog(fragment);
 
         glGetShaderiv(fragment, GL_COMPILE_STATUS, &res);
-        if(!res) {
+        if (!res) {
             glDeleteShader(vertex);
             glDeleteShader(fragment);
             vertex = 0;
@@ -94,7 +105,7 @@ Result<std::string> Shader::link() {
     fragment = 0;
 
     glGetProgramiv(program, GL_LINK_STATUS, &res);
-    if(!res) {
+    if (!res) {
         glDeleteProgram(program);
         program = 0;
         return Err("shader link failed:\n{}", programLog);
@@ -134,7 +145,7 @@ void RenderTexture::setup(GLsizei width, GLsizei height) {
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         log::error("pp fbo not complete, uh oh! i guess i will have to cut off ur pp now");
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFbo);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, readFbo);
@@ -232,6 +243,7 @@ void cleanupPostProcess() {
 #include <Geode/modify/CCScheduler.hpp>
 #include <Geode/modify/CCNode.hpp>
 #include <imgui-cocos.hpp>
+#include <numbers>
 
 class $modify(CCNode) {
     void visit() {

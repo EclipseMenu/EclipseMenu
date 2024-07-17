@@ -4,7 +4,6 @@
 #include <imgui_internal.h>
 #include <string>
 #include <cmath>
-#include <cstdio>
 #include <nlohmann/json.hpp>
 
 #include <fmt/format.h>
@@ -35,6 +34,18 @@ namespace eclipse::gui {
         /// @brief Converts the color to ImU32
         operator ImU32() const {
             return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
+        }
+
+        ImVec4 operator=(Color col2) {
+            return {r, g, b, a};
+        }
+
+        Color operator=(ImVec4 col2) {
+            return {col2.x, col2.y, col2.z, col2.w};
+        }
+
+        operator cocos2d::ccColor4F() const {
+            return {r, g, b, a};
         }
 
         /// @brief Returns a pointer to the color data

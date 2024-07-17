@@ -14,6 +14,7 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.autoclick", 1.f);
 
             tab->addFloatToggle("AutoClicker", "player.autoclick", 0.f, 10.f, "%.3f s.");
+                ->handleKeybinds();
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.autoclick", false); }

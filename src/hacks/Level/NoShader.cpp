@@ -9,9 +9,12 @@ namespace eclipse::hacks::Level {
     class NoShader : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
-            tab->addToggle("No Shaders", "level.noshader")->setDescription("Disables shaders");
+            tab->addToggle("No Shaders", "level.noshader")
+                ->handleKeybinds()
+                ->setDescription("Disables shaders");
         }
 
+        [[nodiscard]] bool isCheating() override { return config::get<bool>("level.noshader", false); }
         [[nodiscard]] const char* getId() const override { return "No Shaders"; }
     };
 

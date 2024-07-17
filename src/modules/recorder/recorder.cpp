@@ -1,4 +1,6 @@
 #include "recorder.hpp"
+#include <thread>
+
 #ifndef GEODE_IS_ANDROID
 
 #include <Geode/Geode.hpp>
@@ -27,7 +29,7 @@ namespace eclipse::recorder {
 
         m_renderPath = renderPath;
 
-        if(!m_ffmpegCLI)
+        if (!m_ffmpegCLI)
             return;
 
         std::thread t(&Recorder::recordThread, this);
@@ -53,7 +55,7 @@ namespace eclipse::recorder {
         command << " -y -f rawvideo -pix_fmt rgb24 -s " << m_renderSettings.m_width << "x" << m_renderSettings.m_height;
         command << " -r " << m_renderSettings.m_fps;
 
-        if(!m_renderSettings.m_args.empty())
+        if (!m_renderSettings.m_args.empty())
             command << " " << m_renderSettings.m_args;
 
         command << " -i - ";
@@ -76,7 +78,7 @@ namespace eclipse::recorder {
 
         command << "-vf \"vflip";
 
-        if(!m_renderSettings.m_videoArgs.empty())
+        if (!m_renderSettings.m_videoArgs.empty())
             command << "," << m_renderSettings.m_videoArgs;
 
         command << "\" -an " << m_renderPath;
@@ -88,7 +90,7 @@ namespace eclipse::recorder {
         while (m_recording || m_frameHasData) {
             m_lock.lock();
 
-            if(m_frameHasData) {
+            if (m_frameHasData) {
                 const geode::ByteVector frame = m_currentFrame;
                 m_frameHasData = false;
                 m_lock.unlock();

@@ -17,7 +17,6 @@ namespace eclipse::hacks::Player {
         }
 
         [[nodiscard]] int32_t getPriority() const override { return 2; }
-        [[nodiscard]] bool isCheating() override { return false; }
         [[nodiscard]] const char* getId() const override { return "Wave Trail Size"; }
     };
 
@@ -25,7 +24,7 @@ namespace eclipse::hacks::Player {
 
     class $modify(HardStreak) {
         void updateStroke(float dt) {
-            if(config::get<bool>("player.wavetrailsize.toggle", false)) {
+            if (config::get<bool>("player.wavetrailsize.toggle", false)) {
                 float trailSize = config::get<float>("player.wavetrailsize", 0.f);
                 this->m_pulseSize = trailSize;
             }

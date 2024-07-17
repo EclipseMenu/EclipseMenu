@@ -15,7 +15,9 @@ namespace eclipse::hacks::Player {
     class ShowTrajectory : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
-            tab->addToggle("Show Trajectory", "player.showtrajectory")->setDescription("Shows where the player will be if they click/don\'t click.");
+            tab->addToggle("Show Trajectory", "player.showtrajectory")
+                ->setDescription("Shows where the player will be if they click/don't click.")
+                ->handleKeybinds();
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.showtrajectory", false); }
@@ -56,7 +58,7 @@ namespace eclipse::hacks::Player {
 
             static TrajectoryDrawNode* instance = nullptr;
             
-            if(!instance) {
+            if (!instance) {
                 instance = TrajectoryDrawNode::create();
                 instance->retain();
             }
@@ -107,10 +109,10 @@ namespace eclipse::hacks::Player {
 
                 PlayLayer::get()->checkCollisions(player, m_frameDt, false);
 
-                if(m_simuationDead)
+                if (m_simuationDead)
                     break;
 
-                if(!iterationActionDone && (!isPlayer2 && !m_player1Pressed || isPlayer2 && !m_player2Pressed)) {
+                if (!iterationActionDone && (!isPlayer2 && !m_player1Pressed || isPlayer2 && !m_player2Pressed)) {
                     iterationActionDone = true;
                     down ? player->pushButton(PlayerButton::Jump) : player->releaseButton(PlayerButton::Jump);
                 }
@@ -130,14 +132,14 @@ namespace eclipse::hacks::Player {
         }
 
         void buttonForPlayer(PlayerObject* player, PlayerObject* playerBase, bool down) {
-            if(!player || !playerBase) return;
+            if (!player || !playerBase) return;
 
             bool isPlayer2 = playerBase == PlayLayer::get()->m_player2;
 
             player->copyAttributes(playerBase);
             player->m_gravityMod = playerBase->m_gravityMod;
 
-            if((isPlayer2 && m_player2Pressed) || (!isPlayer2 && m_player1Pressed)) {
+            if ((isPlayer2 && m_player2Pressed) || (!isPlayer2 && m_player1Pressed)) {
                 down ? player->pushButton(PlayerButton::Jump) : player->releaseButton(PlayerButton::Jump);
             }
 
@@ -185,7 +187,7 @@ namespace eclipse::hacks::Player {
         }
 
         bool isSimulationDead(PlayerObject* player) {
-            if(m_simulating && (player == m_player1 || player == m_player2)) {
+            if (m_simulating && (player == m_player1 || player == m_player2)) {
                 m_simuationDead = true;
                 return true;
             }
@@ -194,7 +196,7 @@ namespace eclipse::hacks::Player {
         }
 
         void handleButton(bool down, bool player1) {
-            if(player1)
+            if (player1)
                 m_player1Pressed = down;
             else
                 m_player2Pressed = down;
@@ -203,7 +205,7 @@ namespace eclipse::hacks::Player {
         void simulate() {
             PlayLayer* pl = PlayLayer::get();
 
-            if(!pl) return;
+            if (!pl) return;
 
             m_simulating = true;
 
@@ -212,7 +214,7 @@ namespace eclipse::hacks::Player {
 
             simulateForPlayer(m_player1, m_player2, pl->m_player1);
 
-            if(pl->m_gameState.m_isDualMode)
+            if (pl->m_gameState.m_isDualMode)
                 simulateForPlayer(m_player2, m_player1, pl->m_player2);
 
             m_simulating = false;
@@ -241,19 +243,19 @@ namespace eclipse::hacks::Player {
         }
 
         void destroyPlayer(PlayerObject* player, GameObject* gameObject) {
-            if(s_simulation.isSimulationDead(player)) return;
+            if (s_simulation.isSimulationDead(player)) return;
 
             PlayLayer::destroyPlayer(player, gameObject);
         }
 
         void playEndAnimationToPos(cocos2d::CCPoint p0) {
-            if(s_simulation.isSimulating()) return;
+            if (s_simulation.isSimulating()) return;
             
             PlayLayer::playEndAnimationToPos(p0);
         }
 
         void flipGravity(PlayerObject *p0, bool p1, bool p2) {
-            if(s_simulation.isSimulating()) return;
+            if (s_simulation.isSimulating()) return;
             
             PlayLayer::flipGravity(p0, p1, p2);
         }
@@ -274,7 +276,7 @@ namespace eclipse::hacks::Player {
 
     class $modify(HardStreak) {
         void addPoint(cocos2d::CCPoint p0) {
-            if(s_simulation.isSimulating()) return;
+            if (s_simulation.isSimulating()) return;
 
             HardStreak::addPoint(p0);
         }
@@ -282,7 +284,7 @@ namespace eclipse::hacks::Player {
 
     class $modify(EffectGameObject) {
         void triggerObject(GJBaseGameLayer *p0, int p1, const gd::vector<int> *p2) {
-            if(s_simulation.isSimulating()) return;
+            if (s_simulation.isSimulating()) return;
             
             return EffectGameObject::triggerObject(p0, p1, p2);
         }
@@ -290,7 +292,7 @@ namespace eclipse::hacks::Player {
 
     class $modify(GameObject) {
         void playShineEffect() {
-            if(s_simulation.isSimulating()) return;
+            if (s_simulation.isSimulating()) return;
             
             GameObject::playShineEffect();
         }
@@ -299,13 +301,13 @@ namespace eclipse::hacks::Player {
     class $modify(PlayerObject) {
 
         void playSpiderDashEffect(cocos2d::CCPoint from, cocos2d::CCPoint to) {
-            if(s_simulation.isSimulating()) return;
+            if (s_simulation.isSimulating()) return;
 
             PlayerObject::playSpiderDashEffect(from, to);
         }
 
         void incrementJumps() {
-            if(s_simulation.isSimulating()) return;
+            if (s_simulation.isSimulating()) return;
             
             PlayerObject::incrementJumps();
         }
@@ -313,12 +315,12 @@ namespace eclipse::hacks::Player {
         void update(float dt){
             PlayerObject::update(dt);
 
-            if(PlayLayer::get() && !s_simulation.isSimulating())
+            if (PlayLayer::get() && !s_simulation.isSimulating())
                 s_simulation.setFrameDelta(dt);
         }
 
         void ringJump(RingObject *p0, bool p1) {
-            if(s_simulation.isSimulating()) return;
+            if (s_simulation.isSimulating()) return;
             
             PlayerObject::ringJump(p0, p1);
         }
@@ -326,14 +328,14 @@ namespace eclipse::hacks::Player {
 
     class $modify(GJBaseGameLayer) {
         bool canBeActivatedByPlayer(PlayerObject* p0, EffectGameObject* p1) {
-            if(s_simulation.isSimulating())
+            if (s_simulation.isSimulating())
                 return false;
             
             return GJBaseGameLayer::canBeActivatedByPlayer(p0, p1);
         }
 
         void handleButton(bool down, int button, bool isPlayer1){
-            if(button == 1)
+            if (button == 1)
                 s_simulation.handleButton(down, isPlayer1);
 
             GJBaseGameLayer::handleButton(down, button, isPlayer1);
@@ -365,13 +367,13 @@ namespace eclipse::hacks::Player {
         }
 
         void playerTouchedRing(PlayerObject* player, RingObject* ring) {
-            if(s_simulation.isSimulating()) return;
+            if (s_simulation.isSimulating()) return;
 
             GJBaseGameLayer::playerTouchedRing(player, ring);
         }
 
         void updateCamera(float dt) {
-            if(config::get<bool>("player.showtrajectory", false))
+            if (config::get<bool>("player.showtrajectory", false))
                 s_simulation.simulate();
             else
                 s_simulation.hide();
