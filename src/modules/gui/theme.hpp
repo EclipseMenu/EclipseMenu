@@ -59,12 +59,10 @@ namespace eclipse::gui::imgui {
 
             if(jf.contains("options") && jf["options"].contains("font")) {
                 std::string fontFile = jf["options"]["font"];
-                unzipResult = unzipper.extractTo(fontFile, geode::Mod::get()->getSaveDir() / "themes" / fontFile);
+                unzipResult = unzipper.extractTo(fontFile, geode::Mod::get()->getSaveDir() / "fonts" / fontFile);
 
                 if(!unzipResult)
                     geode::log::error("Failed to extract theme font: {}", unzipResult.error());
-                else
-                    std::filesystem::rename(geode::Mod::get()->getSaveDir() / "themes" / fontFile, geode::Mod::get()->getSaveDir() / "fonts" / fontFile);
             }
 
             loadFromFile(geode::Mod::get()->getSaveDir() / "themes" / jsonFilename);
