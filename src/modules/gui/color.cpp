@@ -17,6 +17,6 @@ namespace eclipse::gui {
     }
 
     void from_json(const nlohmann::json &j, Color &e) {
-        e = Color::fromString(j.get<std::string>().c_str());
+        e = Color::fromString(j.get<std::string>());
     }
 }

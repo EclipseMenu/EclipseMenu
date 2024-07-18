@@ -231,9 +231,6 @@ namespace eclipse::hacks::Level {
         void updateEditor(float dt) {
             LevelEditorLayer::updateEditor(dt);
 
-            if (config::get<bool>("level.showhitboxes", false))
-                LevelEditorLayer::updateDebugDraw();
-
             forceDraw(this, true);
         }
     };
