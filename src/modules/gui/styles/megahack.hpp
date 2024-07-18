@@ -7,6 +7,14 @@ namespace eclipse::gui::imgui {
     class MegahackStyle : public Style {
     public:
         void visit(LabelComponent* label) override {
+            auto availWidth = ImGui::GetContentRegionAvail().x;
+            float textWidth = ImGui::CalcTextSize(label->getTitle().c_str(), nullptr, true, availWidth).x;
+
+            float posX = (availWidth - textWidth) * 0.5f;
+            if (posX > 0.0f) {
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + posX);
+            }
+
             ImGui::TextWrapped("%s", label->getTitle().c_str());
         }   
 
@@ -17,27 +25,51 @@ namespace eclipse::gui::imgui {
 
             if (checkbox->getOptions()) {
                 ImGui::PushItemWidth(-1);
+
+                auto textColor = value ? colors[ImGuiCol_Text] : colors[ImGuiCol_TextDisabled];
+                ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)textColor);
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
                 ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
 
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
-                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
 
                 auto availWidth = ImGui::GetContentRegionAvail().x;
                 auto buttonSize = ImVec2(availWidth * 0.9f, 0);
                 auto arrowSize = ImVec2(availWidth * 0.1f, 0);
 
-                ImGui::Button(checkbox->getTitle().c_str(), buttonSize);
+                if(ImGui::Button(checkbox->getTitle().c_str(), buttonSize)) {
+                    checkbox->setValue(!value);
+                    checkbox->triggerCallback(!value);
+                }
+
+                if (checkbox->hasKeybind()) {
+                    // Open context menu on either Right click or Shift+Click
+                    if (ImGui::IsItemClicked(1) || (ImGui::IsItemClicked(0) && ImGui::GetIO().KeyShift)) {
+                        ImGui::OpenPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str());
+                    }
+
+                    if (ImGui::BeginPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str())) {
+                        auto* keybinds = keybinds::Manager::get();
+                        auto* keybind = keybinds->getKeybind(checkbox->getId());
+
+                        if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
+                            keybinds->setKeybindState(checkbox->getId(), true);
+                        } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
+                            keybinds->setKeybindState(checkbox->getId(), false);
+                        }
+
+                        ImGui::EndPopup();
+                    }
+                }
+
                 ImGui::SameLine(0, 0);
 
-                ImGui::PopStyleColor(2);
                 ImGui::PopStyleVar(2);
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
                 bool openPopup = ImGui::Button((std::string("##open_") + checkbox->getTitle()).c_str(), arrowSize);
                 ImGui::PopItemWidth();
-                ImGui::PopStyleColor(3);
+                ImGui::PopStyleColor(4);
 
                 auto scale = 1.f;
                 auto top = ImGui::GetItemRectMin().y + (4.5 * scale);
@@ -77,9 +109,30 @@ namespace eclipse::gui::imgui {
                 ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
 
                 if (ImGui::Button(checkbox->getTitle().c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
-                    checkbox->triggerCallback(!value);
                     checkbox->setValue(!value);
+                    checkbox->triggerCallback(!value);
                 }
+
+                if (checkbox->hasKeybind()) {
+                    // Open context menu on either Right click or Shift+Click
+                    if (ImGui::IsItemClicked(1) || (ImGui::IsItemClicked(0) && ImGui::GetIO().KeyShift)) {
+                        ImGui::OpenPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str());
+                    }
+
+                    if (ImGui::BeginPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str())) {
+                        auto* keybinds = keybinds::Manager::get();
+                        auto* keybind = keybinds->getKeybind(checkbox->getId());
+
+                        if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
+                            keybinds->setKeybindState(checkbox->getId(), true);
+                        } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
+                            keybinds->setKeybindState(checkbox->getId(), false);
+                        }
+
+                        ImGui::EndPopup();
+                    }
+                }
+
                 ImGui::PopStyleColor(4);
                 ImGui::PopStyleVar();
 
@@ -140,10 +193,38 @@ namespace eclipse::gui::imgui {
             ImGui::PopItemWidth();
 
             ImGui::SameLine();
-            if (ImGui::Checkbox(floatToggle->getTitle().c_str(), &toggle)) {
+
+            ImGui::PushItemWidth(-1.0f);
+
+            auto &style = ImGui::GetStyle();
+            auto &colors = style.Colors;
+
+            auto textColor = toggle ? colors[ImGuiCol_Text] : colors[ImGuiCol_TextDisabled];
+
+            ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4) textColor);
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
+
+            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+
+            if (ImGui::Button(floatToggle->getTitle().c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+                toggle = !toggle;
                 config::set(floatToggle->getId() + ".toggle", toggle);
                 floatToggle->triggerCallback();
             }
+            ImGui::PopStyleColor(4);
+            ImGui::PopStyleVar();
+
+            auto scale = 1.f;
+
+            textColor.w *= ImGui::GetStyle().Alpha;
+            ImGui::GetWindowDrawList()->AddRectFilled(
+                    ImVec2(ImGui::GetItemRectMax().x - 5 * scale, ImGui::GetItemRectMin().y + 1 * scale),
+                    ImVec2(ImGui::GetItemRectMax().x - 2 * scale, ImGui::GetItemRectMax().y - 1 * scale),
+                    ImGui::ColorConvertFloat4ToU32(textColor));
+
+            ImGui::PopItemWidth();
         }   
 
         void visit(RadioButtonComponent* radioButton) override {
@@ -190,9 +271,13 @@ namespace eclipse::gui::imgui {
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
 
-            if (ImGui::Button(button->getTitle().c_str())) {
+            auto availWidth = ImGui::GetContentRegionAvail().x;
+
+            if (ImGui::Button(button->getTitle().c_str(), ImVec2(availWidth, 0))) {
                 button->triggerCallback();
             }
+
+            ImGui::PopStyleColor(3);
 
             // Draw two lines
             bool isMouseOver = ImGui::IsItemHovered();
@@ -222,15 +307,13 @@ namespace eclipse::gui::imgui {
                     ImVec2(ImGui::GetItemRectMax().x - 2, ImGui::GetItemRectMax().y - 3),
                     color, 2.5f * scale);
 
-            ImGui::PopStyleColor(3);
-
             ImGui::PopItemWidth();
         }   
 
         void visit(ColorComponent* color) override {
             auto value = config::get<gui::Color>(color->getId(), {1, 1, 1, 1});
             if(ImGui::ColorEdit3(color->getTitle().c_str(), value.data(), ImGuiColorEditFlags_NoInputs)) {
-                config::set(color->getId(), value);
+                config::set<gui::Color>(color->getId(), value);
                 color->triggerCallback(value);
             }
         }   

@@ -19,6 +19,14 @@ namespace eclipse::recorder {
     }
 
     void Recorder::start(std::filesystem::path renderPath) {
+        if(!m_ffmpegCLI)
+            return;
+
+        int result = std::system((m_ffmpegPath + " -version >nul 2>&1").c_str());
+
+        if(result != 0)
+            geode::log::error("FFmpeg not found {}", m_ffmpegPath);
+
         m_currentFrame.resize(m_renderSettings.m_width * m_renderSettings.m_height * 3, 0);
         m_renderTexture.m_width = m_renderSettings.m_width;
         m_renderTexture.m_height = m_renderSettings.m_height;
@@ -28,9 +36,6 @@ namespace eclipse::recorder {
         m_frameHasData = false;
 
         m_renderPath = renderPath;
-
-        if (!m_ffmpegCLI)
-            return;
 
         std::thread t(&Recorder::recordThread, this);
         t.detach();

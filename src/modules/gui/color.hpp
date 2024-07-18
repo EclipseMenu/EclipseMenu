@@ -10,7 +10,6 @@
 
 namespace eclipse::gui {
     struct Color {
-        // Define default colors
         static const Color WHITE;
         static const Color BLACK;
         static const Color RED;
@@ -26,6 +25,33 @@ namespace eclipse::gui {
 
         Color(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a) {}
 
+        Color(const Color &other) : r(other.r), g(other.g), b(other.b), a(other.a) {}
+
+        Color(Color &&other) noexcept : r(other.r), g(other.g), b(other.b), a(other.a) {
+            other.r = other.g = other.b = 0;
+            other.a = 1.0f;
+        }
+
+        Color& operator=(const Color &other) {
+            if (this == &other) return *this;
+            r = other.r;
+            g = other.g;
+            b = other.b;
+            a = other.a;
+            return *this;
+        }
+
+        Color& operator=(Color &&other) noexcept {
+            if (this == &other) return *this;
+            r = other.r;
+            g = other.g;
+            b = other.b;
+            a = other.a;
+            other.r = other.g = other.b = 0;
+            other.a = 1.0f;
+            return *this;
+        }
+
         /// @brief Converts the color to ImVec4
         operator ImVec4() const {
             return {r, g, b, a};
@@ -36,12 +62,12 @@ namespace eclipse::gui {
             return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
         }
 
-        ImVec4 operator=(Color col2) {
-            return {r, g, b, a};
-        }
-
-        Color operator=(ImVec4 col2) {
-            return {col2.x, col2.y, col2.z, col2.w};
+        Color& operator=(const ImVec4 &col2) {
+            r = col2.x;
+            g = col2.y;
+            b = col2.z;
+            a = col2.w;
+            return *this;
         }
 
         operator cocos2d::ccColor4F() const {
@@ -117,6 +143,7 @@ namespace eclipse::gui {
             v2 = (float) ((color >> 16) & 0xFF) / 255.0f;
             v3 = (float) ((color >> 8) & 0xFF) / 255.0f;
             v4 = (float) (color & 0xFF) / 255.0f;
+
             switch (type) {
                 default:
                     return {v1, v2, v3, v4};
@@ -180,5 +207,4 @@ namespace eclipse::gui {
 
     void to_json(nlohmann::json &j, const Color &e);
     void from_json(const nlohmann::json &j, Color &e);
-
 }

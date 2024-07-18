@@ -9,13 +9,19 @@
 
 using namespace geode::prelude;
 
-namespace eclipse::Hacks::Bot {
+namespace eclipse::Hacks::Level {
 
     class PracticeFix : public hack::Hack {
+    public:
+        static bool shouldEnable() {
+            return config::get<bool>("bot.practicefix", false) || config::get<int>("bot.state", 0) == 1;
+        }
+        
+    private:
         void init() override {
-            auto tab = gui::MenuTab::find("Bot");
+            auto tab = gui::MenuTab::find("Level");
             tab->addToggle("Practice Fix", "bot.practicefix")
-                ->setDescription("Properly saves the player's velocity when respawning from a checkpoint.");
+                ->setDescription("Properly saves and restores the player's data when respawning from a checkpoint.");
         }
 
         [[nodiscard]] bool isCheating() override { return false; }
@@ -447,7 +453,7 @@ namespace eclipse::Hacks::Bot {
         void loadFromCheckpoint(CheckpointObject* checkpoint) {
             FixPlayLayer* playLayer = static_cast<FixPlayLayer*>(FixPlayLayer::get());
 
-            if (config::get<bool>("bot.practicefix", false) && playLayer->m_fields->m_checkpoints.contains(checkpoint)) {
+            if (PracticeFix::shouldEnable() && playLayer->m_fields->m_checkpoints.contains(checkpoint)) {
                 PlayLayer::loadFromCheckpoint(checkpoint);
 
                 CheckpointData& data = playLayer->m_fields->m_checkpoints[checkpoint];
@@ -480,7 +486,7 @@ namespace eclipse::Hacks::Bot {
             auto result = CheckpointObject::init();
 #endif
 
-            if (!config::get<bool>("bot.practicefix", false))
+            if (!PracticeFix::shouldEnable())
                 return result;
 
             FixPlayLayer* playLayer = static_cast<FixPlayLayer*>(FixPlayLayer::get());
