@@ -51,7 +51,6 @@ namespace eclipse::gui::imgui {
     }
 
     MenuTab* ImGuiEngine::findTab(const std::string& name) {
-        // TODO: do the layout thing with this too
         return dynamic_cast<WindowLayout*>(getTheme()->getLayout())->findTab(name);
     }
 
