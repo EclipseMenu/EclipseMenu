@@ -1,3 +1,4 @@
+#include "Geode/binding/LevelTools.hpp"
 #include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
@@ -51,7 +52,7 @@ namespace eclipse::hacks::Creator {
         }
     };
 
-// due to some mysterious reason, this will crash in Debug mode (probably because of std::move dum dum)
+// due to some mysterious reason, this will crash in Debug mode
 #ifdef NDEBUG
     class $modify(LevelTools) {
         static void onModify(auto& self) {

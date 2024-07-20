@@ -8,7 +8,7 @@
 #include <modules/gui/color.hpp>
 
 #include "layouts/window/window.hpp"
-#include "styles/default.hpp"
+#include "styles/megahack.hpp"
 
 namespace eclipse::gui::imgui {
 
@@ -51,13 +51,18 @@ namespace eclipse::gui::imgui {
     }
 
     MenuTab* ImGuiEngine::findTab(const std::string& name) {
-        // TODO: do the layout thing with this too
         return dynamic_cast<WindowLayout*>(getTheme()->getLayout())->findTab(name);
     }
 
     Theme* ImGuiEngine::getTheme() {
         // TODO: change this for theme picker
-        if (!m_theme) m_theme = new Theme(geode::Mod::get()->getResourcesDir() / "basic.json", (new WindowLayout())->setStyle(new DefaultStyle())); 
+        if (!m_theme) {
+            if(std::filesystem::exists(geode::Mod::get()->getSaveDir() / "themes" / "megahack.json"))
+                m_theme = new Theme(geode::Mod::get()->getSaveDir() / "themes" / "megahack.json");
+            else
+                m_theme = new Theme(geode::Mod::get()->getResourcesDir() / "megahack.zip");
+        }
+
         return m_theme;
     }
 }

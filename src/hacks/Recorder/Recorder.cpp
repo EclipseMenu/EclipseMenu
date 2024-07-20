@@ -64,7 +64,7 @@ namespace eclipse::hacks::Recorder {
 
         recorder::RenderSettings settings;
 
-        settings.m_birtate = config::get<float>("recorder.bitrate", 30.f);
+        settings.m_bitrate = config::get<float>("recorder.bitrate", 30.f);
         settings.m_fps = config::get<float>("recorder.fps", 60.f);
         settings.m_width = config::get<int>("recorder.resolution.x", 1920);
         settings.m_height = config::get<int>("recorder.resolution.y", 1080);
@@ -116,8 +116,10 @@ namespace eclipse::hacks::Recorder {
 
             tab->addButton("Start Recording")->callback(start);
             tab->addButton("Stop Recording")->callback([] {
-                stop();
-                stopAudio();
+                if(s_recorder.isRecording())
+                    stop();
+                if(s_recorder.isRecordingAudio())
+                    stopAudio();
             });
 
             config::setIfEmpty("recorder.fps", 60.f);
@@ -138,7 +140,7 @@ namespace eclipse::hacks::Recorder {
             tab->addInputText("Args", "recorder.args");
             tab->addInputText("Extra Args", "recorder.extraargs");
             tab->addInputText("Video Args", "recorder.videoargs");
-
+            
             tab->addLabel("Presets");
             tab->addButton("CPU")->callback([] {
                 config::set<int>("recorder.codec", 0);
