@@ -64,7 +64,7 @@ namespace eclipse::hacks::Recorder {
 
         recorder::RenderSettings settings;
 
-        settings.m_birtate = config::get<float>("recorder.bitrate", 30.f);
+        settings.m_bitrate = config::get<float>("recorder.bitrate", 30.f);
         settings.m_fps = config::get<float>("recorder.fps", 60.f);
         settings.m_width = config::get<int>("recorder.resolution.x", 1920);
         settings.m_height = config::get<int>("recorder.resolution.y", 1080);
