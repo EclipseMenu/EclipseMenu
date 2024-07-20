@@ -9,11 +9,11 @@ namespace eclipse::hacks::Player {
     class AutoClicker : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
-            tab->addToggle("AutoClicker", "player.autoclick")->handleKeybinds();
+            tab->addToggle("Auto Clicker", "player.autoclick")->handleKeybinds();
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.autoclick", false); }
-        [[nodiscard]] const char* getId() const override { return "AutoClicker"; }
+        [[nodiscard]] const char* getId() const override { return "Auto Clicker"; }
     };
 
     REGISTER_HACK(AutoClicker)
