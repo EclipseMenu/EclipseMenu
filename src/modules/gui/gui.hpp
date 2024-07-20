@@ -588,99 +588,12 @@ namespace eclipse::gui {
         /// @brief Get if the menu is toggled.
         [[nodiscard]] bool isToggled() { return m_isToggled; }
 
+        /// @brief Get the layout's component style.
+        [[nodiscard]] Style* getStyle() { return m_style; }
+
     protected:
         bool m_isToggled;
         Style* m_style;
-    };
-
-    class Theme {
-    public:
-        explicit Theme(const std::filesystem::path& path, Layout* lay) {
-            loadFromFile(path);
-            m_layout = lay;
-        }
-
-        /// @brief Load the theme.
-        void loadFromFile(const std::filesystem::path& path) {
-            std::ifstream ifs(path.c_str());
-            nlohmann::json jf = nlohmann::json::parse(ifs);
-            if (jf.contains("colors")) {
-                std::map<int, Color> m = jf.at("colors").get<std::map<int, Color>>();
-                for (auto[k, v] : m) {
-                    m_colors[k] = v;
-                }
-            }
-            if (jf.contains("floats")) {
-                std::map<int, float> m2 = jf.at("floats").get<std::map<int, float>>();
-                for (auto[k, v] : m2) {
-                    m_floats[k] = v;
-                }
-            }
-        }
-
-        /// @brief Save the theme to a file.
-        void saveToFile(const std::filesystem::path& path) {
-            nlohmann::json j;
-            for (auto[k, v] : m_colors) {
-                j["colors"][k] = v;
-            }
-            for (auto[k, v] : m_floats) {
-                j["floats"][k] = v;
-            }
-            std::ofstream file(path.c_str());
-            file << j;
-        }
-
-        /// @brief Set up the UI.
-        virtual void setup() {
-            auto &style = ImGui::GetStyle();
-            auto &colors = style.Colors;
-
-            for (auto[k, v] : m_colors) {
-                colors[static_cast<ImGuiCol_>(k)] = v;
-            }
-            for (auto[k, v] : m_floats) {
-                switch (k) {
-                    case 1:
-                        style.WindowRounding = v;
-                        break;
-                    case 2:
-                        style.FrameRounding = v;
-                        break;
-                    case 3:
-                        style.PopupRounding = v;
-                        break;
-                    case 4:
-                        style.IndentSpacing = v;
-                        break;
-                    case 5:
-                        style.ScrollbarSize = v;
-                        break;
-                    case 6:
-                        style.ScrollbarRounding = v;
-                        break;
-                    case 7:
-                        style.GrabMinSize = v;
-                        break;
-                    case 8:
-                        style.GrabRounding = v;
-                        break;
-                    case 9:
-                        style.WindowBorderSize = v;
-                        break;
-                }
-            }
-        }
-
-        /// @brief Get the layout of the theme.
-        [[nodiscard]] Layout* getLayout() { return m_layout; }
-
-    private:
-        Layout* m_layout;
-        std::map<int, Color> m_colors;
-        std::map<int, float> m_floats;
-        std::map<int, ImVec2> m_vecs;
-        // plus like colors and settings that the user can change (also theme saving to file)
     };
 
     /// @brief Abstract class, that wraps all UI function calls.

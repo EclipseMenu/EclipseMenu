@@ -19,13 +19,13 @@ namespace eclipse::recorder {
         uint32_t m_height = 1080;
         uint32_t m_fps = 60;
         Codec m_codec = None;
-        float m_birtate = 30;
+        float m_bitrate = 30;
         std::string m_args;
         std::string m_extraArgs;
         std::string m_videoArgs;
 
-        RenderSettings() : m_width(1920), m_height(1080), m_fps(60), m_birtate(30) {}
-        RenderSettings(uint32_t width, uint32_t height, uint32_t fps, float bitrate, Codec codec) : m_width(width), m_height(height), m_fps(fps), m_birtate(bitrate), m_codec(codec) {}
+        RenderSettings() : m_width(1920), m_height(1080), m_fps(60), m_bitrate(30) {}
+        RenderSettings(uint32_t width, uint32_t height, uint32_t fps, float bitrate, Codec codec) : m_width(width), m_height(height), m_fps(fps), m_bitrate(bitrate), m_codec(codec) {}
     };
 
     class Recorder {

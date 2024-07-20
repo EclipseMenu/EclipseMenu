@@ -1,5 +1,6 @@
 #pragma once
 #include <modules/gui/gui.hpp>
+#include "theme.hpp"
 
 namespace eclipse::gui::imgui {
 
