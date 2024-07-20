@@ -20,9 +20,10 @@ namespace eclipse::hacks::Level {
     class $modify(PlayLayer) {
         bool init(GJGameLevel* gj, bool p1, bool p2) {
             if (!PlayLayer::init(gj, p1, p2)) return false;
+            if (!config::get<bool>("level.forceplatformer", false)) return true;
 
-            if (m_player1 && config::get<bool>("level.forceplatformer", false)) m_player1->togglePlatformerMode(true);
-            if (m_player2 && config::get<bool>("level.forceplatformer", false)) m_player2->togglePlatformerMode(true);
+            if (m_player1) m_player1->togglePlatformerMode(true);
+            if (m_player2) m_player2->togglePlatformerMode(true);
 
             return true;
         }

@@ -76,7 +76,7 @@ namespace eclipse::recorder {
                 break;
         }
                 
-		command << "-b:v " << m_renderSettings.m_birtate << "M ";
+		command << "-b:v " << m_renderSettings.m_bitrate << "M ";
 
 		if (!m_renderSettings.m_extraArgs.empty())
 			command << m_renderSettings.m_extraArgs << " ";
