@@ -25,7 +25,7 @@ namespace eclipse::hacks::Level {
             bool isLevelComplete = false;
         };
         void eclipseHideVFX() {
-            if (!config::get<bool>("level.hidelevelcomplete") || !m_fields->isLevelComplete) { return; }
+            if (!m_fields->isLevelComplete) { return; }
             for (unsigned int i = getChildrenCount(); i-- > 0; ) {
                 auto theObject = getChildren()->objectAtIndex(i);
                 if (const auto ccCircleWave = geode::cast::typeinfo_cast<CCCircleWave*>(theObject)) {
@@ -64,12 +64,12 @@ namespace eclipse::hacks::Level {
         }
         void postUpdate(float p0) {
             PlayLayer::postUpdate(p0);
-            if (!config::get<bool>("level.hidelevelcomplete") || !m_fields->isLevelComplete) { return; }
+            if (!config::get<bool>("level.hidelevelcomplete", false) || !m_fields->isLevelComplete) { return; }
             EclipsePlayLayer::eclipseHideVFX();
         }
         void levelComplete() {
             PlayLayer::levelComplete();
-            if (!config::get<bool>("level.hidelevelcomplete")) { return; }
+            if (!config::get<bool>("level.hidelevelcomplete", false)) { return; }
             m_fields->isLevelComplete = true;
             EclipsePlayLayer::eclipseHideVFX();
         }
