@@ -7,7 +7,7 @@
 namespace eclipse::hacks::Player {
 
     class MuteRewardsSFX : public hack::Hack {
-        config::setIfEmpty<bool>("player.muterewardssfx", false);
+        config::setIfEmpty("player.muterewardssfx", false);
         void init() override {
             auto tab = gui::MenuTab::find("Player");
             tab->addToggle("Mute Rewards SFX on Death", "player.muterewardssfx")
