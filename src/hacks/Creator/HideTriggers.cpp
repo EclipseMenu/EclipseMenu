@@ -39,7 +39,7 @@ namespace eclipse::hacks::Creator {
             s_editorTriggers.clear();
             geode::cocos::CCArrayExt<GameObject*> objects = editorLayer->m_objects;
             for (auto obj : objects) {
-                if (obj->m_objectType == GameObjectType::Modifier && !isSpeedPortal(obj)) {
+                if (obj->m_objectType == GameObjectType::Modifier && !isSpeedPortal(obj) && obj->m_objectID != 2063) {
                     s_editorTriggers.push_back(obj);
                 }
             }
@@ -58,7 +58,7 @@ namespace eclipse::hacks::Creator {
             s_editorTriggers.clear();
         }
 
-        void updateVisibility(float dt) {
+        void updateVisibility(float dt) override {
             LevelEditorLayer::updateVisibility(dt);
             if (!config::get<bool>("creator.hidetriggers", false)) return;
 

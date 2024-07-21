@@ -13,7 +13,7 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("level.accuratepercent.bugfix", true);
             config::setIfEmpty("level.accuratepercent.show_minutes", true);
             tab->addToggle("Accurate Percentage", "level.accuratepercentage")
-                ->setDescription("Allows for more decimals in a level percentage.")
+                ->setDescription("Allows for more decimals in a level percentage, and adds other useful utils.")
                 ->handleKeybinds()
                 ->addOptions([] (gui::MenuTab* options) {
                     options->addToggle("Normal Mode", "level.accuratepercent.normal_mode");
