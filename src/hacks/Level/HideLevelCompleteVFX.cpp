@@ -7,6 +7,7 @@
 namespace eclipse::hacks::Level {
 
     class HideLevelCompleteVFX : public hack::Hack {
+        config::setIfEmpty("level.hidelevelcomplete", false);
         void init() override {
             auto tab = gui::MenuTab::find("Level");
             tab->addToggle("Hide Level Complete VFX", "level.hidelevelcomplete")
