@@ -8,9 +8,10 @@ namespace eclipse::hacks::Level {
 
     class HideLevelCompleteVFX : public hack::Hack {
         void init() override {
+            config::setIfEmpty("level.hidelevelcomplete", false);
             auto tab = gui::MenuTab::find("Level");
             tab->addToggle("Hide Level Complete VFX", "level.hidelevelcomplete")
-                ->setDescription("Hides the explosion and fireworks seen when completing a level. (Does not hide particles.)")
+                ->setDescription("Hides the explosion and fireworks seen when completing a level. (Does not hide particles.) (Created by RayDeeUx)")
                 ->handleKeybinds();
         }
 
@@ -31,20 +32,32 @@ namespace eclipse::hacks::Level {
                     ccCircleWave->setVisible(false);
                 }
             }
+            CCLayer* forCircleWaveLightFlash = nullptr;
             if (const auto mainNode = getChildByIDRecursive("main-node")) {
                 for (CCNode* mainNodeChild : geode::cocos::CCArrayExt<CCNode*>(mainNode->getChildren())) {
                     if (const auto whereEverythingIs = geode::cast::typeinfo_cast<CCLayer*>(mainNodeChild)) {
-                        for (CCNode* childTwo : geode::cocos::CCArrayExt<CCNode*>(whereEverythingIs->getChildren())) {
-                            if (const auto ccCircleWave = geode::cast::typeinfo_cast<CCCircleWave*>(childTwo)) {
-                                ccCircleWave->setVisible(false);
-                            } else if (const auto ccLightFlash = geode::cast::typeinfo_cast<CCLightFlash*>(childTwo)) {
-                                ccLightFlash->setVisible(false);
-                            }
-                        }
+                        forCircleWaveLightFlash = whereEverythingIs;
+                        break;
+                    }
+                }
+            }
+            if (forCircleWaveLightFlash) {
+                for (CCNode* childTwo : geode::cocos::CCArrayExt<CCNode*>(forCircleWaveLightFlash->getChildren())) {
+                    if (const auto ccCircleWave = geode::cast::typeinfo_cast<CCCircleWave*>(childTwo)) {
+                        ccCircleWave->setVisible(false);
+                    } else if (const auto ccLightFlash = geode::cast::typeinfo_cast<CCLightFlash*>(childTwo)) {
+                        ccLightFlash->setVisible(false);
                     }
                 }
             }
         }
+        /*
+        unfortunately TodoReturn spawnCircle() and TodoReturn spawnFirework()
+        are unavailable for hooking, so i need to improvise.
+        also, while it's more performant to hook showCompleteText and showCompleteEffect,
+        neither of these two hooks cover all possible ccCircleWave/ccLightFlash nodes.
+        -- raydeeux
+        */
         void onQuit() {
             m_fields->isLevelComplete = false;
             PlayLayer::onQuit();
