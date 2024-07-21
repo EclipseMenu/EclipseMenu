@@ -122,6 +122,15 @@ namespace eclipse::gui::imgui {
         config::set(floatToggle->getId() + ".toggle", toggle);
         floatToggle->triggerCallback();
       }
+      if (!floatToggle->getDescription().empty()) {
+        ImGui::SameLine();
+        ImGui::TextDisabled("(?)");
+        if (ImGui::IsItemHovered()) {
+          ImGui::BeginTooltip();
+          ImGui::TextUnformatted(floatToggle->getDescription().c_str());
+          ImGui::EndTooltip();
+        }
+      }
     }
 
     void visit(RadioButtonComponent* radioButton) override {
