@@ -8,8 +8,11 @@ namespace eclipse::hacks::Player {
 
     class MuteRewardsSFX : public hack::Hack {
         void init() override {
+            config::setIfEmpty("player.muterewardssfx", false);
             auto tab = gui::MenuTab::find("Player");
-            tab->addToggle("Mute Rewards SFX on Death", "player.muterewardssfx")->setDescription("Disables player death effect")->handleKeybinds();
+            tab->addToggle("Mute Rewards SFX on Death", "player.muterewardssfx")
+                ->setDescription("Disables all rewards SFX (orbs, diamonds, keys) when the player dies. (Created by RayDeeUx)")
+                ->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Mute Rewards SFX on Death"; }
