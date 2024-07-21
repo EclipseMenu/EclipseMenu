@@ -22,8 +22,9 @@ namespace eclipse::hacks::Player {
 
     class $modify(MyPlayerObject, PlayerObject){
         void animatePlatformerJump(float p0) {
-            if (config::get<bool>("player.noplatformersquish", true)) { return; }
-            PlayerObject::animatePlatformerJump(p0);
+            if (!config::get<bool>("player.noplatformersquish", false)) {
+                PlayerObject::animatePlatformerJump(p0);
+            }
         }
     };
 
