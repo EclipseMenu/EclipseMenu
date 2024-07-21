@@ -34,7 +34,7 @@ namespace eclipse::hacks::Player {
             bool isPlayerAlive = !pl->m_player1->m_isDead;
             bool pauseLayerActive = cocos2d::CCDirector::get()->getRunningScene()->getChildByIDRecursive("PauseLayer");
             bool notFoundInBadSFX = std::find(m_fields->badSFX.begin(), m_fields->badSFX.end(), std::string(path)) == m_fields->badSFX.end();
-            bool isSettingDisabled = !config::get<bool>("player.muterewardssfx");
+            bool isSettingDisabled = !config::get<bool>("player.muterewardssfx", false);
             // these bools could be in one if statement but are separated for readability
             if (isSettingDisabled || pauseLayerActive || isPlayerAlive || notFoundInBadSFX) { FMODAudioEngine::sharedEngine()->playEffect(path, p1, p2, p3); }
         }
