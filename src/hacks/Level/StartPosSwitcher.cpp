@@ -244,7 +244,11 @@ namespace eclipse::hacks::Level {
 
             auto* switcher = StartposSwitcherNode::create(this);
             switcher->setID("startpos-switcher"_spr);
-            m_uiLayer->addChild(switcher, 1000);
+            if (auto uiMenu = geode::cast::typeinfo_cast<cocos2d::CCMenu*>(m_uiLayer->getChildByID("eclipse-ui"_spr))) {
+                uiMenu->addChild(switcher, 1000);
+            } else { // fallback
+                m_uiLayer->addChild(switcher, 1000);
+            }
         }
     };
 

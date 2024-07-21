@@ -291,8 +291,15 @@ namespace eclipse::gui {
             return this;
         }
 
+        /// @brief Set toggle description.
+        FloatToggleComponent* setDescription(std::string description) {
+            m_description = std::move(description);
+            return this;
+        }
+
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+        [[nodiscard]] const std::string& getDescription() const { return m_description; }
 
         [[nodiscard]] float getMin() const { return m_min; }
         [[nodiscard]] float getMax() const { return m_max; }
@@ -309,6 +316,7 @@ namespace eclipse::gui {
         std::string m_id;
         std::string m_title;
         std::string m_format;
+        std::string m_description;
         float m_min;
         float m_max;
         std::function<void(float)> m_valueCallback;
