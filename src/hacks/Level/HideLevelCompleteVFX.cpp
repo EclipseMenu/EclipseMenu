@@ -32,16 +32,21 @@ namespace eclipse::hacks::Level {
                     ccCircleWave->setVisible(false);
                 }
             }
+            CCLayer* forCircleWaveLightFlash = nullptr;
             if (const auto mainNode = getChildByIDRecursive("main-node")) {
                 for (CCNode* mainNodeChild : geode::cocos::CCArrayExt<CCNode*>(mainNode->getChildren())) {
                     if (const auto whereEverythingIs = geode::cast::typeinfo_cast<CCLayer*>(mainNodeChild)) {
-                        for (CCNode* childTwo : geode::cocos::CCArrayExt<CCNode*>(whereEverythingIs->getChildren())) {
-                            if (const auto ccCircleWave = geode::cast::typeinfo_cast<CCCircleWave*>(childTwo)) {
-                                ccCircleWave->setVisible(false);
-                            } else if (const auto ccLightFlash = geode::cast::typeinfo_cast<CCLightFlash*>(childTwo)) {
-                                ccLightFlash->setVisible(false);
-                            }
-                        }
+                        forCircleWaveLightFlash = whereEverythingIs;
+                        break;
+                    }
+                }
+            }
+            if (forCircleWaveLightFlash) {
+                for (CCNode* childTwo : geode::cocos::CCArrayExt<CCNode*>(forCircleWaveLightFlash->getChildren())) {
+                    if (const auto ccCircleWave = geode::cast::typeinfo_cast<CCCircleWave*>(childTwo)) {
+                        ccCircleWave->setVisible(false);
+                    } else if (const auto ccLightFlash = geode::cast::typeinfo_cast<CCLightFlash*>(childTwo)) {
+                        ccLightFlash->setVisible(false);
                     }
                 }
             }
