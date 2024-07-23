@@ -1,3 +1,4 @@
+#include <iterator>
 #include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
@@ -22,7 +23,7 @@ namespace eclipse::hacks::Player {
 
 	class $modify(FMODAudioEngine) {
 		struct Fields {
-			const std::set<std::string> badSFX = { "achievement_01.ogg", "magicExplosion.ogg", "gold02.ogg", "secretKey.ogg" };
+			const std::string badSFX[4] = { "achievement_01.ogg", "magicExplosion.ogg", "gold02.ogg", "secretKey.ogg" };
 		};
 		static void onModify(auto& self) {
 			SAFE_PRIORITY("FMODAudioEngine::playEffect");
@@ -33,7 +34,7 @@ namespace eclipse::hacks::Player {
 			if (!pl) { return FMODAudioEngine::sharedEngine()->playEffect(path, p1, p2, p3); } // play sfx if not in playlayer
 			bool isPlayerAlive = !pl->m_player1->m_isDead;
 			bool pauseLayerActive = cocos2d::CCDirector::get()->getRunningScene()->getChildByIDRecursive("PauseLayer");
-			bool notFoundInBadSFX = !m_fields->badSFX.contains(std::string(path));
+			bool notFoundInBadSFX = std::ranges::find(std::begin(m_fields->badSFX), std::end(m_fields->badSFX), std::string(path)) == std::end(m_fields->badSFX);
 			bool isSettingDisabled = !config::get<bool>("player.muterewardssfx", false);
 			// these bools could be in one if statement but are separated for readability
 			if (isSettingDisabled || pauseLayerActive || isPlayerAlive || notFoundInBadSFX) { FMODAudioEngine::sharedEngine()->playEffect(path, p1, p2, p3); }

@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 
 #include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/CCCircleWave.hpp>
 
 namespace eclipse::hacks::Level {
 
@@ -20,56 +21,16 @@ namespace eclipse::hacks::Level {
 
 	REGISTER_HACK(HideLevelCompleteVFX)
 
-	class $modify(EclipsePlayLayer, PlayLayer) {
-		struct Fields {
-			bool isLevelComplete = false;
-		};
-		void eclipseHideVFX() {
-			if (!m_fields->isLevelComplete) return;
-			if (getParent()->getChildByID("PauseLayer")) return;
-			for (unsigned int i = getChildrenCount(); i-- > 0; ) {
-				auto theObject = getChildren()->objectAtIndex(i);
-				if (const auto ccCircleWave = geode::cast::typeinfo_cast<CCCircleWave*>(theObject)) {
-					ccCircleWave->setVisible(false);
-				}
-			}
-			if (const auto mainNode = getChildByIDRecursive("main-node")) {
-				for (CCNode* mainNodeChild : geode::cocos::CCArrayExt<CCNode*>(mainNode->getChildren())) {
-					if (const auto whereEverythingIs = geode::cast::typeinfo_cast<CCLayer*>(mainNodeChild)) {
-						for (CCNode* childTwo : geode::cocos::CCArrayExt<CCNode*>(whereEverythingIs->getChildren())) {
-							if (const auto ccCircleWave = geode::cast::typeinfo_cast<CCCircleWave*>(childTwo)) {
-								ccCircleWave->setVisible(false);
-							} else if (const auto ccLightFlash = geode::cast::typeinfo_cast<CCLightFlash*>(childTwo)) {
-								ccLightFlash->setVisible(false);
-							}
-						}
-					}
-				}
-			}
-		}
-		/*
-		unfortunately TodoReturn spawnCircle() and TodoReturn spawnFirework()
-		are unavailable for hooking, so i need to improvise.
-		also, while it's more performant to hook showCompleteText and showCompleteEffect,
-		neither of these two hooks cover all possible ccCircleWave/ccLightFlash nodes.
-		-- raydeeux
-		*/
-		void onQuit() {
-			m_fields->isLevelComplete = false;
-			PlayLayer::onQuit();
-		}
-		void postUpdate(float p0) {
-			PlayLayer::postUpdate(p0);
-			if (config::get<bool>("level.hidelevelcomplete", false) && m_fields->isLevelComplete && !getParent()->getChildByID("PauseLayer")) {
-				EclipsePlayLayer::eclipseHideVFX();
-			}
-		}
-		void levelComplete() {
-			PlayLayer::levelComplete();
-			if (config::get<bool>("level.hidelevelcomplete", false)) {
-				m_fields->isLevelComplete = true;
-				EclipsePlayLayer::eclipseHideVFX();
-			}
+	bool isLevelComplete = false;
+
+	class $modify(EclipseCCCircleWave, CCCircleWave) {
+		static CCCircleWave* create(float startRadius, float endRadius, float duration, bool fadeIn, bool easeOut) {
+			CCCircleWave* cw = CCCircleWave::create(startRadius, endRadius, duration, fadeIn, easeOut);
+			PlayLayer* pl = PlayLayer::get();
+			if (!pl) return cw;
+			if (pl->m_levelEndAnimationStarted && config::get<bool>("level.hidelevelcomplete", false))
+				cw->setVisible(false);
+			return cw;
 		}
 	};
 }
