@@ -1,3 +1,4 @@
+#include <numbers>
 #include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
@@ -9,7 +10,7 @@
 namespace eclipse::hacks::Player {
 
     double degToRad(double degrees) {
-        return degrees * M_PI / 180;
+        return degrees * std::numbers::pi / 180;
     }
 
     cocos2d::CCPoint rotateVector(const cocos2d::CCPoint& vector, double angle) {
@@ -18,7 +19,7 @@ namespace eclipse::hacks::Player {
         return ccp(x, y);
     }
 
-    cocos2d::CCPoint screenToGame(const cocos2d::CCPoint& screenPos, PlayLayer *playLayer) {
+    cocos2d::CCPoint screenToGame(const cocos2d::CCPoint& screenPos, PlayLayer* playLayer) {
         auto cameraPos = playLayer->m_gameState.m_cameraPosition;
         auto cameraScale = playLayer->m_gameState.m_cameraZoom;
         auto cameraAngle = playLayer->m_gameState.m_cameraAngle;

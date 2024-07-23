@@ -10,7 +10,7 @@
 
 namespace eclipse::gui::imgui {
     /// @brief Calculate a random window position outside the screen.
-    ImVec2 WindowLayout::randomWindowPosition(Window &window) {
+    ImVec2 WindowLayout::randomWindowPosition(Window& window) {
         // Calculate target position randomly to be outside the screen
         auto screenSize = ImGui::GetIO().DisplaySize;
         auto windowSize = window.getSize();
@@ -58,9 +58,10 @@ namespace eclipse::gui::imgui {
         float x = snap;
         float y = snap;
         for (auto& title: builtInWindows) {
-            auto it = std::find_if(m_windows.begin(), m_windows.end(), [&title](const Window &window) {
+            auto it = std::find_if(m_windows.begin(), m_windows.end(), [&title](const Window& window) {
                 return window.getTitle() == title;
             });
+
             if (it != m_windows.end()) {
                 positions[&(*it)] = ImVec2(x, y);
                 y += it->getSize().y + snap;
@@ -83,7 +84,7 @@ namespace eclipse::gui::imgui {
 
             // Set the position
             auto windowColumn = firstColumnLock ? index + 1 : index;
-            positions[&window] = ImVec2((float) windowColumn * (windowWidth + snap) + snap, *min);
+            positions[&window] = ImVec2(static_cast<float>(windowColumn) * (windowWidth + snap) + snap, *min);
             *min += window.getSize().y + snap;
 
             // Update the height
@@ -182,7 +183,7 @@ namespace eclipse::gui::imgui {
 
         // Run move actions
         auto deltaTime = ImGui::GetIO().DeltaTime;
-        for (auto &action: m_actions) {
+        for (auto& action: m_actions) {
             action->update(deltaTime);
         }
 

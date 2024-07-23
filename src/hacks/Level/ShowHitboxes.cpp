@@ -80,7 +80,7 @@ namespace eclipse::hacks::Level {
         Other
     };
 
-    inline HitboxType getHitboxType(const gui::Color &color) {
+    inline HitboxType getHitboxType(const gui::Color& color) {
         if (color.r == 0.0f)
             return color.b == 1.0f ? HitboxType::Solid : HitboxType::Other;
         else if (color.g == 1.0f)
@@ -88,8 +88,8 @@ namespace eclipse::hacks::Level {
         return HitboxType::Danger;
     }
 
-    inline void drawRect(cocos2d::CCDrawNode *node, const cocos2d::CCRect &rect, const gui::Color &color,
-                         float borderWidth, const gui::Color &borderColor) {
+    inline void drawRect(cocos2d::CCDrawNode* node, const cocos2d::CCRect& rect, const gui::Color& color,
+                         float borderWidth, const gui::Color& borderColor) {
         std::vector<cocos2d::CCPoint> vertices = {
                 cocos2d::CCPoint(rect.getMinX(), rect.getMinY()),
                 cocos2d::CCPoint(rect.getMinX(), rect.getMaxY()),
@@ -98,12 +98,14 @@ namespace eclipse::hacks::Level {
         };
         s_skipDrawHook = true;
         
-        node->drawPolygon(vertices.data(), vertices.size(),
-                          (const cocos2d::_ccColor4F &) color, borderWidth,
-                          (const cocos2d::_ccColor4F &) borderColor);
+        node->drawPolygon(
+            vertices.data(), vertices.size(),
+            static_cast<const cocos2d::ccColor4F&>(color), borderWidth,
+            static_cast<const cocos2d::ccColor4F&>(borderColor)
+        );
     }
 
-    void drawForPlayer(cocos2d::CCDrawNode *node, PlayerObject* player, const gui::Color &color, float borderWidth, const gui::Color &innerColor) {
+    void drawForPlayer(cocos2d::CCDrawNode* node, PlayerObject* player, const gui::Color& color, float borderWidth, const gui::Color& innerColor) {
         cocos2d::CCRect rect1 = player->getObjectRect();
         cocos2d::CCRect rect2 = player->m_vehicleSize >= 1.f ? player->getObjectRect(0.25f, 0.25f) : player->getObjectRect(0.4f, 0.4f);
 
@@ -111,7 +113,7 @@ namespace eclipse::hacks::Level {
         drawRect(node, rect2, innerColor, borderWidth, {innerColor.r, innerColor.g, innerColor.b, 1.f});
     }
 
-    void customDraw(cocos2d::CCDrawNode* drawNode, gui::Color& color, float &borderSize, gui::Color& borderColor) {
+    void customDraw(cocos2d::CCDrawNode* drawNode, gui::Color color, float& borderSize, gui::Color borderColor) {
         if (s_skipDrawHook) {
             s_skipDrawHook = false;
             return;
@@ -158,18 +160,19 @@ namespace eclipse::hacks::Level {
 
     class $modify(cocos2d::CCDrawNode) {
 
-        bool drawPolygon(cocos2d::CCPoint *vertex, unsigned int count, const cocos2d::ccColor4F &fillColor,
-                         float borderWidth, const cocos2d::ccColor4F &borderColor) {
+        bool drawPolygon(cocos2d::CCPoint* vertex, unsigned int count, const cocos2d::ccColor4F& fillColor,
+                         float borderWidth, const cocos2d::ccColor4F& borderColor) {
             borderWidth = abs(borderWidth);
-            customDraw(this, (gui::Color&)fillColor, borderWidth, (gui::Color&)borderColor);
+
+            customDraw(this, fillColor, borderWidth, borderColor);
             return cocos2d::CCDrawNode::drawPolygon(vertex, count, fillColor, borderWidth, borderColor);
         }
 
-        bool drawCircle(cocos2d::CCPoint const &position, float radius, cocos2d::_ccColor4F const &color,
-                        float borderWidth, cocos2d::_ccColor4F const &borderColor, unsigned int segments) {
+        bool drawCircle(const cocos2d::CCPoint& position, float radius, const cocos2d::ccColor4F& color,
+                        float borderWidth, const cocos2d::ccColor4F& borderColor, unsigned int segments) {
             borderWidth = abs(borderWidth);
 
-            customDraw(static_cast<cocos2d::CCDrawNode*>(this), (gui::Color &) color, borderWidth, (gui::Color &) borderColor);
+            customDraw(static_cast<cocos2d::CCDrawNode*>(this), color, borderWidth, borderColor);
             return cocos2d::CCDrawNode::drawCircle(position, radius, color, borderWidth, borderColor, segments);
         }
 
@@ -211,17 +214,17 @@ namespace eclipse::hacks::Level {
                 drawForPlayer(self->m_debugDrawNode, self->m_player2, playerColor, borderSize, playerColorInner);
 
             if (config::get<bool>("level.showhitboxes.traillength.toggle", false)) {
-                for(auto& pair : s_playerTrail1)
-                    drawRect(self->m_debugDrawNode, pair.first, playerColor, borderSize, {playerColor.r, playerColor.g, playerColor.b, 1.f});
+                for (const auto& [rect, _] : s_playerTrail1)
+                    drawRect(self->m_debugDrawNode, rect, playerColor, borderSize, {playerColor.r, playerColor.g, playerColor.b, 1.f});
 
-                for(auto& pair : s_playerTrail2)
-                    drawRect(self->m_debugDrawNode, pair.first, playerColor, borderSize, {playerColor.r, playerColor.g, playerColor.b, 1.f});
+                for (const auto& [rect, _] : s_playerTrail2)
+                    drawRect(self->m_debugDrawNode, rect, playerColor, borderSize, {playerColor.r, playerColor.g, playerColor.b, 1.f});
 
-                for(auto& pair : s_playerTrail1)
-                    drawRect(self->m_debugDrawNode, pair.second, playerColorInner, borderSize, {playerColorInner.r, playerColorInner.g, playerColorInner.b, 1.f});
+                for (const auto& [_, rect] : s_playerTrail1)
+                    drawRect(self->m_debugDrawNode, rect, playerColorInner, borderSize, {playerColorInner.r, playerColorInner.g, playerColorInner.b, 1.f});
 
-                for(auto& pair : s_playerTrail2)
-                    drawRect(self->m_debugDrawNode, pair.second, playerColorInner, borderSize, {playerColorInner.r, playerColorInner.g, playerColorInner.b, 1.f});
+                for (const auto& [_, rect] : s_playerTrail2)
+                    drawRect(self->m_debugDrawNode, rect, playerColorInner, borderSize, {playerColorInner.r, playerColorInner.g, playerColorInner.b, 1.f});
             }
         }
     }

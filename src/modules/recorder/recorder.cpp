@@ -19,12 +19,12 @@ namespace eclipse::recorder {
     }
 
     void Recorder::start(std::filesystem::path renderPath) {
-        if(!m_ffmpegCLI)
+        if (!m_ffmpegCLI)
             return;
 
         int result = std::system((m_ffmpegPath + " -version >nul 2>&1").c_str());
 
-        if(result != 0)
+        if (result != 0)
             geode::log::error("FFmpeg not found {}", m_ffmpegPath);
 
         m_currentFrame.resize(m_renderSettings.m_width * m_renderSettings.m_height * 3, 0);
@@ -48,7 +48,7 @@ namespace eclipse::recorder {
     }
 
     void Recorder::captureFrame() {
-        while(m_frameHasData) {}
+        while (m_frameHasData) {}
 
         m_renderTexture.capture(m_lock, m_currentFrame, m_frameHasData);
     }
@@ -75,11 +75,11 @@ namespace eclipse::recorder {
                 command << "-c:v h264_amf ";
                 break;
         }
-                
-		command << "-b:v " << m_renderSettings.m_bitrate << "M ";
 
-		if (!m_renderSettings.m_extraArgs.empty())
-			command << m_renderSettings.m_extraArgs << " ";
+        command << "-b:v " << m_renderSettings.m_bitrate << "M ";
+
+        if (!m_renderSettings.m_extraArgs.empty())
+            command << m_renderSettings.m_extraArgs << " ";
 
         command << "-vf \"vflip";
 
@@ -121,7 +121,7 @@ namespace eclipse::recorder {
         std::stringstream command;
 
         command << m_ffmpegPath << " -y -i " << m_renderPath << " -i fmodoutput.wav -c:v copy -map 0:v -map 1:a "
-		   << tempPath;
+           << tempPath;
 
         geode::log::info("Recording audio to: {}", command.str());
 
