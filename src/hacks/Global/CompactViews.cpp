@@ -9,8 +9,6 @@ namespace eclipse::hacks::Global {
 
 	class CompactViews : public hack::Hack {
 		void init() override {
-			config::setIfEmpty("global.compacteditorlevels", false);
-			config::setIfEmpty("global.compactprofilecomments", false);
 			auto tab = gui::MenuTab::find("Global");
 			tab->addToggle("Compact Editor Levels", "global.compacteditorlevels")
 				->handleKeybinds()
