@@ -23,7 +23,7 @@ namespace eclipse::hacks::Player {
 
 	class $modify(FMODAudioEngine) {
 		struct Fields {
-			const std::string badSFX[4] = { "achievement_01.ogg", "magicExplosion.ogg", "gold02.ogg", "secretKey.ogg" };
+			const std::array<std::string, 4> badSFX = { "achievement_01.ogg", "magicExplosion.ogg", "gold02.ogg", "secretKey.ogg" };
 		};
 		static void onModify(auto& self) {
 			SAFE_PRIORITY("FMODAudioEngine::playEffect");
