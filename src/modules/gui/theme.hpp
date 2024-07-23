@@ -14,10 +14,10 @@ namespace eclipse::gui::imgui {
     class Theme {
     public:
         explicit Theme(const std::filesystem::path& path) {
-            if(!std::filesystem::exists(geode::Mod::get()->getSaveDir() / "themes"))
+            if (!std::filesystem::exists(geode::Mod::get()->getSaveDir() / "themes"))
                 std::filesystem::create_directories(geode::Mod::get()->getSaveDir() / "themes");
 
-            if(path.extension() == ".zip")
+            if (path.extension() == ".zip")
                 loadFromZip(path);
             else
                 loadFromFile(path);
@@ -26,7 +26,7 @@ namespace eclipse::gui::imgui {
         void loadFromZip(const std::filesystem::path& path) {
             auto result = geode::utils::file::Unzip::create(path);
 
-            if(!result) {
+            if (!result) {
                 geode::log::error("Failed to extract theme at {}: {}", path, result.error());
                 return;
             }
@@ -37,31 +37,31 @@ namespace eclipse::gui::imgui {
             uint32_t jsonCount = 0;
             std::string jsonFilename;
 
-            for(const auto& entry : entries) {
-                if(entry.extension() == ".json") {
+            for (const auto& entry : entries) {
+                if (entry.extension() == ".json") {
                     jsonFilename = entry.filename().string();
                     jsonCount++;
                 }
             }
 
-            if(jsonCount != 1) {
+            if (jsonCount != 1) {
                 geode::log::error("Failed to extract theme: not a valid theme (expected 1 json file)");
                 return;
             }
             
             auto unzipResult = unzipper.extractTo(jsonFilename, geode::Mod::get()->getSaveDir() / "themes" / jsonFilename);
 
-            if(!unzipResult)
+            if (!unzipResult)
                 geode::log::error("Failed to extract theme: {}", unzipResult.error());
 
             std::ifstream ifs(geode::Mod::get()->getSaveDir() / "themes" / jsonFilename);
             nlohmann::json jf = nlohmann::json::parse(ifs);
 
-            if(jf.contains("options") && jf["options"].contains("font")) {
+            if (jf.contains("options") && jf["options"].contains("font")) {
                 std::string fontFile = jf["options"]["font"];
                 unzipResult = unzipper.extractTo(fontFile, geode::Mod::get()->getSaveDir() / "fonts" / fontFile);
 
-                if(!unzipResult)
+                if (!unzipResult)
                     geode::log::error("Failed to extract theme font: {}", unzipResult.error());
             }
 
@@ -89,8 +89,8 @@ namespace eclipse::gui::imgui {
                 }
                 if (jf["options"].contains("style")) m_styleNum = jf["options"]["style"];
 
-                if(jf["options"].contains("font")) {
-                    if(!std::filesystem::exists(geode::Mod::get()->getSaveDir() / "fonts"))
+                if (jf["options"].contains("font")) {
+                    if (!std::filesystem::exists(geode::Mod::get()->getSaveDir() / "fonts"))
                         std::filesystem::create_directories(geode::Mod::get()->getSaveDir() / "fonts");
 
                     m_font = jf["options"].at("font").get<std::string>();
@@ -119,14 +119,14 @@ namespace eclipse::gui::imgui {
 
             auto result = geode::utils::file::Zip::create(path);
 
-            if(!result) {
+            if (!result) {
                 geode::log::error("Failed to create theme at {}: {}", path, result.error());
                 return;
             }
 
             auto& zipper = result.value();
-            zipper.addFrom(jsonPath);
-            zipper.addFrom(m_fontPath);
+            static_cast<void>(zipper.addFrom(jsonPath));
+            static_cast<void>(zipper.addFrom(m_fontPath));
 
             std::filesystem::remove(jsonPath);
         }
@@ -148,8 +148,8 @@ namespace eclipse::gui::imgui {
 
         /// @brief Set up the UI.
         virtual void setup() {
-            auto &style = ImGui::GetStyle();
-            auto &colors = style.Colors;
+            auto& style = ImGui::GetStyle();
+            auto& colors = style.Colors;
 
             switch (m_styleNum) {
                 case 0:
@@ -240,7 +240,7 @@ namespace eclipse::gui::imgui {
                 }
             }
 
-            if(std::filesystem::exists(m_fontPath)) {
+            if (std::filesystem::exists(m_fontPath)) {
                 auto font = ImGui::GetIO().Fonts->AddFontFromFileTTF(m_fontPath.string().c_str(), 20.0f);
                 ImGui::GetIO().FontDefault = font;
             }

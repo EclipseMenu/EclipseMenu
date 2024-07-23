@@ -17,7 +17,7 @@ namespace eclipse::hacks::Player {
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.autoclick", false); }
-        [[nodiscard]] const char* getId() const override { return "AutoClicker"; }
+        [[nodiscard]] const char* getId() const override { return "Auto Clicker"; }
     };
 
     REGISTER_HACK(AutoClicker)

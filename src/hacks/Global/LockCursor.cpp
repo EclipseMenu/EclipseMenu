@@ -25,7 +25,7 @@ namespace eclipse::hacks::Global {
 
             #ifdef __APPLE__
 
-            if (!gui::Engine::get()->isToggled() && config::get<bool>("global.lockcursor") && !PlayLayer::get()->m_hasCompletedLevel && !PlayLayer::get()->m_isPaused) {
+            if (!gui::Engine::get()->isToggled() && config::get<bool>("global.lockcursor", false) && !PlayLayer::get()->m_hasCompletedLevel && !PlayLayer::get()->m_isPaused) {
                 CGEventRef ourEvent = CGEventCreate(NULL);
                 auto point = CGEventGetLocation(ourEvent);
                 CFRelease(ourEvent);

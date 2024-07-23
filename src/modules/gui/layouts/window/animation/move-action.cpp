@@ -2,7 +2,7 @@
 
 namespace eclipse::gui::animation {
     MoveAction* MoveAction::create(double duration, ImVec2* vector, ImVec2 target, EasingFunction easing) {
-        auto *instance = new MoveAction();
+        auto* instance = new MoveAction();
         instance->m_duration = duration;
         instance->m_target = vector;
         instance->m_start = {vector->x, vector->y};

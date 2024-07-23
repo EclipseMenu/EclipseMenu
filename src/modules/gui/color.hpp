@@ -25,14 +25,16 @@ namespace eclipse::gui {
 
         Color(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a) {}
 
-        Color(const Color &other) : r(other.r), g(other.g), b(other.b), a(other.a) {}
+        Color(const Color& other) : r(other.r), g(other.g), b(other.b), a(other.a) {}
 
-        Color(Color &&other) noexcept : r(other.r), g(other.g), b(other.b), a(other.a) {
+        Color(const cocos2d::ccColor4F& other) : r(other.r), g(other.g), b(other.b), a(other.a) {}
+
+        Color(Color&& other) noexcept : r(other.r), g(other.g), b(other.b), a(other.a) {
             other.r = other.g = other.b = 0;
             other.a = 1.0f;
         }
 
-        Color& operator=(const Color &other) {
+        Color& operator=(const Color& other) {
             if (this == &other) return *this;
             r = other.r;
             g = other.g;
@@ -41,7 +43,7 @@ namespace eclipse::gui {
             return *this;
         }
 
-        Color& operator=(Color &&other) noexcept {
+        Color& operator=(Color&& other) noexcept {
             if (this == &other) return *this;
             r = other.r;
             g = other.g;
@@ -62,7 +64,7 @@ namespace eclipse::gui {
             return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
         }
 
-        Color& operator=(const ImVec4 &col2) {
+        Color& operator=(const ImVec4& col2) {
             r = col2.x;
             g = col2.y;
             b = col2.z;
@@ -76,7 +78,7 @@ namespace eclipse::gui {
 
         /// @brief Returns a pointer to the color data
         /// @return Pointer to the color data
-        float *data() {
+        float* data() {
             return &r;
         }
 
@@ -124,7 +126,7 @@ namespace eclipse::gui {
         /// @brief Creates a new color from HSV values
         /// @param hsv HSV values
         /// @return New color
-        static Color fromHSV(const ImVec4 &hsv) {
+        static Color fromHSV(const ImVec4& hsv) {
             return fromHSV(hsv.x, hsv.y, hsv.z, hsv.w);
         }
 
@@ -205,6 +207,6 @@ namespace eclipse::gui {
         }
     };
 
-    void to_json(nlohmann::json &j, const Color &e);
-    void from_json(const nlohmann::json &j, Color &e);
+    void to_json(nlohmann::json& j, const Color& e);
+    void from_json(const nlohmann::json& j, Color& e);
 }

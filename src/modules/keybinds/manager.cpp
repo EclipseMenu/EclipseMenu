@@ -25,7 +25,7 @@ namespace eclipse::keybinds {
     }
 
     std::string keyToString(Keys key) {
-#define CASE(key, name) case Keys:: key: return name
+#define CASE(key, name) case Keys::key: return name
         switch (key) {
             CASE(None, "-");
 
@@ -442,17 +442,15 @@ namespace eclipse::keybinds {
         m_keyStates[key] = true;
 
         for (auto& keybind : m_keybinds) {
-            if (keybind.getKey() == key && keybind.isInitialized()) {
+            if (keybind.getKey() == key && keybind.isInitialized())
                 keybind.execute();
-            }
         }
     }
 
     Keybind* Manager::getKeybind(const std::string& id) {
         for (auto& keybind : m_keybinds) {
-            if (keybind.getId() == id) {
+            if (keybind.getId() == id)
                 return &keybind;
-            }
         }
         return nullptr;
     }

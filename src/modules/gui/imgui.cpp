@@ -57,7 +57,7 @@ namespace eclipse::gui::imgui {
     Theme* ImGuiEngine::getTheme() {
         // TODO: change this for theme picker
         if (!m_theme) {
-            if(std::filesystem::exists(geode::Mod::get()->getSaveDir() / "themes" / "megahack.json"))
+            if (std::filesystem::exists(geode::Mod::get()->getSaveDir() / "themes" / "megahack.json"))
                 m_theme = new Theme(geode::Mod::get()->getSaveDir() / "themes" / "megahack.json");
             else
                 m_theme = new Theme(geode::Mod::get()->getResourcesDir() / "megahack.zip");

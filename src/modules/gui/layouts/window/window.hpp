@@ -15,7 +15,7 @@ namespace eclipse::gui::imgui {
         MenuTab* findTab(const std::string& name);
 
     private:
-        ImVec2 randomWindowPosition(Window &window);
+        ImVec2 randomWindowPosition(Window& window);
         std::map<Window*, ImVec2> getStackedPositions();
         void stackWindows();
 

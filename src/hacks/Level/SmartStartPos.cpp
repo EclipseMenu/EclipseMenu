@@ -32,7 +32,7 @@ namespace eclipse::hacks::Level {
                 return a->getPositionX() < b->getPositionX();
             });
 
-            for(auto obj : vec) {
+            for (auto obj : vec) {
                 if (obj->getPositionX() - 10 > startPos->getPositionX())
                     break;
                 else if (obj->getPositionX() - 10 < startPos->getPositionX())
@@ -127,7 +127,7 @@ namespace eclipse::hacks::Level {
 
         void resetLevel() {
             if (config::get<bool>("level.smartstartpos", false)) {
-                for(StartPosObject* obj : m_fields->m_startPositions)
+                for (StartPosObject* obj : m_fields->m_startPositions)
                     setupStartPos(obj);
             }
 

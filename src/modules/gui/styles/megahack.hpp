@@ -19,8 +19,8 @@ namespace eclipse::gui::imgui {
         }   
 
         void visit(ToggleComponent* checkbox) override {
-            auto &style = ImGui::GetStyle();
-            auto &colors = style.Colors;
+            auto& style = ImGui::GetStyle();
+            auto& colors = style.Colors;
             bool value = checkbox->getValue();
 
             if (checkbox->getOptions()) {
@@ -39,7 +39,7 @@ namespace eclipse::gui::imgui {
                 auto buttonSize = ImVec2(availWidth * 0.9f, 0);
                 auto arrowSize = ImVec2(availWidth * 0.1f, 0);
 
-                if(ImGui::Button(checkbox->getTitle().c_str(), buttonSize)) {
+                if (ImGui::Button(checkbox->getTitle().c_str(), buttonSize)) {
                     checkbox->setValue(!value);
                     checkbox->triggerCallback(!value);
                 }
@@ -67,7 +67,7 @@ namespace eclipse::gui::imgui {
                 ImGui::SameLine(0, 0);
 
                 ImGui::PopStyleVar(2);
-                bool openPopup = ImGui::Button((std::string("##open_") + checkbox->getTitle()).c_str(), arrowSize);
+                bool openPopup = ImGui::Button(fmt::format("##open_{}", checkbox->getTitle()).c_str(), arrowSize);
                 ImGui::PopItemWidth();
                 ImGui::PopStyleColor(4);
 
@@ -85,14 +85,14 @@ namespace eclipse::gui::imgui {
                         ImVec2(right, bottom),
                         ImGui::ColorConvertFloat4ToU32(triangleColor));
 
-                std::string popupName = std::string("##") + checkbox->getTitle();
+                std::string popupName = fmt::format("##{}", checkbox->getTitle());
                 if (openPopup)
                     ImGui::OpenPopup(popupName.c_str());
 
                 if (ImGui::BeginPopup(popupName.c_str())) {
-                    for (Component* cmp : checkbox->getOptions()->getComponents()) {
+                    for (Component* cmp : checkbox->getOptions()->getComponents())
                         Style::visit(cmp);
-                    }
+
                     ImGui::EndPopup();
                 }
             } else {
@@ -100,7 +100,7 @@ namespace eclipse::gui::imgui {
 
                 auto textColor = value ? colors[ImGuiCol_Text] : colors[ImGuiCol_TextDisabled];
 
-                auto &style = ImGui::GetStyle();
+                auto& style = ImGui::GetStyle();
                 ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4) textColor);
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
@@ -196,8 +196,8 @@ namespace eclipse::gui::imgui {
 
             ImGui::PushItemWidth(-1.0f);
 
-            auto &style = ImGui::GetStyle();
-            auto &colors = style.Colors;
+            auto& style = ImGui::GetStyle();
+            auto& colors = style.Colors;
 
             auto textColor = toggle ? colors[ImGuiCol_Text] : colors[ImGuiCol_TextDisabled];
 
@@ -264,8 +264,8 @@ namespace eclipse::gui::imgui {
         }   
 
         void visit(ButtonComponent* button) override {
-            auto &style = ImGui::GetStyle();
-            auto &colors = style.Colors;
+            auto& style = ImGui::GetStyle();
+            auto& colors = style.Colors;
             ImGui::PushItemWidth(-1);
 
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
@@ -313,7 +313,7 @@ namespace eclipse::gui::imgui {
 
         void visit(ColorComponent* color) override {
             auto value = config::get<gui::Color>(color->getId(), {1, 1, 1, 1});
-            if(ImGui::ColorEdit3(color->getTitle().c_str(), value.data(), ImGuiColorEditFlags_NoInputs)) {
+            if (ImGui::ColorEdit3(color->getTitle().c_str(), value.data(), ImGuiColorEditFlags_NoInputs)) {
                 config::set<gui::Color>(color->getId(), value);
                 color->triggerCallback(value);
             }

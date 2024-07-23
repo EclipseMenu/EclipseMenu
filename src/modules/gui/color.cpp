@@ -11,12 +11,12 @@ namespace eclipse::gui {
     const Color Color::CYAN = {0, 1, 1};
     const Color Color::MAGENTA = {1, 0, 1};
 
-    void to_json(nlohmann::json &j, const Color &e) {
+    void to_json(nlohmann::json& j, const Color& e) {
         auto str = e.toString();
         j = str;
     }
 
-    void from_json(const nlohmann::json &j, Color &e) {
+    void from_json(const nlohmann::json& j, Color& e) {
         e = Color::fromString(j.get<std::string>());
     }
 }

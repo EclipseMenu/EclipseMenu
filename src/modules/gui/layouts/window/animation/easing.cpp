@@ -1,10 +1,7 @@
 #include "easing.hpp"
 
 #include <cmath>
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
+#include <numbers>
 
 namespace eclipse::gui::animation {
     EasingFunction getEasingFunction(Easing easing, EasingMode mode) {
@@ -26,15 +23,15 @@ namespace eclipse::gui::animation {
         /* == Sine == */
 
         double easeInSine(double t) {
-            return 1.0 - cos(t * M_PI / 2.0);
+            return 1.0 - cos(t * std::numbers::pi / 2.0);
         }
 
         double easeOutSine(double t) {
-            return sin(t * M_PI / 2.0);
+            return sin(t * std::numbers::pi / 2.0);
         }
 
         double easeInOutSine(double t) {
-            return -(cos(M_PI * t) - 1.0) / 2.0;
+            return -(cos(std::numbers::pi * t) - 1.0) / 2.0;
         }
 
         /* == Quadratic == */
@@ -153,7 +150,7 @@ namespace eclipse::gui::animation {
             if (t == 0.0 || t == 1.0)
                 return t;
 
-            const double c4 = (2 * M_PI) / 3;
+            const double c4 = (2 * std::numbers::pi) / 3;
             return -pow(2.0, 10.0 * t - 10.0) * sin((t * 10.0 - 10.75) * c4);
         }
 
@@ -161,7 +158,7 @@ namespace eclipse::gui::animation {
             if (t == 0.0 || t == 1.0)
                 return t;
 
-            const double c4 = (2 * M_PI) / 3;
+            const double c4 = (2 * std::numbers::pi) / 3;
             return pow(2.0, -10.0 * t) * sin((t * 10.0 - 0.75) * c4) + 1.0;
         }
 
@@ -170,9 +167,9 @@ namespace eclipse::gui::animation {
                 return t;
 
             if (t < 0.5)
-                return -(pow(2.0, 20.0 * t - 10.0) * sin((20.0 * t - 11.125) * (2 * M_PI) / 4.5)) / 2.0;
+                return -(pow(2.0, 20.0 * t - 10.0) * sin((20.0 * t - 11.125) * (2 * std::numbers::pi) / 4.5)) / 2.0;
 
-            return (pow(2.0, -20.0 * t + 10.0) * sin((20.0 * t - 11.125) * (2 * M_PI) / 4.5)) / 2.0 + 1.0;
+            return (pow(2.0, -20.0 * t + 10.0) * sin((20.0 * t - 11.125) * (2 * std::numbers::pi) / 4.5)) / 2.0 + 1.0;
         }
 
         /* == Bounce == */

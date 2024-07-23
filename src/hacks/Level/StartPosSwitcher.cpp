@@ -219,7 +219,7 @@ namespace eclipse::hacks::Level {
                 this->resetCamera();
         }
 
-        void addObject(GameObject *object) {
+        void addObject(GameObject* object) {
             PlayLayer::addObject(object);
 
             uint32_t id = object->m_objectID;
@@ -231,7 +231,7 @@ namespace eclipse::hacks::Level {
             PlayLayer::createObjectsFromSetupFinished();
             if (startPosObjects.empty()) return;
 
-            std::sort(startPosObjects.begin(), startPosObjects.end(), [](GameObject *a, GameObject *b) {
+            std::sort(startPosObjects.begin(), startPosObjects.end(), [](GameObject* a, GameObject* b) {
                 return a->getPositionX() < b->getPositionX();
             });
 
@@ -244,7 +244,11 @@ namespace eclipse::hacks::Level {
 
             auto* switcher = StartposSwitcherNode::create(this);
             switcher->setID("startpos-switcher"_spr);
-            m_uiLayer->addChild(switcher, 1000);
+            if (auto uiMenu = geode::cast::typeinfo_cast<cocos2d::CCMenu*>(m_uiLayer->getChildByID("eclipse-ui"_spr))) {
+                uiMenu->addChild(switcher, 1000);
+            } else { // fallback
+                m_uiLayer->addChild(switcher, 1000);
+            }
         }
     };
 

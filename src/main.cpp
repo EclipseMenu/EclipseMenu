@@ -1,5 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
+#include <Geode/modify/UILayer.hpp>
 #include <Geode/modify/CCScheduler.hpp>
 
 #include <modules/config/config.hpp>
@@ -66,7 +67,7 @@ class $modify(cocos2d::CCScheduler) {
         }
 
         // Add ability for ImGui to capture right click
-        auto &io = ImGui::GetIO();
+        auto& io = ImGui::GetIO();
         if (keybinds::isKeyPressed(keybinds::Keys::MouseRight)) {
             io.AddMouseButtonEvent(1, true);
         } else if (keybinds::isKeyReleased(keybinds::Keys::MouseRight)) {
@@ -74,6 +75,17 @@ class $modify(cocos2d::CCScheduler) {
         }
 
         keybinds::Manager::get()->update();
+    }
+};
+
+class $modify(UILayer) {
+    bool init(GJBaseGameLayer* p0) {
+        if (!UILayer::init(p0)) return false;
+        auto menu = cocos2d::CCMenu::create();
+        menu->setID("eclipse-ui"_spr);
+        this->addChild(menu, 1000);
+        menu->setPosition({0, 0});
+        return true;
     }
 };
 
