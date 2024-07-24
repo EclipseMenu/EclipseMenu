@@ -25,10 +25,10 @@ namespace eclipse::hacks::Player {
     class $modify(GJBaseGameLayer) {
         virtual void update(float p0) {
             auto *playLayer = PlayLayer::get();
-            if (config::get<bool>("player.autokill.toggle", false)) {
+            if (config::get<bool>("player.autokill.toggle", false) && playLayer != nullptr) {
                 auto killPercent = config::get<float>("player.autokill");
                 float currentPercent = playLayer->getCurrentPercent();
-                if (currentPercent >= killPercent && playLayer != nullptr && playLayer->m_player1->m_isPlatformer == false) {
+                if (currentPercent >= killPercent && playLayer->m_player1->m_isPlatformer == false) {
                     playLayer->resetLevel();
                 }
             }
