@@ -10,10 +10,16 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
 
-            config::setIfEmpty("player.autoclick.toggle", false);
-            config::setIfEmpty("player.autoclick", 1.f);
+            config::setIfEmpty("player.autoclick", false);
 
-            tab->addFloatToggle("AutoClicker", "player.autoclick", 0.f, 10.f, "%.3f s.");
+            gui::ToggleComponent* toggle = tab->addToggle("AutoClicker", "player.autoclick")->handleKeybinds();
+
+            config::setIfEmpty<float>("player.autoclick.interval", 1.f);
+            
+            toggle->addOptions([](gui::MenuTab* options) {
+                options->addInputFloat("Interval", "player.autoclick.interval", 0.f, 10.f, "%.3f s.");
+            });
+
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.autoclick", false); }
@@ -31,8 +37,8 @@ namespace eclipse::hacks::Player {
         void processCommands(float dt) {
             GJBaseGameLayer::processCommands(dt);
 
-            if (config::get<bool>("player.autoclick.toggle", false)) {
-                float clickInterval = config::get<float>("player.autoclick", 0.f);
+            if (config::get<bool>("player.autoclick", false)) {
+                float clickInterval = config::get<float>("player.autoclick.interval", 0.f);
                 m_fields->thedt += dt;
                 if (m_fields->thedt > clickInterval) { // FIXME: doesn't click
                     m_fields->clicking = !m_fields->clicking;
