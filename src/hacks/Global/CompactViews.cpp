@@ -51,7 +51,7 @@ namespace eclipse::hacks::Global {
 
     class $modify(EclipseLevelCell, LevelCell) {
         void onClick(CCObject* sender) {
-            // hooking this function is necessary in order for the "view" button to work while compact mode is active in "my levels"
+            // get the "view" button to work with compact mode in "my levels"
             if (this->m_level->m_levelType == GJLevelType::Editor && config::get<bool>("global.compacteditorlevels", false)) {
                 const auto scene = cocos2d::CCScene::create();
                 scene->addChild(EditLevelLayer::create(m_level));
