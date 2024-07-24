@@ -2,8 +2,8 @@
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
 
-#include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/CCCircleWave.hpp>
+#include <Geode/modify/CCLightFlash.hpp>
 
 namespace eclipse::hacks::Level {
 
