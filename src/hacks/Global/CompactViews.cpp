@@ -7,21 +7,30 @@
 
 namespace eclipse::hacks::Global {
 
-    class CompactViews : public hack::Hack {
+    class CompactEditorLevels : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Global");
             tab->addToggle("Compact Editor Levels", "global.compacteditorlevels")
                 ->handleKeybinds()
                 ->setDescription("Enables the compact view when browsing custom editor levels. Adapted from code by Cvolton. (Created by RayDeeUx)");
+        }
+
+        [[nodiscard]] const char* getId() const override { return "Compact Editor Levels"; }
+    };
+
+    class CompactProfileComments : public hack::Hack {
+        void init() override {
+            auto tab = gui::MenuTab::find("Global");
             tab->addToggle("Compact Profile Comments", "global.compactprofilecomments")
                 ->handleKeybinds()
                 ->setDescription("Enables the compact view when viewing profile comments. Adapted from code by Cvolton. (Created by RayDeeUx)");
         }
 
-        [[nodiscard]] const char* getId() const override { return "Compact Views"; }
+        [[nodiscard]] const char* getId() const override { return "Compact Profile Comments"; }
     };
 
-    REGISTER_HACK(CompactViews);
+    REGISTER_HACK(CompactEditorLevels);
+    REGISTER_HACK(CompactProfileComments);
 
     class $modify(EclipseCustomListView, CustomListView) {
         /*
