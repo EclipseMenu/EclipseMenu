@@ -33,4 +33,15 @@ namespace eclipse::hacks::Level {
             return cw;
         }
     };
+
+    class $modify(EclipseCCLightFlash, CCLightFlash) {
+        // i cant believe i need to hook this function with NINETEEN params to get things working what the heck :despair:
+        void playEffect(cocos2d::CCPoint point, cocos2d::ccColor3B color, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, float p10, float p11, float p12, float p13, float p14, float p15, int p16, bool p17, bool p18, float p19) {
+            PlayLayer* pl = PlayLayer::get();
+            if (!pl) return CCLightFlash::playEffect(point, color, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19);
+            if (pl->m_levelEndAnimationStarted && config::get<bool>("level.hidelevelcomplete", false))
+                this->setVisible(false);
+            CCLightFlash::playEffect(point, color, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19);
+        }
+    };
 }
