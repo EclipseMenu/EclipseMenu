@@ -67,7 +67,7 @@ class $modify(cocos2d::CCScheduler) {
         }
 
         // Add ability for ImGui to capture right click
-        auto &io = ImGui::GetIO();
+        auto& io = ImGui::GetIO();
         if (keybinds::isKeyPressed(keybinds::Keys::MouseRight)) {
             io.AddMouseButtonEvent(1, true);
         } else if (keybinds::isKeyReleased(keybinds::Keys::MouseRight)) {
@@ -79,7 +79,7 @@ class $modify(cocos2d::CCScheduler) {
 };
 
 class $modify(UILayer) {
-    bool init(GJBaseGameLayer *p0) {
+    bool init(GJBaseGameLayer* p0) {
         if (!UILayer::init(p0)) return false;
         auto menu = cocos2d::CCMenu::create();
         menu->setID("eclipse-ui"_spr);

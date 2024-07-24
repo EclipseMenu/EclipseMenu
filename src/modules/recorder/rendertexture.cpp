@@ -36,7 +36,7 @@ namespace eclipse::recorder {
         m_texture->release();
     }
 
-    void RenderTexture::capture(std::mutex &lock, std::vector<uint8_t> &data, volatile bool &hasDataFlag) {
+    void RenderTexture::capture(std::mutex& lock, std::vector<uint8_t>& data, volatile bool& hasDataFlag) {
 #ifndef GEODE_IS_ANDROID
         auto director = cocos2d::CCDirector::sharedDirector();
 

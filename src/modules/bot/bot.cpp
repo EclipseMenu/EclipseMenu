@@ -21,13 +21,12 @@ namespace eclipse::bot {
     }
 
     void Bot::removeInputsAfter(int frame) {
-        const auto check = [&](const gdr::Input &input) -> bool { return input.frame > frame; };
-        m_replay.inputs.erase(std::remove_if (m_replay.inputs.begin(), m_replay.inputs.end(), check), m_replay.inputs.end());
+        const auto check = [&](const gdr::Input& input) -> bool { return input.frame > frame; };
+        std::erase_if(m_replay.inputs, [&](const gdr::Input& input) -> bool { return input.frame > frame; });
     }
 
     void Bot::recordInput(int frame, PlayerButton button, bool player2, bool pressed) {
-        gdr::Input input(frame, (int)button, player2, pressed);
-        m_replay.inputs.push_back(input);
+        m_replay.inputs.emplace_back(frame, static_cast<int>(button), player2, pressed);
     }
 
     std::optional<gdr::Input> Bot::poll(int frame) {
@@ -67,7 +66,7 @@ namespace eclipse::bot {
         f.seekg(0, std::ios::beg);
 
         geode::ByteVector data(fileSize);
-        f.read(reinterpret_cast<char *>(data.data()), fileSize);
+        f.read(reinterpret_cast<char*>(data.data()), fileSize);
         f.close();
 
         m_replay = BotReplay::importData(data);

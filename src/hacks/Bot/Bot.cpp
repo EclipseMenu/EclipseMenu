@@ -20,7 +20,7 @@ namespace eclipse::hacks::Bot {
         std::filesystem::path replayDirectory = Mod::get()->getSaveDir() / "replays";
 
         if (!std::filesystem::exists(replayDirectory))
-		    std::filesystem::create_directory(replayDirectory);
+            std::filesystem::create_directory(replayDirectory);
 
         std::filesystem::path replayPath = replayDirectory / (config::get<std::string>("bot.replayname", "temp") + ".gdr");
         s_bot.save(replayPath);
@@ -67,7 +67,7 @@ namespace eclipse::hacks::Bot {
 
     class $modify(PlayLayer) {
 
-        bool init(GJGameLevel *gj, bool p1, bool p2) {
+        bool init(GJGameLevel* gj, bool p1, bool p2) {
             bool result = PlayLayer::init(gj, p1, p2);
             s_bot.setLevelInfo(gdr::Level(gj->m_levelName, gj->m_levelID.value()));
             return result;
@@ -98,7 +98,10 @@ namespace eclipse::hacks::Bot {
         }
 
         CheckpointObject* markCheckpoint() {
-            if (s_bot.getState() == bot::State::RECORD && (((BotPlayerObject*) m_player1)->m_fields->m_isDead || ((BotPlayerObject*) m_player2)->m_fields->m_isDead))
+            if (
+                s_bot.getState() == bot::State::RECORD &&
+                (static_cast<BotPlayerObject*>(m_player1)->m_fields->m_isDead || static_cast<BotPlayerObject*>(m_player2)->m_fields->m_isDead)
+            )
                 return nullptr;
 
             return PlayLayer::markCheckpoint();

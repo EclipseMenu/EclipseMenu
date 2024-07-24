@@ -6,24 +6,24 @@
 
 namespace eclipse::hacks::Player {
 
-	class NoPlatformerJumpSquish : public hack::Hack {
-		void init() override {
-			auto tab = gui::MenuTab::find("Player");
-			tab->addToggle("No Platformer Jump Squish", "player.noplatformersquish")
-				->setDescription("Disables the squishing animation when jumping in place while playing platformer levels. (Created by RayDeeUx)")
-				->handleKeybinds();
-		}
+    class NoPlatformerJumpSquish : public hack::Hack {
+        void init() override {
+            auto tab = gui::MenuTab::find("Player");
+            tab->addToggle("No Platformer Jump Squish", "player.noplatformersquish")
+                ->setDescription("Disables the squishing animation when jumping in place while playing platformer levels. (Created by RayDeeUx)")
+                ->handleKeybinds();
+        }
 
-		[[nodiscard]] const char* getId() const override { return "No Platformer Jump Squish"; }
-	};
+        [[nodiscard]] const char* getId() const override { return "No Platformer Jump Squish"; }
+    };
 
-	REGISTER_HACK(NoPlatformerJumpSquish)
+    REGISTER_HACK(NoPlatformerJumpSquish)
 
-	class $modify(MyPlayerObject, PlayerObject){
-		void animatePlatformerJump(float p0) {
-			if (!config::get<bool>("player.noplatformersquish", false))
-				PlayerObject::animatePlatformerJump(p0);
-		}
-	};
+    class $modify(MyPlayerObject, PlayerObject){
+        void animatePlatformerJump(float p0) {
+            if (!config::get<bool>("player.noplatformersquish", false))
+                PlayerObject::animatePlatformerJump(p0);
+        }
+    };
 
 }

@@ -60,7 +60,7 @@ namespace eclipse::hacks::Recorder {
         std::filesystem::path renderDirectory = geode::Mod::get()->getSaveDir() / "renders" / lvl->m_levelName;
 
         if (!std::filesystem::exists(renderDirectory))
-		    std::filesystem::create_directories(renderDirectory);
+            std::filesystem::create_directories(renderDirectory);
 
         recorder::RenderSettings settings;
 
@@ -97,11 +97,11 @@ namespace eclipse::hacks::Recorder {
         afterEndTimer = 0.f;
 
         if (PlayLayer::get()->getChildByID("EndLevelLayer"))
-		    PlayLayer::get()->getChildByID("EndLevelLayer")->removeFromParent();
+            PlayLayer::get()->getChildByID("EndLevelLayer")->removeFromParent();
 
         PlayLayer::get()->stopAllActions();
         PlayLayer::get()->startGame();
-	    PlayLayer::get()->resetLevelFromStart();
+        PlayLayer::get()->resetLevelFromStart();
 
         s_recorder.startAudio(renderPath);
     }
@@ -116,9 +116,9 @@ namespace eclipse::hacks::Recorder {
 
             tab->addButton("Start Recording")->callback(start);
             tab->addButton("Stop Recording")->callback([] {
-                if(s_recorder.isRecording())
+                if (s_recorder.isRecording())
                     stop();
-                if(s_recorder.isRecordingAudio())
+                if (s_recorder.isRecordingAudio())
                     stopAudio();
             });
 
@@ -209,7 +209,7 @@ namespace eclipse::hacks::Recorder {
 
             FMOD::Channel* audioChannel;
 
-            for(int i = 0; i < 2; i++) {
+            for (int i = 0; i < 2; i++) {
                 FMODAudioEngine::sharedEngine()->m_system->getChannel(126 + i, &audioChannel);
                 if (audioChannel) {
                     uint32_t channelTime = 0;
@@ -250,7 +250,7 @@ namespace eclipse::hacks::Recorder {
 
             totalTime += dt;
 
-            double frameDt = 1. / (double)fps * timewarp;
+            double frameDt = 1. / static_cast<double>(fps) * timewarp;
             double time = totalTime + extraTime - lastFrameTime;
 
             if (time >= frameDt) {

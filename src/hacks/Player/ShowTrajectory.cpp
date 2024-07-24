@@ -66,7 +66,7 @@ namespace eclipse::hacks::Player {
             return instance;
         }
 
-        void drawRectangleHitbox(cocos2d::CCRect const& rect, cocos2d::ccColor4B colBase, cocos2d::ccColor4B colBorder) {
+        void drawRectangleHitbox(const cocos2d::CCRect& rect, cocos2d::ccColor4B colBase, cocos2d::ccColor4B colBorder) {
             const size_t N = 4;
             std::vector<cocos2d::CCPoint> points(N);
 
@@ -103,7 +103,7 @@ namespace eclipse::hacks::Player {
 
             const size_t iterations = 300;
 
-            for(size_t i = 0; i < iterations; i++) {
+            for (size_t i = 0; i < iterations; i++) {
                 cocos2d::CCPoint initialPlayerPosition = player->getPosition();
                 resetCollisionLog(player);
 
@@ -166,7 +166,6 @@ namespace eclipse::hacks::Player {
         }
 
     public:
-
         void init() {
             PlayLayer* pl = PlayLayer::get();
 
@@ -233,9 +232,8 @@ namespace eclipse::hacks::Player {
     static TrajectorySimulation s_simulation;
 
     class $modify(PlayLayer) {
-        
-        bool init(GJGameLevel* level, bool unk1, bool unk2) {
-            bool result = PlayLayer::init(level, unk1, unk2);
+        bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
+            bool result = PlayLayer::init(level, useReplay, dontCreateObjects);
 
             s_simulation.init();
 
@@ -254,7 +252,7 @@ namespace eclipse::hacks::Player {
             PlayLayer::playEndAnimationToPos(p0);
         }
 
-        void flipGravity(PlayerObject *p0, bool p1, bool p2) {
+        void flipGravity(PlayerObject* p0, bool p1, bool p2) {
             if (s_simulation.isSimulating()) return;
             
             PlayLayer::flipGravity(p0, p1, p2);
@@ -283,7 +281,7 @@ namespace eclipse::hacks::Player {
     };
 
     class $modify(EffectGameObject) {
-        void triggerObject(GJBaseGameLayer *p0, int p1, const gd::vector<int> *p2) {
+        void triggerObject(GJBaseGameLayer* p0, int p1, const gd::vector<int>* p2) {
             if (s_simulation.isSimulating()) return;
             
             return EffectGameObject::triggerObject(p0, p1, p2);
@@ -319,7 +317,7 @@ namespace eclipse::hacks::Player {
                 s_simulation.setFrameDelta(dt);
         }
 
-        void ringJump(RingObject *p0, bool p1) {
+        void ringJump(RingObject* p0, bool p1) {
             if (s_simulation.isSimulating()) return;
             
             PlayerObject::ringJump(p0, p1);

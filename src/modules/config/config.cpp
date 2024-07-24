@@ -19,7 +19,7 @@ namespace eclipse::config {
     /// @brief Load config file from path
     /// @param path Path to the config file
     /// @return True if the file was loaded successfully
-    bool loadFile(const std::filesystem::path &path) {
+    bool loadFile(const std::filesystem::path& path) {
         std::ifstream file(path);
         if (!file.is_open()) return false;
 
@@ -39,7 +39,7 @@ namespace eclipse::config {
 
     /// @brief Save config file to path
     /// @param path Path to save the config file
-    void saveFile(const std::filesystem::path &path) {
+    void saveFile(const std::filesystem::path& path) {
         std::ofstream file(path);
         file << getStorage().dump(4);
         file.close();
@@ -50,7 +50,7 @@ namespace eclipse::config {
         saveFile(path);
     }
 
-    void saveProfile(const std::string &profile) {
+    void saveProfile(const std::string& profile) {
         auto profilesDir = geode::Mod::get()->getSaveDir() / "profiles";
         std::filesystem::create_directories(profilesDir);
 
@@ -58,7 +58,7 @@ namespace eclipse::config {
         saveFile(path);
     }
 
-    void loadProfile(const std::string &profile) {
+    void loadProfile(const std::string& profile) {
         auto profilesDir = geode::Mod::get()->getSaveDir() / "profiles";
         auto path = profilesDir / (profile + ".json");
         if (!loadFile(path)) {
@@ -67,7 +67,7 @@ namespace eclipse::config {
         }
     }
 
-    void deleteProfile(const std::string &profile) {
+    void deleteProfile(const std::string& profile) {
         auto profilesDir = geode::Mod::get()->getSaveDir() / "profiles";
         auto path = profilesDir / (profile + ".json");
         if (std::filesystem::exists(path)) {
@@ -82,7 +82,7 @@ namespace eclipse::config {
             return profiles;
         }
 
-        for (auto &entry : std::filesystem::directory_iterator(profilesDir)) {
+        for (auto& entry : std::filesystem::directory_iterator(profilesDir)) {
             if (entry.is_regular_file() && entry.path().extension() == ".json") {
                 profiles.push_back(entry.path().stem().string());
             }
