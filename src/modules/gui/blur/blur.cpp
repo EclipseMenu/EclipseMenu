@@ -19,62 +19,62 @@ float blurTimer = 0.f;
 
 Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath) {
     auto vertexSource = file::readString(vertexPath);
-        if (!vertexSource)
-            return Err("failed to read vertex shader at path {}: {}", vertexPath.string(), vertexSource.unwrapErr());
+    if (!vertexSource)
+        return Err("failed to read vertex shader at path {}: {}", vertexPath.string(), vertexSource.unwrapErr());
 
-        auto fragmentSource = file::readString(fragmentPath);
-        if (!fragmentSource)
-            return Err("failed to read fragment shader at path {}: {}", fragmentPath.string(), fragmentSource.unwrapErr());
+    auto fragmentSource = file::readString(fragmentPath);
+    if (!fragmentSource)
+        return Err("failed to read fragment shader at path {}: {}", fragmentPath.string(), fragmentSource.unwrapErr());
 
-        auto getShaderLog = [](GLuint id) -> std::string {
-            GLint length, written;
-            glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-            if (length <= 0)
-                return "";
-            auto stuff = new char[length + 1];
-            glGetShaderInfoLog(id, length, &written, stuff);
-            std::string result(stuff);
-            delete[] stuff;
-            return result;
-        };
-        GLint res;
+    auto getShaderLog = [](GLuint id) -> std::string {
+        GLint length, written;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        if (length <= 0)
+            return "";
+        auto stuff = new char[length + 1];
+        glGetShaderInfoLog(id, length, &written, stuff);
+        std::string result(stuff);
+        delete[] stuff;
+        return result;
+    };
+    GLint res;
 
-        vertex = glCreateShader(GL_VERTEX_SHADER);
-        auto oglSucks = vertexSource.unwrap().c_str();
-        glShaderSource(vertex, 1, &oglSucks, nullptr);
-        glCompileShader(vertex);
-        auto vertexLog = getShaderLog(vertex);
+    vertex = glCreateShader(GL_VERTEX_SHADER);
+    auto oglSucks = vertexSource.unwrap().c_str();
+    glShaderSource(vertex, 1, &oglSucks, nullptr);
+    glCompileShader(vertex);
+    auto vertexLog = getShaderLog(vertex);
 
-        glGetShaderiv(vertex, GL_COMPILE_STATUS, &res);
-        if (!res) {
-            glDeleteShader(vertex);
-            vertex = 0;
-            return Err("vertex shader compilation failed:\n{}", vertexLog);
-        }
+    glGetShaderiv(vertex, GL_COMPILE_STATUS, &res);
+    if (!res) {
+        glDeleteShader(vertex);
+        vertex = 0;
+        return Err("vertex shader compilation failed:\n{}", vertexLog);
+    }
 
-        fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        oglSucks = fragmentSource.unwrap().c_str();
-        glShaderSource(fragment, 1, &oglSucks, nullptr);
-        glCompileShader(fragment);
-        auto fragmentLog = getShaderLog(fragment);
+    fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    oglSucks = fragmentSource.unwrap().c_str();
+    glShaderSource(fragment, 1, &oglSucks, nullptr);
+    glCompileShader(fragment);
+    auto fragmentLog = getShaderLog(fragment);
 
-        glGetShaderiv(fragment, GL_COMPILE_STATUS, &res);
-        if (!res) {
-            glDeleteShader(vertex);
-            glDeleteShader(fragment);
-            vertex = 0;
-            fragment = 0;
-            return Err("fragment shader compilation failed:\n{}", fragmentLog);
-        }
+    glGetShaderiv(fragment, GL_COMPILE_STATUS, &res);
+    if (!res) {
+        glDeleteShader(vertex);
+        glDeleteShader(fragment);
+        vertex = 0;
+        fragment = 0;
+        return Err("fragment shader compilation failed:\n{}", fragmentLog);
+    }
 
-        program = glCreateProgram();
-        glAttachShader(program, vertex);
-        glAttachShader(program, fragment);
+    program = glCreateProgram();
+    glAttachShader(program, vertex);
+    glAttachShader(program, fragment);
 
-        return Ok(fmt::format(
-            "shader compilation successful. logs:\nvert:\n{}\nfrag:\n{}",
-            vertexLog, fragmentLog
-        ));
+    return Ok(fmt::format(
+        "shader compilation successful. logs:\nvert:\n{}\nfrag:\n{}",
+        vertexLog, fragmentLog
+    ));
 }
 
 Result<std::string> Shader::link() {
@@ -195,21 +195,15 @@ void setupPostProcess() {
     auto fragmentPath = (std::string)CCFileUtils::get()->fullPathForFilename("pp-frag.glsl"_spr, false);
 
     auto res = ppShader.compile(vertexPath, fragmentPath);
-    if (!res) {
-        log::error("Failed to compile shader: {}", res.unwrapErr());
-        return;
-    }
-    log::info("{}", res.unwrap());
+    if (!res) return log::error("Failed to compile shader: {}", res.unwrapErr());
+    // log::info("{}", res.unwrap());
 
     glBindAttribLocation(ppShader.program, 0, "aPosition");
     glBindAttribLocation(ppShader.program, 1, "aTexCoords");
 
     res = ppShader.link();
-    if (!res) {
-        log::error("Failed to link shader: {}", res.unwrapErr());
-        return;
-    }
-    log::info("{}", res.unwrap());
+    if (!res) return log::error("Failed to link shader: {}", res.unwrapErr());
+    // log::info("{}", res.unwrap());
 
     ccGLUseProgram(ppShader.program);
     glUniform1i(glGetUniformLocation(ppShader.program, "screen"), 0);
@@ -251,7 +245,7 @@ class $modify(CCNode) {
             CCNode::visit();
             return;
         }
-        float blur = 0.05 * (1.f - std::cos((float)std::numbers::pi * blurTimer)) * 0.5f;
+        float blur = 0.05f * (1.f - std::cos((float)std::numbers::pi * blurTimer)) * 0.5f;
         if (blur == 0.f) {
             CCNode::visit();
             return;

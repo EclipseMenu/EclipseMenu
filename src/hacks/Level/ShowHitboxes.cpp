@@ -8,11 +8,29 @@
 #include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/GameObject.hpp>
 
 namespace eclipse::hacks::Level {
 
+    /// @brief Check whether hitboxes made by RobTop should be drawn. (e.g. in practice mode)
+    inline bool robtopHitboxCheck() {
+        if (auto* pl = PlayLayer::get())
+            return pl->m_isPracticeMode && GameManager::get()->getGameVariable("0166");
+        else if (auto* ed = LevelEditorLayer::get())
+            return GameManager::get()->getGameVariable("0045");
+        return false;
+    }
+
+    /// @brief Gracefully disable hitboxes to return to the original state
+    inline void toggleOffHitboxes() {
+        if (config::get<bool>("level.showhitboxes", false)) return;
+        if (auto* gjbgl = GJBaseGameLayer::get())
+            gjbgl->m_debugDrawNode->setVisible(robtopHitboxCheck());
+    }
+
     static bool s_isDead = false;
     static bool s_skipDrawHook = false;
+    static bool s_slopeHitboxFix = false;
 
     static std::deque<std::pair<cocos2d::CCRect, cocos2d::CCRect>> s_playerTrail1, s_playerTrail2;
 
@@ -27,22 +45,23 @@ namespace eclipse::hacks::Level {
                     LevelEditorLayer::get()->updateEditor(0);
                     LevelEditorLayer::get()->updateOptions();
                 }
+                toggleOffHitboxes();
             });
 
-            config::setIfEmpty<float>("level.showhitboxes.bordersize", 0.25f);
-            config::setIfEmpty<float>("level.showhitboxes.fillalpha", 0.25f);
-            config::setIfEmpty<float>("level.showhitboxes.traillength", 240.0f);
-            config::setIfEmpty<bool>("level.showhitboxes.fillalpha.toggle", true);
-            config::setIfEmpty<gui::Color>("level.showhitboxes.solid_color", gui::Color(0, 0.247, 1));
-            config::setIfEmpty<gui::Color>("level.showhitboxes.danger_color", gui::Color(1, 0, 0));
-            config::setIfEmpty<gui::Color>("level.showhitboxes.player_color", gui::Color(1, 0, 0));
-            config::setIfEmpty<gui::Color>("level.showhitboxes.player_color_inner", gui::Color(0, 1, 0.2f));
-            config::setIfEmpty<gui::Color>("level.showhitboxes.player_color_rotated", gui::Color(1, 1, 0));
-            config::setIfEmpty<gui::Color>("level.showhitboxes.other_color", gui::Color(0, 1, 0));
+            config::setIfEmpty("level.showhitboxes.bordersize", 0.25f);
+            config::setIfEmpty("level.showhitboxes.fillalpha", 0.25f);
+            config::setIfEmpty("level.showhitboxes.traillength", 240.0f);
+            config::setIfEmpty("level.showhitboxes.fillalpha.toggle", true);
+            config::setIfEmpty("level.showhitboxes.solid_color", gui::Color(0, 0.247, 1));
+            config::setIfEmpty("level.showhitboxes.danger_color", gui::Color::RED);
+            config::setIfEmpty("level.showhitboxes.player_color", gui::Color::RED);
+            config::setIfEmpty("level.showhitboxes.player_color_inner", gui::Color(0, 1, 0.2f));
+            config::setIfEmpty("level.showhitboxes.player_color_rotated", gui::Color::YELLOW);
+            config::setIfEmpty("level.showhitboxes.other_color", gui::Color::GREEN);
 
             toggle->addOptions([](gui::MenuTab* options) {
                 options->addToggle("Hide Player", "level.showhitboxes.hideplayer");
-                options->addToggle("On Death", "level.showhitboxes.ondeath");
+                options->addToggle("Hitboxes On Death", "level.showhitboxes.ondeath")->handleKeybinds();
                 options->addToggle("Custom Colors", "level.showhitboxes.customcolors")->addOptions([](gui::MenuTab* optionsColor) {
                     optionsColor->addColorComponent("Solid Color", "level.showhitboxes.solid_color");
                     optionsColor->addColorComponent("Danger Color", "level.showhitboxes.danger_color");
@@ -91,18 +110,14 @@ namespace eclipse::hacks::Level {
     inline void drawRect(cocos2d::CCDrawNode* node, const cocos2d::CCRect& rect, const gui::Color& color,
                          float borderWidth, const gui::Color& borderColor) {
         std::vector<cocos2d::CCPoint> vertices = {
-                cocos2d::CCPoint(rect.getMinX(), rect.getMinY()),
-                cocos2d::CCPoint(rect.getMinX(), rect.getMaxY()),
-                cocos2d::CCPoint(rect.getMaxX(), rect.getMaxY()),
-                cocos2d::CCPoint(rect.getMaxX(), rect.getMinY())
+            cocos2d::CCPoint(rect.getMinX(), rect.getMinY()),
+            cocos2d::CCPoint(rect.getMinX(), rect.getMaxY()),
+            cocos2d::CCPoint(rect.getMaxX(), rect.getMaxY()),
+            cocos2d::CCPoint(rect.getMaxX(), rect.getMinY())
         };
         s_skipDrawHook = true;
         
-        node->drawPolygon(
-            vertices.data(), vertices.size(),
-            static_cast<const cocos2d::ccColor4F&>(color), borderWidth,
-            static_cast<const cocos2d::ccColor4F&>(borderColor)
-        );
+        node->drawPolygon(vertices.data(), vertices.size(), color, borderWidth, borderColor);
     }
 
     void drawForPlayer(cocos2d::CCDrawNode* node, PlayerObject* player, const gui::Color& color, float borderWidth, const gui::Color& innerColor) {
@@ -113,7 +128,7 @@ namespace eclipse::hacks::Level {
         drawRect(node, rect2, innerColor, borderWidth, {innerColor.r, innerColor.g, innerColor.b, 1.f});
     }
 
-    void customDraw(cocos2d::CCDrawNode* drawNode, gui::Color color, float& borderSize, gui::Color borderColor) {
+    void customDraw(cocos2d::CCDrawNode* drawNode, gui::Color& color, float& borderSize, gui::Color& borderColor) {
         if (s_skipDrawHook) {
             s_skipDrawHook = false;
             return;
@@ -159,12 +174,11 @@ namespace eclipse::hacks::Level {
     }
 
     class $modify(cocos2d::CCDrawNode) {
-
         bool drawPolygon(cocos2d::CCPoint* vertex, unsigned int count, const cocos2d::ccColor4F& fillColor,
                          float borderWidth, const cocos2d::ccColor4F& borderColor) {
             borderWidth = abs(borderWidth);
 
-            customDraw(this, fillColor, borderWidth, borderColor);
+            customDraw(this, (gui::Color&) fillColor, borderWidth, (gui::Color&) borderColor);
             return cocos2d::CCDrawNode::drawPolygon(vertex, count, fillColor, borderWidth, borderColor);
         }
 
@@ -172,35 +186,28 @@ namespace eclipse::hacks::Level {
                         float borderWidth, const cocos2d::ccColor4F& borderColor, unsigned int segments) {
             borderWidth = abs(borderWidth);
 
-            customDraw(static_cast<cocos2d::CCDrawNode*>(this), color, borderWidth, borderColor);
+            customDraw(this, (gui::Color&) color, borderWidth, (gui::Color&) borderColor);
             return cocos2d::CCDrawNode::drawCircle(position, radius, color, borderWidth, borderColor, segments);
         }
-
     };
 
     void forceDraw(GJBaseGameLayer* self, bool editor) {
         bool show = config::get<bool>("level.showhitboxes", false);
-
-        self->m_debugDrawNode->setVisible(show || editor);
+        bool robtopShow = editor || robtopHitboxCheck();
+        self->m_debugDrawNode->setVisible(show || robtopShow);
 
         bool onDeath = config::get<bool>("level.showhitboxes.ondeath", false);
 
-        GameManager::get()->setGameVariable("0045", show && !onDeath);
-        GameManager::get()->setGameVariable("0166", show && !onDeath);
-
-        if (!show)
-            return;
-        
+        if (!show) return;
         if (onDeath) {
-            self->m_debugDrawNode->setVisible(s_isDead || editor);
-
-            if (!s_isDead) return;
+            self->m_debugDrawNode->setVisible(s_isDead || robtopShow);
+            if (!s_isDead && !editor) return;
         }
 
         if (!config::get<bool>("level.showhitboxes.hideplayer", false)) {
             bool customColors = config::get<bool>("level.showhitboxes.customcolors", false);
 
-            float borderSize = config::get<float>("level.showhitboxes.bordersize", 0.25f);
+            auto borderSize = config::get<float>("level.showhitboxes.bordersize", 0.25f);
 
             float alpha = config::get<bool>("level.showhitboxes.fillalpha.toggle", false) ? config::get<float>("level.showhitboxes.fillalpha", 0.25f) : 0.f;
 
@@ -229,7 +236,6 @@ namespace eclipse::hacks::Level {
         }
     }
 
-
     class $modify(LevelEditorLayer) {
         void updateEditor(float dt) {
             LevelEditorLayer::updateEditor(dt);
@@ -242,9 +248,10 @@ namespace eclipse::hacks::Level {
         void updateProgressbar() {
             PlayLayer::updateProgressbar();
 
-            if (config::get<bool>("level.showhitboxes", false))
+            // only call updateDebugDraw if it wasn't called yet to prevent overdraw
+            if (config::get<bool>("level.showhitboxes", false) && !robtopHitboxCheck())
                 PlayLayer::updateDebugDraw();
-            
+
             forceDraw(this, false);
         }
 
@@ -261,33 +268,58 @@ namespace eclipse::hacks::Level {
     class $modify(PlayerObject) {
         void playerDestroyed(bool p0) {
             s_isDead = true;
-
             PlayerObject::playerDestroyed(p0);
         }
     };
 
     class $modify(GJBaseGameLayer) {
-
         void processCommands(float dt) {
             GJBaseGameLayer::processCommands(dt);
 
-            if (s_isDead || !config::get<bool>("level.showhitboxes", false) || !config::get<bool>("level.showhitboxes.traillength.toggle", false)) return;
+            if (s_isDead || !config::get<bool>("level.showhitboxes.traillength.toggle", false))
+                return;
 
-            std::pair<cocos2d::CCRect, cocos2d::CCRect> pair = {m_player1->getObjectRect(), m_player1->m_vehicleSize >= 1.f ? m_player1->getObjectRect(0.25f, 0.25f) : m_player1->getObjectRect(0.4f, 0.4f)};
-            s_playerTrail1.emplace_back(pair);
+            s_playerTrail1.emplace_back(
+                m_player1->getObjectRect(),
+                m_player1->m_vehicleSize >= 1.f ? m_player1->getObjectRect(0.25f, 0.25f) : m_player1->getObjectRect(0.4f, 0.4f)
+            );
 
             if (m_gameState.m_isDualMode) {
-                pair = {m_player2->getObjectRect(), m_player2->m_vehicleSize >= 1.f ? m_player2->getObjectRect(0.25f, 0.25f) : m_player2->getObjectRect(0.4f, 0.4f)};
-                s_playerTrail2.emplace_back(pair);
+                s_playerTrail2.emplace_back(
+                    m_player2->getObjectRect(),
+                    m_player2->m_vehicleSize >= 1.f ? m_player2->getObjectRect(0.25f, 0.25f) : m_player2->getObjectRect(0.4f, 0.4f)
+                );
             }
 
-            int max = static_cast<int>(config::get<float>("level.showhitboxes.traillength", 240.f));
+            auto max = static_cast<int>(config::get<float>("level.showhitboxes.traillength", 240.f));
 
             while (s_playerTrail1.size() > max)
                 s_playerTrail1.pop_front();
 
             while (s_playerTrail2.size() > max)
                 s_playerTrail2.pop_front();
+        }
+
+        void updateDebugDraw() override {
+            auto ptr1 = reinterpret_cast<uintptr_t>(this);
+            auto ptr2 = reinterpret_cast<uintptr_t>(LevelEditorLayer::get());
+            // unlock hitboxes in editor even if they are disabled
+            if (ptr1 == ptr2) this->m_isDebugDrawEnabled |= config::get<bool>("level.showhitboxes", false);
+
+            s_slopeHitboxFix = true;
+            GJBaseGameLayer::updateDebugDraw();
+            s_slopeHitboxFix = false;
+        }
+    };
+
+    class $modify(GameObject) {
+        static void onModify(auto& self) {
+            SAFE_PRIORITY("GameObject::determineSlopeOrientation");
+        }
+
+        void determineSlopeDirection() {
+            if (s_slopeHitboxFix) return;
+            GameObject::determineSlopeDirection();
         }
     };
 }
