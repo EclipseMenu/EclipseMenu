@@ -9,6 +9,7 @@ namespace eclipse::hacks::Player {
     class NoHideTrigger : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
+
             tab->addToggle("No Hide Trigger", "player.nohidetrigger")
                 ->setDescription("Disables hide player triggers.")
                 ->handleKeybinds();
@@ -19,7 +20,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(NoHideTrigger)
 
-    class $modify(NoHideTrigger_Hook, EffectGameObject) {
+    class $modify(EffectGameObject) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("EffectGameObject::triggerObject");
         }

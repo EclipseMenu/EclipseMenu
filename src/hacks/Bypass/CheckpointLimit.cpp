@@ -9,6 +9,7 @@ namespace eclipse::hacks::Bypass {
     class CheckpointLimit : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
+
             tab->addToggle("Checkpoint Limit", "bypass.checkpointlimit")
                 ->handleKeybinds()
                 ->setDescription("Allows you to place more than 50 checkpoints in practice mode.");

@@ -9,6 +9,7 @@ namespace eclipse::hacks::Level {
     class ForcePlatformer : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
+
             tab->addToggle("Force Platformer", "level.forceplatformer")->handleKeybinds();
         }
 

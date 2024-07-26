@@ -9,6 +9,7 @@ namespace eclipse::hacks::Cosmetic {
     class PracticeMusic : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
+
             tab->addToggle("Practice Music Sync", "bypass.practicemusic")->handleKeybinds();
         }
 
@@ -18,6 +19,7 @@ namespace eclipse::hacks::Cosmetic {
     class MusicCustomizer : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
+
             tab->addToggle("Music Customizer", "bypass.musiccustomizer")->handleKeybinds();
         }
 
@@ -27,7 +29,7 @@ namespace eclipse::hacks::Cosmetic {
     REGISTER_HACK(PracticeMusic)
     REGISTER_HACK(MusicCustomizer)
 
-    class $modify(MusicUnlocker_Hook, GameStatsManager) {
+    class $modify(GameStatsManager) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("GameStatsManager::isItemUnlocked");
         }

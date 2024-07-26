@@ -15,9 +15,10 @@ namespace eclipse::gui {
         config::set(m_id, value);
     }
 
-    void ToggleComponent::addOptions(const std::function<void(MenuTab*)>& options) {
+    void ToggleComponent::addOptions(const std::function<void(std::shared_ptr<MenuTab>)>& options) {
         if (!m_options)
-            m_options = new MenuTab("Options");
+            m_options = std::make_shared<MenuTab>("Options");
+
         options(m_options);
     }
 
@@ -52,40 +53,45 @@ namespace eclipse::gui {
         return this;
     }
 
-    void MenuTab::addComponent(Component* component) {
+    void MenuTab::addComponent(std::shared_ptr<Component> component) {
         m_components.push_back(component);
     }
 
-    void MenuTab::removeComponent(Component* component) {
-        m_components.erase(std::remove(m_components.begin(), m_components.end(), component), m_components.end());
+    void MenuTab::removeComponent(std::weak_ptr<Component> component) {
+        auto it = std::find_if(m_components.begin(), m_components.end(), [&component](const std::shared_ptr<Component>& c) {
+            return component.lock() == c;
+        });
+
+        m_components[it - m_components.begin()].reset();
+        m_components.erase(it);
     }
 
-    MenuTab* MenuTab::find(const std::string& name) {
+    std::shared_ptr<MenuTab> MenuTab::find(const std::string& name) {
         return Engine::get()->findTab(name);
     }
 
-    Engine* Engine::get() {
+    std::shared_ptr<Engine> Engine::get() {
         // TODO: Make this return the correct engine based on platform,
         // or even switch between engines at runtime.
-        static imgui::ImGuiEngine instance;
-        return &instance;
+        static auto instance = std::make_shared<imgui::ImGuiEngine>();
+        return std::static_pointer_cast<Engine>(instance);
     }
 
 #define SUPPORT_COMPONENT(type) (auto* component##__LINE__ = dynamic_cast<type*>(component)) this->visit(component##__LINE__)
     
     void Style::visit(Component* component) {
-      if SUPPORT_COMPONENT(ToggleComponent);
-      else if SUPPORT_COMPONENT(SliderComponent);
-      else if SUPPORT_COMPONENT(LabelComponent);
-      else if SUPPORT_COMPONENT(InputFloatComponent);
-      else if SUPPORT_COMPONENT(InputIntComponent);
-      else if SUPPORT_COMPONENT(InputTextComponent);
-      else if SUPPORT_COMPONENT(FloatToggleComponent);
-      else if SUPPORT_COMPONENT(RadioButtonComponent);
-      else if SUPPORT_COMPONENT(ComboComponent);
-      else if SUPPORT_COMPONENT(ButtonComponent);
-      else if SUPPORT_COMPONENT(ColorComponent);
-      else if SUPPORT_COMPONENT(KeybindComponent);
+        if SUPPORT_COMPONENT(ToggleComponent);
+        else if SUPPORT_COMPONENT(SliderComponent);
+        else if SUPPORT_COMPONENT(LabelComponent);
+        else if SUPPORT_COMPONENT(InputFloatComponent);
+        else if SUPPORT_COMPONENT(InputIntComponent);
+        else if SUPPORT_COMPONENT(InputTextComponent);
+        else if SUPPORT_COMPONENT(FloatToggleComponent);
+        else if SUPPORT_COMPONENT(RadioButtonComponent);
+        else if SUPPORT_COMPONENT(ComboComponent);
+        else if SUPPORT_COMPONENT(ButtonComponent);
+        else if SUPPORT_COMPONENT(ColorComponent);
+        else if SUPPORT_COMPONENT(KeybindComponent);
     }
 
 #undef SUPPORT_COMPONENT

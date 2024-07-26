@@ -9,6 +9,7 @@ namespace eclipse::hacks::Bypass {
     class CharLimit : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
+
             tab->addToggle("Character Limit Bypass", "bypass.charlimit")
                 ->handleKeybinds()
                 ->setDescription("Allows you to bypass the character limit of any text field");

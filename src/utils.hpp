@@ -36,7 +36,7 @@ namespace eclipse::utils {
     }
 
     template<typename T>
-    constexpr T& memberByOffset(void* ptr, size_t offset) {
+    [[deprecated("Don't use MBO!")]] constexpr T& memberByOffset(void* ptr, size_t offset) {
         return *reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(ptr) + offset);
     }
 

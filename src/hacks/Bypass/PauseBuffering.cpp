@@ -9,6 +9,7 @@ namespace eclipse::hacks::Bypass {
     class PauseBuffering : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
+
             tab->addToggle("Pause Buffering", "bypass.pausebuffering")
                 ->handleKeybinds()
                 ->setDescription("Prevents the game from blocking pause buffering.");
@@ -19,7 +20,7 @@ namespace eclipse::hacks::Bypass {
 
     REGISTER_HACK(PauseBuffering)
 
-    class $modify(PauseBuffering_Hook, UILayer) {
+    class $modify(UILayer) {
         void onPause(cocos2d::CCObject* sender) {
             if (!config::get<bool>("bypass.pausebuffering", false))
                 return UILayer::onPause(sender);

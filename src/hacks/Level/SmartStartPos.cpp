@@ -9,6 +9,7 @@ namespace eclipse::hacks::Level {
     class SmartStartPos : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
+
             tab->addToggle("Smart StartPos", "level.smartstartpos")
                 ->handleKeybinds()
                 ->setDescription("Makes the start positions automatically pick the correct gamemode and speed\nOnly works in levels without direction changes");

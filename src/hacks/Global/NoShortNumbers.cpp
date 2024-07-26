@@ -9,6 +9,7 @@ namespace eclipse::hacks::Global {
     class NoShortNumbers : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Global");
+
             tab->addToggle("No Short Numbers", "global.noshortnumbers")
                 ->setDescription("Removes any abbreviation. (Example: 23.4K -> 23400)")
                 ->handleKeybinds();

@@ -9,6 +9,7 @@ namespace eclipse::hacks::Creator {
     class SmoothTrail : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Creator");
+
             tab->addToggle("Smooth Editor Trail", "creator.smoothtrail")
                 ->handleKeybinds()
                 ->setDescription("Makes the trail in editor playback smoother.");

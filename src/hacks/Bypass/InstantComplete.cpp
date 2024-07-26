@@ -9,6 +9,7 @@ namespace eclipse::hacks::Bypass {
     class InstantComplete : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
+
             tab->addToggle("Instant Complete", "bypass.instantcomplete")->handleKeybinds();
         }
 

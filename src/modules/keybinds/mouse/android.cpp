@@ -16,12 +16,11 @@ namespace eclipse::keybinds {
             auto* touch = static_cast<cocos2d::CCTouch*>(touches->anyObject());
             if (!touch) return CCTouchDispatcher::touches(touches, event, type);
 
-            auto* manager = Manager::get();
-            if (type == cocos2d::CCTOUCHBEGAN) {
+            auto manager = Manager::get();
+            if (type == cocos2d::CCTOUCHBEGAN)
                 manager->registerKeyPress(Keys::MouseLeft);
-            } else if (type == cocos2d::CCTOUCHENDED) {
+            else if (type == cocos2d::CCTOUCHENDED)
                 manager->registerKeyRelease(Keys::MouseLeft);
-            }
 
             cocos2d::CCTouchDispatcher::touches(touches, event, type);
         }

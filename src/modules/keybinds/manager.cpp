@@ -215,11 +215,10 @@ namespace eclipse::keybinds {
         }
 
         void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-            if (action == GLFW_PRESS) {
+            if (action == GLFW_PRESS)
                 Manager::get()->registerKeyPress(convertGlfwKey(key));
-            } else if (action == GLFW_RELEASE) {
+            else if (action == GLFW_RELEASE)
                 Manager::get()->registerKeyRelease(convertGlfwKey(key));
-            }
 
             CCEGLView::onGLFWKeyCallback(window, key, scancode, action, mods);
         }
@@ -357,22 +356,21 @@ namespace eclipse::keybinds {
         }
 
         bool dispatchKeyboardMSG(cocos2d::enumKeyCodes key, bool down, bool idk) {
-            if (down) {
+            if (down)
                 Manager::get()->registerKeyPress(convertCocosKey(key));
-            } else if (!down) {
+            else if (!down)
                 Manager::get()->registerKeyRelease(convertCocosKey(key));
-            }
 
             return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, idk);
         }
     };
 #endif
 
-    static std::map<std::string, gui::KeybindComponent*> s_keybindComponents;
+    static std::map<std::string, std::shared_ptr<gui::KeybindComponent>> s_keybindComponents;
 
-    Manager* Manager::get() {
-        static Manager s_manager;
-        return &s_manager;
+    std::shared_ptr<Manager> Manager::get() {
+        static auto instance = std::make_shared<Manager>();
+        return instance;
     }
 
     Keybind& Manager::registerKeybind(const std::string& id, const std::string& title, const std::function<void()>& callback) {
@@ -408,25 +406,30 @@ namespace eclipse::keybinds {
                 keybind.setInitialized(state);
                 config::set(fmt::format("keybind.{}.active", id), state);
 
-                auto* tab = gui::MenuTab::find("Keybinds");
+                auto tab = gui::MenuTab::find("Keybinds");
                 if (state) {
                     // Add the keybind to the GUI
-                    auto* keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", id), true);
+                    auto keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", id), true);
                     keybindComponent->callback([tab, keybindComponent, id](Keys key) {
                         auto keybind = Manager::get()->getKeybind(id);
 
+                        if (!keybind.has_value()) return;
+
+                        auto keybindRef = keybind->get();
+
                         if (key == Keys::None) {
                             config::set(fmt::format("keybind.{}.active", id), false);
-                            keybind->setInitialized(false);
+                            keybindRef.setInitialized(false);
                             tab->removeComponent(keybindComponent);
                         }
 
-                        keybind->setKey(key);
+                        keybindRef.setKey(key);
                     });
+
                     s_keybindComponents[id] = keybindComponent;
                 } else {
                     // Remove the keybind from the GUI
-                    if (auto* keybindComponent = s_keybindComponents[id]; keybindComponent) {
+                    if (auto keybindComponent = s_keybindComponents[id]; keybindComponent) {
                         tab->removeComponent(keybindComponent);
                     }
                 }
@@ -447,12 +450,13 @@ namespace eclipse::keybinds {
         }
     }
 
-    Keybind* Manager::getKeybind(const std::string& id) {
+    std::optional<std::reference_wrapper<Keybind>> Manager::getKeybind(const std::string& id) {
         for (auto& keybind : m_keybinds) {
             if (keybind.getId() == id)
-                return &keybind;
+                return keybind;
         }
-        return nullptr;
+
+        return {};
     }
 
     void Manager::registerKeyRelease(Keys key) {
@@ -466,22 +470,25 @@ namespace eclipse::keybinds {
 
     bool isKeyPressed(Keys key) {
         auto manager = Manager::get();
-        if (manager->m_keyStates[key] ^ manager->m_lastKeyStates[key]) {
+
+        if (manager->m_keyStates[key] ^ manager->m_lastKeyStates[key])
             return manager->m_keyStates[key];
-        }
+
         return false;
     }
 
     bool isKeyReleased(Keys key) {
         auto manager = Manager::get();
-        if (manager->m_keyStates[key] ^ manager->m_lastKeyStates[key]) {
+
+        if (manager->m_keyStates[key] ^ manager->m_lastKeyStates[key])
             return !manager->m_keyStates[key];
-        }
+
         return false;
     }
 
     void Manager::setupTab() {
-        auto* tab = gui::MenuTab::find("Keybinds");
+        auto tab = gui::MenuTab::find("Keybinds");
+
         tab->addKeybind("Open Menu", "menu.toggleKey")->callback([](Keys key) {
             if (key == Keys::MouseLeft) {
                 // Reset it back to the default keybind (LMB softlocks the menu)
@@ -489,8 +496,8 @@ namespace eclipse::keybinds {
                 config::set("menu.toggleKey", Keys::Tab);
             }
 
-            auto* keybind = Manager::get()->getKeybind("menu.toggle");
-            keybind->setKey(key);
+            if (auto keybind = Manager::get()->getKeybind("menu.toggle"); keybind.has_value())
+                keybind->get().setKey(key);
         });
     }
 

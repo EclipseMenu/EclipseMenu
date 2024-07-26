@@ -12,6 +12,7 @@ namespace eclipse::hacks::Bypass {
     class CopyBypass : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
+
             tab->addToggle("Copy Bypass", "bypass.copybypass")
                 ->handleKeybinds()
                 ->setDescription("Allows you to copy any level.");

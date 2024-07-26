@@ -11,9 +11,10 @@ namespace eclipse::hacks::Player {
             auto tab = gui::MenuTab::find("Player");
 
             config::setIfEmpty<float>("player.autoclick.interval", 1.f);
+
             tab->addToggle("AutoClicker", "player.autoclick")
                 ->handleKeybinds()
-                ->addOptions([](gui::MenuTab* options) {
+                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                     options->addInputFloat("Interval", "player.autoclick.interval", 0.f, 10.f, "%.3f s.");
                 });
         }

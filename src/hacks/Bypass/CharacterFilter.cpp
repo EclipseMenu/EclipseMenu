@@ -9,6 +9,7 @@ namespace eclipse::hacks::Bypass {
     class CharFilter : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
+
             tab->addToggle("Character Filter Bypass", "bypass.charfilter")
                 ->handleKeybinds()
                 ->setDescription("Allows you to bypass the character filter on any text field");

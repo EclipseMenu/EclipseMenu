@@ -10,6 +10,7 @@ namespace eclipse::hacks::Player {
     class JumpHack : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
+
             tab->addToggle("Jump Hack", "player.jumphack")
                 ->setDescription("Allows the player to infinitely jump in the air")
                 ->handleKeybinds();

@@ -18,6 +18,7 @@ namespace eclipse::hacks::Global {
         sound->getDefaults(&freq, nullptr);
         channel->setFrequency(freq * speed);
     }
+
     void updateChannels() {
         FMOD::Channel* audioChannel;
         FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;

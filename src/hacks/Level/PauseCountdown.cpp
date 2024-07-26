@@ -12,11 +12,12 @@ namespace eclipse::hacks::Level {
     class PauseCount : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
+
             config::setIfEmpty("level.pausecount.time", 3.f);
 
             tab->addToggle("Pause Countdown", "level.pausecount")
                 ->handleKeybinds()
-                ->addOptions([] (gui::MenuTab* options) {
+                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                     options->addInputFloat("Countdown Time", "level.pausecount.time", 0.1f, 15.f, "%.2fs");
                 });
         }
@@ -68,10 +69,10 @@ namespace eclipse::hacks::Level {
 
         void update(float dt) {
             if (!PlayLayer::get()) return GJBaseGameLayer::update(dt);
+
             if (m_fields->pausedt > 0.f) m_fields->pausedt -= dt;
-            if (m_fields->pausedt <= 0.5f || !config::get<bool>("level.pausecount", false)) {
+            if (m_fields->pausedt <= 0.5f || !config::get<bool>("level.pausecount", false))
                 GJBaseGameLayer::update(dt);
-            }
         }
     };
 
@@ -79,7 +80,7 @@ namespace eclipse::hacks::Level {
         void onResume(cocos2d::CCObject* sender) {
             PauseLayer::onResume(sender);
 
-            PauseBGL* bg = static_cast<PauseBGL*>(PauseBGL::get());
+            auto* bg = static_cast<PauseBGL*>(PauseBGL::get());
 
             if (!PlayLayer::get() || !bg) return;
             if (bg->m_gameState.m_currentProgress == 0) return;

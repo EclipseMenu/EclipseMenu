@@ -2,10 +2,12 @@
 
 #include <Geode/Geode.hpp>
 
+#include <memory>
 #include <utility>
 #include <vector>
 #include <unordered_map>
 #include <functional>
+#include <optional>
 
 namespace eclipse::keybinds {
 
@@ -116,7 +118,7 @@ namespace eclipse::keybinds {
     class Manager {
     public:
         /// @brief Get the keybind manager.
-        static Manager* get();
+        static std::shared_ptr<Manager> get();
 
         /// @brief Register a keybind to the manager (in case the keybind will be later used)
         /// @param id The ID of the keybind.
@@ -140,7 +142,7 @@ namespace eclipse::keybinds {
         /// @brief Get a keybind by its ID.
         /// @param id The ID of the keybind.
         /// @return The keybind with the given ID.
-        [[nodiscard]] Keybind* getKeybind(const std::string& id);
+        [[nodiscard]] std::optional<std::reference_wrapper<Keybind>> getKeybind(const std::string& id);
 
         /// @brief Set whether a keybind is enabled or not.
         /// @param id The ID of the keybind.

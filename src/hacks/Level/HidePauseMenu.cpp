@@ -9,6 +9,7 @@ namespace eclipse::hacks::Level {
     class HidePause : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
+
             tab->addToggle("Hide Pause Menu", "level.hidepause")
                 ->handleKeybinds()
                 ->setDescription("Hides the pause menu. Useful for taking screenshots of levels");

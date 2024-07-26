@@ -9,6 +9,7 @@ namespace eclipse::hacks::Player {
     class MuteLevelAudioOnDeath : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
+
             tab->addToggle("Mute Level Audio On Death", "player.mutelevelaudioondeath")
                 ->setDescription("Mutes all level audio (Music + SFX) on player death. (Created by RayDeeUx)")
                 ->handleKeybinds();
@@ -19,7 +20,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(MuteLevelAudioOnDeath)
 
-    class $modify(MyPlayerObject, PlayerObject) {
+    class $modify(PlayerObject) {
         /*
         originally from erysedits by raydeeux.
         adapted by raydeeux, and improved using 2.206's bindings.
@@ -31,14 +32,14 @@ namespace eclipse::hacks::Player {
             // do nothing if playlayer is nullptr
             if (!pl) return PlayerObject::playerDestroyed(p0);
 
+            // avoid accidental sfx muting with deaths from others in globed
             if (this != pl->m_player1 && this != pl->m_player2)
-                // avoid accidental sfx muting with deaths from others in globed
                 return PlayerObject::playerDestroyed(p0);
 
             if (config::get<bool>("player.mutelevelaudioondeath", false)) {
 
+                // do nothing if in practice mode BUT practice sync disabled
                 if (pl->m_isPracticeMode && !pl->m_practiceMusicSync)
-                    // do nothing if in practice mode BUT practice sync disabled
                     return PlayerObject::playerDestroyed(p0);
 
                 const auto fmod = FMODAudioEngine::sharedEngine();

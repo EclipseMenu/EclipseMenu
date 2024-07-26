@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "gui.hpp"
 #include "color.hpp"
 
@@ -78,14 +80,14 @@ namespace eclipse::gui::imgui {
                     int layNum = jf["options"]["layout"];
                     switch (layNum) {
                         case 0:
-                            m_layout = new WindowLayout();
+                            m_layout = std::static_pointer_cast<Layout>(std::make_shared<WindowLayout>());
                             break;
                         default:
-                            m_layout = new WindowLayout();
+                            m_layout = std::static_pointer_cast<Layout>(std::make_shared<WindowLayout>());
                             break;
                     }
                 } else {
-                    m_layout = new WindowLayout();
+                    m_layout = std::static_pointer_cast<Layout>(std::make_shared<WindowLayout>());
                 }
                 if (jf["options"].contains("style")) m_styleNum = jf["options"]["style"];
 
@@ -153,13 +155,13 @@ namespace eclipse::gui::imgui {
 
             switch (m_styleNum) {
                 case 0:
-                    m_layout->setStyle(new DefaultStyle());
+                    m_layout->setStyle(std::make_shared<DefaultStyle>());
                     break;
                 case 1:
-                    m_layout->setStyle(new MegahackStyle());
+                    m_layout->setStyle(std::make_shared<MegahackStyle>());
                     break;
                 default:
-                    m_layout->setStyle(new DefaultStyle());
+                    m_layout->setStyle(std::make_shared<DefaultStyle>());
                     break;
             }
 
@@ -247,10 +249,10 @@ namespace eclipse::gui::imgui {
         }
 
         /// @brief Get the theme's layout
-        [[nodiscard]] Layout* getLayout() { return m_layout; }
+        [[nodiscard]] std::shared_ptr<Layout> getLayout() { return m_layout; }
 
     private:
-        Layout* m_layout;
+        std::shared_ptr<Layout> m_layout;
         std::string m_font;
         std::filesystem::path m_fontPath;
         std::map<int, Color> m_colors;

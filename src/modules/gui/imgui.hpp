@@ -10,15 +10,15 @@ namespace eclipse::gui::imgui {
         void toggle() override;
         bool isToggled() override;
 
-        MenuTab* findTab(const std::string& name) override;
+        std::shared_ptr<MenuTab> findTab(const std::string& name) override;
 
-        Theme* getTheme();
+        std::shared_ptr<Theme> getTheme();
 
     private:
         bool m_initialized = false;
         bool m_isOpened = false;
 
-        Theme* m_theme;
+        std::shared_ptr<Theme> m_theme;
     };
 
 }

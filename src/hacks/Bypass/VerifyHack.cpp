@@ -9,6 +9,7 @@ namespace eclipse::hacks::Bypass {
     class VerifyHack : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
+
             tab->addToggle("Verify Bypass", "bypass.verifyhack")
                 ->handleKeybinds()
                 ->setDescription("Automatically verifies levels for you");

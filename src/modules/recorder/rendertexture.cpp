@@ -11,11 +11,15 @@ namespace eclipse::recorder {
         m_texture = new cocos2d::CCTexture2D;
 
         {
-            auto data = malloc(m_width * m_height * 3);
-            memset(data, 0, m_width * m_height * 3);
-            m_texture->initWithData(data, cocos2d::kCCTexture2DPixelFormat_RGB888, m_width, m_height,
-                                    cocos2d::CCSize(static_cast<float>(m_width), static_cast<float>(m_height)));
-            free(data);
+            std::unique_ptr<char, void(*)(void*)> data(static_cast<char*>(malloc(m_width * m_height * 3)), free);
+
+            memset(data.get(), 0, m_width * m_height * 3);
+            m_texture->initWithData(
+                data.get(),
+                cocos2d::kCCTexture2DPixelFormat_RGB888,
+                m_width, m_height,
+                cocos2d::CCSize(static_cast<float>(m_width), static_cast<float>(m_height))
+            );
         }
 
         glGetIntegerv(GL_RENDERBUFFER_BINDING_EXT, &m_old_rbo);

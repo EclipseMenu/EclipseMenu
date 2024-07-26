@@ -9,6 +9,7 @@ namespace eclipse::hacks::Level {
     class PauseDuringComplete : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
+
             tab->addToggle("Pause During Complete", "level.pauseduringcomplete")
                 ->setDescription("Allows you to pause during the level complete cutscene.")
                 ->handleKeybinds();
@@ -19,7 +20,7 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(PauseDuringComplete)
 
-    class $modify(PauseDuringComplete_Hook, PlayLayer) {
+    class $modify(PlayLayer) {
         void pauseGame(bool p0) {
             if (!config::get<bool>("level.pauseduringcomplete", false))
                 return PlayLayer::pauseGame(p0);

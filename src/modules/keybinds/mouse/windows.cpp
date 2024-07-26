@@ -28,7 +28,7 @@ namespace eclipse::keybinds {
         void onGLFWMouseCallBack(GLFWwindow* window, int button, int action, int mods) {
             cocos2d::CCEGLView::onGLFWMouseCallBack(window, button, action, mods);
 
-            auto* manager = Manager::get();
+            auto manager = Manager::get();
             auto key = convertMouseKey(button);
 
             if (action == GLFW_PRESS)

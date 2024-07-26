@@ -9,6 +9,7 @@ namespace eclipse::hacks::Level {
     class MatchLabelFonts : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
+
             tab->addToggle("Match Percent/Time Fonts", "level.matchlabelfonts")
                 ->setDescription("Matches the level percentage/level time UI element's font with the font used in a level. (Created by RayDeeUx)")
                 ->handleKeybinds();
@@ -19,7 +20,7 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(MatchLabelFonts)
 
-    class $modify(MyPlayLayer, PlayLayer) {
+    class $modify(PlayLayer) {
         void onEnterTransitionDidFinish() {
             PlayLayer::onEnterTransitionDidFinish();
 

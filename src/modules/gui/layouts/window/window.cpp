@@ -183,16 +183,17 @@ namespace eclipse::gui::imgui {
 
         // Run move actions
         auto deltaTime = ImGui::GetIO().DeltaTime;
-        for (auto& action: m_actions) {
+        for (auto action: m_actions) {
             action->update(deltaTime);
         }
 
         // Remove finished actions
         m_actions.erase(std::remove_if(m_actions.begin(), m_actions.end(), [](auto action) {
             if (action->isFinished()) {
-                delete action;
+                action.reset();
                 return true;
             }
+
             return false;
         }), m_actions.end());
 
@@ -215,22 +216,21 @@ namespace eclipse::gui::imgui {
         config::setTemp("draggingWindow", false);
     }
 
-    MenuTab* WindowLayout::findTab(const std::string& name) {
-        for (const auto& tab : m_tabs) {
+    std::shared_ptr<MenuTab> WindowLayout::findTab(const std::string& name) {
+        for (auto tab : m_tabs) {
             if (tab->getTitle() == name) {
                 return tab;
             }
         }
 
         // If the tab does not exist, create a new one.
-        auto* tab = new MenuTab(name);
+        auto tab = std::make_shared<MenuTab>(name);
         m_tabs.push_back(tab);
 
         // Create a new window for the tab.
         m_windows.emplace_back(name, [this, tab]() {
-            for (auto& component : tab->getComponents()) {
-                m_style->visit(component);
-            }
+            for (auto component : tab->getComponents())
+                m_style->visit(component.get());
         });
 
         return tab;

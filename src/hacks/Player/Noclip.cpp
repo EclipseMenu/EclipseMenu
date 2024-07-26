@@ -9,6 +9,7 @@ namespace eclipse::hacks::Player {
     class Noclip : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
+
             tab->addToggle("Noclip", "player.noclip")->setDescription("Disables player death")->handleKeybinds();
         }
 

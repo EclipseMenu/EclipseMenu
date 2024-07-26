@@ -12,6 +12,7 @@ namespace eclipse::recorder {
         void open(const std::string& cmd) override;
         bool close() override;
         void write(const void* data, size_t size) override;
+
     private:
         subprocess::Popen m_process;
     };

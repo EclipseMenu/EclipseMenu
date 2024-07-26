@@ -32,10 +32,11 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.framestepper.hold_speed", 5);
 
             auto tab = gui::MenuTab::find("Player");
+
             tab->addToggle("Frame Stepper", "player.framestepper")
                 ->setDescription("Allows you to step through the game frame by frame.")
                 ->handleKeybinds()
-                ->addOptions([] (auto* options) {
+                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                     options->addKeybind("Step Key", "player.framestepper.step_key");
                     options->addToggle("Enable Hold", "player.framestepper.hold");
                     options->addInputFloat("Hold Delay", "player.framestepper.hold_delay", 0.0f, FLT_MAX, "%.2f");

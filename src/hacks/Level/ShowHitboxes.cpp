@@ -37,10 +37,12 @@ namespace eclipse::hacks::Level {
     class ShowHitboxes : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
+
             gui::ToggleComponent* toggle = tab->addToggle("Show Hitboxes", "level.showhitboxes")->handleKeybinds();
 
             toggle->callback([](bool value) {
                 if (PlayLayer::get()) PlayLayer::get()->updateProgressbar();
+
                 if (LevelEditorLayer::get()) {
                     LevelEditorLayer::get()->updateEditor(0);
                     LevelEditorLayer::get()->updateOptions();
@@ -59,10 +61,10 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.showhitboxes.player_color_rotated", gui::Color::YELLOW);
             config::setIfEmpty("level.showhitboxes.other_color", gui::Color::GREEN);
 
-            toggle->addOptions([](gui::MenuTab* options) {
+            toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                 options->addToggle("Hide Player", "level.showhitboxes.hideplayer");
                 options->addToggle("Hitboxes On Death", "level.showhitboxes.ondeath")->handleKeybinds();
-                options->addToggle("Custom Colors", "level.showhitboxes.customcolors")->addOptions([](gui::MenuTab* optionsColor) {
+                options->addToggle("Custom Colors", "level.showhitboxes.customcolors")->addOptions([](std::shared_ptr<gui::MenuTab> optionsColor) {
                     optionsColor->addColorComponent("Solid Color", "level.showhitboxes.solid_color");
                     optionsColor->addColorComponent("Danger Color", "level.showhitboxes.danger_color");
                     optionsColor->addColorComponent("Other Color", "level.showhitboxes.other_color");

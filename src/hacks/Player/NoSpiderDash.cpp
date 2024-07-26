@@ -9,6 +9,7 @@ namespace eclipse::hacks::Player {
     class NoSpiderDash : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
+
             tab->addToggle("No Spider Dash", "player.nospiderdash")
                 ->setDescription("Disables the spider dash trail.")
                 ->handleKeybinds();
@@ -19,7 +20,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(NoSpiderDash)
 
-    class $modify(NoSpiderDash_Hook, PlayerObject) {
+    class $modify(PlayerObject) {
         void playSpiderDashEffect(cocos2d::CCPoint from, cocos2d::CCPoint to) {
             bool playEffects = m_playEffects;
             if (config::get<bool>("player.nospiderdash", false))

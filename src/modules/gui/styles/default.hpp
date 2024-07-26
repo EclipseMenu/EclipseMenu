@@ -26,13 +26,16 @@ namespace eclipse::gui::imgui {
                 }
 
                 if (ImGui::BeginPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str())) {
-                    auto* keybinds = keybinds::Manager::get();
-                    auto* keybind = keybinds->getKeybind(checkbox->getId());
+                    auto keybinds = keybinds::Manager::get();
+                    auto keybind = keybinds->getKeybind(checkbox->getId());
 
-                    if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
-                        keybinds->setKeybindState(checkbox->getId(), true);
-                    } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
-                        keybinds->setKeybindState(checkbox->getId(), false);
+                    if (keybind.has_value()) {
+                        auto& keybindRef = keybind->get();
+
+                        if (!keybindRef.isInitialized() && ImGui::MenuItem("Add keybind"))
+                            keybinds->setKeybindState(checkbox->getId(), true);
+                        else if (keybindRef.isInitialized() && ImGui::MenuItem("Remove keybind"))
+                            keybinds->setKeybindState(checkbox->getId(), false);
                     }
 
                     ImGui::EndPopup();
@@ -49,7 +52,7 @@ namespace eclipse::gui::imgui {
                 }
             }
 
-            if (checkbox->getOptions()) {
+            if (auto options = checkbox->getOptions().lock()) {
                 ImGui::PushItemWidth(-1);
                 auto availWidth = ImGui::GetContentRegionAvail().x;
                 auto buttonSize = ImVec2(availWidth * 0.885f, 0);
@@ -65,8 +68,8 @@ namespace eclipse::gui::imgui {
 
                 ImGui::SetNextWindowSizeConstraints(ImVec2(240, 0), ImVec2(FLT_MAX, FLT_MAX));
                 if (ImGui::BeginPopup(popupName.c_str(), ImGuiWindowFlags_NoMove)) {
-                    for (auto* comp : checkbox->getOptions()->getComponents())
-                        Style::visit(comp);
+                    for (auto comp : options->getComponents())
+                        Style::visit(comp.get());
 
                     ImGui::EndPopup();
                 }
@@ -204,7 +207,7 @@ namespace eclipse::gui::imgui {
                     auto labelStr = title.substr(0, labelEnd) + "...";
                     auto newSize = ImGui::CalcTextSize(labelStr.c_str());
                     if (newSize.x > labelMaxWidth - 20)
-                    break;
+                        break;
                     labelEnd++;
                 }
                 auto truncatedLabel = title.substr(0, labelEnd) + "...";
@@ -214,7 +217,7 @@ namespace eclipse::gui::imgui {
                 ImGui::Button(title.c_str(), ImVec2(labelMaxWidth, 0));
             }
 
-            ImGui::SameLine(0, 0);
+            ImGui::SameLine(.0f, .0f);
 
             ImGui::PopStyleColor(3);
             ImGui::PopStyleVar(2);
@@ -237,7 +240,7 @@ namespace eclipse::gui::imgui {
                 ImGui::Text("%s", "Press any key to change the keybind...");
                 ImGui::Separator();
 
-                ImGui::Text("%s", "Press ESC to clear the cancel.");
+                ImGui::Text("%s", "Press ESC to cancel.");
 
                 if (keybinds::isKeyDown(keybinds::Keys::Escape)) {
                     ImGui::CloseCurrentPopup();

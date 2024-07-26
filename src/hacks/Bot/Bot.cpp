@@ -33,11 +33,12 @@ namespace eclipse::hacks::Bot {
 
     class Bot : public hack::Hack {
         void init() override {
-            const auto updateBotState = [](int state) { s_bot.setState(bot::State(state)); };
+            const auto updateBotState = [](int state) { s_bot.setState(static_cast<bot::State>(state)); };
 
             config::setIfEmpty("bot.state", 0);
 
             auto tab = gui::MenuTab::find("Bot");
+
             tab->addRadioButton("Disabled", "bot.state", 0)->callback(updateBotState)->handleKeybinds();
             tab->addRadioButton("Record", "bot.state", 1)->callback(updateBotState)->handleKeybinds();
             tab->addRadioButton("Playback", "bot.state", 2)->callback(updateBotState)->handleKeybinds();

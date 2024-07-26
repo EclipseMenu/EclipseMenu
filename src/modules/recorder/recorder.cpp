@@ -1,21 +1,25 @@
-#include "recorder.hpp"
 #include <thread>
+#include <memory>
+
+#include "recorder.hpp"
 
 #ifndef GEODE_IS_ANDROID
 
 #include <Geode/Geode.hpp>
 
 #ifdef GEODE_IS_WINDOWS
+
 #include "ffmpeg/windows/ffmpegWindows.hpp"
+
 #endif
 
 namespace eclipse::recorder {
     Recorder::Recorder(std::string ffmpegPath) {
         #ifdef GEODE_IS_WINDOWS
-        m_ffmpegCLI = new ffmpegWindows();
+        m_ffmpegCLI = std::make_unique<ffmpegWindows>();
         #endif
 
-        m_ffmpegPath = ffmpegPath;
+        m_ffmpegPath = std::move(ffmpegPath);
     }
 
     void Recorder::start(std::filesystem::path renderPath) {
@@ -37,8 +41,7 @@ namespace eclipse::recorder {
 
         m_renderPath = renderPath;
 
-        std::thread t(&Recorder::recordThread, this);
-        t.detach();
+        std::thread(&Recorder::recordThread, this).detach();
     }
 
     void Recorder::stop() {

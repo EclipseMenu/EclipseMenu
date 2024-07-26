@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "blur.hpp"
 
 using namespace geode::prelude;
@@ -29,12 +31,14 @@ Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, con
     auto getShaderLog = [](GLuint id) -> std::string {
         GLint length, written;
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+
         if (length <= 0)
             return "";
-        auto stuff = new char[length + 1];
-        glGetShaderInfoLog(id, length, &written, stuff);
-        std::string result(stuff);
-        delete[] stuff;
+
+        auto stuff = std::make_unique<char[]>(length + 1);
+        glGetShaderInfoLog(id, length, &written, stuff.get());
+        std::string result(stuff.get());
+
         return result;
     };
     GLint res;
@@ -86,12 +90,14 @@ Result<std::string> Shader::link() {
     auto getProgramLog = [](GLuint id) -> std::string {
         GLint length, written;
         glGetProgramiv(id, GL_INFO_LOG_LENGTH, &length);
+
         if (length <= 0)
             return "";
-        auto stuff = new char[length + 1];
-        glGetProgramInfoLog(id, length, &written, stuff);
-        std::string result(stuff);
-        delete[] stuff;
+
+        auto stuff = std::make_unique<char[]>(length + 1);
+        glGetProgramInfoLog(id, length, &written, stuff.get());
+        std::string result(stuff.get());
+
         return result;
     };
     GLint res;
@@ -241,11 +247,12 @@ void cleanupPostProcess() {
 
 class $modify(CCNode) {
     void visit() {
-        if ((CCNode*)this != CCDirector::get()->getRunningScene() || ppShader.program == 0) {
+        if (static_cast<CCNode*>(this) != CCDirector::get()->getRunningScene() || ppShader.program == 0) {
             CCNode::visit();
             return;
         }
-        float blur = 0.05f * (1.f - std::cos((float)std::numbers::pi * blurTimer)) * 0.5f;
+
+        float blur = 0.05f * (1.f - std::cos(static_cast<float>(std::numbers::pi) * blurTimer)) * 0.5f;
         if (blur == 0.f) {
             CCNode::visit();
             return;
@@ -287,8 +294,10 @@ class $modify(CCNode) {
 class $modify(CCEGLViewProtocol) {
     void setFrameSize(float width, float height) {
         CCEGLViewProtocol::setFrameSize(width, height);
+
         if (!CCDirector::get()->getOpenGLView())
             return;
+
         cleanupPostProcess();
         setupPostProcess();
     }
@@ -315,10 +324,12 @@ $on_mod(Unloaded) {
 class $modify(CCScheduler) {
     void update(float dt) {
         CCScheduler::update(dt);
+
         if (eclipse::gui::Engine::get()->isToggled())
             blurTimer += CCDirector::get()->getDeltaTime() / 0.1f;
         else
             blurTimer -= CCDirector::get()->getDeltaTime() / 0.1f;
+
         if (blurTimer < 0.f) blurTimer = 0.f;
         if (blurTimer > 1.f) blurTimer = 1.f;
 

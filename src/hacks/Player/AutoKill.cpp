@@ -18,7 +18,7 @@ namespace eclipse::hacks::Player {
             tab->addToggle("Auto Kill", "player.autokill")
                 ->handleKeybinds()
                 ->setDescription("Kills the player at a certain time/percentage.")
-                ->addOptions([](gui::MenuTab* options) {
+                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                     options->addFloatToggle("Kill at Percentage", "player.autokill.percentage", 0.f, 100.f, "%.2f%%")
                         ->handleKeybinds()
                         ->setDescription("Kills the player at a certain percentage.");

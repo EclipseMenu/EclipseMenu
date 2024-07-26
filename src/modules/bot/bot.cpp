@@ -49,7 +49,7 @@ namespace eclipse::bot {
 
         geode::ByteVector data = m_replay.exportData();
         std::ofstream file(path, std::ios::binary);
-        file.write((const char*)data.data(), data.size());
+        file.write(reinterpret_cast<const char*>(data.data()), data.size());
         file.close();
     }
 

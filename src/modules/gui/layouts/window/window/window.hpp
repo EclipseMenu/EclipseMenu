@@ -57,7 +57,7 @@ namespace eclipse::gui::imgui {
         /// @param duration How long the animation should last in seconds
         /// @param easing Easing mode (see "animation/easing.hpp")
         /// @param useRealPosition Whether to change the actual position of the window
-        animation::MoveAction* animateTo(
+        std::shared_ptr<animation::MoveAction> animateTo(
                 const ImVec2& target,
                 double duration,
                 animation::EasingFunction easing,

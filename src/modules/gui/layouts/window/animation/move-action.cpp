@@ -1,8 +1,8 @@
 #include "move-action.hpp"
 
 namespace eclipse::gui::animation {
-    MoveAction* MoveAction::create(double duration, ImVec2* vector, ImVec2 target, EasingFunction easing) {
-        auto* instance = new MoveAction();
+    std::shared_ptr<MoveAction> MoveAction::create(double duration, ImVec2* vector, ImVec2 target, EasingFunction easing) {
+        auto instance = std::make_shared<MoveAction>();
         instance->m_duration = duration;
         instance->m_target = vector;
         instance->m_start = {vector->x, vector->y};

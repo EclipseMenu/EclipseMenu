@@ -9,6 +9,7 @@ namespace eclipse::hacks::Bypass {
     class CommentHistory : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
+
             tab->addToggle("Comment History Bypass", "bypass.commenthistory")
                 ->handleKeybinds()
                 ->setDescription("Allows you to see any user's comment history");

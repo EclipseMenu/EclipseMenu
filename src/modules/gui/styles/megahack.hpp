@@ -2,6 +2,8 @@
 
 #include <modules/gui/gui.hpp>
 #include <misc/cpp/imgui_stdlib.h>
+#include <modules/config/config.hpp>
+#include <imgui-cocos.hpp>
 
 namespace eclipse::gui::imgui {
     class MegahackStyle : public Style {
@@ -37,9 +39,8 @@ namespace eclipse::gui::imgui {
             float textWidth = ImGui::CalcTextSize(label->getTitle().c_str(), nullptr, true, availWidth).x;
 
             float posX = (availWidth - textWidth) * 0.5f;
-            if (posX > 0.0f) {
+            if (posX > 0.0f)
                 ImGui::SetCursorPosX(ImGui::GetCursorPosX() + posX);
-            }
 
             ImGui::TextWrapped("%s", label->getTitle().c_str());
         }   
@@ -56,14 +57,16 @@ namespace eclipse::gui::imgui {
                 }
 
                 if (ImGui::BeginPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str())) {
-                    auto* keybinds = keybinds::Manager::get();
-                    auto* keybind = keybinds->getKeybind(checkbox->getId());
+                    auto keybinds = keybinds::Manager::get();
+                    auto keybind = keybinds->getKeybind(checkbox->getId());
 
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
-                    if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
-                        keybinds->setKeybindState(checkbox->getId(), true);
-                    } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
-                        keybinds->setKeybindState(checkbox->getId(), false);
+                    if (keybind.has_value()) {
+                        auto& keybindRef = keybind->get();
+
+                        if (!keybindRef.isInitialized() && ImGui::MenuItem("Add keybind"))
+                            keybinds->setKeybindState(checkbox->getId(), true);
+                        else if (keybindRef.isInitialized() && ImGui::MenuItem("Remove keybind"))
+                            keybinds->setKeybindState(checkbox->getId(), false);
                     }
                     ImGui::PopStyleColor();
 
@@ -71,7 +74,7 @@ namespace eclipse::gui::imgui {
                 }
             };
 
-            if (checkbox->getOptions()) {
+            if (auto options = checkbox->getOptions().lock()) {
                 ImGui::PushItemWidth(-1);
 
                 auto textColor = value ? colors[ImGuiCol_Text] : colors[ImGuiCol_TextDisabled];
@@ -112,10 +115,11 @@ namespace eclipse::gui::imgui {
                 auto triangleColor = colors[ImGuiCol_TextDisabled];
                 triangleColor.w *= ImGui::GetStyle().Alpha;
                 ImGui::GetWindowDrawList()->AddTriangleFilled(
-                        ImVec2(right, top),
-                        ImVec2(left, bottom),
-                        ImVec2(right, bottom),
-                        ImGui::ColorConvertFloat4ToU32(triangleColor));
+                    ImVec2(right, top),
+                    ImVec2(left, bottom),
+                    ImVec2(right, bottom),
+                    ImGui::ColorConvertFloat4ToU32(triangleColor)
+                );
 
                 std::string popupName = fmt::format("##{}", checkbox->getTitle());
                 if (openPopup)
@@ -123,8 +127,8 @@ namespace eclipse::gui::imgui {
 
                 ImGui::SetNextWindowSizeConstraints(ImVec2(240, 0), ImVec2(FLT_MAX, FLT_MAX));
                 if (ImGui::BeginPopup(popupName.c_str())) {
-                    for (Component* cmp : checkbox->getOptions()->getComponents())
-                        Style::visit(cmp);
+                    for (auto cmp : options->getComponents())
+                        Style::visit(cmp.get());
 
                     ImGui::EndPopup();
                 }
@@ -246,14 +250,16 @@ namespace eclipse::gui::imgui {
                 }
 
                 if (ImGui::BeginPopup(id.c_str())) {
-                    auto* keybinds = keybinds::Manager::get();
-                    auto* keybind = keybinds->getKeybind(floatToggle->getId());
+                    auto keybinds = keybinds::Manager::get();
+                    auto keybind = keybinds->getKeybind(floatToggle->getId());
 
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
-                    if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
-                        keybinds->setKeybindState(floatToggle->getId(), true);
-                    } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
-                        keybinds->setKeybindState(floatToggle->getId(), false);
+                    if (keybind.has_value()) {
+                        auto& keybindRef = keybind->get();
+
+                        if (!keybindRef.isInitialized() && ImGui::MenuItem("Add keybind"))
+                            keybinds->setKeybindState(floatToggle->getId(), true);
+                        else if (keybindRef.isInitialized() && ImGui::MenuItem("Remove keybind"))
+                            keybinds->setKeybindState(floatToggle->getId(), false);
                     }
                     ImGui::PopStyleColor();
 
@@ -265,9 +271,10 @@ namespace eclipse::gui::imgui {
 
             textColor.w *= ImGui::GetStyle().Alpha;
             ImGui::GetWindowDrawList()->AddRectFilled(
-                    ImVec2(ImGui::GetItemRectMax().x - 5 * scale, ImGui::GetItemRectMin().y + 1 * scale),
-                    ImVec2(ImGui::GetItemRectMax().x - 2 * scale, ImGui::GetItemRectMax().y - 1 * scale),
-                    ImGui::ColorConvertFloat4ToU32(textColor));
+                ImVec2(ImGui::GetItemRectMax().x - 5 * scale, ImGui::GetItemRectMin().y + 1 * scale),
+                ImVec2(ImGui::GetItemRectMax().x - 2 * scale, ImGui::GetItemRectMax().y - 1 * scale),
+                ImGui::ColorConvertFloat4ToU32(textColor)
+            );
 
             ImGui::PopItemWidth();
         }   
@@ -290,15 +297,20 @@ namespace eclipse::gui::imgui {
                 }
 
                 if (ImGui::BeginPopup(id.c_str())) {
-                    auto* keybinds = keybinds::Manager::get();
+                    auto keybinds = keybinds::Manager::get();
                     auto specialId = fmt::format("{}-{}", radioButton->getId(), radioButton->getValue());
-                    auto* keybind = keybinds->getKeybind(specialId);
+                    auto keybind = keybinds->getKeybind(specialId);
 
                     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
-                    if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
-                        keybinds->setKeybindState(specialId, true);
-                    } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
-                        keybinds->setKeybindState(specialId, false);
+
+                    if (keybind.has_value()) {
+                        auto& keybindRef = keybind->get();
+
+                        if (!keybindRef.isInitialized() && ImGui::MenuItem("Add keybind")) {
+                            keybinds->setKeybindState(specialId, true);
+                        } else if (keybindRef.isInitialized() && ImGui::MenuItem("Remove keybind")) {
+                            keybinds->setKeybindState(specialId, false);
+                        }
                     }
                     ImGui::PopStyleColor();
 
@@ -449,7 +461,7 @@ namespace eclipse::gui::imgui {
                 ImGui::Text("%s", "Press any key to change the keybind...");
                 ImGui::Separator();
 
-                ImGui::Text("%s", "Press ESC to clear the cancel.");
+                ImGui::Text("%s", "Press ESC to cancel.");
 
                 if (keybinds::isKeyDown(keybinds::Keys::Escape)) {
                     ImGui::CloseCurrentPopup();

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <memory>
 #include "color.hpp"
 
 namespace eclipse::gui {
@@ -76,7 +77,7 @@ namespace eclipse::gui {
         }
 
         /// @brief Add sub-component to toggle.
-        void addOptions(const std::function<void(MenuTab*)>& options);
+        void addOptions(const std::function<void(std::shared_ptr<MenuTab>)>& options);
         
         /// @brief Get the toggle value.
         [[nodiscard]] bool getValue() const;
@@ -94,7 +95,8 @@ namespace eclipse::gui {
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
-        [[nodiscard]] MenuTab* getOptions() const { return m_options; }
+        [[nodiscard]] const std::string& getDescription() const { return m_description; }
+        [[nodiscard]] std::weak_ptr<MenuTab> getOptions() const { return m_options; }
         [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
 
         void triggerCallback(bool value) {
@@ -105,7 +107,7 @@ namespace eclipse::gui {
         std::string m_id;
         std::string m_title;
         std::function<void(bool)> m_callback;
-        MenuTab* m_options = nullptr;
+        std::shared_ptr<MenuTab> m_options = nullptr;
         bool m_hasKeybind = false;
     };
 
@@ -512,91 +514,91 @@ namespace eclipse::gui {
         explicit MenuTab(std::string title) : m_title(std::move(title)) {}
 
         /// @brief Add a component to the tab.
-        void addComponent(Component* component);
+        void addComponent(std::shared_ptr<Component> component);
 
         /// @brief Remove a component from the tab.
-        void removeComponent(Component* component);
+        void removeComponent(std::weak_ptr<Component> component);
 
         /// @brief Add a label to the tab.
-        LabelComponent* addLabel(const std::string& title) {
-            auto* label = new LabelComponent(title);
+        std::shared_ptr<LabelComponent> addLabel(const std::string& title) {
+            auto label = std::make_shared<LabelComponent>(title);
             addComponent(label);
             return label;
         }
 
         /// @brief Add a checkbox to the tab.
-        ToggleComponent* addToggle(const std::string& title, const std::string& id) {
-            auto* toggle = new ToggleComponent(id, title);
+        std::shared_ptr<ToggleComponent> addToggle(const std::string& title, const std::string& id) {
+            auto toggle = std::make_shared<ToggleComponent>(id, title);
             addComponent(toggle);
             return toggle;
         }
 
         /// @brief Add a radio button to the tab.
-        RadioButtonComponent* addRadioButton(const std::string& title, const std::string& id, int value) {
-            auto* button = new RadioButtonComponent(id, title, value);
+        std::shared_ptr<RadioButtonComponent> addRadioButton(const std::string& title, const std::string& id, int value) {
+            auto button = std::make_shared<RadioButtonComponent>(id, title, value);
             addComponent(button);
             return button;
         }
 
         /// @brief Add a radio button to the tab.
-        ComboComponent* addCombo(const std::string& title, const std::string& id, std::vector<std::string> items, int value) {
-            auto* combo = new ComboComponent(id, title, items, value);
+        std::shared_ptr<ComboComponent> addCombo(const std::string& title, const std::string& id, std::vector<std::string> items, int value) {
+            auto combo = std::make_shared<ComboComponent>(id, title, items, value);
             addComponent(combo);
             return combo;
         }
 
         /// @brief Add a slider to the tab.
-        SliderComponent* addSlider(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f") {
-            auto* slider = new SliderComponent(title, id, min, max, format);
+        std::shared_ptr<SliderComponent> addSlider(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f") {
+            auto slider = std::make_shared<SliderComponent>(title, id, min, max, format);
             addComponent(slider);
             return slider;
         }
 
         /// @brief Add an input float to the tab.
-        InputFloatComponent* addInputFloat(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f") {
-            auto* inputfloat = new InputFloatComponent(title, id, min, max, format);
+        std::shared_ptr<InputFloatComponent> addInputFloat(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f") {
+            auto inputfloat = std::make_shared<InputFloatComponent>(title, id, min, max, format);
             addComponent(inputfloat);
             return inputfloat;
         }
 
         /// @brief Add an input int to the tab.
-        InputIntComponent* addInputInt(const std::string& title, const std::string& id, int min = INT_MIN, int max = INT_MAX) {
-            auto* inputint = new InputIntComponent(title, id, min, max);
+        std::shared_ptr<InputIntComponent> addInputInt(const std::string& title, const std::string& id, int min = INT_MIN, int max = INT_MAX) {
+            auto inputint = std::make_shared<InputIntComponent>(title, id, min, max);
             addComponent(inputint);
             return inputint;
         }
 
         /// @brief Add an float toggle to the tab.
-        FloatToggleComponent* addFloatToggle(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f") {
-            auto* floattoggle = new FloatToggleComponent(title, id, min, max, format);
+        std::shared_ptr<FloatToggleComponent> addFloatToggle(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f") {
+            auto floattoggle = std::make_shared<FloatToggleComponent>(title, id, min, max, format);
             addComponent(floattoggle);
             return floattoggle;
         }
 
         /// @brief Add an input text to the tab.
-        InputTextComponent* addInputText(const std::string& title, const std::string& id) {
-            auto* inputtext = new InputTextComponent(title, id);
+        std::shared_ptr<InputTextComponent> addInputText(const std::string& title, const std::string& id) {
+            auto inputtext = std::make_shared<InputTextComponent>(title, id);
             addComponent(inputtext);
             return inputtext;
         }
 
         /// @brief Add a button to the tab.
-        ButtonComponent* addButton(const std::string& title) {
-            auto* button = new ButtonComponent(title);
+        std::shared_ptr<ButtonComponent> addButton(const std::string& title) {
+            auto button = std::make_shared<ButtonComponent>(title);
             addComponent(button);
             return button;
         }
 
         /// @brief Add a color picker to the tab.
-        ColorComponent* addColorComponent(const std::string& title, const std::string& id, bool hasOpacity = false) {
-            auto* color = new ColorComponent(title, id, hasOpacity);
+        std::shared_ptr<ColorComponent> addColorComponent(const std::string& title, const std::string& id, bool hasOpacity = false) {
+            auto color = std::make_shared<ColorComponent>(title, id, hasOpacity);
             addComponent(color);
             return color;
         }
 
         /// @brief Add a keybind to the tab.
-        KeybindComponent* addKeybind(const std::string& title, const std::string& id, bool canDelete = false) {
-            auto* keybind = new KeybindComponent(title, id, canDelete);
+        std::shared_ptr<KeybindComponent> addKeybind(const std::string& title, const std::string& id, bool canDelete = false) {
+            auto keybind = std::make_shared<KeybindComponent>(title, id, canDelete);
             addComponent(keybind);
             return keybind;
         }
@@ -605,14 +607,14 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getTitle() const { return m_title; }
 
         /// @brief Get the tab's components.
-        [[nodiscard]] const std::vector<Component*>& getComponents() const { return m_components; }
+        [[nodiscard]] const std::vector<std::shared_ptr<Component>>& getComponents() const { return m_components; }
 
         /// @brief Find a tab by name (or create a new one if it does not exist).
-        static MenuTab* find(const std::string& name);
+        static std::shared_ptr<MenuTab> find(const std::string& name);
 
     private:
         std::string m_title;
-        std::vector<Component*> m_components;
+        std::vector<std::shared_ptr<Component>> m_components;
     };
 
     class Style {
@@ -649,14 +651,14 @@ namespace eclipse::gui {
         virtual void draw() {}
 
         /// @brief Handle the component.
-        virtual void visit(Component* component) {}
+        virtual void visit(std::weak_ptr<Component> component) {}
 
         /// @brief Toggle the menu.
         virtual void toggle() {
             m_isToggled = !m_isToggled;
         }
 
-        Layout* setStyle(Style* st) { 
+        Layout* setStyle(std::shared_ptr<Style> st) { 
             m_style = st;
             return this;
         }
@@ -665,18 +667,18 @@ namespace eclipse::gui {
         [[nodiscard]] bool isToggled() const { return m_isToggled; }
 
         /// @brief Get the layout's component style.
-        [[nodiscard]] Style* getStyle() { return m_style; }
+        [[nodiscard]] std::weak_ptr<Style> getStyle() { return m_style; }
 
     protected:
         bool m_isToggled;
-        Style* m_style;
+        std::shared_ptr<Style> m_style;
     };
 
     /// @brief Abstract class, that wraps all UI function calls.
     class Engine {
     public:
         /// @brief Get the UI engine instance. (ImGui for desktop, Cocos2d for mobile)
-        static Engine* get();
+        static std::shared_ptr<Engine> get();
 
         /// @brief Initialize the UI engine.
         virtual void init() = 0;
@@ -688,7 +690,7 @@ namespace eclipse::gui {
         virtual bool isToggled() = 0;
 
         /// @brief Find a tab by name.
-        virtual MenuTab* findTab(const std::string& name) = 0;
+        virtual std::shared_ptr<MenuTab> findTab(const std::string& name) = 0;
     };
 
 

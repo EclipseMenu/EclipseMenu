@@ -8,21 +8,27 @@
 #include <modules/gui/color.hpp>
 
 #include "layouts/window/window.hpp"
-#include "styles/megahack.hpp"
 
 namespace eclipse::gui::imgui {
 
     void ImGuiEngine::init() {
         if (m_initialized) return;
-        GEODE_ANDROID(ImGuiCocos::get().setForceLegacy(true);) // fixes some random crashes on android
+
+        // fixes some random crashes on android
+        GEODE_ANDROID(
+            ImGuiCocos::get().setForceLegacy(true);
+        )
+
         ImGuiCocos::get()
             .setup([&]() {
                 getTheme()->setup();
             })
             .draw([&]() {
                 ImGuiCocos::get().setInputMode(ImGuiCocos::InputMode::Default);
+
                 getTheme()->getLayout()->draw();
             });
+
         m_initialized = true;
     }
 
@@ -50,17 +56,17 @@ namespace eclipse::gui::imgui {
         m_theme->getLayout()->toggle();
     }
 
-    MenuTab* ImGuiEngine::findTab(const std::string& name) {
-        return dynamic_cast<WindowLayout*>(getTheme()->getLayout())->findTab(name);
+    std::shared_ptr<MenuTab> ImGuiEngine::findTab(const std::string& name) {
+        return std::static_pointer_cast<WindowLayout>(getTheme()->getLayout())->findTab(name);
     }
 
-    Theme* ImGuiEngine::getTheme() {
+    std::shared_ptr<Theme> ImGuiEngine::getTheme() {
         // TODO: change this for theme picker
         if (!m_theme) {
             if (std::filesystem::exists(geode::Mod::get()->getSaveDir() / "themes" / "megahack.json"))
-                m_theme = new Theme(geode::Mod::get()->getSaveDir() / "themes" / "megahack.json");
+                m_theme = std::make_shared<Theme>(geode::Mod::get()->getSaveDir() / "themes" / "megahack.json");
             else
-                m_theme = new Theme(geode::Mod::get()->getResourcesDir() / "megahack.zip");
+                m_theme = std::make_shared<Theme>(geode::Mod::get()->getResourcesDir() / "megahack.zip");
         }
 
         return m_theme;

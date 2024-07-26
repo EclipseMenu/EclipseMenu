@@ -25,15 +25,16 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("label.startpos_switcher.alpha_mod", 0.4f);
 
             auto tab = gui::MenuTab::find("Level");
+
             tab->addToggle("StartPos Switcher", "level.startpos_switcher")
                 ->handleKeybinds()
                 ->setDescription("Allows you to switch between StartPos objects")
-                ->addOptions([](auto* options) {
+                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                     options->addKeybind("Previous StartPos", "level.startpos_switcher.previous");
                     options->addKeybind("Next StartPos", "level.startpos_switcher.next");
                     options->addToggle("Reset Camera", "level.startpos_switcher.reset_camera");
                     options->addToggle("Show Label", "level.startpos_switcher.label")
-                        ->addOptions([](auto* options) {
+                        ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                             options->addSlider("Label Scale", "label.startpos_switcher.scale", 0.1f, 2.f, "%.2fx");
                             options->addSlider("Opacity Modifier", "label.startpos_switcher.alpha_mod", 0.f, 1.f);
                             options->addColorComponent("Label Color", "label.startpos_switcher.color", true);

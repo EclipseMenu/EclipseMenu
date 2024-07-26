@@ -20,6 +20,7 @@ namespace eclipse::Hacks::Level {
     private:
         void init() override {
             auto tab = gui::MenuTab::find("Level");
+
             tab->addToggle("Practice Fix", "bot.practicefix")
                 ->setDescription("Properly saves and restores the player's data when respawning from a checkpoint.");
         }
@@ -451,7 +452,7 @@ namespace eclipse::Hacks::Level {
         }
 
         void loadFromCheckpoint(CheckpointObject* checkpoint) {
-            FixPlayLayer* playLayer = static_cast<FixPlayLayer*>(FixPlayLayer::get());
+            auto* playLayer = static_cast<FixPlayLayer*>(FixPlayLayer::get());
 
             if (PracticeFix::shouldEnable() && playLayer->m_fields->m_checkpoints.contains(checkpoint)) {
                 PlayLayer::loadFromCheckpoint(checkpoint);
@@ -470,6 +471,7 @@ namespace eclipse::Hacks::Level {
     class $modify(LevelEditorLayer) {
         bool init(GJGameLevel* level, bool unk) {
             bool result = LevelEditorLayer::init(level, unk);
+
             if (auto* playLayer = static_cast<FixPlayLayer*>(FixPlayLayer::get()))
                 playLayer->m_fields->m_checkpoints.clear();
             

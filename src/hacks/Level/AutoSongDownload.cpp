@@ -9,6 +9,7 @@ namespace eclipse::hacks::Level {
     class AutoSongDownload : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
+
             tab->addToggle("Automatic Song Download", "level.autosongdownload")->handleKeybinds();
         }
 

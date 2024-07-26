@@ -8,14 +8,16 @@ namespace eclipse::hacks::Global {
     class AccuratePercentage : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
+
             config::setIfEmpty("level.accuratepercent.amount", 4);
             config::setIfEmpty("level.accuratepercent.normal_mode", true);
             config::setIfEmpty("level.accuratepercent.bugfix", true);
             config::setIfEmpty("level.accuratepercent.show_minutes", true);
+
             tab->addToggle("Accurate Percentage", "level.accuratepercentage")
                 ->setDescription("Allows for more decimals in a level percentage, and adds other useful utils.")
                 ->handleKeybinds()
-                ->addOptions([] (gui::MenuTab* options) {
+                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                     options->addToggle("Normal Mode", "level.accuratepercent.normal_mode");
                     options->addInputInt("Decimal Places", "level.accuratepercent.amount", 0, 15);
                     options->addToggle("Fix 0% bug", "level.accuratepercent.bugfix");

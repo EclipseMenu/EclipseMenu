@@ -82,10 +82,12 @@ namespace eclipse::gui::imgui {
 
     void Window::setSize(const ImVec2& size) { m_size = size; }
 
-    animation::MoveAction* Window::animateTo(const ImVec2& target, double duration, animation::EasingFunction easing, bool useRealPosition) {
-        auto* action = animation::MoveAction::create(duration, &m_drawPosition, target, easing);
+    std::shared_ptr<animation::MoveAction> Window::animateTo(const ImVec2& target, double duration, animation::EasingFunction easing, bool useRealPosition) {
+        auto action = animation::MoveAction::create(duration, &m_drawPosition, target, easing);
+
         if (useRealPosition)
             m_position = target;
+
         return action;
     }
 

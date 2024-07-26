@@ -27,7 +27,6 @@ namespace eclipse::hacks::Level {
     }
 
     class $modify(HitboxGameObject, GameObject) {
-
         struct Fields {
             float m_originalRadius = -1.f;
         };
@@ -56,7 +55,7 @@ namespace eclipse::hacks::Level {
         for (GameObject* gameObject : s_affectedGameObjects) {
             gameObject->setObjectRectDirty(true);
             gameObject->setOrientedRectDirty(true);
-            gameObject->m_objectRadius = ((HitboxGameObject*)gameObject)->m_fields->m_originalRadius;
+            gameObject->m_objectRadius = static_cast<HitboxGameObject*>(gameObject)->m_fields->m_originalRadius;
         }
 
         s_affectedGameObjects.clear();
@@ -79,7 +78,7 @@ namespace eclipse::hacks::Level {
             tab->addToggle("Hitbox Multiplier", "level.hitbox_multiplier")
                 ->handleKeybinds()
                 ->callback([](bool){forceHitboxRecalculation();})
-                ->addOptions([] (gui::MenuTab* options) {
+                ->addOptions([] (std::shared_ptr<gui::MenuTab> options) {
                     options->addInputFloat("Player Multiplier", "level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx");
                     options->addInputFloat("Solid Multiplier", "level.hitbox_multiplier.solid", 0.01f, 10.f, "%.2fx");
                     options->addInputFloat("Hazard Multiplier", "level.hitbox_multiplier.hazard", 0.01f, 10.f, "%.2fx");

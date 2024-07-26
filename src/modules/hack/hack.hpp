@@ -1,4 +1,7 @@
 #pragma once
+
+#include <memory>
+
 #include <Geode/Geode.hpp>
 #include <utils.hpp>
 
@@ -24,18 +27,18 @@ namespace eclipse::hack {
     /// @brief Base class for all hacks.
     class Hack {
     public:
-        /// @brief Adds the hack to the list of hacks.
-        static void registerHack(Hack* hack);
+        /// @brief Adds the hack to thred of hacks.
+        static void registerHack(std::shared_ptr<Hack> hack);
 
         /// @brief Registers a hack by its type.
         template<typename T, typename = std::enable_if_t<std::is_base_of_v<Hack, T>>>
-        static void registerHack() { registerHack(new T()); }
+        static void registerHack() { registerHack(std::make_shared<T>()); }
 
         /// @brief Finds a hack by its ID.
-        [[nodiscard]] static Hack* find(const std::string& id);
+        [[nodiscard]] static std::weak_ptr<Hack> find(const std::string& id);
 
         /// @brief Get all registered hacks.
-        [[nodiscard]] static const std::vector<Hack*>& getHacks();
+        [[nodiscard]] static const std::vector<std::shared_ptr<Hack>>& getHacks();
 
         /// @brief Initializes all hacks.
         static void initializeHacks();

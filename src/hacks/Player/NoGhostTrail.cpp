@@ -9,6 +9,7 @@ namespace eclipse::hacks::Player {
     class NoGhostTrail : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
+
             tab->addToggle("No Ghost Trail", "player.noghosttrail")
                 ->setDescription("Disables player ghost trail triggers.")
                 ->handleKeybinds();
@@ -19,7 +20,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(NoGhostTrail)
 
-    class $modify(NoGhostTrail_Hook, PlayerObject) {
+    class $modify(PlayerObject) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("PlayerObject::toggleGhostEffect");
         }

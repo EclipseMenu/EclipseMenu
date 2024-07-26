@@ -12,16 +12,16 @@ namespace eclipse::gui::imgui {
 
         bool shouldRender();
 
-        MenuTab* findTab(const std::string& name);
+        std::shared_ptr<MenuTab> findTab(const std::string& name);
 
     private:
         ImVec2 randomWindowPosition(Window& window);
         std::map<Window*, ImVec2> getStackedPositions();
         void stackWindows();
 
-        std::vector<MenuTab*> m_tabs;
+        std::vector<std::shared_ptr<MenuTab>> m_tabs;
         std::vector<Window> m_windows;
-        std::vector<animation::MoveAction*> m_actions;
+        std::vector<std::shared_ptr<animation::MoveAction>> m_actions;
 
         bool m_isAnimating = false;
     };

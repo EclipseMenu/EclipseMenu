@@ -9,6 +9,7 @@ namespace eclipse::hacks::Player {
     class NoRobotFire : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
+
             tab->addToggle("No Robot Fire", "player.norobotfire")
                 ->setDescription("Disables the robot's fire when jumping.")
                 ->handleKeybinds();
@@ -19,7 +20,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(NoRobotFire)
 
-    class $modify(NoRobotFire_Hook, PlayerObject) {
+    class $modify(PlayerObject) {
         void update(float dt) override {
             if (!config::get<bool>("player.norobotfire", false))
                 return PlayerObject::update(dt);

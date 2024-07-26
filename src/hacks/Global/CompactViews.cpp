@@ -10,6 +10,7 @@ namespace eclipse::hacks::Global {
     class CompactEditorLevels : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Global");
+
             tab->addToggle("Compact Editor Levels", "global.compacteditorlevels")
                 ->handleKeybinds()
                 ->setDescription("Enables the compact view when browsing custom editor levels. Adapted from code by Cvolton. (Created by RayDeeUx)");
@@ -32,7 +33,7 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(CompactEditorLevels);
     REGISTER_HACK(CompactProfileComments);
 
-    class $modify(EclipseCustomListView, CustomListView) {
+    class $modify(CustomListView) {
         /*
         original code by cvolton, re-used for "my levels" list
         and now reused for profile comments yayy
@@ -49,7 +50,7 @@ namespace eclipse::hacks::Global {
         }
     };
 
-    class $modify(EclipseLevelCell, LevelCell) {
+    class $modify(LevelCell) {
         void onClick(CCObject* sender) {
             // get the "view" button to work with compact mode in "my levels"
             if (this->m_level->m_levelType == GJLevelType::Editor && config::get<bool>("global.compacteditorlevels", false)) {

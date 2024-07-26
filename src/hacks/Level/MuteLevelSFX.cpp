@@ -9,6 +9,7 @@ namespace eclipse::hacks::Level {
     class MuteLevelSFX : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
+
             tab->addToggle("Mute Level SFX", "level.mutelevelsfx")
                 ->setDescription("Disables SFX/Edit SFX triggers. (Created by RayDeeUx)")
                 ->handleKeybinds();
