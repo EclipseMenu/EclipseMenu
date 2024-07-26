@@ -10,16 +10,12 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
 
-            config::setIfEmpty("player.autoclick", false);
-
-            gui::ToggleComponent* toggle = tab->addToggle("AutoClicker", "player.autoclick")->handleKeybinds();
-
             config::setIfEmpty<float>("player.autoclick.interval", 1.f);
-            
-            toggle->addOptions([](gui::MenuTab* options) {
-                options->addInputFloat("Interval", "player.autoclick.interval", 0.f, 10.f, "%.3f s.");
-            });
-
+            tab->addToggle("AutoClicker", "player.autoclick")
+                ->handleKeybinds()
+                ->addOptions([](gui::MenuTab* options) {
+                    options->addInputFloat("Interval", "player.autoclick.interval", 0.f, 10.f, "%.3f s.");
+                });
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.autoclick", false); }
@@ -30,7 +26,7 @@ namespace eclipse::hacks::Player {
 
     class $modify(GJBaseGameLayer) {
         struct Fields {
-            float thedt = 0.f;
+            float timer = 0.f;
             bool clicking = false;
         };
 
@@ -38,12 +34,12 @@ namespace eclipse::hacks::Player {
             GJBaseGameLayer::processCommands(dt);
 
             if (config::get<bool>("player.autoclick", false)) {
-                float clickInterval = config::get<float>("player.autoclick.interval", 0.f);
-                m_fields->thedt += dt;
-                if (m_fields->thedt > clickInterval) { // FIXME: doesn't click
+                auto clickInterval = config::get<float>("player.autoclick.interval", 0.f);
+                m_fields->timer += dt;
+                if (m_fields->timer > clickInterval) { // FIXME: doesn't click
                     m_fields->clicking = !m_fields->clicking;
-                    m_fields->clicking ? m_player1->releaseButton(PlayerButton::Jump) : m_player1->pushButton(PlayerButton::Jump);
-                    m_fields->thedt = 0.f;
+                    GJBaseGameLayer::handleButton(m_fields->clicking, 1, true);
+                    m_fields->timer = 0.f;
                 }
             }
         }

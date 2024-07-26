@@ -63,7 +63,7 @@ namespace eclipse::gui::imgui {
                 if (openPopup)
                     ImGui::OpenPopup(popupName.c_str());
 
-                ImGui::SetNextWindowSizeConstraints(ImVec2(200, 0), ImVec2(FLT_MAX, FLT_MAX));
+                ImGui::SetNextWindowSizeConstraints(ImVec2(240, 0), ImVec2(FLT_MAX, FLT_MAX));
                 if (ImGui::BeginPopup(popupName.c_str(), ImGuiWindowFlags_NoMove)) {
                     for (auto* comp : checkbox->getOptions()->getComponents())
                         Style::visit(comp);

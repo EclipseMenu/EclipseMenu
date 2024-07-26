@@ -6,6 +6,32 @@
 namespace eclipse::gui::imgui {
     class MegahackStyle : public Style {
     public:
+        /// @brief Special tooltip function that makes sure the tooltip fits on the screen.
+        static void handleTooltip(const std::string& text) {
+            if (text.empty()) return;
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                ImVec2 pos = ImGui::GetMousePos();
+
+                auto size = ImGui::CalcTextSize(text.c_str());
+                size.x /= config::getTemp<float>("UIScale", 1.0f);
+                auto screenSize = ImGui::GetIO().DisplaySize;
+
+                const float padding = 10.0f;
+                pos.x += padding;
+                pos.y += padding;
+
+                if (pos.x + size.x > screenSize.x)
+                    pos.x = screenSize.x - size.x - padding;
+                if (pos.y + size.y > screenSize.y)
+                    pos.y = screenSize.y - size.y - padding;
+
+                ImGui::SetNextWindowPos(pos);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
+                ImGui::SetTooltip("%s", text.c_str());
+                ImGui::PopStyleColor();
+            }
+        }
+
         void visit(LabelComponent* label) override {
             auto availWidth = ImGui::GetContentRegionAvail().x;
             float textWidth = ImGui::CalcTextSize(label->getTitle().c_str(), nullptr, true, availWidth).x;
@@ -22,6 +48,28 @@ namespace eclipse::gui::imgui {
             auto& style = ImGui::GetStyle();
             auto& colors = style.Colors;
             bool value = checkbox->getValue();
+
+            auto handleKeybindMenu = [checkbox] {
+                // Open context menu on either Right click or Shift+Click
+                if (ImGui::IsItemClicked(1) || (ImGui::IsItemClicked(0) && ImGui::GetIO().KeyShift)) {
+                    ImGui::OpenPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str());
+                }
+
+                if (ImGui::BeginPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str())) {
+                    auto* keybinds = keybinds::Manager::get();
+                    auto* keybind = keybinds->getKeybind(checkbox->getId());
+
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
+                    if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
+                        keybinds->setKeybindState(checkbox->getId(), true);
+                    } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
+                        keybinds->setKeybindState(checkbox->getId(), false);
+                    }
+                    ImGui::PopStyleColor();
+
+                    ImGui::EndPopup();
+                }
+            };
 
             if (checkbox->getOptions()) {
                 ImGui::PushItemWidth(-1);
@@ -43,26 +91,10 @@ namespace eclipse::gui::imgui {
                     checkbox->setValue(!value);
                     checkbox->triggerCallback(!value);
                 }
+                handleTooltip(checkbox->getDescription());
 
-                if (checkbox->hasKeybind()) {
-                    // Open context menu on either Right click or Shift+Click
-                    if (ImGui::IsItemClicked(1) || (ImGui::IsItemClicked(0) && ImGui::GetIO().KeyShift)) {
-                        ImGui::OpenPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str());
-                    }
-
-                    if (ImGui::BeginPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str())) {
-                        auto* keybinds = keybinds::Manager::get();
-                        auto* keybind = keybinds->getKeybind(checkbox->getId());
-
-                        if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
-                            keybinds->setKeybindState(checkbox->getId(), true);
-                        } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
-                            keybinds->setKeybindState(checkbox->getId(), false);
-                        }
-
-                        ImGui::EndPopup();
-                    }
-                }
+                if (checkbox->hasKeybind())
+                    handleKeybindMenu();
 
                 ImGui::SameLine(0, 0);
 
@@ -89,6 +121,7 @@ namespace eclipse::gui::imgui {
                 if (openPopup)
                     ImGui::OpenPopup(popupName.c_str());
 
+                ImGui::SetNextWindowSizeConstraints(ImVec2(240, 0), ImVec2(FLT_MAX, FLT_MAX));
                 if (ImGui::BeginPopup(popupName.c_str())) {
                     for (Component* cmp : checkbox->getOptions()->getComponents())
                         Style::visit(cmp);
@@ -112,26 +145,10 @@ namespace eclipse::gui::imgui {
                     checkbox->setValue(!value);
                     checkbox->triggerCallback(!value);
                 }
+                handleTooltip(checkbox->getDescription());
 
-                if (checkbox->hasKeybind()) {
-                    // Open context menu on either Right click or Shift+Click
-                    if (ImGui::IsItemClicked(1) || (ImGui::IsItemClicked(0) && ImGui::GetIO().KeyShift)) {
-                        ImGui::OpenPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str());
-                    }
-
-                    if (ImGui::BeginPopup(fmt::format("##context-menu-{}", checkbox->getId()).c_str())) {
-                        auto* keybinds = keybinds::Manager::get();
-                        auto* keybind = keybinds->getKeybind(checkbox->getId());
-
-                        if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
-                            keybinds->setKeybindState(checkbox->getId(), true);
-                        } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
-                            keybinds->setKeybindState(checkbox->getId(), false);
-                        }
-
-                        ImGui::EndPopup();
-                    }
-                }
+                if (checkbox->hasKeybind())
+                    handleKeybindMenu();
 
                 ImGui::PopStyleColor(4);
                 ImGui::PopStyleVar();
@@ -155,6 +172,7 @@ namespace eclipse::gui::imgui {
                 config::set(slider->getId(), value);
                 slider->triggerCallback(value);
             }
+            handleTooltip(slider->getDescription());
             ImGui::PopItemWidth();
         }   
 
@@ -166,6 +184,7 @@ namespace eclipse::gui::imgui {
                 config::set(inputFloat->getId(), value);
                 inputFloat->triggerCallback(value);
             }
+            handleTooltip(inputFloat->getDescription());
             ImGui::PopItemWidth();
         }   
 
@@ -177,6 +196,7 @@ namespace eclipse::gui::imgui {
                 config::set(inputInt->getId(), value);
                 inputInt->triggerCallback(value);
             }
+            handleTooltip(inputInt->getDescription());
             ImGui::PopItemWidth();
         }   
 
@@ -213,6 +233,8 @@ namespace eclipse::gui::imgui {
                 config::set(floatToggle->getId() + ".toggle", toggle);
                 floatToggle->triggerCallback();
             }
+            handleTooltip(floatToggle->getDescription());
+
             ImGui::PopStyleColor(4);
             ImGui::PopStyleVar();
 
@@ -229,11 +251,13 @@ namespace eclipse::gui::imgui {
 
         void visit(RadioButtonComponent* radioButton) override {
             int value = config::get<int>(radioButton->getId(), radioButton->getValue());
-            if (radioButton->getValue()) ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1, 1, 1, 1));
+            ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1, 1, 1, 1));
             if (ImGui::RadioButton(radioButton->getTitle().c_str(), &value, radioButton->getValue())) {
                 config::set(radioButton->getId(), value);
                 radioButton->triggerCallback(value);
             }
+            handleTooltip(radioButton->getDescription());
+            ImGui::PopStyleColor();
         }   
 
         void visit(ComboComponent* combo) override {
@@ -260,6 +284,7 @@ namespace eclipse::gui::imgui {
                 config::set(inputText->getId(), value);
                 inputText->triggerCallback(value);
             }
+            handleTooltip(inputText->getDescription());
             ImGui::PopItemWidth();
         }   
 
@@ -277,6 +302,7 @@ namespace eclipse::gui::imgui {
             if (ImGui::Button(button->getTitle().c_str(), ImVec2(availWidth, 0))) {
                 button->triggerCallback();
             }
+            handleTooltip(button->getDescription());
 
             ImGui::PopStyleColor(3);
 
@@ -317,12 +343,14 @@ namespace eclipse::gui::imgui {
                 config::set<gui::Color>(color->getId(), value);
                 color->triggerCallback(value);
             }
+            handleTooltip(color->getDescription());
         }   
 
         void visit(KeybindComponent* keybind) override {
             auto& title = keybind->getTitle();
             auto canDelete = keybind->canDelete();
 
+            ImGui::PushID(title.c_str());
             ImGui::PushItemWidth(-1);
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
             ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
@@ -346,7 +374,7 @@ namespace eclipse::gui::imgui {
                 }
                 auto truncatedLabel = title.substr(0, labelEnd) + "...";
                 ImGui::Button(truncatedLabel.c_str(), ImVec2(labelMaxWidth, 0));
-                // TODO: Add a tooltip on hover
+                handleTooltip(title);
             } else {
                 ImGui::Button(title.c_str(), ImVec2(labelMaxWidth, 0));
             }
@@ -412,6 +440,7 @@ namespace eclipse::gui::imgui {
             }
 
             ImGui::PopItemWidth();
+            ImGui::PopID();
         }   
     };
 }

@@ -31,6 +31,26 @@ namespace eclipse::gui {
         return this;
     }
 
+    RadioButtonComponent* RadioButtonComponent::handleKeybinds() {
+        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
+            auto value = getValue();
+            config::set(this->getId(), value);
+            this->triggerCallback(value);
+        });
+        m_hasKeybind = true;
+        return this;
+    }
+
+    FloatToggleComponent* FloatToggleComponent::handleKeybinds() {
+        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
+            bool value = !config::get<bool>(this->getId() + ".toggle", false);
+            config::set(this->getId() + ".toggle", value);
+            this->triggerCallback();
+        });
+        m_hasKeybind = true;
+        return this;
+    }
+
     void MenuTab::addComponent(Component* component) {
         m_components.push_back(component);
     }

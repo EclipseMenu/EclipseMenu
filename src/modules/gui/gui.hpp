@@ -26,6 +26,18 @@ namespace eclipse::gui {
 
         /// @brief Get the component's title. (used for sorting in the menu)
         [[nodiscard]] virtual const std::string& getTitle() const { return getId(); }
+
+        /// @brief Get the component's description.
+        [[nodiscard]] const std::string& getDescription() const { return m_description; }
+
+        /// @brief Set the component's description.
+        virtual Component* setDescription(std::string description) {
+            m_description = std::move(description);
+            return this;
+        }
+
+    protected:
+        std::string m_description;
     };
 
     /// @brief Simple label component, that displays a title.
@@ -38,6 +50,11 @@ namespace eclipse::gui {
 
         [[nodiscard]] const std::string& getId() const override { return m_title; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+
+        LabelComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
 
     private:
         std::string m_title;
@@ -58,12 +75,6 @@ namespace eclipse::gui {
             return this;
         }
 
-        /// @brief Set toggle description.
-        ToggleComponent* setDescription(std::string description) {
-            m_description = std::move(description);
-            return this;
-        }
-
         /// @brief Add sub-component to toggle.
         void addOptions(std::function<void(MenuTab*)> options);
         
@@ -76,9 +87,13 @@ namespace eclipse::gui {
         /// @brief Allows to set keybinds for the toggle.
         ToggleComponent* handleKeybinds();
 
+        ToggleComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
+
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
-        [[nodiscard]] const std::string& getDescription() const { return m_description; }
         [[nodiscard]] MenuTab* getOptions() const { return m_options; }
         [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
 
@@ -89,7 +104,6 @@ namespace eclipse::gui {
     private:
         std::string m_id;
         std::string m_title;
-        std::string m_description;
         std::function<void(bool)> m_callback;
         MenuTab* m_options = nullptr;
         bool m_hasKeybind = false;
@@ -116,6 +130,9 @@ namespace eclipse::gui {
         /// @brief Set the radio button value.
         void setValue(int value) { m_value = value; }
 
+        /// @brief Allows to set keybinds for the radio button.
+        RadioButtonComponent* handleKeybinds();
+
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
 
@@ -123,18 +140,24 @@ namespace eclipse::gui {
             if (m_callback) m_callback(value);
         }
 
+        RadioButtonComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
+
     private:
         std::string m_id;
         std::string m_title;
         int m_value;
         std::function<void(int)> m_callback;
+        bool m_hasKeybind = false;
     };
 
     /// @brief Combo component for selecting one of the options.
     class ComboComponent : public Component {
     public:
         explicit ComboComponent(std::string id, std::string title, std::vector<std::string> items, int value)
-            : m_id(std::move(id)), m_title(std::move(title)), m_items(items), m_value(value) {}
+            : m_id(std::move(id)), m_title(std::move(title)), m_items(std::move(items)), m_value(value) {}
 
         void onInit() override {}
         void onUpdate() override {}
@@ -156,6 +179,11 @@ namespace eclipse::gui {
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+
+        ComboComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
 
         void triggerCallback(int value) {
             if (m_callback) m_callback(value);
@@ -190,6 +218,11 @@ namespace eclipse::gui {
         [[nodiscard]] float getMin() const { return m_min; }
         [[nodiscard]] float getMax() const { return m_max; }
         [[nodiscard]] const std::string& getFormat() const { return m_format; }
+
+        SliderComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
 
         void triggerCallback(float value) {
             if (m_callback) m_callback(value);
@@ -226,6 +259,11 @@ namespace eclipse::gui {
         [[nodiscard]] float getMax() const { return m_max; }
         [[nodiscard]] const std::string& getFormat() const { return m_format; }
 
+        InputFloatComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
+
         void triggerCallback(float value) {
             if (m_callback) m_callback(value);
         }
@@ -260,6 +298,11 @@ namespace eclipse::gui {
         [[nodiscard]] int getMin() const { return m_min; }
         [[nodiscard]] int getMax() const { return m_max; }
 
+        InputIntComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
+
         void triggerCallback(int value) {
             if (m_callback) m_callback(value);
         }
@@ -292,10 +335,13 @@ namespace eclipse::gui {
         }
 
         /// @brief Set toggle description.
-        FloatToggleComponent* setDescription(std::string description) {
+        FloatToggleComponent* setDescription(std::string description) override {
             m_description = std::move(description);
             return this;
         }
+
+        /// @brief Allows to set keybinds for the toggle.
+        FloatToggleComponent* handleKeybinds();
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
@@ -321,6 +367,7 @@ namespace eclipse::gui {
         float m_max;
         std::function<void(float)> m_valueCallback;
         std::function<void()> m_toggleCallback;
+        bool m_hasKeybind = false;
     };
 
     /// @brief Input text component to get user input as a string.
@@ -340,6 +387,11 @@ namespace eclipse::gui {
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+
+        InputTextComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
 
         void triggerCallback(std::string value) {
             if (m_callback) m_callback(value);
@@ -370,6 +422,11 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] bool hasOpacity() const { return m_hasOpacity; }
 
+        ColorComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
+
         void triggerCallback(gui::Color value) {
             if (m_callback) m_callback(value);
         }
@@ -399,6 +456,11 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getId() const override { return m_title; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
 
+        ButtonComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
+
         void triggerCallback() {
             if (m_callback) m_callback();
         }
@@ -426,6 +488,11 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] bool canDelete() const { return m_canDelete; }
+
+        KeybindComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
 
         void triggerCallback(keybinds::Keys key) {
             if (m_callback) m_callback(key);
@@ -594,7 +661,7 @@ namespace eclipse::gui {
         }
 
         /// @brief Get if the menu is toggled.
-        [[nodiscard]] bool isToggled() { return m_isToggled; }
+        [[nodiscard]] bool isToggled() const { return m_isToggled; }
 
         /// @brief Get the layout's component style.
         [[nodiscard]] Style* getStyle() { return m_style; }
