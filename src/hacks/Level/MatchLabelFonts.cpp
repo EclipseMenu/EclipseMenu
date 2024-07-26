@@ -22,9 +22,9 @@ namespace eclipse::hacks::Level {
     class $modify(MyPlayLayer, PlayLayer) {
         void onEnterTransitionDidFinish() {
             PlayLayer::onEnterTransitionDidFinish();
-            if (m_attemptLabel && m_percentageLabel && config::get<bool>("level.matchlabelfonts", false)) {
-                m_percentageLabel->setFntFile(m_attemptLabel->getFntFile()); // bindings for macos: m1 0x50e1d4, imac 0x5e4750
-            }
+
+            if (m_attemptLabel && m_percentageLabel && config::get<bool>("level.matchlabelfonts", false))
+                m_percentageLabel->setFntFile(m_attemptLabel->getFntFile());
         }
     };
 
