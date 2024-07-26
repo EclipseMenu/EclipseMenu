@@ -19,7 +19,7 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(TransparentLists)
 
     class $modify(cocos2d::CCLayerColor) {
-      bool initWithColor(const cocos2d::ccColor4B& yk, float f1, float f2) {
+        bool initWithColor(const cocos2d::ccColor4B& yk, float f1, float f2) {
             if (config::get<bool>("global.transparentlists", false))
                 return cocos2d::CCLayerColor::initWithColor(cocos2d::ccc4(0, 0, 0, 0), 0, 0);
             else

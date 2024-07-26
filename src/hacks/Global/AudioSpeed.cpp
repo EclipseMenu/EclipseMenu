@@ -37,8 +37,9 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.audiospeed.toggle", false);
             config::setIfEmpty("global.audiospeed", 1.f);
 
-            auto floatToggle = tab->addFloatToggle("Audio Speed", "global.audiospeed", 0.0001f, 1000.f, "%.4f");
-            floatToggle->toggleCallback(updateChannels);
+            tab->addFloatToggle("Audio Speed", "global.audiospeed", 0.0001f, 1000.f, "%.4f")
+                ->handleKeybinds()
+                ->toggleCallback(updateChannels);
         }
 
         void update() override {

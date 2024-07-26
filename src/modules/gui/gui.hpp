@@ -76,7 +76,7 @@ namespace eclipse::gui {
         }
 
         /// @brief Add sub-component to toggle.
-        void addOptions(std::function<void(MenuTab*)> options);
+        void addOptions(const std::function<void(MenuTab*)>& options);
         
         /// @brief Get the toggle value.
         [[nodiscard]] bool getValue() const;
@@ -135,6 +135,7 @@ namespace eclipse::gui {
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+        [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
 
         void triggerCallback(int value) {
             if (m_callback) m_callback(value);
@@ -345,7 +346,7 @@ namespace eclipse::gui {
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
-        [[nodiscard]] const std::string& getDescription() const { return m_description; }
+        [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
 
         [[nodiscard]] float getMin() const { return m_min; }
         [[nodiscard]] float getMax() const { return m_max; }
