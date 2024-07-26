@@ -11,10 +11,21 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
 
-            config::setIfEmpty("player.autockill.toggle", false);
-            config::setIfEmpty("player.autokill", 50.f);
+            config::setIfEmpty("player.autokill.percentage.toggle", true);
+            config::setIfEmpty("player.autokill.percentage", 50.0f);
+            config::setIfEmpty("player.autokill.time", 90.0f);
 
-            tab->addFloatToggle("Auto Kill", "player.autokill", 0.f, 100.f, "%.2f%");
+            tab->addToggle("Auto Kill", "player.autokill")
+                ->handleKeybinds()
+                ->setDescription("Kills the player at a certain time/percentage.")
+                ->addOptions([](gui::MenuTab* options) {
+                    options->addFloatToggle("Kill at Percentage", "player.autokill.percentage", 0.f, 100.f, "%.2f%%")
+                        ->handleKeybinds()
+                        ->setDescription("Kills the player at a certain percentage.");
+                    options->addFloatToggle("Kill at Time", "player.autokill.time", 0.f, FLT_MAX, "%.2f s.")
+                        ->handleKeybinds()
+                        ->setDescription("Kills the player at a certain time.");
+                });
         }
 
         [[nodiscard]] const char* getId() const override { return "Auto Kill"; }
@@ -23,16 +34,37 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(AutoKill)
 
     class $modify(GJBaseGameLayer) {
-        virtual void update(float p0) {
-            auto *playLayer = PlayLayer::get();
-            if (config::get<bool>("player.autokill.toggle", false) && playLayer != nullptr) {
-                auto killPercent = config::get<float>("player.autokill");
-                float currentPercent = playLayer->getCurrentPercent();
-                if (currentPercent >= killPercent && playLayer->m_player1->m_isPlatformer == false) {
-                    playLayer->resetLevel();
-                }
-            }
+        void killPlayer() {
+            auto* playLayer = PlayLayer::get();
+            if (!playLayer) return;
+
+            bool noclipEnabled = config::get<bool>("player.noclip", false);
+            config::set("player.noclip", false);
+            if (m_player1 && !m_player1->m_isDead)
+                playLayer->PlayLayer::destroyPlayer(m_player1, m_player1);
+            config::set("player.noclip", noclipEnabled);
+        }
+
+        void update(float p0) override {
             GJBaseGameLayer::update(p0);
+
+            if (!config::get<bool>("player.autokill", false))
+                return;
+
+            auto* playLayer = PlayLayer::get();
+            if (!playLayer) return;
+
+            auto percentageEnabled = config::get<bool>("player.autokill.percentage.toggle", true);
+            auto percentage = config::get<float>("player.autokill.percentage", 50.0f);
+            auto timeEnabled = config::get<bool>("player.autokill.time.toggle", false);
+            auto time = config::get<float>("player.autokill.time", 90.0f);
+
+            bool shouldKill = false;
+            shouldKill |= percentageEnabled && playLayer->getCurrentPercent() >= percentage;
+            shouldKill |= timeEnabled && m_gameState.m_levelTime >= time;
+
+            if (shouldKill)
+                killPlayer();
         }
     };
 
