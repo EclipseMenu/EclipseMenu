@@ -18,7 +18,6 @@ namespace eclipse::hacks::Global {
         sound->getDefaults(&freq, nullptr);
         channel->setFrequency(freq * speed);
     }
-
     void updateChannels() {
         FMOD::Channel* audioChannel;
         FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
@@ -39,7 +38,6 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.audiospeed", 1.f);
 
             auto floatToggle = tab->addFloatToggle("Audio Speed", "global.audiospeed", 0.0001f, 1000.f, "%.4f");
-
             floatToggle->toggleCallback(updateChannels);
         }
 

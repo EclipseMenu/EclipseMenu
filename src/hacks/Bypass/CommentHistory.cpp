@@ -11,7 +11,7 @@ namespace eclipse::hacks::Bypass {
             auto tab = gui::MenuTab::find("Bypass");
             tab->addToggle("Comment History Bypass", "bypass.commenthistory")
                 ->handleKeybinds()
-                ->setDescription("Allows you to see any users comment history");
+                ->setDescription("Allows you to see any user's comment history");
         }
 
         [[nodiscard]] const char* getId() const override { return "Comment History Bypass"; }

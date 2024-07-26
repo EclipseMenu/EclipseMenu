@@ -229,6 +229,7 @@ namespace eclipse::gui::imgui {
 
         void visit(RadioButtonComponent* radioButton) override {
             int value = config::get<int>(radioButton->getId(), radioButton->getValue());
+            if (radioButton->getValue()) ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1, 1, 1, 1));
             if (ImGui::RadioButton(radioButton->getTitle().c_str(), &value, radioButton->getValue())) {
                 config::set(radioButton->getId(), value);
                 radioButton->triggerCallback(value);
