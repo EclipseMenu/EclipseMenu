@@ -13,7 +13,8 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.speedhack.toggle", false);
             config::setIfEmpty("global.speedhack", 1.f);
 
-            tab->addFloatToggle("Speedhack", "global.speedhack", 0.0001f, 1000.f, "%.4f");
+            tab->addFloatToggle("Speedhack", "global.speedhack", 0.0001f, 1000.f, "%.4f")
+                ->handleKeybinds();
         }
 
         [[nodiscard]] bool isCheating() override { 
@@ -26,12 +27,10 @@ namespace eclipse::hacks::Global {
 
     REGISTER_HACK(Speedhack)
 
-    class $modify(cocos2d::CCScheduler)
-    {
-        void update(float dt)
-        {
-            float speedhack =
-            config::get<bool>("global.speedhack.toggle", false) ? config::get<float>("global.speedhack", 1.f) : 1.f;
+    class $modify(cocos2d::CCScheduler) {
+        void update(float dt) {
+            bool speedhackEnabled = config::get<bool>("global.speedhack.toggle", false);
+            float speedhack = speedhackEnabled ? config::get<float>("global.speedhack", 1.f) : 1.f;
 
             if (speedhack <= 0)
                 speedhack = 1.f;

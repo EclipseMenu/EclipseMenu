@@ -15,7 +15,7 @@ namespace eclipse::gui {
         config::set(m_id, value);
     }
 
-    void ToggleComponent::addOptions(std::function<void(MenuTab*)> options) {
+    void ToggleComponent::addOptions(const std::function<void(MenuTab*)>& options) {
         if (!m_options)
             m_options = new MenuTab("Options");
         options(m_options);
@@ -32,7 +32,8 @@ namespace eclipse::gui {
     }
 
     RadioButtonComponent* RadioButtonComponent::handleKeybinds() {
-        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
+        auto specialId = fmt::format("{}-{}", m_id, m_value);
+        keybinds::Manager::get()->registerKeybind(specialId, m_title, [this](){
             auto value = getValue();
             config::set(this->getId(), value);
             this->triggerCallback(value);

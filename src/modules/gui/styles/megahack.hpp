@@ -178,7 +178,7 @@ namespace eclipse::gui::imgui {
 
         void visit(InputFloatComponent* inputFloat) override {
             auto value = config::get<float>(inputFloat->getId(), 0.f);
-            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.3f);
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
             if (ImGui::InputFloat(inputFloat->getTitle().c_str(), &value, 0, 0, inputFloat->getFormat().c_str())) {
                 value = std::clamp(value, inputFloat->getMin(), inputFloat->getMax());
                 config::set(inputFloat->getId(), value);
@@ -190,7 +190,7 @@ namespace eclipse::gui::imgui {
 
         void visit(InputIntComponent* inputInt) override {
             auto value = config::get<int>(inputInt->getId(), 0);
-            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.3f);
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
             if (ImGui::InputInt(inputInt->getTitle().c_str(), &value, 0, 0)) {
                 value = std::clamp(value, inputInt->getMin(), inputInt->getMax());
                 config::set(inputInt->getId(), value);
@@ -204,7 +204,7 @@ namespace eclipse::gui::imgui {
             auto value = config::get<float>(floatToggle->getId(), 0.0f);
             bool toggle = config::get<bool>(floatToggle->getId() + ".toggle", false);
 
-            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.3f);
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
             if (ImGui::InputFloat(("##" + floatToggle->getTitle()).c_str(), &value, 0, 0, floatToggle->getFormat().c_str())) {
                 value = std::clamp(value, floatToggle->getMin(), floatToggle->getMax());
                 config::set(floatToggle->getId(), value);
@@ -212,7 +212,7 @@ namespace eclipse::gui::imgui {
             }
             ImGui::PopItemWidth();
 
-            ImGui::SameLine();
+            ImGui::SameLine(0, 1);
 
             ImGui::PushItemWidth(-1.0f);
 
@@ -238,6 +238,29 @@ namespace eclipse::gui::imgui {
             ImGui::PopStyleColor(4);
             ImGui::PopStyleVar();
 
+            if (floatToggle->hasKeybind()) {
+                // Open context menu on either Right click or Shift+Click
+                auto id = fmt::format("##context-menu-{}", floatToggle->getId());
+                if (ImGui::IsItemClicked(1) || (ImGui::IsItemClicked(0) && ImGui::GetIO().KeyShift)) {
+                    ImGui::OpenPopup(id.c_str());
+                }
+
+                if (ImGui::BeginPopup(id.c_str())) {
+                    auto* keybinds = keybinds::Manager::get();
+                    auto* keybind = keybinds->getKeybind(floatToggle->getId());
+
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
+                    if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
+                        keybinds->setKeybindState(floatToggle->getId(), true);
+                    } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
+                        keybinds->setKeybindState(floatToggle->getId(), false);
+                    }
+                    ImGui::PopStyleColor();
+
+                    ImGui::EndPopup();
+                }
+            }
+
             auto scale = 1.f;
 
             textColor.w *= ImGui::GetStyle().Alpha;
@@ -258,6 +281,30 @@ namespace eclipse::gui::imgui {
             }
             handleTooltip(radioButton->getDescription());
             ImGui::PopStyleColor();
+
+            if (radioButton->hasKeybind()) {
+                // Open context menu on either Right click or Shift+Click
+                auto id = fmt::format("##context-menu-{}-{}", radioButton->getId(), radioButton->getValue());
+                if (ImGui::IsItemClicked(1) || (ImGui::IsItemClicked(0) && ImGui::GetIO().KeyShift)) {
+                    ImGui::OpenPopup(id.c_str());
+                }
+
+                if (ImGui::BeginPopup(id.c_str())) {
+                    auto* keybinds = keybinds::Manager::get();
+                    auto specialId = fmt::format("{}-{}", radioButton->getId(), radioButton->getValue());
+                    auto* keybind = keybinds->getKeybind(specialId);
+
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
+                    if (!keybind->isInitialized() && ImGui::MenuItem("Add keybind")) {
+                        keybinds->setKeybindState(specialId, true);
+                    } else if (keybind->isInitialized() && ImGui::MenuItem("Remove keybind")) {
+                        keybinds->setKeybindState(specialId, false);
+                    }
+                    ImGui::PopStyleColor();
+
+                    ImGui::EndPopup();
+                }
+            }
         }   
 
         void visit(ComboComponent* combo) override {
@@ -379,7 +426,7 @@ namespace eclipse::gui::imgui {
                 ImGui::Button(title.c_str(), ImVec2(labelMaxWidth, 0));
             }
 
-            ImGui::SameLine(0, 0);
+            ImGui::SameLine(0, 2);
 
             ImGui::PopStyleColor(3);
             ImGui::PopStyleVar(2);
@@ -390,7 +437,7 @@ namespace eclipse::gui::imgui {
 
             auto key = config::get<keybinds::Keys>(keybind->getId(), keybinds::Keys::None);
             auto keyName = keybinds::keyToString(key);
-            bool changed = ImGui::Button(keyName.c_str(), ImVec2(availWidth * 0.4f, 0));
+            bool changed = ImGui::Button(keyName.c_str(), ImVec2(availWidth * 0.38f, 0));
             ImGui::PopStyleColor(3);
             ImGui::PopStyleVar();
 
