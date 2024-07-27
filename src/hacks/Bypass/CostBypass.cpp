@@ -12,7 +12,7 @@ namespace eclipse::hacks::Bypass {
 
             tab->addToggle("Cost Bypass", "bypass.costbypass")
                 ->handleKeybinds()
-                ->setDescription("Sets the cost of all shop items to 0 orbs.");
+                ->setDescription("Sets the cost of all shop items to 0 orbs. (requires restart)");
         }
 
         [[nodiscard]] const char* getId() const override { return "Cost Bypass"; }
