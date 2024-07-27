@@ -1,4 +1,5 @@
 #include <Geode/Geode.hpp>
+#include <Geode/loader/SettingEvent.hpp>
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/modify/UILayer.hpp>
 #include <Geode/modify/CCScheduler.hpp>
@@ -7,6 +8,7 @@
 #include <modules/gui/layouts/window/window.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
+#include <imgui-cocos.hpp>
 
 using namespace eclipse;
 
@@ -90,6 +92,13 @@ class $modify(UILayer) {
 };
 
 $on_mod(Loaded) {
+    // Allow user to change between OpenGL 2.0/3.0
+    auto *mod = geode::Mod::get();
+    ImGuiCocos::get().setForceLegacy(mod->getSettingValue<bool>("legacy-render"));
+    geode::listenForSettingChanges<bool>("legacy-render", [](bool value) {
+        ImGuiCocos::get().setForceLegacy(value);
+    });
+
     // Load the configuration file.
     config::load();
 

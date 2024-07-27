@@ -43,5 +43,13 @@
 		"sprites": [
 			"resources/ECLIPSE-android.png"
 		]
+	},
+	"settings": {
+		"legacy-render": {
+			"name": "Use Legacy rendering",
+			"description": "Use OpenGL 2.0 instead of OpenGL 3.0 for rendering, which can solve some rendering issues on older hardware.\nThis setting disables some features like blur and internal recorder.",
+			"type": "bool",
+			"default": false
+		}
 	}
 }

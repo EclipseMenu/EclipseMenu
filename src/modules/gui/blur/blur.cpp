@@ -1,5 +1,5 @@
 #include <memory>
-
+#include <utils.hpp>
 #include "blur.hpp"
 
 using namespace geode::prelude;
@@ -158,18 +158,17 @@ void RenderTexture::setup(GLsizei width, GLsizei height) {
 }
 
 void RenderTexture::cleanup() {
-    if (fbo)
-        glDeleteFramebuffers(1, &fbo);
-    if (tex)
-        glDeleteTextures(1, &tex);
-    if (rbo)
-        glDeleteRenderbuffers(1, &rbo);
+    if (fbo) glDeleteFramebuffers(1, &fbo);
+    if (tex) glDeleteTextures(1, &tex);
+    if (rbo) glDeleteRenderbuffers(1, &rbo);
     fbo = 0;
     tex = 0;
     rbo = 0;
 }
 
 void setupPostProcess() {
+    if (eclipse::utils::shouldUseLegacyDraw()) return;
+
     auto size = CCDirector::get()->getOpenGLView()->getFrameSize() * geode::utils::getDisplayFactor();
 
     ppRt0.setup((GLsizei)size.width, (GLsizei)size.height);
@@ -238,6 +237,7 @@ void cleanupPostProcess() {
 
 // hook time yippee
 
+#include <Geode/loader/SettingEvent.hpp>
 #include <Geode/modify/CCEGLViewProtocol.hpp>
 #include <Geode/modify/GameManager.hpp>
 #include <Geode/modify/CCScheduler.hpp>
@@ -246,7 +246,7 @@ void cleanupPostProcess() {
 #include <numbers>
 
 class $modify(CCNode) {
-    void visit() {
+    void visit() override {
         if (static_cast<CCNode*>(this) != CCDirector::get()->getRunningScene() || ppShader.program == 0) {
             CCNode::visit();
             return;
@@ -292,7 +292,7 @@ class $modify(CCNode) {
 };
 
 class $modify(CCEGLViewProtocol) {
-    void setFrameSize(float width, float height) {
+    void setFrameSize(float width, float height) override {
         CCEGLViewProtocol::setFrameSize(width, height);
 
         if (!CCDirector::get()->getOpenGLView())
@@ -312,7 +312,13 @@ class $modify(GameManager) {
 };
 
 $on_mod(Loaded) {
-    Loader::get()->queueInMainThread([]() {
+    geode::listenForSettingChanges<bool>("legacy-render", [](bool value) {
+        geode::queueInMainThread([]() {
+            cleanupPostProcess();
+            setupPostProcess();
+        });
+    });
+    geode::queueInMainThread([]() {
         cleanupPostProcess();
         setupPostProcess();
     });
@@ -322,19 +328,16 @@ $on_mod(Unloaded) {
 }
 
 class $modify(CCScheduler) {
-    void update(float dt) {
+    void update(float dt) override {
         CCScheduler::update(dt);
 
+        auto deltaTimeMod = CCDirector::get()->getDeltaTime() / 0.1f;
         if (eclipse::gui::Engine::get()->isToggled())
-            blurTimer += CCDirector::get()->getDeltaTime() / 0.1f;
+            blurTimer += deltaTimeMod;
         else
-            blurTimer -= CCDirector::get()->getDeltaTime() / 0.1f;
+            blurTimer -= deltaTimeMod;
 
-        if (blurTimer < 0.f) blurTimer = 0.f;
-        if (blurTimer > 1.f) blurTimer = 1.f;
-
-        if (blurTimer == 0.f)
-            return;
+        blurTimer = std::clamp(blurTimer, 0.f, 1.f);
     }
 };
 
