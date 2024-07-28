@@ -11,16 +11,18 @@ namespace eclipse::hacks::Global {
 
     class AutoSafeMode : public hack::Hack {
     public:
+        static bool hasCheats() {
+            const auto& hacks = hack::Hack::getHacks();
+            return std::any_of(hacks.begin(), hacks.end(), [](auto& hack) {
+                return hack->isCheating();
+            });
+        }
+
         static bool shouldEnable() {
             if (!config::get<bool>("global.autosafemode", false))
                 return false;
 
-            for (auto& hack : hack::Hack::getHacks()) {
-                if (hack->isCheating())
-                    return true;
-            }
-
-            return false;
+            return hasCheats();
         }
 
     private:
@@ -29,6 +31,10 @@ namespace eclipse::hacks::Global {
 
             config::setIfEmpty("global.autosafemode", true);
             tab->addToggle("Auto Safe Mode", "global.autosafemode")->handleKeybinds();
+        }
+
+        void update() override {
+            config::setTemp("hasCheats", hasCheats());
         }
 
         [[nodiscard]] const char* getId() const override { return "Auto Safe Mode"; }

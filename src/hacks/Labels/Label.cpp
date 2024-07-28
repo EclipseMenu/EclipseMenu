@@ -1,52 +1,46 @@
-/*
 #include "Label.hpp"
 #include <utility>
 
+#include <modules/labels/variables.hpp>
+
 namespace eclipse::hacks::Labels {
 
-    Label::Label(std::string text, std::string font)
-        : m_text(std::move(text)), m_font(std::move(font)) {}
+    bool SmartLabel::init(const std::string& text, const std::string& font) {
+        if (!CCLabelBMFont::initWithString("", font.c_str()))
+            return false;
 
-    void Label::addToLayer(cocos2d::CCLayer* layer) {
-        if (m_layer) removeFromLayer();
+        auto res = rift::compile(text);
+        if (res) m_script = res.getValue();
+        else m_error = res.getMessage();
 
-        m_label = cocos2d::CCLabelBMFont::create(m_text.c_str(), m_font.c_str());
-        m_label->setZOrder(1000);
-        m_label->setID(m_id);
-        m_layer = layer;
-        m_layer->addChild(m_label);
-        update();
+        return true;
     }
 
-    void Label::removeFromLayer() {
-        if (!m_layer || !m_label) return;
+    void SmartLabel::setScript(const std::string& script) {
+        if (script == m_text) return;
 
-        m_layer->removeChild(m_label);
-        CC_SAFE_DELETE(m_label);
+        delete m_script;
+        m_script = nullptr;
+        m_text = script;
+        auto res = rift::compile(script);
+        if (res) m_script = res.getValue();
+        else m_error = res.getMessage();
     }
 
-    void Label::update() {
-        if (!m_label) return;
-        m_label->setFntFile(m_font.c_str());
-        m_label->setCString(m_text.c_str());
-        m_label->setVisible(m_visible);
-        m_label->setScale(m_scale);
+    void SmartLabel::update() {
+        if (!isVisible()) return setContentSize({0, 0});
 
-        if (m_heightMultiplier != 1.0f && m_anchor.y == 0) {
-            auto offset = m_label->getContentSize().height - getHeight();
-            m_label->setPosition({m_position.x, m_position.y + offset * m_scale});
+        // Re-evaluate the script
+        if (m_script) {
+            auto text = m_script->run(labels::VariableManager::get().getVariables());
+            setString(text.c_str());
         } else {
-            m_label->setPosition(m_position);
+            setString(m_error.c_str());
         }
 
-        m_label->setAnchorPoint(m_anchor);
-        m_label->setColor(m_color.toCCColor3B());
-        m_label->setOpacity(static_cast<uint8_t>(m_color.a * 255));
+        // Update the content size if needed
+        if (m_heightMultiplier != 1.0f)
+            setContentSize(getContentSize());
     }
 
-    float Label::getHeight() const {
-        if (!m_label) return 0;
-        return m_label->getContentSize().height * m_heightMultiplier;
-    }
-
-}*/
+}

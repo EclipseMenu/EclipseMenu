@@ -64,16 +64,18 @@ class $modify(cocos2d::CCScheduler) {
 
     void update(float dt) override {
         cocos2d::CCScheduler::update(dt);
-        for (auto hack : hack::Hack::getHacks()) {
+        for (const auto& hack : hack::Hack::getHacks()) {
             hack->update();
         }
 
         // Add ability for ImGui to capture right click
-        auto& io = ImGui::GetIO();
-        if (keybinds::isKeyPressed(keybinds::Keys::MouseRight)) {
-            io.AddMouseButtonEvent(1, true);
-        } else if (keybinds::isKeyReleased(keybinds::Keys::MouseRight)) {
-            io.AddMouseButtonEvent(1, false);
+        if (s_isInitialized) {
+            auto& io = ImGui::GetIO();
+            if (keybinds::isKeyPressed(keybinds::Keys::MouseRight)) {
+                io.AddMouseButtonEvent(1, true);
+            } else if (keybinds::isKeyReleased(keybinds::Keys::MouseRight)) {
+                io.AddMouseButtonEvent(1, false);
+            }
         }
 
         keybinds::Manager::get()->update();

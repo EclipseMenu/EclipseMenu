@@ -49,6 +49,10 @@ namespace eclipse::utils {
         return *reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(ptr) + offset);
     }
 
+    /// @brief Gets the current time as a string.
+    /// @param useTwelveHours Whether to use twelve hours format.
+    /// @return Current time as a string (e.g. "16:34:56", "12:34 PM").
+    std::string getClock(bool useTwelveHours = false);
 
     /// @brief Get whether current OpenGL context has an extension.
     /// @param extension Extension to check.
