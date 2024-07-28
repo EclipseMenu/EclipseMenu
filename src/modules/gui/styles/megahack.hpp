@@ -60,6 +60,8 @@ namespace eclipse::gui::imgui {
                     auto keybinds = keybinds::Manager::get();
                     auto keybind = keybinds->getKeybind(checkbox->getId());
 
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
+
                     if (keybind.has_value()) {
                         auto& keybindRef = keybind->get();
 
@@ -252,6 +254,8 @@ namespace eclipse::gui::imgui {
                 if (ImGui::BeginPopup(id.c_str())) {
                     auto keybinds = keybinds::Manager::get();
                     auto keybind = keybinds->getKeybind(floatToggle->getId());
+
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
 
                     if (keybind.has_value()) {
                         auto& keybindRef = keybind->get();
