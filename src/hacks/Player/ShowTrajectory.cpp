@@ -90,10 +90,10 @@ namespace eclipse::hacks::Player {
         }
 
         void resetCollisionLog(PlayerObject* self) {
-            self->m_unk4e8->removeAllObjects();
-            self->m_unk4ec->removeAllObjects();
-            self->m_unk4f0->removeAllObjects();
-            self->m_unk4f4->removeAllObjects();
+            self->m_collisionLogTop->removeAllObjects();
+            self->m_collisionLogBottom->removeAllObjects();
+            self->m_collisionLogLeft->removeAllObjects();
+            self->m_collisionLogRight->removeAllObjects();
         }
 
         void iterateForPlayer(PlayerObject* player, bool down, bool isPlayer2) {
