@@ -269,7 +269,8 @@ namespace eclipse::hacks::Level {
 
     class $modify(ShowHitboxesPOHook, PlayerObject) {
         void playerDestroyed(bool p0) {
-            s_isDead = true;
+            if (auto* pl = PlayLayer::get())
+                s_isDead = this == pl->m_player1 || this == pl->m_player2;
             PlayerObject::playerDestroyed(p0);
         }
     };
