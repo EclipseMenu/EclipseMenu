@@ -27,7 +27,7 @@ namespace eclipse::hacks::Global {
 
     REGISTER_HACK(Speedhack)
 
-    class $modify(cocos2d::CCScheduler) {
+    class $modify(SpeedhackSchedulerHook, cocos2d::CCScheduler) {
         void update(float dt) {
             float speedhack = config::get<bool>("global.speedhack.toggle", false)
                 ? config::get<float>("global.speedhack", 1.f)

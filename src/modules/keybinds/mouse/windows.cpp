@@ -24,7 +24,7 @@ namespace eclipse::keybinds {
         }
     }
 
-    class $modify(cocos2d::CCEGLView) {
+    class $modify(MouseKeybindingsManagerCCEGLVHook, cocos2d::CCEGLView) {
         void onGLFWMouseCallBack(GLFWwindow* window, int button, int action, int mods) {
             cocos2d::CCEGLView::onGLFWMouseCallBack(window, button, action, mods);
 

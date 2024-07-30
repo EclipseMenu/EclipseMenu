@@ -19,7 +19,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(NoDeathEffect)
 
-    class $modify(PlayerObject) {
+    class $modify(NoDeathEffectPOHook, PlayerObject) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("PlayerObject::playDeathEffect");
         }

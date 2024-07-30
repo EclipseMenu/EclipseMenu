@@ -29,7 +29,7 @@ namespace eclipse::hacks::Cosmetic {
     REGISTER_HACK(PracticeMusic)
     REGISTER_HACK(MusicCustomizer)
 
-    class $modify(GameStatsManager) {
+    class $modify(MusicCustomizerGSMHook, GameStatsManager) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("GameStatsManager::isItemUnlocked");
         }

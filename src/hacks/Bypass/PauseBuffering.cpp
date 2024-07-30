@@ -20,7 +20,7 @@ namespace eclipse::hacks::Bypass {
 
     REGISTER_HACK(PauseBuffering)
 
-    class $modify(UILayer) {
+    class $modify(PauseBufferingUILHook, UILayer) {
         void onPause(cocos2d::CCObject* sender) {
             if (!config::get<bool>("bypass.pausebuffering", false))
                 return UILayer::onPause(sender);

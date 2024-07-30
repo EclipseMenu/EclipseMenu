@@ -55,7 +55,7 @@ namespace eclipse::hacks::Bot {
     REGISTER_HACK(Bot)
 
     //temporary, player->m_isDead is wrong
-    class $modify(BotPlayerObject, PlayerObject) {
+    class $modify(BotPOHook, PlayerObject) {
         struct Fields {
             bool m_isDead = false;
         };
@@ -66,8 +66,7 @@ namespace eclipse::hacks::Bot {
         }
     };
 
-    class $modify(PlayLayer) {
-
+    class $modify(BotPLHook, PlayLayer) {
         bool init(GJGameLevel* gj, bool p1, bool p2) {
             bool result = PlayLayer::init(gj, p1, p2);
             s_bot.setLevelInfo(gdr::Level(gj->m_levelName, gj->m_levelID.value()));
@@ -80,8 +79,8 @@ namespace eclipse::hacks::Bot {
             resetFrame = false;
 
             //temporary, player->m_isDead is wrong
-            static_cast<BotPlayerObject*>(m_player1)->m_fields->m_isDead = false;
-            static_cast<BotPlayerObject*>(m_player2)->m_fields->m_isDead = false;
+            static_cast<BotPOHook*>(m_player1)->m_fields->m_isDead = false;
+            static_cast<BotPOHook*>(m_player2)->m_fields->m_isDead = false;
 
             if (s_bot.getState() == bot::State::RECORD) {
                 s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, true, false);
@@ -101,7 +100,7 @@ namespace eclipse::hacks::Bot {
         CheckpointObject* markCheckpoint() {
             if (
                 s_bot.getState() == bot::State::RECORD &&
-                (static_cast<BotPlayerObject*>(m_player1)->m_fields->m_isDead || static_cast<BotPlayerObject*>(m_player2)->m_fields->m_isDead)
+                (static_cast<BotPOHook*>(m_player1)->m_fields->m_isDead || static_cast<BotPOHook*>(m_player2)->m_fields->m_isDead)
             )
                 return nullptr;
 
@@ -120,7 +119,7 @@ namespace eclipse::hacks::Bot {
         }
     };
 
-    class $modify(GJBaseGameLayer) {
+    class $modify(BotBGLHook, GJBaseGameLayer) {
         void processCommands(float dt) {
             GJBaseGameLayer::processCommands(dt);
 

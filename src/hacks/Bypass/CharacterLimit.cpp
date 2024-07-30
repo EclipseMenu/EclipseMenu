@@ -20,9 +20,11 @@ namespace eclipse::hacks::Bypass {
 
     REGISTER_HACK(CharLimit)
 
-    class $modify(CCTextInputNode) {
+    class $modify(CharacterLimitCCTINHook, CCTextInputNode) {
         void updateLabel(gd::string str) {
-            if (config::get<bool>("bypass.charlimit", false)) setMaxLabelLength(99999);
+            if (config::get<bool>("bypass.charlimit", false))
+                setMaxLabelLength(99999);
+
             CCTextInputNode::updateLabel(str);
         }
     };

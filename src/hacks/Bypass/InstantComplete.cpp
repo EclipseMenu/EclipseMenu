@@ -19,7 +19,7 @@ namespace eclipse::hacks::Bypass {
 
     REGISTER_HACK(InstantComplete)
 
-    class $modify(PlayLayer) {
+    class $modify(InstantCompletePLHook, PlayLayer) {
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
             if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 

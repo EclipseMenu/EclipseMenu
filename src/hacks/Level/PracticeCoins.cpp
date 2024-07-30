@@ -20,7 +20,7 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(PracticeCoins)
 
-    class $modify(GJBaseGameLayer) {
+    class $modify(PracticeCoinsBGLHook, GJBaseGameLayer) {
         void collisionCheckObjects(PlayerObject* player, gd::vector<GameObject*>* gameObjects, int p2, float p3) {
             if (!config::get<bool>("level.practicecoins", false))
                 return GJBaseGameLayer::collisionCheckObjects(player, gameObjects, p2, p3);

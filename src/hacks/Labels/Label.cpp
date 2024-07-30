@@ -1,5 +1,4 @@
 #include "Label.hpp"
-#include <utility>
 
 #include <modules/labels/variables.hpp>
 
@@ -9,9 +8,14 @@ namespace eclipse::hacks::Labels {
         if (!CCLabelBMFont::initWithString("", font.c_str()))
             return false;
 
+        const auto& contentSize = this->getContentSize();
+        m_contentSize = cocos2d::CCSize{ contentSize.width, contentSize.height * m_heightMultiplier };
+
         auto res = rift::compile(text);
-        if (res) m_script = res.getValue();
-        else m_error = res.getMessage();
+        if (res)
+            m_script = res.getValue();
+        else
+            m_error = res.getMessage();
 
         return true;
     }
@@ -22,25 +26,35 @@ namespace eclipse::hacks::Labels {
         delete m_script;
         m_script = nullptr;
         m_text = script;
+
         auto res = rift::compile(script);
-        if (res) m_script = res.getValue();
-        else m_error = res.getMessage();
+        if (res)
+            m_script = res.getValue();
+        else
+            m_error = res.getMessage();
     }
 
     void SmartLabel::update() {
-        if (!isVisible()) return setContentSize({0, 0});
+        if (!isVisible()) {
+            m_contentSize = cocos2d::CCSize{0, 0};
+
+            return this->setContentSize({0, 0});
+        }
 
         // Re-evaluate the script
         if (m_script) {
             auto text = m_script->run(labels::VariableManager::get().getVariables());
-            setString(text.c_str());
+            this->setString(text.c_str());
         } else {
-            setString(m_error.c_str());
+            this->setString(m_error.c_str());
         }
 
         // Update the content size if needed
         if (m_heightMultiplier != 1.0f)
-            setContentSize(getContentSize());
+            this->setContentSize(this->getContentSize());
+
+        const auto& contentSize = this->getContentSize();
+        m_contentSize = cocos2d::CCSize{ contentSize.width, contentSize.height * m_heightMultiplier };
     }
 
 }

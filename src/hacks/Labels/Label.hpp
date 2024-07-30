@@ -37,12 +37,12 @@ namespace eclipse::hacks::Labels {
         void update();
 
         [[nodiscard]] const cocos2d::CCSize& getContentSize() const override {
-            auto initial = cocos2d::CCLabelBMFont::getContentSize();
-            return { initial.width, initial.height * m_heightMultiplier };
+            return m_contentSize;
         }
 
     private:
         cocos2d::CCPoint m_customPosition = {0, 0};
+        cocos2d::CCSize m_contentSize;
         float m_heightMultiplier = 1.0f;
         rift::Script* m_script = nullptr;
         std::string m_text;

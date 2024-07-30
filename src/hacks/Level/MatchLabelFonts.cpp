@@ -20,7 +20,7 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(MatchLabelFonts)
 
-    class $modify(PlayLayer) {
+    class $modify(MatchLabelFontsPLHook, PlayLayer) {
         void onEnterTransitionDidFinish() {
             PlayLayer::onEnterTransitionDidFinish();
 

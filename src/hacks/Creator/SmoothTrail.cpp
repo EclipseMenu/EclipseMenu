@@ -20,7 +20,7 @@ namespace eclipse::hacks::Creator {
 
     REGISTER_HACK(SmoothTrail)
 
-    class $modify(LevelEditorLayer) {
+    class $modify(SmoothTrailLELHook, LevelEditorLayer) {
         void postUpdate(float dt) {
             if (config::get("creator.smoothtrail", false))
                 m_trailTimer = 0.1f; // Force trail update every frame

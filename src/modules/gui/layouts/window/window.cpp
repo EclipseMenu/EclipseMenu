@@ -57,7 +57,7 @@ namespace eclipse::gui::imgui {
         // Built-ins go into first column
         float x = snap;
         float y = snap;
-        for (auto& title: builtInWindows) {
+        for (auto& title : builtInWindows) {
             auto it = std::find_if(m_windows.begin(), m_windows.end(), [&title](const Window& window) {
                 return window.getTitle() == title;
             });
@@ -73,7 +73,7 @@ namespace eclipse::gui::imgui {
         // Rest are stacked to take as little space as possible
         auto columnCount = firstColumnLock ? columns - 1 : columns;
         std::vector<float> heights(columnCount, snap);
-        for (auto& window: m_windows) {
+        for (auto& window : m_windows) {
             // Skip built-in windows
             if (std::find(builtInWindows.begin(), builtInWindows.end(), window.getTitle()) != builtInWindows.end())
                 continue;
@@ -183,9 +183,8 @@ namespace eclipse::gui::imgui {
 
         // Run move actions
         auto deltaTime = ImGui::GetIO().DeltaTime;
-        for (auto action: m_actions) {
+        for (auto action : m_actions)
             action->update(deltaTime);
-        }
 
         // Remove finished actions
         m_actions.erase(std::remove_if(m_actions.begin(), m_actions.end(), [](auto action) {

@@ -33,7 +33,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(AutoKill)
 
-    class $modify(GJBaseGameLayer) {
+    class $modify(AutoKillBGLHook, GJBaseGameLayer) {
         void killPlayer() {
             auto* playLayer = PlayLayer::get();
             if (!playLayer) return;

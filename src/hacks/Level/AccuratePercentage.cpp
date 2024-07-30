@@ -30,7 +30,7 @@ namespace eclipse::hacks::Global {
 
     REGISTER_HACK(AccuratePercentage)
 
-    class $modify(PlayLayer) {
+    class $modify(AccuratePercentagePLHook, PlayLayer) {
         float customGetProgress() {
             if (config::get<bool>("level.accuratepercent.bugfix", true)) {
                 float percent;

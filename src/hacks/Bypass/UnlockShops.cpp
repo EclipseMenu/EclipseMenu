@@ -20,7 +20,7 @@ namespace eclipse::hacks::Bypass {
 
     REGISTER_HACK(UnlockShops)
 
-    class $modify(GameManager) {
+    class $modify(UnlockShopsGMHook, GameManager) {
         bool getUGV(const char* key) {
             if (GameManager::getUGV(key))
                 return true;

@@ -62,7 +62,7 @@ namespace eclipse::hacks::Level {
             }
     };
 
-    class $modify(PauseBGL, GJBaseGameLayer) {
+    class $modify(PauseBGLHook, GJBaseGameLayer) {
         struct Fields {
             float pausedt = 0.f;
         };
@@ -76,16 +76,19 @@ namespace eclipse::hacks::Level {
         }
     };
 
-    class $modify(PauseLayer) {
+    class $modify(PauseCountdownPLHook, PauseLayer) {
         void onResume(cocos2d::CCObject* sender) {
             PauseLayer::onResume(sender);
 
-            auto* bg = static_cast<PauseBGL*>(PauseBGL::get());
+            auto* bg = static_cast<PauseBGLHook*>(PauseBGLHook::get());
 
             if (!PlayLayer::get() || !bg) return;
             if (bg->m_gameState.m_currentProgress == 0) return;
+
             bg->m_fields->pausedt = config::get<float>("level.pausecount.time", 3.f);
-            if (config::get<bool>("level.pausecount", false)) bg->addChild(PauseCountdown::create());
+
+            if (config::get<bool>("level.pausecount", false))
+                bg->addChild(PauseCountdown::create());
         }
     };
 }

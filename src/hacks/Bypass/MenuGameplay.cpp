@@ -19,7 +19,7 @@ namespace eclipse::hacks::Bypass {
 
     REGISTER_HACK(MenuGameplay)
 
-    class $modify(MenuGameLayer) {
+    class $modify(MenuGameplayMGLHook, MenuGameLayer) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("MenuGameLayer::tryJump");
             SAFE_PRIORITY("MenuGameLayer::update");

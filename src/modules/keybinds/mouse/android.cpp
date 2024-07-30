@@ -6,7 +6,7 @@
 
 namespace eclipse::keybinds {
 
-    class $modify(cocos2d::CCTouchDispatcher) {
+    class $modify(MouseKeybindingsManagerCCTDHook, cocos2d::CCTouchDispatcher) {
         static void onModify(auto& self) {
             FIRST_PRIORITY("cocos2d::CCTouchDispatcher::touches");
         }

@@ -20,14 +20,14 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(HidePause)
 
-    class $modify(HPMPauseLayer, PauseLayer) {
+    class $modify(HPMPauseLayerHook, PauseLayer) {
         void customSetup() override {
-            HPMPauseLayer::createHideScheduler(this);
+            HPMPauseLayerHook::createHideScheduler(this);
             PauseLayer::customSetup();
         }
 
         static void createHideScheduler(PauseLayer* pauseLayer) {
-            pauseLayer->schedule(schedule_selector(HPMPauseLayer::updatePauseMenu));
+            pauseLayer->schedule(schedule_selector(HPMPauseLayerHook::updatePauseMenu));
             pauseLayer->setVisible(!config::get<bool>("level.hidepause", false));
         }
 

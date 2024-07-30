@@ -33,7 +33,7 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(CompactEditorLevels);
     REGISTER_HACK(CompactProfileComments);
 
-    class $modify(CustomListView) {
+    class $modify(CompactLevelsCommentsCLVHook, CustomListView) {
         /*
         original code by cvolton, re-used for "my levels" list
         and now reused for profile comments yayy
@@ -50,17 +50,20 @@ namespace eclipse::hacks::Global {
         }
     };
 
-    class $modify(LevelCell) {
+    class $modify(CompactLevelsCommentsLCHook, LevelCell) {
         void onClick(CCObject* sender) {
             // get the "view" button to work with compact mode in "my levels"
-            if (this->m_level->m_levelType == GJLevelType::Editor && config::get<bool>("global.compacteditorlevels", false)) {
-                const auto scene = cocos2d::CCScene::create();
-                scene->addChild(EditLevelLayer::create(m_level));
-                cocos2d::CCDirector::sharedDirector()->replaceScene(cocos2d::CCTransitionFade::create(0.5f, scene));
-            } else LevelCell::onClick(sender);
+            if (this->m_level->m_levelType == GJLevelType::Editor && config::get<bool>("global.compacteditorlevels", false))
+                cocos2d::CCDirector::sharedDirector()->replaceScene(
+                    cocos2d::CCTransitionFade::create(0.5f, EditLevelLayer::scene(m_level))
+                );
+            else
+                LevelCell::onClick(sender);
         }
+
         void loadLocalLevelCell() {
             LevelCell::loadLocalLevelCell();
+
             if (config::get<bool>("global.compacteditorlevels", false)) {
                 if (const auto localLevelname = geode::cast::typeinfo_cast<cocos2d::CCLabelBMFont*>(getChildByIDRecursive("level-name")))
                     localLevelname->limitLabelWidth(200.f, .6f, .01f);
