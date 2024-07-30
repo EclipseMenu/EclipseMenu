@@ -22,7 +22,7 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         // Temporarily add a button to toggle the GUI on android. (This will be removed later)
         auto androidButton = CCMenuItemSpriteExtra::create(
             cocos2d::CCSprite::createWithSpriteFrameName("GJ_everyplayBtn_001.png"),
-            this, menu_selector(EclipseButtonMenuLayerHook::onToggleUI)
+            this, menu_selector(EclipseButtonMLHook::onToggleUI)
         );
         androidButton->setID("toggle"_spr);
         auto menu = this->getChildByID("bottom-menu");
