@@ -11,7 +11,7 @@ namespace eclipse::hacks::Level {
             auto tab = gui::MenuTab::find("Level");
 
             tab->addToggle("Match Percent/Time Fonts", "level.matchlabelfonts")
-                ->setDescription("Matches the level percentage/level time UI element's font\nwith the font used in a level. (Created by RayDeeUx)")
+                ->setDescription("Matches the level percentage/level time UI element's font with the font used in a level. (Created by RayDeeUx)")
                 ->handleKeybinds();
         }
 

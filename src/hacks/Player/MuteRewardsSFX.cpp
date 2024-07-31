@@ -11,7 +11,7 @@ namespace eclipse::hacks::Player {
             auto tab = gui::MenuTab::find("Player");
 
             tab->addToggle("Mute Rewards SFX on Death", "player.muterewardssfx")
-                ->setDescription("Disables all rewards SFX (orbs, diamonds, keys)\nwhen the player dies. (Created by RayDeeUx)")
+                ->setDescription("Disables all rewards SFX (orbs, diamonds, keys) when the player dies. (Created by RayDeeUx)")
                 ->handleKeybinds();
         }
 
