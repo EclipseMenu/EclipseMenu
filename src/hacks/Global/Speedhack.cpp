@@ -10,7 +10,9 @@ namespace eclipse::hacks::Global {
         void init() override {
             auto tab = gui::MenuTab::find("Global");
 
-            config::setIfEmpty("global.speedhack.toggle", false);
+            // speedhack should always be disabled by default
+            // to prevent freezing the game while loading
+            config::set("global.speedhack.toggle", false);
             config::setIfEmpty("global.speedhack", 1.f);
 
             tab->addFloatToggle("Speedhack", "global.speedhack", 0.0001f, 1000.f, "%.4f")

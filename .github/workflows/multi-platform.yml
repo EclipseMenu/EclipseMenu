@@ -14,6 +14,7 @@ jobs:
         config:
         - name: Windows
           os: windows-latest
+          build-type: RelWithDebInfo
 
         - name: macOS
           os: macos-latest
@@ -41,6 +42,7 @@ jobs:
           combine: true
           export-pdb: true
           target: ${{ matrix.config.target }}
+          build-config: ${{ matrix.config.build-type || 'Release' }}
 
   package:
     name: Package builds
