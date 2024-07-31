@@ -11,7 +11,7 @@ namespace eclipse::hacks::Player {
             auto tab = gui::MenuTab::find("Player");
 
             tab->addToggle("No Hide Trigger", "player.nohidetrigger")
-                ->setDescription("Disables hide player triggers.")
+                ->setDescription("Disables \"Hide Player\" triggers. (Players will still be hidden if an \"Options\" trigger is set up to do so.)")
                 ->handleKeybinds();
         }
 

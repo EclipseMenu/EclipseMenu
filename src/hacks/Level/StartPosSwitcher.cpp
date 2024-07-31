@@ -28,7 +28,7 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("StartPos Switcher", "level.startpos_switcher")
                 ->handleKeybinds()
-                ->setDescription("Allows you to switch between StartPos objects")
+                ->setDescription("Allows you to switch between StartPos objects.")
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                     options->addKeybind("Previous StartPos", "level.startpos_switcher.previous");
                     options->addKeybind("Next StartPos", "level.startpos_switcher.next");

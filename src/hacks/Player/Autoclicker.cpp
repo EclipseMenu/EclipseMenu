@@ -14,6 +14,7 @@ namespace eclipse::hacks::Player {
 
             tab->addToggle("AutoClicker", "player.autoclick")
                 ->handleKeybinds()
+                ->setDescription("Clicks periodically when playing levels. Applies to both the level editor and actual levels. (Created by AzureBluet)")
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                     options->addInputFloat("Interval", "player.autoclick.interval", 0.f, 10.f, "%.3f s.");
                 });

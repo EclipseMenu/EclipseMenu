@@ -12,7 +12,7 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("Auto Practice Mode", "level.autopracticemode")
                 ->handleKeybinds()
-                ->setDescription("Automatically enables practice mode upon entering a level");
+                ->setDescription("Automatically enables practice mode when entering a level. (Created by Uproxide)");
         }
 
         [[nodiscard]] const char* getId() const override { return "Auto Practice Mode"; }

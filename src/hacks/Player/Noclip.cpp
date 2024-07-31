@@ -11,7 +11,7 @@ namespace eclipse::hacks::Player {
             auto tab = gui::MenuTab::find("Player");
 
             tab->addToggle("Noclip", "player.noclip")
-                ->setDescription("Disables player death")
+                ->setDescription("Disables player death.")
                 ->handleKeybinds();
         }
 
