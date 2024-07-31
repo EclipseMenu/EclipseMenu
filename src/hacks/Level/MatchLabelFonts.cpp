@@ -11,7 +11,7 @@ namespace eclipse::hacks::Level {
             auto tab = gui::MenuTab::find("Level");
 
             tab->addToggle("Match Percent/Time Fonts", "level.matchlabelfonts")
-                ->setDescription("Matches the level percentage/level time UI element's font with the font used in a level. (Created by RayDeeUx)")
+                ->setDescription("Matches the level percentage/level time UI element's font\nwith the font used in a level. (Created by RayDeeUx)")
                 ->handleKeybinds();
         }
 
@@ -20,10 +20,9 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(MatchLabelFonts)
 
+    static const std::string s_bigFontName = "bigFont.fnt";
+
     class $modify(MatchLabelFontsPLHook, PlayLayer) {
-        struct Fields {
-            const std::string bigFontName = "bigFont.fnt";
-        };
 
         void matchLabelFonts() {
             m_percentageLabel->setFntFile(m_attemptLabel->getFntFile());
@@ -34,11 +33,11 @@ namespace eclipse::hacks::Level {
         }
 
         bool percentLabelBigFnt() {
-            return m_percentageLabel->getFntFile() == m_fields->bigFontName;
+            return m_percentageLabel->getFntFile() == s_bigFontName;
         }
 
         bool attemptLabelNotBigFnt() {
-            return m_attemptLabel->getFntFile() != m_fields->bigFontName;
+            return m_attemptLabel->getFntFile() != s_bigFontName;
         }
 
         bool shouldMatchLabelFonts() {

@@ -12,7 +12,7 @@ namespace eclipse::hacks::Level {
             auto tab = gui::MenuTab::find("Level");
 
             tab->addToggle("Hide Level Complete VFX", "level.hidelevelcomplete")
-                ->setDescription("Hides the explosion and fireworks seen when completing a level. (Does not hide particles.) (Created by RayDeeUx)")
+                ->setDescription("Hides the explosion and fireworks seen when completing a level.\nDoes not hide particles. (Created by RayDeeUx)")
                 ->handleKeybinds();
         }
 
@@ -22,15 +22,22 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(HideLevelCompleteVFX)
 
     class $modify(HideLevelCompleteVFXCCCWHook, CCCircleWave) {
-        static CCCircleWave* create(float startRadius, float endRadius, float duration, bool fadeIn, bool easeOut) {
-            CCCircleWave* cw = CCCircleWave::create(startRadius, endRadius, duration, fadeIn, easeOut);
+        void draw() {
+            CCCircleWave::draw();
             PlayLayer* pl = PlayLayer::get();
-            if (!pl) return cw;
+            if (!pl) return;
 
             if (pl->m_levelEndAnimationStarted && config::get<bool>("level.hidelevelcomplete", false))
-                cw->setVisible(false);
+                /*
+                CCCircleWaves sometimes get added
+                as child of CurrencyRewardLayer when completing rated levels
+                so i had to change hooks to CCCircleWave::draw();
 
-            return cw;
+                this doesnt affect CCCircleWaves when playlayer is active
+                thanks to the m_levelEndAnimationStarted member variable
+                */
+                if (!geode::cast::typeinfo_cast<CurrencyRewardLayer*>(this->getParent()))
+                    this->setVisible(false);
         }
     };
 

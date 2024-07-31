@@ -11,7 +11,7 @@ namespace eclipse::hacks::Player {
             auto tab = gui::MenuTab::find("Player");
 
             tab->addToggle("Mute Level Audio On Death", "player.mutelevelaudioondeath")
-                ->setDescription("Mutes all level audio (Music + SFX) on player death. (Created by RayDeeUx)")
+                ->setDescription("Mutes all level audio (Music + SFX)\non player death. (Created by RayDeeUx)")
                 ->handleKeybinds();
         }
 
