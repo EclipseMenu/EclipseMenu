@@ -21,11 +21,42 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(MatchLabelFonts)
 
     class $modify(MatchLabelFontsPLHook, PlayLayer) {
-        void onEnterTransitionDidFinish() {
-            PlayLayer::onEnterTransitionDidFinish();
+        struct Fields {
+            const std::string bigFontName = "bigFont.fnt";
+        };
 
-            if (m_attemptLabel && m_percentageLabel && config::get<bool>("level.matchlabelfonts", false))
-                m_percentageLabel->setFntFile(m_attemptLabel->getFntFile());
+        void matchLabelFonts() {
+            m_percentageLabel->setFntFile(m_attemptLabel->getFntFile());
+        }
+
+        bool labelsExist() {
+            return m_attemptLabel && m_percentageLabel;
+        }
+
+        bool percentLabelBigFnt() {
+            return m_percentageLabel->getFntFile() == m_fields->bigFontName;
+        }
+
+        bool attemptLabelNotBigFnt() {
+            return m_attemptLabel->getFntFile() != m_fields->bigFontName;
+        }
+
+        bool shouldMatchLabelFonts() {
+            return labelsExist() && percentLabelBigFnt() && attemptLabelNotBigFnt();
+        }
+
+        void updateProgressbar() {
+            PlayLayer::updateProgressbar();
+
+            if (shouldMatchLabelFonts() && config::get<bool>("level.matchlabelfonts", false))
+                matchLabelFonts();
+        }
+
+        void levelComplete() {
+            PlayLayer::levelComplete();
+
+            if (shouldMatchLabelFonts() && config::get<bool>("level.matchlabelfonts", false))
+                matchLabelFonts();
         }
     };
 

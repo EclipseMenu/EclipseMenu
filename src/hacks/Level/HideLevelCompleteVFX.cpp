@@ -21,7 +21,6 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(HideLevelCompleteVFX)
 
-
     class $modify(HideLevelCompleteVFXCCCWHook, CCCircleWave) {
         static CCCircleWave* create(float startRadius, float endRadius, float duration, bool fadeIn, bool easeOut) {
             CCCircleWave* cw = CCCircleWave::create(startRadius, endRadius, duration, fadeIn, easeOut);
