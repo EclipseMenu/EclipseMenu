@@ -20,7 +20,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(NoRespawnFlash)
 
-    class $modify(PlayerObject) {
+    class $modify(NoRespawnFlashPOHook, PlayerObject) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("PlayerObject::playSpawnEffect");
         }

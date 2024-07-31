@@ -21,22 +21,22 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(MuteRewardsSFX)
 
     const std::array<std::string_view, 4> badSFX = { "achievement_01.ogg", "magicExplosion.ogg", "gold02.ogg", "secretKey.ogg" };
-    class $modify(FMODAudioEngine) {
+
+    class $modify(MuteRewardsSFXFMODAEHook, FMODAudioEngine) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("FMODAudioEngine::playEffect");
         }
 
-        void playEffect(gd::string path, float p1, float p2, float p3) {
+        void playEffect(gd::string path, float speed, float p2, float volume) {
             if (!config::get<bool>("player.muterewardssfx", false))
-                return FMODAudioEngine::sharedEngine()->playEffect(path, p1, p2, p3);
+                return FMODAudioEngine::sharedEngine()->playEffect(path, speed, p2, volume);
 
-            auto pl = PlayLayer::get();
+            auto* pl = PlayLayer::get();
 
             // play sfx if not in playlayer
             if (!pl || !pl->m_player1->m_isDead || pl->m_isPaused)
-                return FMODAudioEngine::sharedEngine()->playEffect(path, p1, p2, p3);
+                return FMODAudioEngine::sharedEngine()->playEffect(path, speed, p2, volume);
 
-            // these bools could be in one if statement but are separated for readability
             bool notFoundInBadSFX = std::find(
                 badSFX.begin(),
                 badSFX.end(),
@@ -44,7 +44,7 @@ namespace eclipse::hacks::Player {
             ) == badSFX.end();
 
             if (notFoundInBadSFX)
-                FMODAudioEngine::sharedEngine()->playEffect(path, p1, p2, p3);
+                FMODAudioEngine::sharedEngine()->playEffect(path, speed, p2, volume);
         }
     };
 

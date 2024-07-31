@@ -62,7 +62,7 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(AutoSafeMode)
     REGISTER_HACK(SafeMode)
 
-    class $modify(PlayLayer) {
+    class $modify(SafeModePLHook, PlayLayer) {
         struct Fields {
             std::uint32_t totalJumps;
             std::uint32_t totalAttempts;
@@ -126,7 +126,7 @@ namespace eclipse::hacks::Global {
         }
     };
 
-    class $modify(PlayerObject) {
+    class $modify(SafeModePOHook, PlayerObject) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("PlayerObject::incrementJumps");
         }

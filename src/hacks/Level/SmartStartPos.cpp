@@ -20,7 +20,7 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(SmartStartPos)
 
-    class $modify(PlayLayer) {
+    class $modify(SmartStartPosPLHook, PlayLayer) {
         struct Fields {
             std::vector<StartPosObject*> m_startPositions;
             std::vector<GameObject*> m_dualPortals, m_gamemodePortals, m_miniPortals, m_speedChanges, m_mirrorPortals;

@@ -18,7 +18,7 @@ namespace eclipse::hacks::Bypass {
 
     REGISTER_HACK(UnlockIcons)
 
-    class $modify(GameManager) {
+    class $modify(UnlockIconsGMHook, GameManager) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("GameManager::isColorUnlocked");
             SAFE_PRIORITY("GameManager::isIconUnlocked");

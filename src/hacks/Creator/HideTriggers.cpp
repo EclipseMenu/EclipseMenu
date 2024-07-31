@@ -28,7 +28,7 @@ namespace eclipse::hacks::Creator {
         return id == 200 || id == 201 || id == 202 || id == 203 || id == 1334;
     }
 
-    class $modify(EditorUI) {
+    class $modify(HideTriggersEUIHook, EditorUI) {
         void onPlaytest(cocos2d::CCObject* sender) {
             EditorUI::onPlaytest(sender);
             if (!config::get<bool>("creator.hidetriggers", false)) return;
@@ -47,15 +47,15 @@ namespace eclipse::hacks::Creator {
         }
     };
 
-    class $modify(LevelEditorLayer) {
+    class $modify(HideTriggersLELHook, LevelEditorLayer) {
         void onStopPlaytest() {
             LevelEditorLayer::onStopPlaytest();
             if (!config::get<bool>("creator.hidetriggers", false)) return;
 
             // Show all triggers
-            for (auto obj : s_editorTriggers) {
+            for (auto obj : s_editorTriggers)
                 obj->setVisible(true);
-            }
+
             s_editorTriggers.clear();
         }
 
@@ -64,9 +64,8 @@ namespace eclipse::hacks::Creator {
             if (!config::get<bool>("creator.hidetriggers", false)) return;
 
             // Hide all triggers
-            for (auto obj : s_editorTriggers) {
+            for (auto obj : s_editorTriggers)
                 obj->setVisible(false);
-            }
         }
     };
 }

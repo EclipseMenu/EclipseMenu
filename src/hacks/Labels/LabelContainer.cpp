@@ -64,7 +64,9 @@ namespace eclipse::hacks::Labels {
     void LabelsContainer::updatePosition() {
         auto winSize = cocos2d::CCDirector::sharedDirector()->getWinSize();
         auto padding = config::get<float>("labels.padding", 3.f);
+
         setContentSize({ winSize.width - padding * 2, winSize.height - padding * 2 });
+
         switch (m_alignment) {
             case Alignment::TopLeft:
                 setPosition(padding, winSize.height - padding);
@@ -103,10 +105,11 @@ namespace eclipse::hacks::Labels {
                 setAnchorPoint({1, 0});
                 break;
         }
+
         this->updateLayout(false);
     }
 
-    void LabelsContainer::addLabel(SmartLabel *label, const std::function<void(SmartLabel*)> &update) {
+    void LabelsContainer::addLabel(SmartLabel* label, const std::function<void(SmartLabel*)>& update) {
         m_labels.emplace_back(label, update);
 
         // set anchor point
@@ -143,8 +146,8 @@ namespace eclipse::hacks::Labels {
         addChild(label);
     }
 
-    void LabelsContainer::removeLabel(SmartLabel *label) {
-        auto it = std::find_if(m_labels.begin(), m_labels.end(), [label](const auto &pair) {
+    void LabelsContainer::removeLabel(SmartLabel* label) {
+        auto it = std::find_if(m_labels.begin(), m_labels.end(), [label](const auto& pair) {
             return pair.first == label;
         });
 
@@ -157,7 +160,7 @@ namespace eclipse::hacks::Labels {
     void LabelsContainer::update() {
         if (!isVisible()) return;
 
-        for (auto &label: m_labels) {
+        for (auto& label : m_labels) {
             label.second(label.first);
             label.first->update();
         }

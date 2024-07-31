@@ -35,6 +35,7 @@ namespace eclipse::hacks::Recorder {
                 d = config::get<int>("recorder.resolution.y", 1080);
             }
         }
+
         reinterpret_cast<void(__stdcall *)(GLint, GLint, GLsizei, GLsizei)>(glViewportAddress)(a, b, c, d);
     }
 
@@ -169,7 +170,7 @@ namespace eclipse::hacks::Recorder {
 
     REGISTER_HACK(InternalRecorder)
 
-    class $modify(ShaderLayer){
+    class $modify(InternalRecorderSLHook, ShaderLayer) {
         void visit() {
             inShaderLayer = true;
             ShaderLayer::visit();
@@ -177,7 +178,7 @@ namespace eclipse::hacks::Recorder {
         }
     };
 
-    class $modify(cocos2d::CCScheduler) {
+    class $modify(InternalRecorderSchedulerHook, cocos2d::CCScheduler) {
         static void onModify(auto& self) {
             FIRST_PRIORITY("cocos2d::CCScheduler::update");
         }
@@ -198,8 +199,7 @@ namespace eclipse::hacks::Recorder {
         }
     };
 
-    class $modify(GJBaseGameLayer) {
-
+    class $modify(InternalRecorderBGLHook, GJBaseGameLayer) {
         void syncMusic() {
             //temp hardcoded
             uint32_t tps = 240;
@@ -231,7 +231,6 @@ namespace eclipse::hacks::Recorder {
 
             if (levelDone) {
                 if (afterEndTimer > endscreen) {
-
                     if (s_recorder.isRecording())
                         startAudio();
                     else if (s_recorder.isRecordingAudio())
@@ -243,7 +242,8 @@ namespace eclipse::hacks::Recorder {
                     afterEndTimer += dt;
             }
 
-            if (!s_recorder.isRecording()) return GJBaseGameLayer::update(dt);
+            if (!s_recorder.isRecording())
+                return GJBaseGameLayer::update(dt);
 
             float fps = config::get<float>("recorder.fps", 60.f);
             float timewarp = m_gameState.m_timeWarp;
@@ -268,23 +268,19 @@ namespace eclipse::hacks::Recorder {
         }
     };
     
-    class $modify(PlayLayer)
-    {
-        void onQuit()
-        {
+    class $modify(InternalRecorderPLHook, PlayLayer) {
+        void onQuit() {
             if (s_recorder.isRecording()) stop();
             if (s_recorder.isRecordingAudio()) stopAudio();
             PlayLayer::onQuit();
         }
 
-        void levelComplete()
-        {
+        void levelComplete() {
             PlayLayer::levelComplete();
             levelDone = true;
         }
 
-        void resetLevel()
-        {
+        void resetLevel() {
             levelDone = false;
             PlayLayer::resetLevel();
         }

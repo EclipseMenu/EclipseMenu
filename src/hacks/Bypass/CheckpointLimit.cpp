@@ -20,7 +20,7 @@ namespace eclipse::hacks::Bypass {
 
     REGISTER_HACK(CheckpointLimit)
 
-    class $modify(PlayLayer) {
+    class $modify(CheckpointLimitPLHook, PlayLayer) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("PlayLayer::storeCheckpoint");
         }

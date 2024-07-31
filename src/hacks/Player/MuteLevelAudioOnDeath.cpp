@@ -20,7 +20,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(MuteLevelAudioOnDeath)
 
-    class $modify(PlayerObject) {
+    class $modify(MuteLevelAudioOnDeathPOHook, PlayerObject) {
         /*
         originally from erysedits by raydeeux.
         adapted by raydeeux, and improved using 2.206's bindings.

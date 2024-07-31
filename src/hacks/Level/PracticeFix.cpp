@@ -867,7 +867,7 @@ namespace eclipse::Hacks::Level {
 
     };
 
-    class $modify(LevelEditorLayer) {
+    class $modify(PracticeFixLELHook, LevelEditorLayer) {
         bool init(GJGameLevel* level, bool unk) {
             bool result = LevelEditorLayer::init(level, unk);
 
@@ -878,7 +878,7 @@ namespace eclipse::Hacks::Level {
         }
     };
 
-    class $modify(CheckpointObject) {
+    class $modify(PracticeFixCOHook, CheckpointObject) {
 #ifdef GEODE_IS_ANDROID
         static CheckpointObject* create() { // this is so dumb
             auto result = CheckpointObject::create();

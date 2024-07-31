@@ -22,7 +22,7 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(HideLevelCompleteVFX)
 
 
-    class $modify(CCCircleWave) {
+    class $modify(HideLevelCompleteVFXCCCWHook, CCCircleWave) {
         static CCCircleWave* create(float startRadius, float endRadius, float duration, bool fadeIn, bool easeOut) {
             CCCircleWave* cw = CCCircleWave::create(startRadius, endRadius, duration, fadeIn, easeOut);
             PlayLayer* pl = PlayLayer::get();
@@ -35,7 +35,7 @@ namespace eclipse::hacks::Level {
         }
     };
 
-    class $modify(CCLightFlash) {
+    class $modify(HideLevelCompleteVFXCCLFHook, CCLightFlash) {
         // i cant believe i need to hook this function with NINETEEN params to get things working what the heck :despair:
         void playEffect(cocos2d::CCPoint point, cocos2d::ccColor3B color, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, float p10, float p11, float p12, float p13, float p14, float p15, int p16, bool p17, bool p18, float p19) {
             PlayLayer* pl = PlayLayer::get();

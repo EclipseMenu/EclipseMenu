@@ -20,7 +20,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(NoGhostTrail)
 
-    class $modify(PlayerObject) {
+    class $modify(NoGhostTrailPOHook, PlayerObject) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("PlayerObject::toggleGhostEffect");
         }

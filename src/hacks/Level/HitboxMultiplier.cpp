@@ -91,8 +91,7 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(HitboxMultiplier)
 
-    class $modify(PlayLayer) {
-
+    class $modify(HitboxMultiplierPLHook, PlayLayer) {
         bool init(GJGameLevel* level, bool unk, bool dontCreateObjects) {
             reset();
             return PlayLayer::init(level, unk, dontCreateObjects);
@@ -109,7 +108,7 @@ namespace eclipse::hacks::Level {
         }
     };
 
-    class $modify(LevelEditorLayer) {
+    class $modify(HitboxMultiplierLELHook, LevelEditorLayer) {
         bool init(GJGameLevel* level, bool unk) {
             reset();
             bool res = LevelEditorLayer::init(level, unk);
@@ -123,7 +122,7 @@ namespace eclipse::hacks::Level {
         }
     };
 
-    class $modify(OBB2D) {
+    class $modify(HitboxMultiplierOBB2DHook, OBB2D) {
         void calculateWithCenter(cocos2d::CCPoint center, float width, float heigth, float rotation) {
             if (!GJBaseGameLayer::get() || !config::get<bool>("level.hitbox_multiplier", false) || !s_rotatedGameObject) {
                 s_rotatedGameObject = nullptr;

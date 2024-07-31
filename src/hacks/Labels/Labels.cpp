@@ -41,7 +41,7 @@ namespace eclipse::hacks::Labels {
         };
     }
 
-    class $modify(LabelsUILayer, UILayer) {
+    class $modify(LabelsUILHook, UILayer) {
         struct Fields {
             std::array<LabelsContainer*, 9> m_containers;
         };

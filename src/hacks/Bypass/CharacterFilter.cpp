@@ -20,10 +20,12 @@ namespace eclipse::hacks::Bypass {
 
     REGISTER_HACK(CharFilter)
 
-    class $modify(CCTextInputNode) {
+    class $modify(CharacterFilterCCTINHook, CCTextInputNode) {
         void updateLabel(gd::string str) {
             // im just gonna hope this is all of it
-            if (config::get<bool>("bypass.charfilter", false)) setAllowedChars("`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,.+_|{}:?/!@#$%^&*()"); 
+            if (config::get<bool>("bypass.charfilter", false))
+                setAllowedChars("`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,.+_|{}:?/!@#$%^&*()");
+ 
             CCTextInputNode::updateLabel(str);
         }
     };

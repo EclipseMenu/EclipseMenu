@@ -25,7 +25,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(AutoClicker)
 
-    class $modify(GJBaseGameLayer) {
+    class $modify(AutoClickerBGLHook, GJBaseGameLayer) {
         struct Fields {
             float timer = 0.f;
             bool clicking = false;

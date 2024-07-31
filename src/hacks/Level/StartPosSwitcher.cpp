@@ -206,9 +206,10 @@ namespace eclipse::hacks::Level {
         float m_timeSinceAction = 0.f;
     };
 
-    class $modify(PlayLayer) {
+    class $modify(StartPosSwitcherPLHook, PlayLayer) {
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
             startPosObjects.clear();
+
             return PlayLayer::init(level, useReplay, dontCreateObjects);
         }
 
@@ -223,8 +224,7 @@ namespace eclipse::hacks::Level {
         void addObject(GameObject* object) {
             PlayLayer::addObject(object);
 
-            uint32_t id = object->m_objectID;
-            if (id == 31)
+            if (object->m_objectID == 31)
                 startPosObjects.push_back(geode::cast::typeinfo_cast<StartPosObject*>(object));
         }
 
