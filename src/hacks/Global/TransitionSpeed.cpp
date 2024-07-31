@@ -22,7 +22,7 @@ namespace eclipse::hacks::Global {
 
     REGISTER_HACK(TransitionSpeed)
 
-    class $modify(cocos2d::CCTransitionFade) {
+    class $modify(TransitionSpeedCCTFHook, cocos2d::CCTransitionFade) {
         static CCTransitionFade* create(float duration, CCScene* scene) {
             return CCTransitionFade::create(config::get<bool>("global.transitionspeed.toggle", false)
                 ? config::get<float>("global.transitionspeed", 0.5f)
