@@ -60,6 +60,10 @@ build-*/
 # other
 build.sh
 compile_commands.json
+compile_commands.json.*
+build-android.sh
+bindings/
+bindingsbefore/
 
 # CLion
 /cmake-*/

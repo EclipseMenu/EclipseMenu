@@ -317,7 +317,7 @@ namespace eclipse::hacks::Level {
 
     class $modify(ShowHitboxesGOHook, GameObject) {
         static void onModify(auto& self) {
-            SAFE_PRIORITY("GameObject::determineSlopeOrientation");
+            SAFE_PRIORITY("GameObject::determineSlopeDirection");
         }
 
         void determineSlopeDirection() {
