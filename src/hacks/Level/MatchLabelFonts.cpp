@@ -24,38 +24,24 @@ namespace eclipse::hacks::Level {
 
     class $modify(MatchLabelFontsPLHook, PlayLayer) {
 
-        void matchLabelFonts() {
-            m_percentageLabel->setFntFile(m_attemptLabel->getFntFile());
-        }
-
-        bool labelsExist() {
-            return m_attemptLabel && m_percentageLabel;
-        }
-
-        bool percentLabelBigFnt() {
-            return m_percentageLabel->getFntFile() == s_bigFontName;
-        }
-
-        bool attemptLabelNotBigFnt() {
-            return m_attemptLabel->getFntFile() != s_bigFontName;
-        }
-
         bool shouldMatchLabelFonts() {
-            return labelsExist() && percentLabelBigFnt() && attemptLabelNotBigFnt();
+            return m_attemptLabel && m_percentageLabel &&
+                m_percentageLabel->getFntFile() == s_bigFontName &&
+                m_attemptLabel->getFntFile() != s_bigFontName;
         }
 
         void updateProgressbar() {
             PlayLayer::updateProgressbar();
 
             if (shouldMatchLabelFonts() && config::get<bool>("level.matchlabelfonts", false))
-                matchLabelFonts();
+                m_percentageLabel->setFntFile(m_attemptLabel->getFntFile());
         }
 
         void levelComplete() {
             PlayLayer::levelComplete();
 
             if (shouldMatchLabelFonts() && config::get<bool>("level.matchlabelfonts", false))
-                matchLabelFonts();
+                m_percentageLabel->setFntFile(m_attemptLabel->getFntFile());
         }
     };
 
