@@ -1,8 +1,11 @@
-name: Build Geode Mod
+name: Build Eclipse
 
 on:
   workflow_dispatch:
   push:
+    branches:
+      - "**"
+  pull_request:
     branches:
       - "**"
 
