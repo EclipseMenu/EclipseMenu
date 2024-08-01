@@ -14,6 +14,7 @@ jobs:
         config:
         - name: Windows
           os: windows-latest
+          build-type: RelWithDebInfo
 
         - name: macOS
           os: macos-latest
@@ -37,10 +38,11 @@ jobs:
         with:
           bindings: EclipseMenu/bindings
           bindings-ref: main
-          sdk: nightly
+          # sdk: nightly
           combine: true
           export-pdb: true
           target: ${{ matrix.config.target }}
+          build-config: ${{ matrix.config.build-type || 'Release' }}
 
   package:
     name: Package builds

@@ -20,7 +20,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(NoRobotFire)
 
-    class $modify(PlayerObject) {
+    class $modify(NoRobotFirePOHook, PlayerObject) {
         void update(float dt) override {
             if (!config::get<bool>("player.norobotfire", false))
                 return PlayerObject::update(dt);

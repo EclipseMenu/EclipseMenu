@@ -16,12 +16,17 @@ endif()
 file(GLOB_RECURSE SOURCES src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${MACOS_SOURCES})
 
-if (WIN32)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
-endif()
-
 # Make sure we can include headers from src
 target_include_directories(${PROJECT_NAME} PRIVATE src)
+
+# Windows specific settings
+if (WIN32)
+  # Disable annoying warnings
+  target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
+
+  # Export all symbols for better debugging
+  set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
 
 # macOS specific settings
 if (APPLE)

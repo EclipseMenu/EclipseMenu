@@ -23,13 +23,14 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(RespawnDelay)
 
-    class $modify(PlayLayer) {
+    class $modify(RespawnDelayPLHook, PlayLayer) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("PlayLayer::destroyPlayer");
         }
 
         void destroyPlayer(PlayerObject* player, GameObject* object) override {
             PlayLayer::destroyPlayer(player, object);
+
             if (config::get<bool>("player.respawndelay.toggle", false)) {
                 auto delay = config::get<float>("player.respawndelay", 1.f);
                 if (auto* respawnSequence = this->getActionByTag(0x10)) {

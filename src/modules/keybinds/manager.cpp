@@ -209,7 +209,7 @@ namespace eclipse::keybinds {
         }
     }
 
-    class $modify(cocos2d::CCEGLView) {
+    class $modify(KeybindingsManagerCCEGLVHook, cocos2d::CCEGLView) {
         static void onModify(auto& self) {
             FIRST_PRIORITY("cocos2d::CCEGLView::onGLFWKeyCallback");
         }
@@ -350,7 +350,7 @@ namespace eclipse::keybinds {
         }
     }
 
-    class $modify(cocos2d::CCKeyboardDispatcher) {
+    class $modify(KeybindingsManagerCCKDHook, cocos2d::CCKeyboardDispatcher) {
         static void onModify(auto& self) {
             FIRST_PRIORITY("cocos2d::CCKeyboardDispatcher::dispatchKeyboardMSG");
         }
@@ -395,9 +395,8 @@ namespace eclipse::keybinds {
     }
 
     void Manager::update() {
-        for (auto& key: m_keyStates) {
+        for (auto& key : m_keyStates)
             m_lastKeyStates.insert_or_assign(key.first, key.second);
-        }
     }
 
     void Manager::setKeybindState(const std::string& id, bool state) {

@@ -1,93 +1,169 @@
-/*#include "LabelContainer.hpp"
+#include "LabelContainer.hpp"
 
 #include <algorithm>
 #include <modules/config/config.hpp>
 
 namespace eclipse::hacks::Labels {
 
-    void LabelsContainer::addLabel(Label *label, const std::function<void(Label*)> &update) {
-        m_labels.emplace_back(label, update);
-    }
+    bool LabelsContainer::init(Alignment alignment) {
+        if (!cocos2d::CCNode::init()) return false;
 
-    void LabelsContainer::removeLabel(Label *label) {
-        m_labels.erase(std::remove_if(m_labels.begin(), m_labels.end(), [label](const auto &pair) {
-            return pair.first == label;
-        }), m_labels.end());
-    }
+        m_alignment = alignment;
+        updatePosition();
 
-    void LabelsContainer::update() {
-        if (!PlayLayer::get()) return;
+        auto* layout = cocos2d::AxisLayout::create(cocos2d::Axis::Column);
+        layout->setAxisReverse(true);
+        layout->setAutoScale(false);
+        layout->setGrowCrossAxis(false);
+        layout->setCrossAxisOverflow(true);
+        layout->setGap(0.f);
 
-        recalculatePositions();
-
-        if (!m_visible) {
-            for (auto &label: m_labels) {
-                label.first->setVisible(false);
-            }
-            return;
-        }
-
-        for (auto &label: m_labels) {
-            label.second(label.first);
-        }
-    }
-
-    void LabelsContainer::recalculatePositions() {
-        PlayLayer* playLayer = PlayLayer::get();
-        if (!playLayer) return;
-
-        auto winSize = cocos2d::CCDirector::sharedDirector()->getWinSize();
-        auto padding = config::get<float>("hack.labels.padding");
-        cocos2d::CCPoint anchor = {0, 0};
-        cocos2d::CCPoint offset = {0, 0};
-        float verticalSign = 1.0f;
+#define SET_ALIGNMENT(axis, crossAxis, crossAxisLine) \
+        layout->setAxisAlignment(cocos2d::AxisAlignment:: axis);               \
+        layout->setCrossAxisAlignment(cocos2d::AxisAlignment:: crossAxis);     \
+        layout->setCrossAxisLineAlignment(cocos2d::AxisAlignment:: crossAxisLine);
 
         switch (m_alignment) {
             case Alignment::TopLeft:
-                anchor = ccp(0, 1);
-                offset = ccp(padding, winSize.height - padding);
+                SET_ALIGNMENT(End, Start, Start);
                 break;
             case Alignment::TopCenter:
-                anchor = ccp(0.5, 1);
-                offset = ccp(winSize.width / 2, winSize.height - padding);
+                SET_ALIGNMENT(End, Center, Center);
                 break;
             case Alignment::TopRight:
-                anchor = ccp(1, 1);
-                offset = ccp(winSize.width - padding, winSize.height - padding);
+                SET_ALIGNMENT(End, End, End);
+                break;
+            case Alignment::CenterLeft:
+                SET_ALIGNMENT(Center, Start, Start);
+                break;
+            case Alignment::Center:
+                SET_ALIGNMENT(Center, Center, Center);
+                break;
+            case Alignment::CenterRight:
+                SET_ALIGNMENT(Center, End, End);
                 break;
             case Alignment::BottomLeft:
-                anchor = ccp(0, 0);
-                offset = ccp(padding, padding);
-                verticalSign = -1.0f;
+                layout->setAxisReverse(false);
+                SET_ALIGNMENT(Start, Start, Start);
                 break;
             case Alignment::BottomCenter:
-                anchor = ccp(0.5, 0);
-                offset = ccp(winSize.width / 2, padding);
-                verticalSign = -1.0f;
+                layout->setAxisReverse(false);
+                SET_ALIGNMENT(Start, Center, Center);
                 break;
             case Alignment::BottomRight:
-                anchor = ccp(1, 0);
-                offset = ccp(winSize.width - padding, padding);
-                verticalSign = -1.0f;
+                layout->setAxisReverse(false);
+                SET_ALIGNMENT(Start, End, End);
                 break;
         }
 
-        for (auto &label: m_labels) {
-            if (!label.first->isVisible()) continue;
+        this->setLayout(layout, false);
 
-            label.first->setAnchor(anchor);
-            label.first->setPosition(offset);
+        return true;
+    }
 
-            offset.y -= label.first->getHeight() * verticalSign * label.first->getScale();
+    void LabelsContainer::updatePosition() {
+        auto winSize = cocos2d::CCDirector::sharedDirector()->getWinSize();
+        auto padding = config::get<float>("labels.padding", 3.f);
+
+        setContentSize({ winSize.width - padding * 2, winSize.height - padding * 2 });
+
+        switch (m_alignment) {
+            case Alignment::TopLeft:
+                setPosition(padding, winSize.height - padding);
+                setAnchorPoint({0, 1});
+                break;
+            case Alignment::TopCenter:
+                setPosition(winSize.width / 2, winSize.height - padding);
+                setAnchorPoint({0.5, 1});
+                break;
+            case Alignment::TopRight:
+                setPosition(winSize.width - padding, winSize.height - padding);
+                setAnchorPoint({1, 1});
+                break;
+            case Alignment::CenterLeft:
+                setPosition(padding, winSize.height / 2);
+                setAnchorPoint({0, 0.5});
+                break;
+            case Alignment::Center:
+                setPosition(winSize.width / 2, winSize.height / 2);
+                setAnchorPoint({0.5, 0.5});
+                break;
+            case Alignment::CenterRight:
+                setPosition(winSize.width - padding, winSize.height / 2);
+                setAnchorPoint({1, 0.5});
+                break;
+            case Alignment::BottomLeft:
+                setPosition(padding, padding);
+                setAnchorPoint({0, 0});
+                break;
+            case Alignment::BottomCenter:
+                setPosition(winSize.width / 2, padding);
+                setAnchorPoint({0.5, 0});
+                break;
+            case Alignment::BottomRight:
+                setPosition(winSize.width - padding, padding);
+                setAnchorPoint({1, 0});
+                break;
+        }
+
+        this->updateLayout(false);
+    }
+
+    void LabelsContainer::addLabel(SmartLabel* label, const std::function<void(SmartLabel*)>& update) {
+        m_labels.emplace_back(label, update);
+
+        // set anchor point
+        switch (m_alignment) {
+            case Alignment::TopLeft:
+                label->setAnchorPoint({0, 1});
+                break;
+            case Alignment::TopCenter:
+                label->setAnchorPoint({0.5, 1});
+                break;
+            case Alignment::TopRight:
+                label->setAnchorPoint({1, 1});
+                break;
+            case Alignment::CenterLeft:
+                label->setAnchorPoint({0, 0.5});
+                break;
+            case Alignment::Center:
+                label->setAnchorPoint({0.5, 0.5});
+                break;
+            case Alignment::CenterRight:
+                label->setAnchorPoint({1, 0.5});
+                break;
+            case Alignment::BottomLeft:
+                label->setAnchorPoint({0, 0});
+                break;
+            case Alignment::BottomCenter:
+                label->setAnchorPoint({0.5, 0});
+                break;
+            case Alignment::BottomRight:
+                label->setAnchorPoint({1, 0});
+                break;
+        }
+
+        addChild(label);
+    }
+
+    void LabelsContainer::removeLabel(SmartLabel* label) {
+        auto it = std::find_if(m_labels.begin(), m_labels.end(), [label](const auto& pair) {
+            return pair.first == label;
+        });
+
+        if (it != m_labels.end()) {
+            m_labels.erase(it);
+            removeChild(label);
         }
     }
 
-    void LabelsContainer::clear() {
-        for (auto &label: m_labels) {
-            delete label.first;
+    void LabelsContainer::update() {
+        if (!isVisible()) return;
+
+        for (auto& label : m_labels) {
+            label.second(label.first);
+            label.first->update();
         }
-        m_labels.clear();
     }
 
-
-}*/
+}

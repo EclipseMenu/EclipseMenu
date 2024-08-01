@@ -38,6 +38,7 @@ namespace eclipse::hacks::Player {
         bool m_player2Pressed = false;
 
         float m_frameDt = 0.f;
+
     private:
         cocos2d::CCDrawNode* getDrawNode() {
 
@@ -90,10 +91,10 @@ namespace eclipse::hacks::Player {
         }
 
         void resetCollisionLog(PlayerObject* self) {
-            self->m_unk4e8->removeAllObjects();
-            self->m_unk4ec->removeAllObjects();
-            self->m_unk4f0->removeAllObjects();
-            self->m_unk4f4->removeAllObjects();
+            self->m_collisionLogTop->removeAllObjects();
+            self->m_collisionLogBottom->removeAllObjects();
+            self->m_collisionLogLeft->removeAllObjects();
+            self->m_collisionLogRight->removeAllObjects();
         }
 
         void iterateForPlayer(PlayerObject* player, bool down, bool isPlayer2) {
@@ -232,7 +233,7 @@ namespace eclipse::hacks::Player {
 
     static TrajectorySimulation s_simulation;
 
-    class $modify(PlayLayer) {
+    class $modify(ShowTrajectoryPLHook, PlayLayer) {
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
             bool result = PlayLayer::init(level, useReplay, dontCreateObjects);
 
@@ -265,7 +266,7 @@ namespace eclipse::hacks::Player {
         }
     };
     
-    class $modify(LevelEditorLayer) {
+    class $modify(ShowTrajectoryLELHook, LevelEditorLayer) {
         bool init(GJGameLevel* level, bool unk) {
             bool result = LevelEditorLayer::init(level, unk);
             s_simulation.quit();
@@ -273,7 +274,7 @@ namespace eclipse::hacks::Player {
         }
     };
 
-    class $modify(HardStreak) {
+    class $modify(ShowTrajectoryHSHook, HardStreak) {
         void addPoint(cocos2d::CCPoint p0) {
             if (s_simulation.isSimulating()) return;
 
@@ -281,7 +282,7 @@ namespace eclipse::hacks::Player {
         }
     };
 
-    class $modify(EffectGameObject) {
+    class $modify(ShowTrajectoryEGOHook, EffectGameObject) {
         void triggerObject(GJBaseGameLayer* p0, int p1, const gd::vector<int>* p2) {
             if (s_simulation.isSimulating()) return;
             
@@ -289,7 +290,7 @@ namespace eclipse::hacks::Player {
         }
     };
 
-    class $modify(GameObject) {
+    class $modify(ShowTrajectoryGOHook, GameObject) {
         void playShineEffect() {
             if (s_simulation.isSimulating()) return;
             
@@ -297,8 +298,7 @@ namespace eclipse::hacks::Player {
         }
     };
 
-    class $modify(PlayerObject) {
-
+    class $modify(ShowTrajectoryPOHook, PlayerObject) {
         void playSpiderDashEffect(cocos2d::CCPoint from, cocos2d::CCPoint to) {
             if (s_simulation.isSimulating()) return;
 
@@ -325,7 +325,7 @@ namespace eclipse::hacks::Player {
         }
     };
 
-    class $modify(GJBaseGameLayer) {
+    class $modify(ShowTrajectoryBGLHook, GJBaseGameLayer) {
         bool canBeActivatedByPlayer(PlayerObject* p0, EffectGameObject* p1) {
             if (s_simulation.isSimulating())
                 return false;

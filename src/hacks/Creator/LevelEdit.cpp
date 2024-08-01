@@ -24,7 +24,7 @@ namespace eclipse::hacks::Creator {
 
     REGISTER_HACK(LevelEdit)
 
-    class $modify(PauseLayer) {
+    class $modify(LevelEditPLHook, PauseLayer) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("PauseLayer::customSetup");
             SAFE_PRIORITY("PauseLayer::onEdit");
@@ -55,7 +55,7 @@ namespace eclipse::hacks::Creator {
 
 // due to some mysterious reason, this will crash in Debug mode
 #ifdef NDEBUG
-    class $modify(LevelTools) {
+    class $modify(LeveleditLTHook, LevelTools) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("LevelTools::verifyLevelIntegrity");
         }

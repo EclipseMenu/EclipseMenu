@@ -18,7 +18,7 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(FreezeAttempts)
     
-    class $modify(PlayLayer) {
+    class $modify(FreezeAttemptsPLHook, PlayLayer) {
         struct Fields {
             std::uint32_t totalAttempts;
         };

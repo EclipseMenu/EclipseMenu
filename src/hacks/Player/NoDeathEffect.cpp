@@ -9,8 +9,9 @@ namespace eclipse::hacks::Player {
     class NoDeathEffect : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
-
-            tab->addToggle("No Death Effect", "player.nodeatheffect")->setDescription("Disables player death effect")->handleKeybinds();
+            tab->addToggle("No Death Effect", "player.nodeatheffect")
+                ->setDescription("Disables player death effect")
+                ->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "No Death Effect"; }
@@ -18,14 +19,14 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(NoDeathEffect)
 
-    class $modify(PlayerObject) {
+    class $modify(NoDeathEffectPOHook, PlayerObject) {
         static void onModify(auto& self) {
-            SAFE_PRIORITY("PlayerObject::playerDestroyed");
+            SAFE_PRIORITY("PlayerObject::playDeathEffect");
         }
 
-        void playerDestroyed(bool p0) {
+        void playDeathEffect() {
             if (!config::get<bool>("player.nodeatheffect", false))
-                return PlayerObject::playerDestroyed(p0);
+                return PlayerObject::playDeathEffect();
         }
     };
 

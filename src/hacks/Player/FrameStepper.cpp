@@ -53,7 +53,7 @@ namespace eclipse::hacks::Player {
     static double s_holdDelayTimer = 0;
     static uint32_t s_holdAdvanceTimer = 0;
 
-    class $modify(cocos2d::CCScheduler) {
+    class $modify(FrameStepperSchedulerHook, cocos2d::CCScheduler) {
         static void onModify(auto& self) {
             FIRST_PRIORITY("cocos2d::CCScheduler::update"); // required to avoid conflict with speedhack
         }
@@ -68,15 +68,15 @@ namespace eclipse::hacks::Player {
 
             // for playlayer, check if the level is not paused/finished (maybe add loading check later?)
             bool usable = false;
-            if (auto playLayer = PlayLayer::get()) {
+            if (auto playLayer = PlayLayer::get())
                 usable = !playLayer->m_isPaused && !playLayer->m_hasCompletedLevel; // && playLayer->m_started;
-            }
-            // for level editor, check if it's in playback mode
-            else if (auto editor = LevelEditorLayer::get()) {
-                usable = editor->m_playbackMode == PlaybackMode::Playing;
-            }
 
-            if (!usable) return cocos2d::CCScheduler::update(dt);
+            // for level editor, check if it's in playback mode
+            else if (auto editor = LevelEditorLayer::get())
+                usable = editor->m_playbackMode == PlaybackMode::Playing;
+
+            if (!usable)
+                return cocos2d::CCScheduler::update(dt);
 
             auto step = 240.f; // TODO: Change this after Physics Bypass is added
 
@@ -85,9 +85,9 @@ namespace eclipse::hacks::Player {
             if (config::get<bool>("player.framestepper.hold", false)) {
                 s_holdDelayTimer += dt;
                 bool firstPress = FrameStepper::isPressed();
-                if (firstPress) {
+
+                if (firstPress)
                     s_holdDelayTimer = 0;
-                }
 
                 // Add a grace period after the first press to allow for holding
                 auto delay = config::get<float>("player.framestepper.hold_delay", 0.25f);
@@ -143,6 +143,7 @@ namespace eclipse::hacks::Player {
             CCMenuItemSpriteExtra::unselected();
             m_onRelease();
         }
+
     private:
         std::function<void()> m_onHold;
         std::function<void()> m_onRelease;
@@ -194,7 +195,7 @@ namespace eclipse::hacks::Player {
 
     // Desktop users don't need the on-screen UI
 #ifndef GEODE_IS_DESKTOP
-    class $modify(UILayer) {
+    class $modify(FrameSFrameStepperUILHook, UILayer) {
         bool init(GJBaseGameLayer* bgl) {
             if (!UILayer::init(bgl))
                 return false;

@@ -175,7 +175,7 @@ namespace eclipse::hacks::Level {
         }
     }
 
-    class $modify(cocos2d::CCDrawNode) {
+    class $modify(ShowHitboxesCCDNHook, cocos2d::CCDrawNode) {
         bool drawPolygon(cocos2d::CCPoint* vertex, unsigned int count, const cocos2d::ccColor4F& fillColor,
                          float borderWidth, const cocos2d::ccColor4F& borderColor) {
             borderWidth = abs(borderWidth);
@@ -238,7 +238,7 @@ namespace eclipse::hacks::Level {
         }
     }
 
-    class $modify(LevelEditorLayer) {
+    class $modify(ShowHitboxesLELHook, LevelEditorLayer) {
         void updateEditor(float dt) {
             LevelEditorLayer::updateEditor(dt);
 
@@ -246,7 +246,7 @@ namespace eclipse::hacks::Level {
         }
     };
 
-    class $modify(PlayLayer) {
+    class $modify(ShowHitboxesPLHook, PlayLayer) {
         void updateProgressbar() {
             PlayLayer::updateProgressbar();
 
@@ -267,14 +267,15 @@ namespace eclipse::hacks::Level {
         }
     };
 
-    class $modify(PlayerObject) {
+    class $modify(ShowHitboxesPOHook, PlayerObject) {
         void playerDestroyed(bool p0) {
-            s_isDead = true;
+            if (auto* pl = PlayLayer::get())
+                s_isDead = this == pl->m_player1 || this == pl->m_player2;
             PlayerObject::playerDestroyed(p0);
         }
     };
 
-    class $modify(GJBaseGameLayer) {
+    class $modify(ShowHitboxesBGLHook, GJBaseGameLayer) {
         void processCommands(float dt) {
             GJBaseGameLayer::processCommands(dt);
 
@@ -314,9 +315,9 @@ namespace eclipse::hacks::Level {
         }
     };
 
-    class $modify(GameObject) {
+    class $modify(ShowHitboxesGOHook, GameObject) {
         static void onModify(auto& self) {
-            SAFE_PRIORITY("GameObject::determineSlopeOrientation");
+            SAFE_PRIORITY("GameObject::determineSlopeDirection");
         }
 
         void determineSlopeDirection() {

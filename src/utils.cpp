@@ -7,6 +7,18 @@ namespace eclipse::utils {
         return rng;
     }
 
+    std::string getClock(bool useTwelveHours) {
+        const char* format = useTwelveHours ? "%I:%M:%S %p" : "%H:%M:%S";
+
+        auto now = std::chrono::system_clock::now();
+        auto time = std::chrono::system_clock::to_time_t(now);
+        auto tm = std::localtime(&time);
+
+        std::stringstream ss;
+        ss << std::put_time(tm, format);
+        return ss.str();
+    }
+
     bool hasOpenGLExtension(const std::string& extension) {
         auto extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
         if (!extensions) return false;

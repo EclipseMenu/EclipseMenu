@@ -2,8 +2,6 @@
 #include <utils.hpp>
 #include "blur.hpp"
 
-using namespace geode::prelude;
-
 // COMPLETELY stolen from cgytrus/SimplePatchLoader (with permission)
 
 #ifdef GEODE_IS_DESKTOP
@@ -19,14 +17,15 @@ GLint ppShaderRadius = 0;
 
 float blurTimer = 0.f;
 
-Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath) {
-    auto vertexSource = file::readString(vertexPath);
-    if (!vertexSource)
-        return Err("failed to read vertex shader at path {}: {}", vertexPath.string(), vertexSource.unwrapErr());
+geode::Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath) {
+    auto vertexSource = geode::utils::file::readString(vertexPath);
 
-    auto fragmentSource = file::readString(fragmentPath);
+    if (!vertexSource)
+        return geode::Err("failed to read vertex shader at path {}: {}", vertexPath.string(), vertexSource.unwrapErr());
+
+    auto fragmentSource = geode::utils::file::readString(fragmentPath);
     if (!fragmentSource)
-        return Err("failed to read fragment shader at path {}: {}", fragmentPath.string(), fragmentSource.unwrapErr());
+        return geode::Err("failed to read fragment shader at path {}: {}", fragmentPath.string(), fragmentSource.unwrapErr());
 
     auto getShaderLog = [](GLuint id) -> std::string {
         GLint length, written;
@@ -53,7 +52,7 @@ Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, con
     if (!res) {
         glDeleteShader(vertex);
         vertex = 0;
-        return Err("vertex shader compilation failed:\n{}", vertexLog);
+        return geode::Err("vertex shader compilation failed:\n{}", vertexLog);
     }
 
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -68,24 +67,24 @@ Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, con
         glDeleteShader(fragment);
         vertex = 0;
         fragment = 0;
-        return Err("fragment shader compilation failed:\n{}", fragmentLog);
+        return geode::Err("fragment shader compilation failed:\n{}", fragmentLog);
     }
 
     program = glCreateProgram();
     glAttachShader(program, vertex);
     glAttachShader(program, fragment);
 
-    return Ok(fmt::format(
+    return geode::Ok(fmt::format(
         "shader compilation successful. logs:\nvert:\n{}\nfrag:\n{}",
         vertexLog, fragmentLog
     ));
 }
 
-Result<std::string> Shader::link() {
+geode::Result<std::string> Shader::link() {
     if (!vertex)
-        return Err("vertex shader not compiled");
+        return geode::Err("vertex shader not compiled");
     if (!fragment)
-        return Err("fragment shader not compiled");
+        return geode::Err("fragment shader not compiled");
 
     auto getProgramLog = [](GLuint id) -> std::string {
         GLint length, written;
@@ -114,15 +113,16 @@ Result<std::string> Shader::link() {
     if (!res) {
         glDeleteProgram(program);
         program = 0;
-        return Err("shader link failed:\n{}", programLog);
+        return geode::Err("shader link failed:\n{}", programLog);
     }
 
-    return Ok(fmt::format("shader link successful. log:\n{}", programLog));
+    return geode::Ok(fmt::format("shader link successful. log:\n{}", programLog));
 }
 
 void Shader::cleanup() {
     if (program)
         glDeleteProgram(program);
+
     program = 0;
 }
 
@@ -152,7 +152,8 @@ void RenderTexture::setup(GLsizei width, GLsizei height) {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        log::error("pp fbo not complete, uh oh! i guess i will have to cut off ur pp now");
+        geode::log::error("pp fbo not complete, uh oh! i guess i will have to cut off ur pp now");
+
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFbo);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, readFbo);
 }
@@ -169,7 +170,7 @@ void RenderTexture::cleanup() {
 void setupPostProcess() {
     if (eclipse::utils::shouldUseLegacyDraw()) return;
 
-    auto size = CCDirector::get()->getOpenGLView()->getFrameSize() * geode::utils::getDisplayFactor();
+    auto size = cocos2d::CCDirector::get()->getOpenGLView()->getFrameSize() * geode::utils::getDisplayFactor();
 
     ppRt0.setup((GLsizei)size.width, (GLsizei)size.height);
     ppRt1.setup((GLsizei)size.width, (GLsizei)size.height);
@@ -196,21 +197,21 @@ void setupPostProcess() {
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    auto vertexPath = (std::string)CCFileUtils::get()->fullPathForFilename("pp-vert.glsl"_spr, false);
-    auto fragmentPath = (std::string)CCFileUtils::get()->fullPathForFilename("pp-frag.glsl"_spr, false);
+    auto vertexPath = std::string{ cocos2d::CCFileUtils::get()->fullPathForFilename("pp-vert.glsl"_spr, false).c_str() };
+    auto fragmentPath = std::string{ cocos2d::CCFileUtils::get()->fullPathForFilename("pp-frag.glsl"_spr, false).c_str() };
 
     auto res = ppShader.compile(vertexPath, fragmentPath);
-    if (!res) return log::error("Failed to compile shader: {}", res.unwrapErr());
+    if (!res) return geode::log::error("Failed to compile shader: {}", res.unwrapErr());
     // log::info("{}", res.unwrap());
 
     glBindAttribLocation(ppShader.program, 0, "aPosition");
     glBindAttribLocation(ppShader.program, 1, "aTexCoords");
 
     res = ppShader.link();
-    if (!res) return log::error("Failed to link shader: {}", res.unwrapErr());
+    if (!res) return geode::log::error("Failed to link shader: {}", res.unwrapErr());
     // log::info("{}", res.unwrap());
 
-    ccGLUseProgram(ppShader.program);
+    cocos2d::ccGLUseProgram(ppShader.program);
     glUniform1i(glGetUniformLocation(ppShader.program, "screen"), 0);
     glUniform2f(glGetUniformLocation(ppShader.program, "screenSize"), size.width, size.height);
     ppShaderFast = glGetUniformLocation(ppShader.program, "fast");
@@ -245,9 +246,9 @@ void cleanupPostProcess() {
 #include <imgui-cocos.hpp>
 #include <numbers>
 
-class $modify(CCNode) {
+class $modify(BlurCCNHook, cocos2d::CCNode) {
     void visit() override {
-        if (static_cast<CCNode*>(this) != CCDirector::get()->getRunningScene() || ppShader.program == 0) {
+        if (static_cast<cocos2d::CCNode*>(this) != cocos2d::CCDirector::get()->getRunningScene() || ppShader.program == 0) {
             CCNode::visit();
             return;
         }
@@ -269,7 +270,7 @@ class $modify(CCNode) {
         CCNode::visit();
 
         glBindVertexArray(ppVao);
-        ccGLUseProgram(ppShader.program);
+        cocos2d::ccGLUseProgram(ppShader.program);
         glUniform1i(ppShaderFast, true);
         glUniform1f(ppShaderRadius, blur);
 
@@ -291,11 +292,11 @@ class $modify(CCNode) {
     }
 };
 
-class $modify(CCEGLViewProtocol) {
+class $modify(BlurCCEGLVPHook, cocos2d::CCEGLViewProtocol) {
     void setFrameSize(float width, float height) override {
         CCEGLViewProtocol::setFrameSize(width, height);
 
-        if (!CCDirector::get()->getOpenGLView())
+        if (!cocos2d::CCDirector::get()->getOpenGLView())
             return;
 
         cleanupPostProcess();
@@ -303,7 +304,7 @@ class $modify(CCEGLViewProtocol) {
     }
 };
 
-class $modify(GameManager) {
+class $modify(BlurGMHook, GameManager) {
     void reloadAllStep5() {
         GameManager::reloadAllStep5();
         cleanupPostProcess();
@@ -327,11 +328,11 @@ $on_mod(Unloaded) {
     cleanupPostProcess();
 }
 
-class $modify(CCScheduler) {
+class $modify(BlurSchedulerHook, cocos2d::CCScheduler) {
     void update(float dt) override {
-        CCScheduler::update(dt);
+        cocos2d::CCScheduler::update(dt);
 
-        auto deltaTimeMod = CCDirector::get()->getDeltaTime() / 0.1f;
+        auto deltaTimeMod = cocos2d::CCDirector::get()->getDeltaTime() / 0.1f;
         if (eclipse::gui::Engine::get()->isToggled())
             blurTimer += deltaTimeMod;
         else

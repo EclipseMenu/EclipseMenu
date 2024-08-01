@@ -24,13 +24,15 @@ namespace eclipse::hacks::Player {
 
     bool jump = false;
 
-    class $modify(GJBaseGameLayer) {
+    class $modify(JumpHackBGLHook, GJBaseGameLayer) {
         void update(float dt) {
             if (config::get<bool>("player.jumphack", false) && jump) {
                 if (m_player1) m_player1->m_isOnGround = true;
                 if (m_player2) m_player2->m_isOnGround = true;
             }
+
             GJBaseGameLayer::update(dt);
+
             if (config::get<bool>("player.jumphack", false) && jump) {
                 if (m_player1) m_player1->m_isOnGround = true;
                 if (m_player2) m_player2->m_isOnGround = true;
@@ -39,10 +41,10 @@ namespace eclipse::hacks::Player {
         }
     };
 
-    class $modify(PlayerObject) {
-        void pushButton(PlayerButton idk) {
+    class $modify(JumpHackPOHook, PlayerObject) {
+        void pushButton(PlayerButton p0) {
             jump = true;
-            PlayerObject::pushButton(idk);
+            PlayerObject::pushButton(p0);
         }
     };
 }

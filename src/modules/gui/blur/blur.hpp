@@ -3,15 +3,13 @@
 #include <Geode/Geode.hpp>
 #include <modules/gui/gui.hpp>
 
-using namespace geode::prelude;
-
 struct Shader {
     GLuint vertex = 0;
     GLuint fragment = 0;
     GLuint program = 0;
 
-    Result<std::string> compile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath);
-    Result<std::string> link();
+    geode::Result<std::string> compile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath);
+    geode::Result<std::string> link();
     void cleanup();
 };
 

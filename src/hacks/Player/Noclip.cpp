@@ -10,7 +10,9 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
 
-            tab->addToggle("Noclip", "player.noclip")->setDescription("Disables player death")->handleKeybinds();
+            tab->addToggle("Noclip", "player.noclip")
+                ->setDescription("Disables player death")
+                ->handleKeybinds();
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.noclip", false); }
@@ -19,23 +21,20 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(Noclip)
 
-    class $modify(PlayLayer) {
+    class $modify(NoClipPLHook, PlayLayer) {
         struct Fields {
             GameObject* m_anticheatObject = nullptr;
         };
 
         void destroyPlayer(PlayerObject* player, GameObject* object) override {
-            if (!m_fields->m_anticheatObject) {
+            if (!m_fields->m_anticheatObject)
                 m_fields->m_anticheatObject = object;
-            }
 
-            if (object == m_fields->m_anticheatObject) {
+            if (object == m_fields->m_anticheatObject)
                 PlayLayer::destroyPlayer(player, object);
-            }
 
-            if (!config::get<bool>("player.noclip", false)) {
+            if (!config::get<bool>("player.noclip", false))
                 PlayLayer::destroyPlayer(player, object);
-            }
         }
     };
 

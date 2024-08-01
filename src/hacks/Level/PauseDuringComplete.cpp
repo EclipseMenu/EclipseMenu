@@ -20,7 +20,7 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(PauseDuringComplete)
 
-    class $modify(PlayLayer) {
+    class $modify(PauseDuringCompletePLHook, PlayLayer) {
         void pauseGame(bool p0) {
             if (!config::get<bool>("level.pauseduringcomplete", false))
                 return PlayLayer::pauseGame(p0);

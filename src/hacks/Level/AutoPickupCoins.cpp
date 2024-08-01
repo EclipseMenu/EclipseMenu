@@ -19,7 +19,7 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(AutoPickupCoins)
 
-    class $modify(PlayLayer) {
+    class $modify(AutoPickupCoinsPLHook, PlayLayer) {
         struct Fields {
             std::vector<EffectGameObject*> m_coins;
         };
@@ -27,9 +27,9 @@ namespace eclipse::hacks::Level {
         void addObject(GameObject* obj) {
             PlayLayer::addObject(obj);
             auto id = obj->m_objectID;
-            if (id == 142 || id == 1329) {
+
+            if (id == 142 || id == 1329)
                 m_fields->m_coins.push_back(static_cast<EffectGameObject*>(obj));
-            }
         }
 
         void resetLevel() {

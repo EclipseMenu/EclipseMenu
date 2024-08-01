@@ -20,7 +20,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(NoHideTrigger)
 
-    class $modify(EffectGameObject) {
+    class $modify(NoHideTriggerEGOHook, EffectGameObject) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("EffectGameObject::triggerObject");
         }

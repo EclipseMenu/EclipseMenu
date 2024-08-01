@@ -20,7 +20,7 @@ namespace eclipse::hacks::Global {
 
     REGISTER_HACK(NoShortNumbers)
 
-    class $modify(GameToolbox) {
+    class $modify(NoShortNumbersGTHook, GameToolbox) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("GameToolbox::intToShortString");
         }

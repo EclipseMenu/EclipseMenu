@@ -18,7 +18,7 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(PlatGamemodes)
 
-    class $modify(GJBaseGameLayer) {
+    class $modify(PlatGamemodesBGLHook, GJBaseGameLayer) {
         void collisionCheckObjects(PlayerObject* player, gd::vector<GameObject*>* gameObjects, int p2, float p3) {
             if (!config::get<bool>("level.platgamemodes", false))
                 return GJBaseGameLayer::collisionCheckObjects(player, gameObjects, p2, p3);

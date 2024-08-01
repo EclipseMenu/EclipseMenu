@@ -23,7 +23,7 @@ namespace eclipse::hacks::Bypass {
 
     REGISTER_HACK(CopyBypass)
 
-    class $modify(LevelInfoLayer) {
+    class $modify(CopyBypassLILHook, LevelInfoLayer) {
         struct Fields {
             int password;
         };

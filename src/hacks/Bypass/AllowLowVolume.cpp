@@ -23,7 +23,7 @@ namespace eclipse::hacks::Bypass {
 
 #define GET_SLIDER(sender) geode::cast::typeinfo_cast<SliderThumb*>(sender); if (!slider) return
 
-    class $modify(OptionsLayer) {
+    class $modify(AllowLowVolumeOLHook, OptionsLayer) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("OptionsLayer::musicSliderChanged");
             SAFE_PRIORITY("OptionsLayer::sfxSliderChanged");
@@ -52,7 +52,7 @@ namespace eclipse::hacks::Bypass {
         }
     };
 
-    class $modify(PauseLayer) {
+    class $modify(AllowLowVolumePLHook, PauseLayer) {
         static void onModify(auto& self) {
             SAFE_PRIORITY("PauseLayer::musicSliderChanged");
             SAFE_PRIORITY("PauseLayer::sfxSliderChanged");
