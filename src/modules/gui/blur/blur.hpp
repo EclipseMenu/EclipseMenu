@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Geode/Geode.hpp>
 #include <modules/gui/gui.hpp>
 
 struct Shader {

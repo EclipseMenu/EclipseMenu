@@ -1,6 +1,5 @@
 #include "hack.hpp"
 
-#include <Geode/Geode.hpp>
 #include <modules/gui/gui.hpp>
 
 namespace eclipse::hack {

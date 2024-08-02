@@ -1,6 +1,5 @@
 #include "imgui.hpp"
 
-#include <Geode/Geode.hpp>
 #include <imgui-cocos.hpp>
 
 #include <utils.hpp>

@@ -73,5 +73,5 @@ jobs:
           filename: ${{ steps.build.outputs.build-output }}/eclipse.eclipse-menu.geode
           wait: false
           content: |
-            New nightly build for commit "${{ github.event.head_commit.message }}"\n
-            [${{ github.sha }}](https://github.com/EclipseMenu/EclipseMenu/commit/${{ github.sha }})!
+            New nightly build for commit "${{ github.event.head_commit.message }}"!
+            [${{ github.sha }}](https://github.com/EclipseMenu/EclipseMenu/commit/${{ github.sha }})
