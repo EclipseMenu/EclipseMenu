@@ -124,7 +124,7 @@ namespace eclipse::hacks::Recorder {
             });
 
             config::setIfEmpty("recorder.fps", 60.f);
-            config::setIfEmpty("recorder.endscreen", 5.f);
+            config::setIfEmpty("recorder.endscreen", 3.4f);
             config::setIfEmpty("recorder.bitrate", 30.f);
             config::setIfEmpty("recorder.resolution.x", 1920.f);
             config::setIfEmpty("recorder.resolution.y", 1080.f);

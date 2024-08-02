@@ -71,4 +71,7 @@ jobs:
         with:
           webhook-url: ${{ secrets.NIGHTLY_WEBHOOK }}
           filename: ${{ steps.build.outputs.build-output }}/eclipse.eclipse-menu.geode
-          content: "New nightly build for commit [${{ github.sha }}](https://github.com/EclipseMenu/EclipseMenu/commit/${{ github.sha }})!"
+          wait: false
+          content: |
+            New nightly build for commit "${{ github.event.head_commit.message }}"\n
+            [${{ github.sha }}](https://github.com/EclipseMenu/EclipseMenu/commit/${{ github.sha }})!
