@@ -29,7 +29,7 @@ namespace eclipse::hacks::Bypass {
     static bool s_bypassUGVSkip = false; // bypass after one time
 
     // i hate this (still better than patches/midhooks)
-    class $modify(GameManager) {
+    class $modify(UnlockVaultsGMHook, GameManager) {
         bool getUGV(const char* key) {
             bool result = GameManager::getUGV(key);
             if (s_bypassUGVSkip) {
@@ -51,7 +51,7 @@ namespace eclipse::hacks::Bypass {
     static bool s_bypassGameStat = false; // bypass game stats
     static int s_bypassGameStatValue = 0; // return value
 
-    class $modify(GameStatsManager) {
+    class $modify(UnlockVaultsGSMHook, GameStatsManager) {
         int getStat(const char* key) {
             int value = GameStatsManager::getStat(key);
             if (!s_bypassGameStat) return value;
@@ -71,7 +71,7 @@ namespace eclipse::hacks::Bypass {
         }
     };
 
-    class $modify(CreatorLayer) {
+    class $modify(UnlockVaultsCLHook, CreatorLayer) {
         void onSecretVault(cocos2d::CCObject* sender) {
             if (config::get<bool>("bypass.unlockvaults", false)) {
                 s_bypassGameStat = true;
@@ -99,7 +99,7 @@ namespace eclipse::hacks::Bypass {
         }
     };
 
-    class $modify(OptionsLayer) {
+    class $modify(UnlockVaultsOLHook, OptionsLayer) {
         void onSecretVault(cocos2d::CCObject* sender) {
             if (config::get<bool>("bypass.unlockvaults", false)) {
                 s_bypassGameStat = true;
@@ -110,7 +110,7 @@ namespace eclipse::hacks::Bypass {
         }
     };
 
-    class $modify(SecretLayer2) {
+    class $modify(UnlockVaultsSL2Hook, SecretLayer2) {
         void onDoor(cocos2d::CCObject* sender) {
             if (config::get<bool>("bypass.unlockvaults", false))
                 s_bypassUGV = true;
@@ -119,7 +119,7 @@ namespace eclipse::hacks::Bypass {
         }
     };
 
-    class $modify(LevelPage) {
+    class $modify(UnlockVaultsLPHook, LevelPage) {
         void addSecretDoor() {
             if (config::get<bool>("bypass.unlockvaults", false))
                 s_bypassUGV = true;
