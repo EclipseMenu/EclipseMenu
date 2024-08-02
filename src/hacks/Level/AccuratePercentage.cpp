@@ -21,7 +21,7 @@ namespace eclipse::hacks::Global {
                     options->addToggle("Normal Mode", "level.accuratepercent.normal_mode");
                     options->addInputInt("Decimal Places", "level.accuratepercent.amount", 0, 15);
                     options->addToggle("Fix 0% bug", "level.accuratepercent.bugfix");
-                    options->addToggle("Show Minutes", "level.accuratepercent.show_minutes");
+                    options->addToggle("Formatted Timer", "level.accuratepercent.show_minutes");
                 });
         }
 
@@ -32,15 +32,8 @@ namespace eclipse::hacks::Global {
 
     class $modify(AccuratePercentagePLHook, PlayLayer) {
         float customGetProgress() {
-            if (config::get<bool>("level.accuratepercent.bugfix", true)) {
-                float percent;
-                if (m_level->m_timestamp > 0) {
-                    percent = static_cast<float>(m_gameState.m_levelTime * 240.f) / m_level->m_timestamp * 100.f;
-                } else {
-                    percent = reinterpret_cast<cocos2d::CCNode*>(m_player1)->getPositionX() / m_levelLength * 100.f;
-                }
-                return std::clamp(percent, 0.f, 100.f);
-            }
+            if (config::get<bool>("level.accuratepercent.bugfix", true))
+                return utils::getActualProgress(this);
             return PlayLayer::getCurrentPercent();
         }
 
@@ -51,18 +44,8 @@ namespace eclipse::hacks::Global {
 
             if (m_level->isPlatformer()) {
                 if (!config::get<bool>("level.accuratepercent.show_minutes", true)) return;
-                auto time = m_gameState.m_levelTime;
-                auto minutes = static_cast<int>(time / 60);
-                auto seconds = static_cast<int>(time) % 60;
-                auto millis = static_cast<int>(time * 1000) % 1000;
-
-                std::string timeStr;
-                if (minutes > 0) {
-                    timeStr = fmt::format("{}:{:02d}.{:03d}", minutes, seconds, millis);
-                } else {
-                    timeStr = fmt::format("{}.{:03d}", seconds, millis);
-                }
-                m_percentageLabel->setString(timeStr.c_str());
+                auto time = utils::formatTime(m_gameState.m_levelTime);
+                m_percentageLabel->setString(time.c_str());
             } else if (config::get<bool>("level.accuratepercent.normal_mode", true)) {
                 float percent = customGetProgress();
                 auto numDigits = config::get<int>("level.accuratepercent.amount", 4);
