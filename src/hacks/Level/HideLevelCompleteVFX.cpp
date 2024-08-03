@@ -84,6 +84,7 @@ namespace eclipse::hacks::Level {
             PlayLayer* pl = PlayLayer::get();
             if (!pl) return;
             if (this->getParent() != pl) return;
+            if (!geode::cast::typeinfo_cast<cocos2d::CCParticleSystemQuad*>(this)) return;
 
             if (pl->m_levelEndAnimationStarted && config::get<bool>("level.hidelevelcomplete", false))
                 this->setVisible(false);
