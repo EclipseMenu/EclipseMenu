@@ -63,15 +63,33 @@ jobs:
 
       - name: Check if has nightly webhook
         id: check
-        run: echo "::set-output name=has-nightly-webhook::${{ secrets.NIGHTLY_WEBHOOK != '' }}"
+        run: echo "has-nightly-webhook=${{ secrets.NIGHTLY_WEBHOOK != '' }}" >> $GITHUB_OUTPUT
+
+      - uses: actions/checkout@v4
+        if: ${{ steps.check.outputs.has-nightly-webhook == 'true' }}
+
+      - name: Get commit messages
+        id: commit
+        if: ${{ steps.check.outputs.has-nightly-webhook == 'true' }}
+        run: |
+          echo "commit-message=$(git log -1 --pretty=format:"%s" | head -n 1)" >> $GITHUB_OUTPUT
+          # echo "commit-message-full=$(echo $COMMIT_MESSAGE | tail -n +2)" >> $GITHUB_OUTPUT # Bash is weird, this doesn't work
+          echo "build-color=#$(git log -1 --pretty=format:"%h" | cut -c 1-6)" >> $GITHUB_OUTPUT
+        #env:
+        #  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
 
       - name: Upload release to Discord
-        uses: tsickert/discord-webhook@v5.3.0
+        uses: prevter/discord-webhook@main
         if: ${{ steps.check.outputs.has-nightly-webhook == 'true' }}
         with:
           webhook-url: ${{ secrets.NIGHTLY_WEBHOOK }}
-          filename: ${{ steps.build.outputs.build-output }}/eclipse.eclipse-menu.geode
-          wait: false
-          content: |
-            New nightly build for commit "${{ github.event.head_commit.message }}"!
-            [${{ github.sha }}](https://github.com/EclipseMenu/EclipseMenu/commit/${{ github.sha }})
+          content: 'New nightly build available!'
+          files: ${{ steps.build.outputs.build-output }}/*.geode
+          embed-title: ${{ steps.commit.outputs.commit-message }}
+          # embed-description: ${{ steps.commit.outputs.commit-message-full }}
+          embed-color: ${{ steps.commit.outputs.build-color }}
+          embed-url: ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}
+          embed-author: ${{ github.actor }}
+          embed-author-icon: 'https://avatars.githubusercontent.com/u/${{ github.actor_id }}?v=4'
+          embed-timestamp: 'now'
+          debug-print: true
