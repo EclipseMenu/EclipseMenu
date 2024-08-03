@@ -27,7 +27,9 @@ namespace eclipse::hacks::Bot {
     }
 
     void loadReplay() {
-        std::filesystem::path replayPath = Mod::get()->getSaveDir() / "replays" / (config::get<std::string>("bot.replayname", "temp") + ".gdr");
+        auto replayDirectory = Mod::get()->getSaveDir() / "replays";
+        auto replayName = config::get<std::string>("bot.replayname", "temp") + ".gdr";
+        std::filesystem::path replayPath = replayDirectory / replayName;
         s_bot.load(replayPath);
     }
 
@@ -36,6 +38,7 @@ namespace eclipse::hacks::Bot {
             const auto updateBotState = [](int state) { s_bot.setState(static_cast<bot::State>(state)); };
 
             config::setIfEmpty("bot.state", 0);
+            updateBotState(config::get<int>("bot.state", 0));
 
             auto tab = gui::MenuTab::find("Bot");
 
@@ -61,7 +64,8 @@ namespace eclipse::hacks::Bot {
         };
 
         void playerDestroyed(bool idk) {
-            m_fields->m_isDead = true;
+            if (auto* gjbgl = GJBaseGameLayer::get())
+                m_fields->m_isDead = gjbgl->m_player1 == this || gjbgl->m_player2 == this;
             PlayerObject::playerDestroyed(idk);
         }
     };

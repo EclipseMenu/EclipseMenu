@@ -1,4 +1,3 @@
-#include <Geode/Geode.hpp>
 #include <Geode/loader/SettingEvent.hpp>
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/modify/UILayer.hpp>

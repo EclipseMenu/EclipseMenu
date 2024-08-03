@@ -60,6 +60,16 @@ namespace eclipse::utils {
     bool hasOpenGLExtension(const std::string& extension);
 
     /// @brief Get whether to use legacy rendering functions for OpenGL.
+    /// @return Whether to use legacy rendering functions.
     bool shouldUseLegacyDraw();
 
+    /// @brief Format time in seconds to a string.
+    /// @param time Time in seconds.
+    /// @return Formatted time string (e.g. "1:23:45.678").
+    std::string formatTime(double time);
+
+    /// @brief Bugfixed version of getCurrentPercent.
+    /// @param playLayer PlayLayer to get the progress from.
+    /// @return Actual progress of the level.
+    float getActualProgress(PlayLayer* playLayer);
 }

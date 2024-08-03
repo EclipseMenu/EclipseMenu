@@ -148,11 +148,7 @@ namespace eclipse::labels {
     static std::string formatTime(int millis) {
         if (millis == 0) return "N/A";
         double seconds = millis / 1000.0;
-        if (seconds < 60.0)
-            return fmt::format("{:.3f}", seconds);
-        int minutes = (int) (seconds / 60.0);
-        seconds -= minutes * 60;
-        return fmt::format("{}:{:06.3f}", minutes, seconds);
+        return utils::formatTime(seconds);
     }
 
     float getFPS() {
