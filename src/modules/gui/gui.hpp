@@ -1,6 +1,7 @@
 #pragma once
 
 #include <modules/keybinds/manager.hpp>
+#include <modules/labels/setting.hpp>
 #include <modules/gui/color.hpp>
 
 #include <utility>
@@ -508,6 +509,44 @@ namespace eclipse::gui {
         std::function<void(keybinds::Keys)> m_callback;
     };
 
+    /// @brief Component that allows to change label settings.
+    class LabelSettingsComponent : public Component {
+    public:
+        explicit LabelSettingsComponent(labels::LabelSettings* settings)
+            : m_settings(settings) {}
+
+        void onInit() override {}
+        void onUpdate() override {}
+
+        [[nodiscard]] const std::string& getId() const override { return m_settings->text; }
+        [[nodiscard]] const std::string& getTitle() const override { return m_settings->text; }
+
+        labels::LabelSettings* getSettings() { return m_settings; }
+
+        LabelSettingsComponent* deleteCallback(const std::function<void()>& func) {
+            m_deleteCallback = func;
+            return this;
+        }
+
+        LabelSettingsComponent* editCallback(const std::function<void()>& func) {
+            m_editCallback = func;
+            return this;
+        }
+
+        void triggerDeleteCallback() {
+            if (m_deleteCallback) m_deleteCallback();
+        }
+
+        void triggerEditCallback() {
+            if (m_editCallback) m_editCallback();
+        }
+
+    private:
+        labels::LabelSettings* m_settings;
+        std::function<void()> m_deleteCallback;
+        std::function<void()> m_editCallback;
+    };
+
     /// @brief Contains a list of components and a title, to be passed into render engine.
     class MenuTab {
     public:
@@ -603,6 +642,13 @@ namespace eclipse::gui {
             return keybind;
         }
 
+        /// @brief Add a label settings to the tab.
+        std::shared_ptr<LabelSettingsComponent> addLabelSetting(labels::LabelSettings* settings) {
+            auto labelSettings = std::make_shared<LabelSettingsComponent>(settings);
+            addComponent(labelSettings);
+            return labelSettings;
+        }
+
         /// @brief Get the tab's title.
         [[nodiscard]] const std::string& getTitle() const { return m_title; }
 
@@ -638,6 +684,7 @@ namespace eclipse::gui {
         virtual void visit(ButtonComponent* button) {};
         virtual void visit(ColorComponent* color) {};
         virtual void visit(KeybindComponent* keybind) {};
+        virtual void visit(LabelSettingsComponent* labelSettings) {};
 
         /// @brief Handle the component.
         void visit(Component* component);

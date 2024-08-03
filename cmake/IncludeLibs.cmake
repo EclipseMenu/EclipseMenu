@@ -4,7 +4,7 @@ add_library(third_party INTERFACE)
 # Include libraries
 CPMAddPackage("gh:matcool/gd-imgui-cocos#09a9555")
 CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
-CPMAddPackage("gh:EclipseMenu/rift#fe40868")
+CPMAddPackage("gh:EclipseMenu/rift#b262115")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
 CPMAddPackage(
     NAME nlohmann_json
