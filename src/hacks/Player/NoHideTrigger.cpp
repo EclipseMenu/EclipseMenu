@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 
 #include <Geode/modify/EffectGameObject.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Player {
 
@@ -36,6 +37,21 @@ namespace eclipse::hacks::Player {
                 default:
                     return EffectGameObject::triggerObject(bgl, p1, p2);
             }
+        }
+    };
+
+    class $modify(NoHideTriggerGJBGLHook, GJBaseGameLayer) {
+        void processOptionsTrigger(GameOptionsTrigger* options) {
+            if (!config::get<bool>("player.nohidetrigger", false))
+                return GJBaseGameLayer::processOptionsTrigger(options);
+
+            auto originalHideP1 = options->m_hideP1;
+            auto originalHideP2 = options->m_hideP2;
+            options->m_hideP1 = GameOptionsSetting::Disabled;
+            options->m_hideP2 = GameOptionsSetting::Disabled;
+            GJBaseGameLayer::processOptionsTrigger(options);
+            options->m_hideP1 = originalHideP1;
+            options->m_hideP2 = originalHideP2;
         }
     };
 

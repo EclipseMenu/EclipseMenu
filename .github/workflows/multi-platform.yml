@@ -1,8 +1,11 @@
-name: Build Geode Mod
+name: Build Eclipse
 
 on:
   workflow_dispatch:
   push:
+    branches:
+      - "**"
+  pull_request:
     branches:
       - "**"
 
@@ -57,3 +60,36 @@ jobs:
         with:
           name: Build Output
           path: ${{ steps.build.outputs.build-output }}
+
+      - name: Check if has nightly webhook
+        id: check
+        run: echo "has-nightly-webhook=${{ secrets.NIGHTLY_WEBHOOK != '' }}" >> $GITHUB_OUTPUT
+
+      - uses: actions/checkout@v4
+        if: ${{ steps.check.outputs.has-nightly-webhook == 'true' }}
+
+      - name: Get commit messages
+        id: commit
+        if: ${{ steps.check.outputs.has-nightly-webhook == 'true' }}
+        run: |
+          echo "commit-message=$(git log -1 --pretty=format:"%s" | head -n 1)" >> $GITHUB_OUTPUT
+          # echo "commit-message-full=$(echo $COMMIT_MESSAGE | tail -n +2)" >> $GITHUB_OUTPUT # Bash is weird, this doesn't work
+          echo "build-color=#$(git log -1 --pretty=format:"%h" | cut -c 1-6)" >> $GITHUB_OUTPUT
+        #env:
+        #  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+
+      - name: Upload release to Discord
+        uses: prevter/discord-webhook@main
+        if: ${{ steps.check.outputs.has-nightly-webhook == 'true' }}
+        with:
+          webhook-url: ${{ secrets.NIGHTLY_WEBHOOK }}
+          content: 'New nightly build available!'
+          files: ${{ steps.build.outputs.build-output }}/*.geode
+          embed-title: ${{ steps.commit.outputs.commit-message }}
+          # embed-description: ${{ steps.commit.outputs.commit-message-full }}
+          embed-color: ${{ steps.commit.outputs.build-color }}
+          embed-url: ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}
+          embed-author: ${{ github.actor }}
+          embed-author-icon: 'https://avatars.githubusercontent.com/u/${{ github.actor_id }}?v=4'
+          embed-timestamp: 'now'
+          debug-print: true

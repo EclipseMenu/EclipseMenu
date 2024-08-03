@@ -1,6 +1,5 @@
 #include "config.hpp"
 
-#include <Geode/Geode.hpp>
 #include <fstream>
 
 namespace eclipse::config {

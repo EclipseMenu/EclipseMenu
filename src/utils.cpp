@@ -31,4 +31,28 @@ namespace eclipse::utils {
         return !hasVAO || useLegacy;
     }
 
+    std::string formatTime(double time) {
+        auto hours = static_cast<int>(time / 3600);
+        auto minutes = static_cast<int>(time / 60);
+        auto seconds = static_cast<int>(time) % 60;
+        auto millis = static_cast<int>(time * 1000) % 1000;
+
+        if (hours > 0)
+            return fmt::format("{}:{:02d}:{:02d}.{:03d}", hours, minutes, seconds, millis);
+        else if (minutes > 0)
+            return fmt::format("{}:{:02d}.{:03d}", minutes, seconds, millis);
+        else
+            return fmt::format("{}.{:03d}", seconds, millis);
+    }
+
+    float getActualProgress(PlayLayer* playLayer) {
+        float percent;
+        if (playLayer->m_level->m_timestamp > 0) {
+            percent = static_cast<float>(playLayer->m_gameState.m_levelTime * 240.f) / playLayer->m_level->m_timestamp * 100.f;
+        } else {
+            percent = reinterpret_cast<cocos2d::CCNode*>(playLayer->m_player1)->getPositionX() / playLayer->m_levelLength * 100.f;
+        }
+        return std::clamp(percent, 0.f, 100.f);
+    }
+
 }

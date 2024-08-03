@@ -25,6 +25,9 @@ namespace eclipse::hacks::Player {
         struct Fields {
             GameObject* m_anticheatObject = nullptr;
         };
+        static void onModify(auto& self) {
+            SAFE_PRIORITY("PlayLayer::destroyPlayer");
+        }
 
         void destroyPlayer(PlayerObject* player, GameObject* object) override {
             if (!m_fields->m_anticheatObject)

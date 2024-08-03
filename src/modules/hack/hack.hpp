@@ -2,7 +2,6 @@
 
 #include <memory>
 
-#include <Geode/Geode.hpp>
 #include <utils.hpp>
 
 #define REGISTER_HACK(hackClass) $execute { eclipse::hack::Hack::registerHack<hackClass>(); }

@@ -6,8 +6,9 @@
 
 #ifdef GEODE_IS_WINDOWS
 #include <Geode/modify/CCEGLView.hpp>
-#endif
+#else
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
+#endif
 
 using namespace geode::prelude;
 
@@ -414,7 +415,7 @@ namespace eclipse::keybinds {
 
                         if (!keybind.has_value()) return;
 
-                        auto keybindRef = keybind->get();
+                        auto& keybindRef = keybind->get();
 
                         if (key == Keys::None) {
                             config::set(fmt::format("keybind.{}.active", id), false);
@@ -427,6 +428,9 @@ namespace eclipse::keybinds {
 
                     s_keybindComponents[id] = keybindComponent;
                 } else {
+                    // Reset the keybind to None
+                    config::set(fmt::format("keybind.{}.key", id), Keys::None);
+
                     // Remove the keybind from the GUI
                     if (auto keybindComponent = s_keybindComponents[id]; keybindComponent) {
                         tab->removeComponent(keybindComponent);
