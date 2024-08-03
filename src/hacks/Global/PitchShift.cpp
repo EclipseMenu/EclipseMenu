@@ -53,7 +53,7 @@ namespace eclipse::hacks::Global {
         }
 
         [[nodiscard]] const char* getId() const override { return "Pitch Shift"; }
-        [[nodiscard]] int32_t getPriority() const override { return -8; }
+        [[nodiscard]] int32_t getPriority() const override { return -9; }
     };
 
     REGISTER_HACK(PitchShift)
