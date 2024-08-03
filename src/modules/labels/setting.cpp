@@ -4,6 +4,7 @@ namespace eclipse::labels {
     size_t LabelSettings::instanceCount = 0;
 
     void from_json(const nlohmann::json& json, LabelSettings& settings) {
+        settings.name = json.value("name", fmt::format("New label {}", settings.id));
         settings.text = json.value("text", "");
         settings.font = json.value("font", "bigFont.fnt");
         settings.scale = json.value("scale", 0.6f);
@@ -14,6 +15,7 @@ namespace eclipse::labels {
 
     void to_json(nlohmann::json& json, const LabelSettings& settings) {
         json = nlohmann::json{
+            {"name", settings.name},
             {"text", settings.text},
             {"font", settings.font},
             {"scale", settings.scale},
