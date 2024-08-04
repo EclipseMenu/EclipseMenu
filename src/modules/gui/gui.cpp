@@ -92,6 +92,7 @@ namespace eclipse::gui {
         else if SUPPORT_COMPONENT(ButtonComponent);
         else if SUPPORT_COMPONENT(ColorComponent);
         else if SUPPORT_COMPONENT(KeybindComponent);
+        else if SUPPORT_COMPONENT(LabelSettingsComponent);
     }
 
 #undef SUPPORT_COMPONENT

@@ -9,6 +9,11 @@ namespace eclipse::hacks::Global {
     void setSpeed(FMOD::Channel* channel) {
         float speed = 1.f;
 
+        if (config::get<bool>("global.audiospeed.sync", false)) {
+            bool speedhack = config::get<bool>("global.speedhack.toggle", false);
+            speed = speedhack ? config::get<float>("global.speedhack", 1.f) : 1.f;
+        }
+
         if (config::get<bool>("global.audiospeed.toggle", false))
             speed = config::get<float>("global.audiospeed", 1.f);
 
@@ -41,17 +46,31 @@ namespace eclipse::hacks::Global {
             tab->addFloatToggle("Audio Speed", "global.audiospeed", 0.0001f, 1000.f, "%.4f")
                 ->handleKeybinds()
                 ->toggleCallback(updateChannels);
+
+            tab->addToggle("Sync with Speedhack", "global.audiospeed.sync")
+                ->handleKeybinds()
+                ->callback([](bool){ updateChannels(); })
+                ->setDescription("Sync audio speed with speedhack, if it's enabled.");
         }
 
         void update() override {
-            if (!config::get<bool>("global.audiospeed.toggle", false))
-                return;
+            bool speedhack = config::get<bool>("global.speedhack.toggle", false);
+            bool toggledSpeedhack = m_lastSpeedhackState != speedhack;
+            m_lastSpeedhackState = speedhack;
 
-            updateChannels();
+            bool audiospeed = config::get<bool>("global.audiospeed.toggle", false);
+            bool sync = config::get<bool>("global.audiospeed.sync", false);
+
+            // With sync: update if speedhack is on or has been toggled
+            // Without sync: update if audiospeed is on
+            if (((speedhack || toggledSpeedhack) && sync) || audiospeed)
+                updateChannels();
         }
 
         [[nodiscard]] const char* getId() const override { return "Audio Speed"; }
-        [[nodiscard]] int32_t getPriority() const override { return -9; }
+        [[nodiscard]] int32_t getPriority() const override { return -8; }
+
+        bool m_lastSpeedhackState = false;
     };
 
     REGISTER_HACK(AudioSpeed)

@@ -33,6 +33,9 @@ namespace eclipse::labels {
         /// @brief Re-fetch all variables from the game
         void refetch();
 
+        /// @brief Update the FPS variable.
+        void updateFPS();
+
     private:
         VarMap m_variables;
     };

@@ -139,7 +139,6 @@ namespace eclipse::gui::imgui {
 
                 auto textColor = value ? colors[ImGuiCol_Text] : colors[ImGuiCol_TextDisabled];
 
-                auto& style = ImGui::GetStyle();
                 ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4) textColor);
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
@@ -504,6 +503,113 @@ namespace eclipse::gui::imgui {
 
             ImGui::PopItemWidth();
             ImGui::PopID();
-        }   
+        }
+
+        void visit(LabelSettingsComponent* labelSettings) override {
+            auto& style = ImGui::GetStyle();
+            auto& colors = style.Colors;
+            auto* settings = labelSettings->getSettings();
+            ImGui::PushID(fmt::format("label-{}", settings->id).c_str());
+
+            ImGui::PushItemWidth(-1);
+
+            auto textColor = settings->visible ? colors[ImGuiCol_Text] : colors[ImGuiCol_TextDisabled];
+            ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)textColor);
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
+
+            auto availWidth = ImGui::GetContentRegionAvail().x;
+            auto buttonSize = ImVec2(availWidth * 0.9f, 0);
+            auto arrowSize = ImVec2(availWidth * 0.1f, 0);
+
+            if (ImGui::Button(settings->name.c_str(), buttonSize)) {
+                settings->visible = !settings->visible;
+                labelSettings->triggerEditCallback();
+            }
+
+            ImGui::SameLine(0, 0);
+
+            ImGui::PopStyleVar(2);
+            bool openPopup = ImGui::Button(fmt::format("##open_label_{}", settings->id).c_str(), arrowSize);
+            ImGui::PopItemWidth();
+            ImGui::PopStyleColor(4);
+
+            auto scale = 1.f;
+            auto top = ImGui::GetItemRectMin().y + (4.5 * scale);
+            auto bottom = ImGui::GetItemRectMax().y - (4.5 * scale);
+            auto right = ImGui::GetItemRectMax().x - (4.5 * scale);
+            auto side = bottom - top;
+            auto left = right - side;
+            auto triangleColor = colors[ImGuiCol_TextDisabled];
+            triangleColor.w *= ImGui::GetStyle().Alpha;
+            ImGui::GetWindowDrawList()->AddTriangleFilled(
+                ImVec2(right, top),
+                ImVec2(left, bottom),
+                ImVec2(right, bottom),
+                ImGui::ColorConvertFloat4ToU32(triangleColor)
+            );
+
+            std::string popupName = fmt::format("##label-settings-{}", settings->id);
+            if (openPopup)
+                ImGui::OpenPopup(popupName.c_str());
+
+            ImGui::SetNextWindowSizeConstraints(ImVec2(240, 0), ImVec2(FLT_MAX, FLT_MAX));
+            if (ImGui::BeginPopup(popupName.c_str())) {
+                auto& name = settings->name;
+                if (ImGui::InputText("Name", &name)) {
+                    settings->name = name;
+                    labelSettings->triggerEditCallback();
+                }
+
+                auto& text = settings->text;
+                if (ImGui::InputText("Text", &text)) {
+                    settings->text = text;
+                    labelSettings->triggerEditCallback();
+                }
+
+                int32_t currentFont = labels::getFontIndex(settings->font);
+                if (ImGui::Combo("Font", &currentFont, labels::fontNames.data(), labels::fontNames.size())) {
+                    settings->font = labels::fontFiles[currentFont];
+                    labelSettings->triggerEditCallback();
+                }
+
+                auto labelScale = settings->scale;
+                if (ImGui::InputFloat("Scale", &labelScale, 0.f, 0.f, "%.2f")) {
+                    settings->scale = std::clamp(labelScale, 0.0f, 10.0f);
+                    labelSettings->triggerEditCallback();
+                }
+
+                auto& color = settings->color;
+                if (ImGui::ColorEdit3("Color", color.data(), ImGuiColorEditFlags_NoInputs)) {
+                    settings->color = color;
+                    labelSettings->triggerEditCallback();
+                }
+
+                auto opacity = settings->color.a;
+                if (ImGui::SliderFloat("Opacity", &opacity, 0.0f, 1.0f)) {
+                    settings->color.a = opacity;
+                    labelSettings->triggerEditCallback();
+                }
+
+                auto alignment = settings->alignment;
+                if (ImGui::Combo("Alignment", (int*)&alignment, labels::alignmentNames.data(), labels::alignmentNames.size())) {
+                    settings->alignment = alignment;
+                    labelSettings->triggerEditCallback();
+                }
+
+                if (ImGui::Button("Delete")) {
+                    labelSettings->triggerDeleteCallback();
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::EndPopup();
+            }
+
+            ImGui::PopID();
+        }
     };
 }
