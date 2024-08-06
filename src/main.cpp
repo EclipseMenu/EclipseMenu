@@ -7,6 +7,7 @@
 #include <modules/gui/layouts/window/window.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
+#include <modules/gui/blur/blur.hpp>
 #include <imgui-cocos.hpp>
 
 using namespace eclipse;
@@ -92,6 +93,7 @@ public:
 
         keybinds::Manager::get()->update();
 
+        gui::blur::update(dt);
     }
 };
 
@@ -111,6 +113,9 @@ $on_mod(Loaded) {
 
     // Load keybinds
     keybinds::Manager::get()->init();
+
+    // Compile blur shader
+    gui::blur::init();
 
     // Schedule hack updates
     cocos2d::CCScheduler::get()->scheduleSelector(
