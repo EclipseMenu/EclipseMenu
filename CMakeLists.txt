@@ -19,6 +19,15 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES} ${MACOS_SOURCES})
 # Make sure we can include headers from src
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
+# Get the latest abbreviated commit hash of the working branch
+execute_process(
+    COMMAND git log -1 --format=%h
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    OUTPUT_VARIABLE GIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+target_compile_definitions(${PROJECT_NAME} PRIVATE GIT_HASH="${GIT_HASH}")
+
 # Windows specific settings
 if (WIN32)
   # Disable annoying warnings
