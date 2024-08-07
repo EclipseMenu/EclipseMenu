@@ -32,8 +32,9 @@ namespace eclipse::hacks::Level {
         }
 
         void updatePauseMenu(float dt) {
-            if (config::get<bool>("level.hidepause", false) == this->isVisible())
+            if (config::get<bool>("level.hidepause", false) == this->isVisible() && gui::Engine::get()->isToggled()) {
                 this->setVisible(!config::get<bool>("level.hidepause", false));
+            }
         }
     };
 }
