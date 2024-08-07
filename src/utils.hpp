@@ -72,4 +72,7 @@ namespace eclipse::utils {
     /// @param playLayer PlayLayer to get the progress from.
     /// @return Actual progress of the level.
     float getActualProgress(PlayLayer* playLayer);
+
+    /// @brief Make the cursor visible/hidden under certain conditions
+    void updateCursorState(bool visible);
 }

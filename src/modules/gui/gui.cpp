@@ -3,7 +3,8 @@
 #include <modules/config/config.hpp>
 #include <algorithm>
 
-#include "imgui.hpp"
+#include "imgui/imgui.hpp"
+#include "cocos/cocos.hpp"
 
 namespace eclipse::gui {
 
@@ -53,7 +54,7 @@ namespace eclipse::gui {
         return this;
     }
 
-    void MenuTab::addComponent(std::shared_ptr<Component> component) {
+    void MenuTab::addComponent(const std::shared_ptr<Component>& component) {
         m_components.push_back(component);
     }
 
@@ -66,35 +67,56 @@ namespace eclipse::gui {
         m_components.erase(it);
     }
 
-    std::shared_ptr<MenuTab> MenuTab::find(const std::string& name) {
-        return Engine::get()->findTab(name);
+    std::shared_ptr<MenuTab> MenuTab::find(std::string_view name) {
+        auto engine = Engine::get();
+        return engine->findTab(name);
+    }
+
+    void Engine::setRenderer(RendererType type) {
+        if (type == m_rendererType && m_renderer) return;
+        if (m_renderer) m_renderer->shutdown();
+
+        switch (type) {
+            case RendererType::ImGui:
+            default:
+                m_renderer = std::make_shared<imgui::ImGuiRenderer>();
+                break;
+            case RendererType::Cocos2d:
+                m_renderer = std::make_shared<cocos::CocosRenderer>();
+                break;
+        }
+
+        m_rendererType = type;
+        m_renderer->init();
+        config::set("menu.renderer", static_cast<int>(type));
     }
 
     std::shared_ptr<Engine> Engine::get() {
-        // TODO: Make this return the correct engine based on platform,
-        // or even switch between engines at runtime.
-        static auto instance = std::make_shared<imgui::ImGuiEngine>();
-        return std::static_pointer_cast<Engine>(instance);
+        static std::shared_ptr<Engine> s_engine = std::make_shared<Engine>();
+        return s_engine;
     }
 
-#define SUPPORT_COMPONENT(type) (auto* component##__LINE__ = dynamic_cast<type*>(component)) this->visit(component##__LINE__)
-    
-    void Style::visit(Component* component) {
-        if SUPPORT_COMPONENT(ToggleComponent);
-        else if SUPPORT_COMPONENT(SliderComponent);
-        else if SUPPORT_COMPONENT(LabelComponent);
-        else if SUPPORT_COMPONENT(InputFloatComponent);
-        else if SUPPORT_COMPONENT(InputIntComponent);
-        else if SUPPORT_COMPONENT(InputTextComponent);
-        else if SUPPORT_COMPONENT(FloatToggleComponent);
-        else if SUPPORT_COMPONENT(RadioButtonComponent);
-        else if SUPPORT_COMPONENT(ComboComponent);
-        else if SUPPORT_COMPONENT(ButtonComponent);
-        else if SUPPORT_COMPONENT(ColorComponent);
-        else if SUPPORT_COMPONENT(KeybindComponent);
-        else if SUPPORT_COMPONENT(LabelSettingsComponent);
+    void Engine::init() {
+        setRenderer(config::get<RendererType>("menu.renderer", RendererType::ImGui));
     }
 
-#undef SUPPORT_COMPONENT
+    void Engine::toggle() {
+        if (!m_renderer) return;
+        m_renderer->toggle();
+    }
+
+    std::shared_ptr<MenuTab> Engine::findTab(std::string_view name) {
+        for (auto tab : m_tabs) {
+            if (tab->getTitle() == name) {
+                return tab;
+            }
+        }
+
+        // If the tab does not exist, create a new one.
+        auto tab = std::make_shared<MenuTab>(std::string(name));
+        m_tabs.push_back(tab);
+
+        return tab;
+    }
 
 }

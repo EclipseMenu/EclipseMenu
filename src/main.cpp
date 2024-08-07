@@ -4,7 +4,6 @@
 #include <Geode/modify/CCScheduler.hpp>
 
 #include <modules/config/config.hpp>
-#include <modules/gui/layouts/window/window.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
 #include <modules/gui/blur/blur.hpp>
@@ -18,7 +17,6 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
     bool init() override {
         if (!MenuLayer::init()) return false;
 
-#ifdef GEODE_IS_ANDROID
         // Temporarily add a button to toggle the GUI on android. (This will be removed later)
         auto androidButton = CCMenuItemSpriteExtra::create(
             cocos2d::CCSprite::createWithSpriteFrameName("GJ_everyplayBtn_001.png"),
@@ -28,7 +26,16 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         auto menu = this->getChildByID("bottom-menu");
         menu->addChild(androidButton);
         menu->updateLayout();
-#endif
+
+        {
+            auto rendererSwitchButton = CCMenuItemSpriteExtra::create(
+                cocos2d::CCSprite::createWithSpriteFrameName("GJ_editModeBtn_001.png"),
+                this, menu_selector(EclipseButtonMLHook::onToggleRenderer)
+            );
+            rendererSwitchButton->setID("render-switch"_spr);
+            menu->addChild(rendererSwitchButton);
+            menu->updateLayout();
+        }
 
         if (s_isInitialized) return true;
 
@@ -57,6 +64,17 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         gui::Engine::get()->toggle();
         config::save();
     }
+
+    void onToggleRenderer(CCObject* sender) {
+        auto engine = gui::Engine::get();
+        auto type = engine->getRendererType() == gui::RendererType::ImGui
+            ? gui::RendererType::Cocos2d
+            : gui::RendererType::ImGui;
+        engine->setRenderer(type);
+        config::set("menu.renderer", type);
+
+        geode::log::info("Switched renderer to {}", type == gui::RendererType::ImGui ? "ImGui" : "Cocos2d");
+    }
 };
 
 class $modify(EclipseUILayerHook, UILayer) {
@@ -82,7 +100,7 @@ public:
             hack->update();
 
         // Add ability for ImGui to capture right click
-        if (s_isInitialized) {
+        if (s_isInitialized && gui::Engine::get()->getRendererType() == gui::RendererType::ImGui) {
             auto& io = ImGui::GetIO();
             if (keybinds::isKeyPressed(keybinds::Keys::MouseRight)) {
                 io.AddMouseButtonEvent(1, true);
