@@ -137,10 +137,10 @@ namespace eclipse::hacks::Labels {
                 {"Noclip Deaths", "Deaths: {noclipDeaths}", false},
             });
 
-            tab->addToggle("Show labels", "labels.visible")
+            tab->addToggle("Show Labels", "labels.visible")
                 ->setDescription("Toggles the visibility of the labels.")
                 ->handleKeybinds();
-            tab->addToggle("Cheat indicator", "labels.cheat-indicator.visible")
+            tab->addToggle("Cheat Indicator", "labels.cheat-indicator.visible")
                 ->callback([](bool) { updateLabels(); })
                 ->setDescription("Shows a red indicator if you have any cheats enabled.")
                 ->handleKeybinds()
