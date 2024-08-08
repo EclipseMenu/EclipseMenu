@@ -12,7 +12,7 @@ namespace eclipse::hacks::Bypass {
 
             tab->addToggle("Comment History Bypass", "bypass.commenthistory")
                 ->handleKeybinds()
-                ->setDescription("Allows you to see any user's comment history");
+                ->setDescription("Allows you to see any user's comment history. (Created by Uproxide)");
         }
 
         [[nodiscard]] const char* getId() const override { return "Comment History Bypass"; }

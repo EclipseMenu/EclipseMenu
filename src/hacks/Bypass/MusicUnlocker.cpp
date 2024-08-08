@@ -10,7 +10,9 @@ namespace eclipse::hacks::Cosmetic {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
 
-            tab->addToggle("Practice Music Sync", "bypass.practicemusic")->handleKeybinds();
+            tab->addToggle("Practice Music Sync", "bypass.practicemusic")
+                ->handleKeybinds()
+                ->setDescription("(Created by Uproxide)");
         }
 
         [[nodiscard]] const char* getId() const override { return "Practice Music Sync"; }
@@ -20,7 +22,9 @@ namespace eclipse::hacks::Cosmetic {
         void init() override {
             auto tab = gui::MenuTab::find("Bypass");
 
-            tab->addToggle("Music Customizer", "bypass.musiccustomizer")->handleKeybinds();
+            tab->addToggle("Music Customizer", "bypass.musiccustomizer")
+                ->handleKeybinds()
+                ->setDescription("(Created by Uproxide)");
         }
 
         [[nodiscard]] const char* getId() const override { return "Music Customizer"; }
