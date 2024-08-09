@@ -22,8 +22,8 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(HideLevelCompleteVFX)
 
     class $modify(HideLevelCompleteVFXCCCWHook, CCCircleWave) {
-        void draw() {
-            CCCircleWave::draw();
+        void setPosition(cocos2d::CCPoint const& p0) {
+            CCCircleWave::setPosition(p0);
 
             if (!config::get<bool>("level.hidelevelcomplete", false)) return;
 
@@ -65,7 +65,7 @@ namespace eclipse::hacks::Level {
 
     // cannot hook the class below due to macos arm/intel differences (?)
     // nvm it was some setupVBO() issue
-    /*
+
     class $modify(HideLevelCompleteVFXCCPSQHook, cocos2d::CCParticleSystemQuad) {
         static cocos2d::CCParticleSystemQuad* create(char const* p0, bool p1) {
             auto psq = cocos2d::CCParticleSystemQuad::create(p0, p1);
@@ -80,7 +80,7 @@ namespace eclipse::hacks::Level {
             return psq;
         }
     };
-    */
+    /*
     class $modify(HideLevelCompleteVFXCCPSHook, cocos2d::CCParticleSystem) {
         void update(float dt) {
             CCParticleSystem::update(dt);
@@ -97,4 +97,5 @@ namespace eclipse::hacks::Level {
                 this->setVisible(false);
         }
     };
+    */
 }
