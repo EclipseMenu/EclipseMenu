@@ -4,6 +4,7 @@
 
 #include <Geode/modify/CCCircleWave.hpp>
 #include <Geode/modify/CCLightFlash.hpp>
+#include <Geode/modify/CCParticleSystemQuad.hpp>
 #include <Geode/modify/CCParticleSystem.hpp>
 
 namespace eclipse::hacks::Level {
@@ -63,24 +64,26 @@ namespace eclipse::hacks::Level {
         }
     };
 
-    // cannot hook the class below due to macos arm/intel differences (?)
-    // nvm it was some setupVBO() issue
-
+    // in case of setupVBO() emergency, comment the below out
+    // nvm it hooks but draw() is finicky and create() doesnt work
+    /*
     class $modify(HideLevelCompleteVFXCCPSQHook, cocos2d::CCParticleSystemQuad) {
-        static cocos2d::CCParticleSystemQuad* create(char const* p0, bool p1) {
-            auto psq = cocos2d::CCParticleSystemQuad::create(p0, p1);
-            if (!config::get<bool>("level.hidelevelcomplete", false)) return psq;
+        void initTexCoordsWithRect(cocos2d::CCRect const& p0) {
+            CCParticleSystemQuad::initTexCoordsWithRect(p0);
+            geode::log::info("help");
+            if (!config::get<bool>("level.hidelevelcomplete", false)) return;
             PlayLayer* pl = PlayLayer::get();
-            if (!pl) return psq;
-            if (psq->getParent() != pl) return psq;
+            if (!pl) return;
+            if (this->getParent() != pl) return;
 
             if (pl->m_levelEndAnimationStarted)
-                psq->setVisible(false);
-
-            return psq;
+                this->setVisible(false);
         }
     };
-    /*
+    */
+
+    // backup plan in case something goes terribly wrong with setupVBO() again --raydeeux
+    // nvm activate the backup plan NOW bc stuff won't hook
     class $modify(HideLevelCompleteVFXCCPSHook, cocos2d::CCParticleSystem) {
         void update(float dt) {
             CCParticleSystem::update(dt);
@@ -97,5 +100,4 @@ namespace eclipse::hacks::Level {
                 this->setVisible(false);
         }
     };
-    */
 }
