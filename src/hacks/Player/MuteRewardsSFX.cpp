@@ -24,7 +24,8 @@ namespace eclipse::hacks::Player {
 
     class $modify(MuteRewardsSFXFMODAEHook, FMODAudioEngine) {
         static void onModify(auto& self) {
-            SAFE_PRIORITY("FMODAudioEngine::playEffect");
+            FIRST_PRIORITY("FMODAudioEngine::playEffect");
+            // change to FIRST_PRIORITY so ControlVanillaSFX (also by RayDeeUx) doesnt bork
         }
 
         void playEffect(gd::string path, float speed, float p2, float volume) {

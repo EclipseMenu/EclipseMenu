@@ -66,7 +66,11 @@ namespace eclipse::hacks::Player {
                 but accuracy > getting the job done in case there's
                 SFX that lasts far, FAR longer.
                 */
-                fmod->pauseAllEffects();
+                /*
+                as of august 2nd, 2024, it is probably better
+                to call stopAllEffects to get the death SFX playing.
+                */
+                fmod->stopAllEffects();
             }
             PlayerObject::playerDestroyed(p0);
         }

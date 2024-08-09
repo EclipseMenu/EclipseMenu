@@ -20,11 +20,27 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(MatchLabelFonts)
 
-    class $modify(MatchLabelFontsPLHook, PlayLayer) {
-        void onEnterTransitionDidFinish() {
-            PlayLayer::onEnterTransitionDidFinish();
+    static const std::string s_bigFontName = "bigFont.fnt";
 
-            if (m_attemptLabel && m_percentageLabel && config::get<bool>("level.matchlabelfonts", false))
+    class $modify(MatchLabelFontsPLHook, PlayLayer) {
+
+        bool shouldMatchLabelFonts() {
+            return m_attemptLabel && m_percentageLabel &&
+                m_percentageLabel->getFntFile() == s_bigFontName &&
+                m_attemptLabel->getFntFile() != s_bigFontName;
+        }
+
+        void updateProgressbar() {
+            PlayLayer::updateProgressbar();
+
+            if (shouldMatchLabelFonts() && config::get<bool>("level.matchlabelfonts", false))
+                m_percentageLabel->setFntFile(m_attemptLabel->getFntFile());
+        }
+
+        void levelComplete() {
+            PlayLayer::levelComplete();
+
+            if (shouldMatchLabelFonts() && config::get<bool>("level.matchlabelfonts", false))
                 m_percentageLabel->setFntFile(m_attemptLabel->getFntFile());
         }
     };
