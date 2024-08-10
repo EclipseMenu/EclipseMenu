@@ -69,9 +69,9 @@ namespace eclipse::config {
     void deleteProfile(const std::string& profile) {
         auto profilesDir = geode::Mod::get()->getSaveDir() / "profiles";
         auto path = profilesDir / (profile + ".json");
-        if (std::filesystem::exists(path)) {
+
+        if (std::filesystem::exists(path))
             std::filesystem::remove(path);
-        }
     }
 
     std::vector<std::string> getProfiles() {
