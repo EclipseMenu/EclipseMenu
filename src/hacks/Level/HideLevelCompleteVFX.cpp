@@ -85,8 +85,8 @@ namespace eclipse::hacks::Level {
     // backup plan in case something goes terribly wrong with setupVBO() again --raydeeux
     // nvm activate the backup plan NOW bc stuff won't hook
     class $modify(HideLevelCompleteVFXCCPSHook, cocos2d::CCParticleSystem) {
-        void update(float dt) {
-            CCParticleSystem::update(dt);
+        void initParticle(cocos2d::sCCParticle* p0) {
+            CCParticleSystem::initParticle(p0);
 
             if (!config::get<bool>("level.hidelevelcomplete", false)) return;
 
