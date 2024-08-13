@@ -24,7 +24,7 @@ namespace eclipse::hacks::Global {
 
     class $modify(TransitionSpeedCCTFHook, cocos2d::CCTransitionFade) {
         #ifdef GEODE_IS_ANDROID
-        static CCTransitionFade* create(float duration, CCScene* scene, ccColor3B const& color) {
+        static CCTransitionFade* create(float duration, CCScene* scene, cocos2d::ccColor3B const& color) {
             return CCTransitionFade::create(config::get<bool>("global.transitionspeed.toggle", false)
                 ? config::get<float>("global.transitionspeed", 0.5f)
                 : duration, scene, color);
