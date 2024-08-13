@@ -110,10 +110,10 @@ namespace eclipse::gui::imgui {
 
         void visit(FloatToggleComponent* floatToggle) override {
             auto value = config::get<float>(floatToggle->getId(), 0.0f);
-            bool toggle = config::get<bool>(floatToggle->getId() + ".toggle", false);
+            bool toggle = config::get<bool>(fmt::format("{}.toggle", floatToggle->getId()), false);
 
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.3f);
-            if (ImGui::InputFloat(("##" + floatToggle->getTitle()).c_str(), &value, 0, 0, floatToggle->getFormat().c_str())) {
+            if (ImGui::InputFloat(fmt::format("##{}", floatToggle->getTitle()).c_str(), &value, 0, 0, floatToggle->getFormat().c_str())) {
                 value = std::clamp(value, floatToggle->getMin(), floatToggle->getMax());
                 config::set(floatToggle->getId(), value);
                 floatToggle->triggerCallback(value);
@@ -122,7 +122,7 @@ namespace eclipse::gui::imgui {
 
             ImGui::SameLine();
             if (ImGui::Checkbox(floatToggle->getTitle().c_str(), &toggle)) {
-                config::set(floatToggle->getId() + ".toggle", toggle);
+                config::set(fmt::format("{}.toggle", floatToggle->getId()), toggle);
                 floatToggle->triggerCallback();
             }
             if (!floatToggle->getDescription().empty()) {

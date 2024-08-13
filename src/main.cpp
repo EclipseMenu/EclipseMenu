@@ -7,6 +7,7 @@
 #include <modules/gui/layouts/window/window.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
+#include <modules/gui/blur/blur.hpp>
 #include <imgui-cocos.hpp>
 
 using namespace eclipse;
@@ -30,6 +31,8 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
 #endif
 
         if (s_isInitialized) return true;
+
+        geode::log::info("Eclipse Menu commit hash: {}", GIT_HASH);
 
         // Initialize the GUI engine.
         gui::Engine::get()->init();
@@ -56,14 +59,25 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
     }
 };
 
-class $modify(HackSchedulerHook, cocos2d::CCScheduler) {
-    static void onModify(auto& self) {
-        FIRST_PRIORITY("cocos2d::CCScheduler::update");
+class $modify(EclipseUILayerHook, UILayer) {
+    bool init(GJBaseGameLayer* p0) {
+        if (!UILayer::init(p0)) return false;
+        auto menu = cocos2d::CCMenu::create();
+        menu->setID("eclipse-ui"_spr);
+        this->addChild(menu, 1000);
+        menu->setPosition({0, 0});
+        return true;
+    }
+};
+
+class HackUpdater : public cocos2d::CCObject {
+public:
+    static HackUpdater* get() {
+        static HackUpdater instance;
+        return &instance;
     }
 
     void update(float dt) override {
-        cocos2d::CCScheduler::update(dt);
-
         for (const auto& hack : hack::Hack::getHacks())
             hack->update();
 
@@ -78,17 +92,8 @@ class $modify(HackSchedulerHook, cocos2d::CCScheduler) {
         }
 
         keybinds::Manager::get()->update();
-    }
-};
 
-class $modify(EclipseUILayerHook, UILayer) {
-    bool init(GJBaseGameLayer* p0) {
-        if (!UILayer::init(p0)) return false;
-        auto menu = cocos2d::CCMenu::create();
-        menu->setID("eclipse-ui"_spr);
-        this->addChild(menu, 1000);
-        menu->setPosition({0, 0});
-        return true;
+        gui::blur::update(dt);
     }
 };
 
@@ -108,4 +113,13 @@ $on_mod(Loaded) {
 
     // Load keybinds
     keybinds::Manager::get()->init();
+
+    // Compile blur shader
+    gui::blur::init();
+
+    // Schedule hack updates
+    cocos2d::CCScheduler::get()->scheduleSelector(
+        schedule_selector(HackUpdater::update),
+        HackUpdater::get(), 0.f, false
+    );
 }

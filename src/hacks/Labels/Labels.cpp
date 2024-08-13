@@ -6,7 +6,6 @@
 #include <modules/labels/setting.hpp>
 
 #include <Geode/modify/UILayer.hpp>
-#include <utility>
 
 namespace eclipse::hacks::Labels {
 

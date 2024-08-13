@@ -45,8 +45,8 @@ namespace eclipse::gui {
 
     FloatToggleComponent* FloatToggleComponent::handleKeybinds() {
         keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
-            bool value = !config::get<bool>(this->getId() + ".toggle", false);
-            config::set(this->getId() + ".toggle", value);
+            bool value = !config::get<bool>(fmt::format("{}.toggle", this->getId()), false);
+            config::set(fmt::format("{}.toggle", this->getId()), value);
             this->triggerCallback();
         });
         m_hasKeybind = true;
