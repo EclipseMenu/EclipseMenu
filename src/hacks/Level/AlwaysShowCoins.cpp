@@ -49,7 +49,7 @@ namespace eclipse::hacks::Level {
         }
 
         void lateInit() override {
-            onChangeShowCoins(config::get<bool>("level.alwaysshowcoins"));
+            onChangeShowCoins(config::get<bool>("level.alwaysshowcoins", false));
         }
 
         [[nodiscard]] const char* getId() const override { return "Always Show Coins"; }

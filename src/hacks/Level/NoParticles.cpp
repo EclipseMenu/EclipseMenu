@@ -9,8 +9,8 @@ namespace eclipse::hacks::Level {
     void onHideParticles(bool state) {
         if (!state) return;
 
-        bool customParticlesEnabled = !config::get<bool>("level.noparticles.nocustomparticles");
-        bool miscParticlesEnabled = !config::get<bool>("level.noparticles.nomiscparticles");
+        bool customParticlesEnabled = !config::get<bool>("level.noparticles.nocustomparticles", false);
+        bool miscParticlesEnabled = !config::get<bool>("level.noparticles.nomiscparticles", false);
 
         if (customParticlesEnabled && miscParticlesEnabled)
             config::set("level.noparticles", false);
@@ -63,7 +63,7 @@ namespace eclipse::hacks::Level {
         }
 
         void update() override {
-            onHideParticles(config::get<bool>("level.noparticles"));
+            onHideParticles(config::get<bool>("level.noparticles", false));
         }
 
         [[nodiscard]] const char* getId() const override { return "No Particles"; }
@@ -77,7 +77,7 @@ namespace eclipse::hacks::Level {
         }
 
         cocos2d::CCParticleSystemQuad* spawnParticle(char const* plist, int zOrder, cocos2d::tCCPositionType positionType, cocos2d::CCPoint position) {
-            if (config::get<bool>("level.noparticles") && config::get<bool>("level.noparticles.nomiscparticles"))
+            if (config::get<bool>("level.noparticles", false) && config::get<bool>("level.noparticles.nomiscparticles", false))
                 return nullptr;
 
             return GJBaseGameLayer::spawnParticle(plist, zOrder, positionType, position);
