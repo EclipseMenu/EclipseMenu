@@ -49,29 +49,29 @@ namespace eclipse::config {
         saveFile(path);
     }
 
-    void saveProfile(const std::string& profile) {
+    void saveProfile(std::string_view profile) {
         auto profilesDir = geode::Mod::get()->getSaveDir() / "profiles";
         std::filesystem::create_directories(profilesDir);
 
-        auto path = profilesDir / (profile + ".json");
+        auto path = profilesDir / fmt::format("{}.json", profile);
         saveFile(path);
     }
 
-    void loadProfile(const std::string& profile) {
+    void loadProfile(std::string_view profile) {
         auto profilesDir = geode::Mod::get()->getSaveDir() / "profiles";
-        auto path = profilesDir / (profile + ".json");
+        auto path = profilesDir / fmt::format("{}.json", profile);
         if (!loadFile(path)) {
             geode::log::warn("Failed to load profile: {}", profile);
             load(); // Load the default config
         }
     }
 
-    void deleteProfile(const std::string& profile) {
+    void deleteProfile(std::string_view profile) {
         auto profilesDir = geode::Mod::get()->getSaveDir() / "profiles";
-        auto path = profilesDir / (profile + ".json");
-        if (std::filesystem::exists(path)) {
+        auto path = profilesDir / fmt::format("{}.json", profile);
+
+        if (std::filesystem::exists(path))
             std::filesystem::remove(path);
-        }
     }
 
     std::vector<std::string> getProfiles() {

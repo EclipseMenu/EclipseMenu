@@ -210,7 +210,7 @@ namespace eclipse::gui::imgui {
             bool toggle = config::get<bool>(floatToggle->getId() + ".toggle", false);
 
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
-            if (ImGui::InputFloat(("##" + floatToggle->getTitle()).c_str(), &value, 0, 0, floatToggle->getFormat().c_str())) {
+            if (ImGui::InputFloat(fmt::format("##{}", floatToggle->getTitle()).c_str(), &value, 0, 0, floatToggle->getFormat().c_str())) {
                 value = std::clamp(value, floatToggle->getMin(), floatToggle->getMax());
                 config::set(floatToggle->getId(), value);
                 floatToggle->triggerCallback(value);
@@ -235,7 +235,7 @@ namespace eclipse::gui::imgui {
 
             if (ImGui::Button(floatToggle->getTitle().c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
                 toggle = !toggle;
-                config::set(floatToggle->getId() + ".toggle", toggle);
+                config::set(fmt::format("{}.toggle", floatToggle->getId()), toggle);
                 floatToggle->triggerCallback();
             }
             handleTooltip(floatToggle->getDescription());
