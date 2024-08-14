@@ -23,11 +23,19 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(TransitionSpeed)
 
     class $modify(TransitionSpeedCCTFHook, cocos2d::CCTransitionFade) {
+        #ifdef GEODE_IS_ANDROID
+        static CCTransitionFade* create(float duration, CCScene* scene, cocos2d::ccColor3B const& color) {
+            return CCTransitionFade::create(config::get<bool>("global.transitionspeed.toggle", false)
+                ? config::get<float>("global.transitionspeed", 0.5f)
+                : duration, scene, color);
+        }
+        #else
         static CCTransitionFade* create(float duration, CCScene* scene) {
             return CCTransitionFade::create(config::get<bool>("global.transitionspeed.toggle", false)
                 ? config::get<float>("global.transitionspeed", 0.5f)
                 : duration, scene);
         }
+        #endif
     };
 
 }
