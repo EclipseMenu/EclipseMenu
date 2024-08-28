@@ -76,7 +76,7 @@ namespace eclipse::hacks::Level {
             bool idsCheck = obj->m_objectID == 3613 || obj->m_objectID == 3662;
             if (isTrigger && !idsCheck && config::get<bool>("level.showtriggers", false)) {
                 if (auto* ego = geode::cast::typeinfo_cast<EffectGameObject*>(obj)) {
-                    if (ego->m_unk4D0 != 1 || !ego->m_isTouchTriggered && obj->m_objectID != 2063) {
+                    if ((ego->m_unk4D0 != 1 || !ego->m_isTouchTriggered) && obj->m_objectID != 2063) {
                         s_lastEditedTrigger = obj; // this will queue the trigger to be added to the section
                         s_originalSectionIndex = obj->m_outerSectionIndex;
                     }
