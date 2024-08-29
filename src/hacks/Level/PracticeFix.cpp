@@ -205,7 +205,6 @@ namespace eclipse::Hacks::Level {
             m_ringOrStreakRelated = player->m_ringOrStreakRelated;
             m_playerColor1 = player->m_playerColor1;
             m_playerColor2 = player->m_playerColor2;
-            m_position = player->m_position;
             m_isSecondPlayer = player->m_isSecondPlayer;
             m_unkA99 = player->m_unkA99;
             m_totalTime = player->m_totalTime;
@@ -279,8 +278,7 @@ namespace eclipse::Hacks::Level {
             m_ignoreDamage = player->m_ignoreDamage;
             m_enable22Changes = player->m_enable22Changes;
 
-            m_xPosition = player->getPositionX();
-            m_yPosition = player->getPositionY();
+            m_position = player->m_position;
             m_rotation = player->getRotation();
 
 #ifndef GEODE_IS_ANDROID
@@ -469,7 +467,6 @@ namespace eclipse::Hacks::Level {
             player->m_ringOrStreakRelated = m_ringOrStreakRelated;
             player->m_playerColor1 = m_playerColor1;
             player->m_playerColor2 = m_playerColor2;
-            player->m_position = m_position;
             player->m_isSecondPlayer = m_isSecondPlayer;
             player->m_unkA99 = m_unkA99;
             player->m_totalTime = m_totalTime;
@@ -542,8 +539,8 @@ namespace eclipse::Hacks::Level {
             player->m_ignoreDamage = m_ignoreDamage;
             player->m_enable22Changes = m_enable22Changes;
 
-            player->setPositionX(m_xPosition);
-            player->setPositionY(m_yPosition);
+            player->m_position = m_position;
+            player->setPosition(m_position);
             player->setRotation(m_rotation);
 
 #ifndef GEODE_IS_ANDROID
@@ -560,8 +557,7 @@ namespace eclipse::Hacks::Level {
         }
 
     private:
-        float m_xPosition;
-        float m_yPosition;
+        cocos2d::CCPoint m_position;
         float m_rotation;
 
         bool m_wasTeleported;
@@ -737,7 +733,6 @@ namespace eclipse::Hacks::Level {
         bool m_ringOrStreakRelated;
         cocos2d::ccColor3B m_playerColor1;
         cocos2d::ccColor3B m_playerColor2;
-        cocos2d::CCPoint m_position;
         bool m_isSecondPlayer;
         bool m_unkA99;
         double m_totalTime;

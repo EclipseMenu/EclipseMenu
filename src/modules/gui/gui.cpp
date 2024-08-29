@@ -53,6 +53,14 @@ namespace eclipse::gui {
         return this;
     }
 
+    ButtonComponent* ButtonComponent::handleKeybinds() {
+        keybinds::Manager::get()->registerKeybind(fmt::format("button.{}", m_title), m_title, [this](){
+            this->triggerCallback();
+        });
+        m_hasKeybind = true;
+        return this;
+    }
+
     void MenuTab::addComponent(std::shared_ptr<Component> component) {
         m_components.push_back(component);
     }

@@ -368,6 +368,35 @@ namespace eclipse::gui::imgui {
 
             ImGui::PopStyleColor(3);
 
+            if (button->hasKeybind()) {
+                // Open context menu on either Right click or Shift+Click
+                auto id = fmt::format("##context-menu-btn-{}", button->getId());
+                if (ImGui::IsItemClicked(1) || (ImGui::IsItemClicked(0) && ImGui::GetIO().KeyShift)) {
+                    ImGui::OpenPopup(id.c_str());
+                }
+
+                if (ImGui::BeginPopup(id.c_str())) {
+                    auto keybinds = keybinds::Manager::get();
+                    auto specialId = fmt::format("button.{}", button->getId());
+                    auto keybind = keybinds->getKeybind(specialId);
+
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
+
+                    if (keybind.has_value()) {
+                        auto& keybindRef = keybind->get();
+
+                        if (!keybindRef.isInitialized() && ImGui::MenuItem("Add keybind")) {
+                            keybinds->setKeybindState(specialId, true);
+                        } else if (keybindRef.isInitialized() && ImGui::MenuItem("Remove keybind")) {
+                            keybinds->setKeybindState(specialId, false);
+                        }
+                    }
+                    ImGui::PopStyleColor();
+
+                    ImGui::EndPopup();
+                }
+            }
+
             // Draw two lines
             bool isMouseOver = ImGui::IsItemHovered();
             bool isItemActive = ImGui::IsItemActive();

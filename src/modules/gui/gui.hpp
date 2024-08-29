@@ -465,6 +465,11 @@ namespace eclipse::gui {
             return this;
         }
 
+        /// @brief Allows to set keybinds for the button.
+        ButtonComponent* handleKeybinds();
+
+        [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
+
         void triggerCallback() {
             if (m_callback) m_callback();
         }
@@ -472,6 +477,7 @@ namespace eclipse::gui {
     private:
         std::string m_title;
         std::function<void()> m_callback;
+        bool m_hasKeybind = false;
     };
 
     /// @brief Component for picking a keybind.
