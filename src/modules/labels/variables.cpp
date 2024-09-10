@@ -2,6 +2,14 @@
 #include <modules/config/config.hpp>
 #include <utils.hpp>
 
+#include <Geode/binding/LevelEditorLayer.hpp>
+#include <Geode/binding/GameManager.hpp>
+#include <Geode/binding/GJGameLevel.hpp>
+#include <Geode/binding/PlayerObject.hpp>
+#include <Geode/binding/PlayLayer.hpp>
+#include <Geode/loader/Mod.hpp>
+#include <Geode/Loader.hpp>
+
 namespace eclipse::labels {
 
     VariableManager& VariableManager::get() {
@@ -69,7 +77,7 @@ namespace eclipse::labels {
     }
 
     bool VariableManager::hasVariable(const std::string& name) const {
-        return m_variables.find(name) != m_variables.end();
+        return m_variables.contains(name);
     }
 
     void VariableManager::removeVariable(const std::string& name) {

@@ -3,9 +3,13 @@
 
 #include "recorder.hpp"
 
+#include <Geode/binding/FMODAudioEngine.hpp>
+#include <Geode/loader/Log.hpp>
+#include <Geode/utils/general.hpp>
+
 #ifndef GEODE_IS_ANDROID
 
-#include <Geode/Geode.hpp>
+#include <utility>
 
 #ifdef GEODE_IS_WINDOWS
 
@@ -39,7 +43,7 @@ namespace eclipse::recorder {
         m_recording = true;
         m_frameHasData = false;
 
-        m_renderPath = renderPath;
+        m_renderPath = std::move(renderPath);
 
         std::thread(&Recorder::recordThread, this).detach();
     }
@@ -110,7 +114,7 @@ namespace eclipse::recorder {
         m_ffmpegCLI->close();
     }
 
-    void Recorder::startAudio(std::filesystem::path renderPath) {
+    void Recorder::startAudio(const std::filesystem::path& renderPath) {
         FMODAudioEngine::sharedEngine()->m_system->setOutput(FMOD_OUTPUTTYPE_WAVWRITER);
         m_recordingAudio = true;
     }
@@ -136,5 +140,5 @@ namespace eclipse::recorder {
         std::filesystem::remove(m_renderPath);
         std::filesystem::rename(tempPath,m_renderPath);
     }
-};
+}
 #endif

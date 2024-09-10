@@ -12,7 +12,7 @@ namespace eclipse::recorder {
     
     public:
         void begin();
-        void end();
+        void end() const;
         void capture(std::mutex& lock, std::vector<uint8_t>& data, volatile bool& hasDataFlag);
     };
 };

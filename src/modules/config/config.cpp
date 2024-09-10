@@ -1,6 +1,8 @@
 #include "config.hpp"
 
 #include <fstream>
+#include <Geode/loader/Mod.hpp>
+#include <Geode/loader/Log.hpp>
 
 namespace eclipse::config {
 
