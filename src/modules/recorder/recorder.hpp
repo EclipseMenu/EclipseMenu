@@ -1,4 +1,5 @@
 #pragma once
+#include <Geode/platform/platform.hpp>
 
 #ifndef GEODE_IS_ANDROID
 #include "rendertexture.hpp"
