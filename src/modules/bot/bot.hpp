@@ -1,7 +1,6 @@
 #pragma once
 
 #include <gdr/gdr.hpp>
-#include <Geode/Enums.hpp>
 
 namespace eclipse::bot {
 
