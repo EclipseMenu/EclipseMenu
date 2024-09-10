@@ -59,4 +59,17 @@ namespace eclipse::utils {
         return std::clamp(percent, 0.f, 100.f);
     }
 
+    void updateCursorState(bool visible) {
+        bool canShowInLevel = true;
+        if (auto* playLayer = PlayLayer::get()) {
+            canShowInLevel = playLayer->m_hasCompletedLevel ||
+                             playLayer->m_isPaused ||
+                             GameManager::sharedState()->getGameVariable("0024");
+        }
+        if (visible || canShowInLevel)
+            PlatformToolbox::showCursor();
+        else
+            PlatformToolbox::hideCursor();
+    }
+
 }

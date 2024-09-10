@@ -398,7 +398,7 @@ namespace eclipse::gui {
         }
 
         void triggerCallback(std::string value) {
-            if (m_callback) m_callback(value);
+            if (m_callback) m_callback(std::move(value));
         }
 
     private:
@@ -559,7 +559,7 @@ namespace eclipse::gui {
         explicit MenuTab(std::string title) : m_title(std::move(title)) {}
 
         /// @brief Add a component to the tab.
-        void addComponent(std::shared_ptr<Component> component);
+        void addComponent(const std::shared_ptr<Component>& component);
 
         /// @brief Remove a component from the tab.
         void removeComponent(std::weak_ptr<Component> component);
@@ -601,30 +601,30 @@ namespace eclipse::gui {
 
         /// @brief Add an input float to the tab.
         std::shared_ptr<InputFloatComponent> addInputFloat(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f") {
-            auto inputfloat = std::make_shared<InputFloatComponent>(title, id, min, max, format);
-            addComponent(inputfloat);
-            return inputfloat;
+            auto inputFloat = std::make_shared<InputFloatComponent>(title, id, min, max, format);
+            addComponent(inputFloat);
+            return inputFloat;
         }
 
         /// @brief Add an input int to the tab.
         std::shared_ptr<InputIntComponent> addInputInt(const std::string& title, const std::string& id, int min = INT_MIN, int max = INT_MAX) {
-            auto inputint = std::make_shared<InputIntComponent>(title, id, min, max);
-            addComponent(inputint);
-            return inputint;
+            auto inputInt = std::make_shared<InputIntComponent>(title, id, min, max);
+            addComponent(inputInt);
+            return inputInt;
         }
 
         /// @brief Add an float toggle to the tab.
         std::shared_ptr<FloatToggleComponent> addFloatToggle(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f") {
-            auto floattoggle = std::make_shared<FloatToggleComponent>(title, id, min, max, format);
-            addComponent(floattoggle);
-            return floattoggle;
+            auto floatToggle = std::make_shared<FloatToggleComponent>(title, id, min, max, format);
+            addComponent(floatToggle);
+            return floatToggle;
         }
 
         /// @brief Add an input text to the tab.
         std::shared_ptr<InputTextComponent> addInputText(const std::string& title, const std::string& id) {
-            auto inputtext = std::make_shared<InputTextComponent>(title, id);
-            addComponent(inputtext);
-            return inputtext;
+            auto inputText = std::make_shared<InputTextComponent>(title, id);
+            addComponent(inputText);
+            return inputText;
         }
 
         /// @brief Add a button to the tab.
@@ -662,89 +662,66 @@ namespace eclipse::gui {
         [[nodiscard]] const std::vector<std::shared_ptr<Component>>& getComponents() const { return m_components; }
 
         /// @brief Find a tab by name (or create a new one if it does not exist).
-        static std::shared_ptr<MenuTab> find(const std::string& name);
+        static std::shared_ptr<MenuTab> find(std::string_view name);
 
     private:
         std::string m_title;
         std::vector<std::shared_ptr<Component>> m_components;
     };
 
-    class Style {
-    public:
-        explicit Style() {}
-
-        /// @brief Draw a custom title bar (or just return false if there is none).
-        virtual bool titlebar() { return false; }
-
-        // Component visitors
-
-        virtual void visit(LabelComponent* label) {};
-        virtual void visit(ToggleComponent* toggle) {};
-        virtual void visit(RadioButtonComponent* radio) {};
-        virtual void visit(ComboComponent* combo) {};
-        virtual void visit(SliderComponent* slider) {};
-        virtual void visit(InputFloatComponent* input) {};
-        virtual void visit(InputTextComponent* input) {};
-        virtual void visit(InputIntComponent* input) {};
-        virtual void visit(FloatToggleComponent* floatToggle) {};
-        virtual void visit(ButtonComponent* button) {};
-        virtual void visit(ColorComponent* color) {};
-        virtual void visit(KeybindComponent* keybind) {};
-        virtual void visit(LabelSettingsComponent* labelSettings) {};
-
-        /// @brief Handle the component.
-        void visit(Component* component);
-    };
-
-    class Layout {
-    public:
-        explicit Layout() : m_isToggled(false), m_style(nullptr) {}
-
-        /// @brief Draw the UI.
-        virtual void draw() {}
-
-        /// @brief Handle the component.
-        virtual void visit(std::weak_ptr<Component> component) {}
-
-        /// @brief Toggle the menu.
-        virtual void toggle() {
-            m_isToggled = !m_isToggled;
-        }
-
-        Layout* setStyle(std::shared_ptr<Style> st) { 
-            m_style = st;
-            return this;
-        }
-
-        /// @brief Get if the menu is toggled.
-        [[nodiscard]] bool isToggled() const { return m_isToggled; }
-
-        /// @brief Get the layout's component style.
-        [[nodiscard]] std::weak_ptr<Style> getStyle() { return m_style; }
-
-    protected:
-        bool m_isToggled;
-        std::shared_ptr<Style> m_style;
+    enum class RendererType {
+        ImGui,
+        Cocos2d
     };
 
     /// @brief Abstract class, that wraps all UI function calls.
-    class Engine {
+    class Renderer {
     public:
-        /// @brief Get the UI engine instance. (ImGui for desktop, Cocos2d for mobile)
-        static std::shared_ptr<Engine> get();
-
-        /// @brief Initialize the UI engine.
+        /// @brief Initialize the renderer.
         virtual void init() = 0;
 
         /// @brief Toggle the UI visibility.
         virtual void toggle() = 0;
 
-        /// @brief Toggle the UI visibility.
-        virtual bool isToggled() = 0;
+        /// @brief Tell the renderer to cleanup/unload.
+        virtual void shutdown() = 0;
 
-        /// @brief Find a tab by name.
-        virtual std::shared_ptr<MenuTab> findTab(const std::string& name) = 0;
+        /// @brief Check if the UI is visible.
+        [[nodiscard]] virtual bool isToggled() const = 0;
     };
 
+    using Tabs = std::vector<std::shared_ptr<MenuTab>>;
+
+    /// @brief Main controller for the UI.
+    class Engine {
+    public:
+        static std::shared_ptr<Engine> get();
+
+        void init();
+
+        void toggle();
+
+        void setRenderer(RendererType type);
+
+        [[nodiscard]] std::shared_ptr<Renderer> getRenderer() const { return m_renderer; }
+
+        [[nodiscard]] RendererType getRendererType() const { return m_rendererType; }
+
+        /// @brief Check if the UI is visible.
+        [[nodiscard]] bool isToggled() {
+            if (!m_renderer) return false;
+            return m_renderer->isToggled();
+        }
+
+        /// @brief Find a tab by name.
+        std::shared_ptr<MenuTab> findTab(std::string_view name);
+
+        [[nodiscard]] const Tabs& getTabs() const { return m_tabs; }
+
+    private:
+        std::shared_ptr<Renderer> m_renderer;
+        RendererType m_rendererType = RendererType::ImGui;
+        Tabs m_tabs;
+    };
 
 }

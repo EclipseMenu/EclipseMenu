@@ -10,10 +10,11 @@
 #include <Geode/modify/CCScheduler.hpp>
 #include <Geode/modify/CCNode.hpp>
 
+#include <modules/gui/cocos/cocos.hpp>
 #include <imgui-cocos.hpp>
+#include <utils.hpp>
 #include <numbers>
 #include <memory>
-#include <utils.hpp>
 
 namespace eclipse::gui::blur {
 
@@ -267,6 +268,11 @@ namespace eclipse::gui::blur {
 
             float blur = 0.05f * (1.f - std::cos(static_cast<float>(std::numbers::pi) * blurTimer)) * 0.5f;
             if (blur == 0.f) {
+                CCNode::visit();
+                return;
+            }
+
+            if (gui::Engine::get()->getRendererType() == gui::RendererType::Cocos2d) {
                 CCNode::visit();
                 return;
             }
