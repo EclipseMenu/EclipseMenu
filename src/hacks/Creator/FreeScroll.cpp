@@ -25,7 +25,7 @@ namespace eclipse::hacks::Creator {
             SAFE_PRIORITY("EditorUI::constrainGameLayerPosition");
         }
 
-        /*void constrainGameLayerPosition(float width, float height) {
+        void constrainGameLayerPosition(float width, float height) {
             if (!config::get<bool>("creator.freescroll", false))
                 return EditorUI::constrainGameLayerPosition(width, height);
 
@@ -51,7 +51,7 @@ namespace eclipse::hacks::Creator {
             //
             //     objLayer->setPosition({x, y});
             // }
-        }*/
+        }
     };
 
 }

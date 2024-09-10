@@ -4,6 +4,7 @@
 
 #include <Geode/modify/GameToolbox.hpp>
 
+#ifndef GEODE_IS_WINDOWS // TODO: Make a patch for Windows
 namespace eclipse::hacks::Level {
 
     class RandomSeed : public hack::Hack {
@@ -37,3 +38,4 @@ namespace eclipse::hacks::Level {
         }
     };
 }
+#endif
