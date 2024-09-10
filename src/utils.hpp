@@ -1,6 +1,7 @@
 #pragma once
 
 #include <random>
+#include <Geode/binding/PlayLayer.hpp>
 
 namespace eclipse::utils {
 
@@ -14,7 +15,7 @@ namespace eclipse::utils {
     /// @param max Maximum value.
     /// @return Random number between min and max.
     template<typename T>
-    inline T random(T min, T max) {
+    T random(T min, T max) {
         if constexpr (std::is_integral_v<T>) {
             std::uniform_int_distribution<T> dist(min, max);
             return dist(getRng());
@@ -31,7 +32,7 @@ namespace eclipse::utils {
     /// @param max Maximum value.
     /// @return Random number between 0 and max.
     template<typename T>
-    inline T random(T max) {
+    T random(T max) {
         return random<T>(0, max);
     }
 

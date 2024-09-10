@@ -64,11 +64,11 @@ namespace eclipse::hacks::Global {
         void loadLocalLevelCell() {
             LevelCell::loadLocalLevelCell();
 
-            if (config::get<bool>("global.compacteditorlevels", false)) {
-                if (const auto localLevelname = geode::cast::typeinfo_cast<cocos2d::CCLabelBMFont*>(getChildByIDRecursive("level-name")))
-                    localLevelname->limitLabelWidth(200.f, .6f, .01f);
-                if (const auto mainLayer = geode::cast::typeinfo_cast<CCLayer*>(getChildByIDRecursive("main-layer")))
-                    mainLayer->setPositionY(-3.5f);
+            if (config::get<bool>("global.compacteditorlevels", false) && m_mainLayer) {
+                m_mainLayer->setPositionY(-3.5f);
+                if (const auto localLevelName = geode::cocos::getChildOfType<cocos2d::CCLabelBMFont>(m_mainLayer, 0))
+                    if (std::string(localLevelName->getString()) == std::string(m_level->m_levelName))
+                        localLevelName->limitLabelWidth(200.f, .6f, .01f);
             }
         }
     };

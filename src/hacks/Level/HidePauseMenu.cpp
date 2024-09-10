@@ -32,8 +32,11 @@ namespace eclipse::hacks::Level {
         }
 
         void updatePauseMenu(float dt) {
-            if (config::get<bool>("level.hidepause", false) == this->isVisible())
+            bool hasZoomMod = geode::Loader::get()->isModLoaded("bobby_shmurner.zoom");
+
+            if (config::get<bool>("level.hidepause", false) == this->isVisible() && (hasZoomMod ? gui::Engine::get()->isToggled() : true)) {
                 this->setVisible(!config::get<bool>("level.hidepause", false));
+            }
         }
     };
 }

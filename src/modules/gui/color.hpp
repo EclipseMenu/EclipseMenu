@@ -1,7 +1,7 @@
 #pragma once
 
 #include <imgui.h>
-#include <imgui_internal.h>
+#include <cocos2d.h>
 #include <string>
 #include <cmath>
 #include <nlohmann/json.hpp>

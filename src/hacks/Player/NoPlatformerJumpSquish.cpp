@@ -10,12 +10,12 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
 
-            tab->addToggle("No Platformer Jump Squish", "player.noplatformersquish")
+            tab->addToggle("No Platformer Jump Anim", "player.noplatformersquish")
                 ->setDescription("Disables the squishing animation when jumping in place inside platformer levels. Applies to both the level editor and actual levels. (Created by RayDeeUx)")
                 ->handleKeybinds();
         }
 
-        [[nodiscard]] const char* getId() const override { return "No Platformer Jump Squish"; }
+        [[nodiscard]] const char* getId() const override { return "No Platformer Jump Anim"; }
     };
 
     REGISTER_HACK(NoPlatformerJumpSquish)

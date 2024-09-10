@@ -1,5 +1,9 @@
 #include "utils.hpp"
 
+#include <fmt/format.h>
+#include <Geode/binding/GJGameLevel.hpp>
+#include <Geode/loader/Mod.hpp>
+
 namespace eclipse::utils {
 
     std::random_device& getRng() {

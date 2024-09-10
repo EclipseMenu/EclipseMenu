@@ -6,11 +6,125 @@
 #include <modules/labels/setting.hpp>
 
 #include <Geode/modify/UILayer.hpp>
-#include <utility>
+#include <Geode/modify/PlayerObject.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Labels {
 
     static std::vector<labels::LabelSettings> s_labels;
+
+    time_t getTimestamp() {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::high_resolution_clock::now().time_since_epoch()
+        ).count();
+    }
+
+    // timestamps, total clicks (reset on death)
+    using ClickInfo = std::pair<std::deque<time_t>, size_t>;
+    struct ClickStorage {
+        ClickInfo jumpClicks;
+        ClickInfo leftClicks;
+        ClickInfo rightClicks;
+
+        void reset() {
+            jumpClicks = {};
+            leftClicks = {};
+            rightClicks = {};
+        }
+
+        void cleanup() {
+            const auto now = getTimestamp();
+            auto removeOld = [now](ClickInfo& info) {
+                while (!info.first.empty() && now - info.first.front() > 1000) {
+                    info.first.pop_front();
+                }
+            };
+
+            removeOld(jumpClicks);
+            removeOld(leftClicks);
+            removeOld(rightClicks);
+        }
+
+        void resetOnDeath() {
+            jumpClicks.second = 0;
+            leftClicks.second = 0;
+            rightClicks.second = 0;
+            reset();
+        }
+
+        void addClick(const PlayerButton btn) {
+            ClickInfo* clickInfo;
+            switch (btn) {
+                case PlayerButton::Jump:
+                    clickInfo = &jumpClicks;
+                    break;
+                case PlayerButton::Left:
+                    clickInfo = &leftClicks;
+                    break;
+                case PlayerButton::Right:
+                    clickInfo = &rightClicks;
+                    break;
+                default:
+                    return;
+            }
+
+            clickInfo->first.push_back(getTimestamp());
+            clickInfo->second++;
+        }
+
+        int getCPS(const PlayerButton btn) const {
+            switch (btn) {
+                case PlayerButton::Jump:
+                    return jumpClicks.first.size();
+                case PlayerButton::Left:
+                    return leftClicks.first.size();
+                case PlayerButton::Right:
+                    return rightClicks.first.size();
+                default:
+                    return 0;
+            }
+        }
+
+        int getClicks(const PlayerButton btn) const {
+            switch (btn) {
+                case PlayerButton::Jump:
+                    return jumpClicks.second;
+                case PlayerButton::Left:
+                    return leftClicks.second;
+                case PlayerButton::Right:
+                    return rightClicks.second;
+                default:
+                    return 0;
+            }
+        }
+    };
+    static ClickStorage s_clicksP1;
+    static ClickStorage s_clicksP2;
+
+    class $modify(LabelsPOHook, PlayerObject) {
+        void pushButton(PlayerButton btn) {
+            PlayerObject::pushButton(btn);
+
+            const auto* gjbgl = GJBaseGameLayer::get();
+            if (!gjbgl) return;
+
+            const bool isP1 = this == gjbgl->m_player1;
+            const bool isP2 = this == gjbgl->m_player2;
+
+            if (isP1)
+                s_clicksP1.addClick(btn);
+            else if (isP2)
+                s_clicksP2.addClick(btn);
+        }
+    };
+
+    class $modify(LabelsPLHook, PlayLayer) {
+        void resetLevel() {
+            PlayLayer::resetLevel();
+            s_clicksP1.resetOnDeath();
+            s_clicksP2.resetOnDeath();
+        }
+    };
 
     class $modify(LabelsUILHook, UILayer) {
         struct Fields {
@@ -179,8 +293,48 @@ namespace eclipse::hacks::Labels {
         }
 
         void update() override {
+            auto& manager = labels::VariableManager::get();
+
             // call this once per frame
-            labels::VariableManager::get().updateFPS();
+            manager.updateFPS();
+
+            // player 1
+            {
+                s_clicksP1.cleanup();
+                const auto jumpTotal = s_clicksP1.getClicks(PlayerButton::Jump);
+                const auto leftTotal = s_clicksP1.getClicks(PlayerButton::Left);
+                const auto rightTotal = s_clicksP1.getClicks(PlayerButton::Right);
+                const auto jumpCPS = s_clicksP1.getCPS(PlayerButton::Jump);
+                const auto leftCPS = s_clicksP1.getCPS(PlayerButton::Left);
+                const auto rightCPS = s_clicksP1.getCPS(PlayerButton::Right);
+                manager.setVariable("cps1", rift::Value::from(jumpCPS));
+                manager.setVariable("cps2", rift::Value::from(leftCPS));
+                manager.setVariable("cps3", rift::Value::from(rightCPS));
+                manager.setVariable("clicks1", rift::Value::from(jumpTotal));
+                manager.setVariable("clicks2", rift::Value::from(leftTotal));
+                manager.setVariable("clicks3", rift::Value::from(rightTotal));
+                manager.setVariable("cps", rift::Value::from(jumpCPS + leftCPS + rightCPS));
+                manager.setVariable("clicks", rift::Value::from(jumpTotal + leftTotal + rightTotal));
+            }
+
+            // player 2
+            {
+                s_clicksP2.cleanup();
+                const auto jumpTotal = s_clicksP2.getClicks(PlayerButton::Jump);
+                const auto leftTotal = s_clicksP2.getClicks(PlayerButton::Left);
+                const auto rightTotal = s_clicksP2.getClicks(PlayerButton::Right);
+                const auto jumpCPS = s_clicksP2.getCPS(PlayerButton::Jump);
+                const auto leftCPS = s_clicksP2.getCPS(PlayerButton::Left);
+                const auto rightCPS = s_clicksP2.getCPS(PlayerButton::Right);
+                manager.setVariable("cps1P2", rift::Value::from(jumpCPS));
+                manager.setVariable("cps2P2", rift::Value::from(leftCPS));
+                manager.setVariable("cps3P2", rift::Value::from(rightCPS));
+                manager.setVariable("clicks1P2", rift::Value::from(jumpTotal));
+                manager.setVariable("clicks2P2", rift::Value::from(leftTotal));
+                manager.setVariable("clicks3P2", rift::Value::from(rightTotal));
+                manager.setVariable("cpsP2", rift::Value::from(jumpCPS + leftCPS + rightCPS));
+                manager.setVariable("clicksP2", rift::Value::from(jumpTotal + leftTotal + rightTotal));
+            }
         }
 
         [[nodiscard]] const char* getId() const override { return "Labels"; }

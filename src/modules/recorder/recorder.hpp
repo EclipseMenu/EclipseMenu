@@ -1,4 +1,5 @@
 #pragma once
+#include <Geode/platform/platform.hpp>
 
 #ifndef GEODE_IS_ANDROID
 #include "rendertexture.hpp"
@@ -27,7 +28,7 @@ namespace eclipse::recorder {
         RenderSettings()
             : m_width(1920), m_height(1080), m_fps(60), m_bitrate(30) {}
         RenderSettings(uint32_t width, uint32_t height, uint32_t fps, float bitrate, Codec codec)
-            : m_width(width), m_height(height), m_fps(fps), m_bitrate(bitrate), m_codec(codec) {}
+            : m_width(width), m_height(height), m_fps(fps), m_codec(codec), m_bitrate(bitrate) {}
     };
 
     class Recorder {
@@ -37,13 +38,13 @@ namespace eclipse::recorder {
         void start(std::filesystem::path renderPath);
         void stop();
 
-        void startAudio(std::filesystem::path renderPath);
+        void startAudio(const std::filesystem::path& renderPath);
         void stopAudio();
 
         void captureFrame();
 
-        bool isRecording() { return m_recording; }
-        bool isRecordingAudio() { return m_recordingAudio; }
+        bool isRecording() const { return m_recording; }
+        bool isRecordingAudio() const { return m_recordingAudio; }
 
     public:
         RenderSettings m_renderSettings;

@@ -2,6 +2,14 @@
 #include <modules/config/config.hpp>
 #include <utils.hpp>
 
+#include <Geode/binding/LevelEditorLayer.hpp>
+#include <Geode/binding/GameManager.hpp>
+#include <Geode/binding/GJGameLevel.hpp>
+#include <Geode/binding/PlayerObject.hpp>
+#include <Geode/binding/PlayLayer.hpp>
+#include <Geode/loader/Mod.hpp>
+#include <Geode/Loader.hpp>
+
 namespace eclipse::labels {
 
     VariableManager& VariableManager::get() {
@@ -69,7 +77,7 @@ namespace eclipse::labels {
     }
 
     bool VariableManager::hasVariable(const std::string& name) const {
-        return m_variables.find(name) != m_variables.end();
+        return m_variables.contains(name);
     }
 
     void VariableManager::removeVariable(const std::string& name) {
@@ -228,8 +236,11 @@ namespace eclipse::labels {
             m_variables["isPracticeMode"] = rift::Value::boolean(gjbgl->m_isPracticeMode);
             m_variables["isPlatformer"] = rift::Value::boolean(gjbgl->m_isPlatformer);
             m_variables["levelTime"] = rift::Value::floating(static_cast<float>(gjbgl->m_gameState.m_levelTime));
+            m_variables["levelLength"] = rift::Value::floating(gjbgl->m_levelLength);
+            m_variables["levelDuration"] = rift::Value::floating(gjbgl->m_level->m_timestamp / 1000.f);
             m_variables["time"] = rift::Value::string(utils::formatTime(gjbgl->m_gameState.m_levelTime));
             m_variables["frame"] = rift::Value::integer(static_cast<int>(gjbgl->m_gameState.m_levelTime * 240.f));
+            m_variables["isDead"] = rift::Value::boolean(gjbgl->m_player1->m_isDead);
             if (auto* pl = gameManager->m_playLayer) {
                 m_variables["editorMode"] = rift::Value::boolean(false);
                 m_variables["progress"] = rift::Value::floating(pl->getCurrentPercent());
@@ -257,7 +268,11 @@ namespace eclipse::labels {
             removeVariable("isPracticeMode");
             removeVariable("isPlatformer");
             removeVariable("levelTime");
+            removeVariable("levelLength");
+            removeVariable("levelDuration");
             removeVariable("time");
+            removeVariable("frame");
+            removeVariable("isDead");
             removeVariable("editorMode");
             removeVariable("progress");
             removeVariable("objects");

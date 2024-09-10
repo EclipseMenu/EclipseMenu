@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 
 #include <Geode/modify/CCTextInputNode.hpp>
+#include <utility>
 
 namespace eclipse::hacks::Bypass {
 
@@ -22,11 +23,16 @@ namespace eclipse::hacks::Bypass {
 
     class $modify(CharacterFilterCCTINHook, CCTextInputNode) {
         void updateLabel(gd::string str) {
-            // im just gonna hope this is all of it
             if (config::get<bool>("bypass.charfilter", false))
-                setAllowedChars("`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,.+_|{}:?/!@#$%^&*()");
+                setAllowedChars(
+                    "abcdefghijklmnopqrstuvwxyz"
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    "0123456789!@#$%^&*()-=_+"
+                    "`~[]{}/?.>,<\\|;:'\""
+                    " "
+                );
  
-            CCTextInputNode::updateLabel(str);
+            CCTextInputNode::updateLabel(std::move(str));
         }
     };
 
