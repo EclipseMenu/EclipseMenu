@@ -16,9 +16,15 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
 
-            tab->addToggle("Show Trajectory", "player.showtrajectory")
+            gui::ToggleComponent* toggle = tab->addToggle("Show Trajectory", "player.showtrajectory")
                 ->setDescription("Shows where the player will be if they click/don't click.")
                 ->handleKeybinds();
+
+            config::setIfEmpty("player.showtrajectory.iterations", 300);
+
+            toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                options->addInputInt("Iterations", "player.showtrajectory.iterations", 1, 1000);
+            });
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.showtrajectory", false); }
@@ -103,7 +109,8 @@ namespace eclipse::hacks::Player {
 
             bool iterationActionDone = false;
 
-            const size_t iterations = 300;
+            const size_t iterations = config::get<int>("player.showtrajectory.iterations", 300);
+;
 
             for (size_t i = 0; i < iterations; i++) {
                 cocos2d::CCPoint initialPlayerPosition = player->getPosition();
