@@ -9,6 +9,7 @@
 #include "styles/megahack.hpp"
 
 #include "layouts/window/window.hpp"
+#include "layouts/panel/panel.hpp"
 
 #include <Geode/utils/file.hpp>
 
@@ -81,6 +82,9 @@ namespace eclipse::gui::imgui {
                     switch (layNum) {
                         case 0:
                             m_layout = std::static_pointer_cast<Layout>(std::make_shared<WindowLayout>());
+                            break;
+                        case 1:
+                            m_layout = std::static_pointer_cast<Layout>(std::make_shared<PanelLayout>());
                             break;
                         default:
                             m_layout = std::static_pointer_cast<Layout>(std::make_shared<WindowLayout>());

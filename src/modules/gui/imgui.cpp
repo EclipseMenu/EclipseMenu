@@ -7,6 +7,7 @@
 #include <modules/gui/color.hpp>
 
 #include "layouts/window/window.hpp"
+#include "layouts/panel/panel.hpp"
 
 namespace eclipse::gui::imgui {
 
@@ -56,16 +57,16 @@ namespace eclipse::gui::imgui {
     }
 
     std::shared_ptr<MenuTab> ImGuiEngine::findTab(const std::string& name) {
-        return std::static_pointer_cast<WindowLayout>(getTheme()->getLayout())->findTab(name);
+        return std::static_pointer_cast<PanelLayout>(getTheme()->getLayout())->findTab(name);
     }
 
     std::shared_ptr<Theme> ImGuiEngine::getTheme() {
         // TODO: change this for theme picker
         if (!m_theme) {
-            if (std::filesystem::exists(geode::Mod::get()->getSaveDir() / "themes" / "megahack.json"))
-                m_theme = std::make_shared<Theme>(geode::Mod::get()->getSaveDir() / "themes" / "megahack.json");
+            if (std::filesystem::exists(geode::Mod::get()->getSaveDir() / "themes" / "crystal.json"))
+                m_theme = std::make_shared<Theme>(geode::Mod::get()->getSaveDir() / "themes" / "crystal.json");
             else
-                m_theme = std::make_shared<Theme>(geode::Mod::get()->getResourcesDir() / "megahack.zip");
+                m_theme = std::make_shared<Theme>(geode::Mod::get()->getResourcesDir() / "crystal.zip");
         }
 
         return m_theme;

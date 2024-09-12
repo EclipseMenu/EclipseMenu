@@ -25,7 +25,7 @@ namespace eclipse::hacks::Level {
         }
 
         void lightningFlash(cocos2d::CCPoint from, cocos2d::CCPoint to, cocos2d::ccColor3B color, float lineWidth, float duration, int displacement, bool flash, float opacity) {
-            if (!config::get<bool>("level.noportallightning"))
+            if (!config::get<bool>("level.noportallightning", false))
                 return GJBaseGameLayer::lightningFlash(from, to, color, lineWidth, duration, displacement, flash, opacity);
 
             auto* gm = GameManager::get();
