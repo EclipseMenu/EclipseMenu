@@ -22,7 +22,7 @@ namespace eclipse::hacks::Player {
                     options->addToggle("Noclip Tint", "player.noclip.tint");
                     options->addColorComponent("Tint Color", "player.noclip.color");
                     options->addInputFloat("Tint Opacity", "player.noclip.opacity", 0.f, 100.f, "%.0f%");
-                    options->addInputFloat("Flash Time", "player.noclip.time", 0.f, 5.f, "%.2fs")->setDescription("0 for instant");
+                    options->addInputFloat("Tint Time", "player.noclip.time", 0.f, 5.f, "%.2fs")->setDescription("0 for instant");
                 });
         }
 
