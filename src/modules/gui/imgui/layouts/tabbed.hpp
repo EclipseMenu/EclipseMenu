@@ -14,8 +14,8 @@ namespace eclipse::gui::imgui {
         void toggle(bool state) override;
 
     public:
-        bool shouldRender();
-        static ImVec2 randomWindowPosition(Window& window);
+        bool shouldRender() const;
+        static ImVec2 randomWindowPosition(const Window& window);
         std::map<Window*, ImVec2> getStackedPositions();
         void stackWindows();
 

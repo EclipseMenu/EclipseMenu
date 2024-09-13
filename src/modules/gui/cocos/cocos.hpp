@@ -7,9 +7,8 @@ namespace eclipse::gui::cocos {
     class CocosRenderer : public Renderer {
     public:
         static std::shared_ptr<CocosRenderer> get() {
-            auto engine = Engine::get();
-            if (engine->getRendererType() != RendererType::Cocos2d) return nullptr;
-            return std::static_pointer_cast<CocosRenderer>(engine->getRenderer());
+            if (Engine::getRendererType() != RendererType::Cocos2d) return nullptr;
+            return std::static_pointer_cast<CocosRenderer>(Engine::get()->getRenderer());
         }
 
         void init() override;

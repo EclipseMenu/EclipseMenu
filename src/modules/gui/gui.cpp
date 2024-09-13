@@ -5,15 +5,34 @@
 
 #include "imgui/imgui.hpp"
 #include "cocos/cocos.hpp"
+#include "theming/manager.hpp"
 
 namespace eclipse::gui {
 
-    bool ToggleComponent::getValue() const {
-        return config::get<bool>(m_id, false);
+    template <typename T>
+    T get_value(std::string_view key, T defaultValue, bool useTemp) {
+        return useTemp ? config::getTemp<T>(key, defaultValue)
+            : config::get<T>(key, defaultValue);
     }
 
-    void ToggleComponent::setValue(bool value) {
-        config::set(m_id, value);
+    template <typename T>
+    void store_value(std::string_view key, T value, bool useTemp) {
+        useTemp ? config::setTemp<T>(key, value)
+            : config::set<T>(key, value);
+    }
+
+    template <typename T>
+    void store_value_ref(std::string_view key, T const& value, bool useTemp) {
+        useTemp ? config::setTemp<T>(key, value)
+            : config::set<T>(key, value);
+    }
+
+    bool ToggleComponent::getValue() const {
+        return get_value(m_id, false, m_noSave);
+    }
+
+    void ToggleComponent::setValue(bool value) const {
+        store_value(m_id, value, m_noSave);
     }
 
     void ToggleComponent::addOptions(const std::function<void(std::shared_ptr<MenuTab>)>& options) {
@@ -33,25 +52,99 @@ namespace eclipse::gui {
         return this;
     }
 
+    int RadioButtonComponent::getValue() const {
+        return get_value(m_id, 0, m_noSave);
+    }
+
+    void RadioButtonComponent::setValue(int value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
     RadioButtonComponent* RadioButtonComponent::handleKeybinds() {
         auto specialId = fmt::format("{}-{}", m_id, m_value);
         keybinds::Manager::get()->registerKeybind(specialId, m_title, [this](){
             auto value = getValue();
-            config::set(this->getId(), value);
+            setValue(value);
             this->triggerCallback(value);
         });
         m_hasKeybind = true;
         return this;
     }
 
+    int ComboComponent::getValue() const {
+        return get_value(m_id, 0, m_noSave);
+    }
+
+    void ComboComponent::setValue(int value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
+    float SliderComponent::getValue() const {
+        return get_value(m_id, 0.f, m_noSave);
+    }
+
+    void SliderComponent::setValue(float value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
+    float InputFloatComponent::getValue() const {
+        return get_value(m_id, 0.f, m_noSave);
+    }
+
+    void InputFloatComponent::setValue(float value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
+    int InputIntComponent::getValue() const {
+        return get_value(m_id, 0, m_noSave);
+    }
+
+    void InputIntComponent::setValue(int value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
     FloatToggleComponent* FloatToggleComponent::handleKeybinds() {
         keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
             bool value = !config::get<bool>(fmt::format("{}.toggle", this->getId()), false);
-            config::set(fmt::format("{}.toggle", this->getId()), value);
+            auto id = fmt::format("{}.toggle", this->getId());
+            m_noSave ? config::setTemp(id, value)
+                : config::set(id, value);
             this->triggerCallback();
         });
         m_hasKeybind = true;
         return this;
+    }
+
+    float FloatToggleComponent::getValue() const {
+        return get_value(m_id, 0.f, m_noSave);
+    }
+
+    void FloatToggleComponent::setValue(float value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
+    bool FloatToggleComponent::getState() const {
+        return get_value(fmt::format("{}.toggle", this->getId()), false, m_noSave);
+    }
+
+    void FloatToggleComponent::setState(bool value) const {
+        store_value(fmt::format("{}.toggle", this->getId()), value, m_noSave);
+    }
+
+    std::string InputTextComponent::getValue() const {
+        return get_value<std::string>(m_id, "", m_noSave);
+    }
+
+    void InputTextComponent::setValue(const std::string& value) const {
+        store_value_ref(m_id, value, m_noSave);
+    }
+
+    Color ColorComponent::getValue() const {
+        return get_value(m_id, Color::BLACK, m_noSave);
+    }
+
+    void ColorComponent::setValue(const Color& value) const {
+        store_value_ref(m_id, value, m_noSave);
     }
 
     ButtonComponent* ButtonComponent::handleKeybinds() {
@@ -67,7 +160,7 @@ namespace eclipse::gui {
     }
 
     void MenuTab::removeComponent(std::weak_ptr<Component> component) {
-        auto it = std::find_if(m_components.begin(), m_components.end(), [&component](const std::shared_ptr<Component>& c) {
+        auto it = std::ranges::find_if(m_components, [&component](const std::shared_ptr<Component>& c) {
             return component.lock() == c;
         });
 
@@ -76,12 +169,12 @@ namespace eclipse::gui {
     }
 
     std::shared_ptr<MenuTab> MenuTab::find(std::string_view name) {
-        auto engine = Engine::get();
-        return engine->findTab(name);
+        return Engine::get()->findTab(name);
     }
 
     void Engine::setRenderer(RendererType type) {
-        if (type == m_rendererType && m_renderer) return;
+        const auto tm = ThemeManager::get();
+        if (type == tm->getRenderer() && m_renderer) return;
         if (m_renderer) m_renderer->shutdown();
 
         switch (type) {
@@ -94,21 +187,24 @@ namespace eclipse::gui {
                 break;
         }
 
-        m_rendererType = type;
+        tm->setRenderer(type);
         m_renderer->init();
-        config::set("menu.renderer", static_cast<int>(type));
+    }
+
+    RendererType Engine::getRendererType() {
+        return ThemeManager::get()->getRenderer();
     }
 
     std::shared_ptr<Engine> Engine::get() {
-        static std::shared_ptr<Engine> s_engine = std::make_shared<Engine>();
+        static auto s_engine = std::make_shared<Engine>();
         return s_engine;
     }
 
     void Engine::init() {
-        setRenderer(config::get<RendererType>("menu.renderer", RendererType::ImGui));
+        setRenderer(ThemeManager::get()->getRenderer());
     }
 
-    void Engine::toggle() {
+    void Engine::toggle() const {
         if (!m_renderer) return;
         m_renderer->toggle();
     }

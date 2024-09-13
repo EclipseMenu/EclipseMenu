@@ -3,21 +3,22 @@
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
 #include <utils.hpp>
+#include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::imgui {
 
-    void TabbedLayout::init() {
-        m_windows.emplace_back("Test window", []{
-            if (ImGui::Button("Toggle layout")) {
-                ImGuiRenderer::get()->setLayoutMode(LayoutMode::Panel);
-            }
-        });
+    constexpr std::array themes = {
+        "Default", "MegaHack"
+    };
 
+    void TabbedLayout::init() {
         // Load tabs
         auto& tabs = Engine::get()->getTabs();
         for (auto& tab : tabs) {
             m_windows.emplace_back(tab->getTitle(), [tab] {
-                ImGui::Text("Placeholder for %s tab", tab->getTitle().c_str());
+                for (auto& component : tab->getComponents()) {
+                    ImGuiRenderer::get()->visitComponent(component);
+                }
             });
         }
 
@@ -26,8 +27,8 @@ namespace eclipse::gui::imgui {
             auto windowStates = config::get("windows", std::vector<nlohmann::json>());
             for (auto &windowState: windowStates) {
                 auto title = windowState.at("title").get<std::string>();
-                auto window = std::find_if(m_windows.begin(), m_windows.end(), [&title](const Window &window) {
-                    return window.getTitle() == title;
+                auto window = std::ranges::find_if(m_windows, [&title](const Window &w) {
+                    return w.getTitle() == title;
                 });
                 if (window != m_windows.end()) {
                     from_json(windowState, *window);
@@ -37,7 +38,7 @@ namespace eclipse::gui::imgui {
         }
     }
 
-    bool TabbedLayout::shouldRender() {
+    bool TabbedLayout::shouldRender() const {
         return Engine::get()->isToggled() || !m_actions.empty();
     }
 
@@ -82,13 +83,13 @@ namespace eclipse::gui::imgui {
             action->update(deltaTime);
 
         // Remove finished actions
-        m_actions.erase(std::remove_if(m_actions.begin(), m_actions.end(), [](auto action) {
+        std::erase_if(m_actions, [](auto action) {
             if (action->isFinished()) {
                 action.reset();
                 return true;
             }
             return false;
-        }), m_actions.end());
+        });
 
         if (!shouldRender()) return;
 
@@ -108,7 +109,6 @@ namespace eclipse::gui::imgui {
     }
 
     void TabbedLayout::toggle(bool state) {
-        geode::log::debug("TabbedLayout::toggle({})", state);
         if (!state) {
             // Save window states
             std::vector<nlohmann::json> windowStates;
@@ -132,15 +132,14 @@ namespace eclipse::gui::imgui {
     }
 
     /// @brief Calculate a random window position outside the screen.
-    ImVec2 TabbedLayout::randomWindowPosition(Window& window) {
+    ImVec2 TabbedLayout::randomWindowPosition(const Window& window) {
         // Calculate target position randomly to be outside the screen
         auto screenSize = ImGui::GetIO().DisplaySize;
         auto windowSize = window.getSize();
         ImVec2 target;
 
         // Pick a random side of the screen
-        auto side = utils::random(3);
-        switch (side) {
+        switch (utils::random(3)) {
             case 0:
                 target = ImVec2(utils::random(screenSize.x - windowSize.x), -windowSize.y);
                 break;
@@ -167,26 +166,27 @@ namespace eclipse::gui::imgui {
             builtInWindows.clear();
         }
 
-        auto snap = config::get<float>("menu.windowSnap", 4.f);
+        auto tm = ThemeManager::get();
+        const auto scale = tm->getGlobalScale();
+        auto margin = tm->getWindowMargin() * scale;
         ImVec2 screenSize = ImGui::GetIO().DisplaySize;
 
-        const auto scale = config::getTemp<float>("UIScale", 1.f);
         float windowWidth = Window::MIN_SIZE.x * scale;
-        auto columns = static_cast<int>((screenSize.x - snap) / (windowWidth + snap));
+        auto columns = static_cast<int>((screenSize.x - margin) / (windowWidth + margin));
 
         std::map<Window*, ImVec2> positions;
 
         // Built-ins go into first column
-        float x = snap;
-        float y = snap;
+        float x = margin;
+        float y = margin;
         for (auto& title : builtInWindows) {
-            auto it = std::find_if(m_windows.begin(), m_windows.end(), [&title](const Window& window) {
+            auto it = std::ranges::find_if(m_windows, [&title](const Window& window) {
                 return window.getTitle() == title;
             });
 
             if (it != m_windows.end()) {
                 positions[&(*it)] = ImVec2(x, y);
-                y += it->getSize().y + snap;
+                y += it->getSize().y + margin;
             }
         }
 
@@ -194,20 +194,20 @@ namespace eclipse::gui::imgui {
 
         // Rest are stacked to take as little space as possible
         auto columnCount = firstColumnLock ? columns - 1 : columns;
-        std::vector<float> heights(columnCount, snap);
+        std::vector<float> heights(columnCount, margin);
         for (auto& window : m_windows) {
             // Skip built-in windows
-            if (std::find(builtInWindows.begin(), builtInWindows.end(), window.getTitle()) != builtInWindows.end())
+            if (std::ranges::find(builtInWindows, window.getTitle()) != builtInWindows.end())
                 continue;
 
             // Find the column with the smallest height
-            auto min = std::min_element(heights.begin(), heights.end());
+            auto min = std::ranges::min_element(heights);
             auto index = std::distance(heights.begin(), min);
 
             // Set the position
             auto windowColumn = firstColumnLock ? index + 1 : index;
-            positions[&window] = ImVec2(static_cast<float>(windowColumn) * (windowWidth + snap) + snap, *min);
-            *min += window.getSize().y + snap;
+            positions[&window] = ImVec2(static_cast<float>(windowColumn) * (windowWidth + margin) + margin, *min);
+            *min += window.getSize().y + margin;
 
             // Update the height
             heights[index] = *min;
@@ -222,8 +222,7 @@ namespace eclipse::gui::imgui {
         auto easingMode = config::get("menu.animationEasingMode", animation::EasingMode::EaseInOut);
         auto easing = animation::getEasingFunction(easingType, easingMode);
 
-        auto positions = getStackedPositions();
-        for (auto& [window, target] : positions) {
+        for (auto& [window, target] : getStackedPositions()) {
             // Check if the window is already in the correct position
             if (window->getPosition().x == target.x && window->getPosition().y == target.y)
                 continue;

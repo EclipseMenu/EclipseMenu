@@ -8,6 +8,7 @@
 #include <modules/keybinds/manager.hpp>
 #include <modules/gui/blur/blur.hpp>
 #include <imgui-cocos.hpp>
+#include <modules/gui/theming/manager.hpp>
 
 using namespace eclipse;
 
@@ -17,17 +18,8 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
     bool init() override {
         if (!MenuLayer::init()) return false;
 
-        // Temporarily add a button to toggle the GUI on android. (This will be removed later)
-        auto androidButton = CCMenuItemSpriteExtra::create(
-            cocos2d::CCSprite::createWithSpriteFrameName("GJ_everyplayBtn_001.png"),
-            this, menu_selector(EclipseButtonMLHook::onToggleUI)
-        );
-        androidButton->setID("toggle"_spr);
-        auto menu = this->getChildByID("bottom-menu");
-        menu->addChild(androidButton);
-        menu->updateLayout();
-
         {
+            auto menu = this->getChildByID("bottom-menu");
             auto rendererSwitchButton = CCMenuItemSpriteExtra::create(
                 cocos2d::CCSprite::createWithSpriteFrameName("GJ_editModeBtn_001.png"),
                 this, menu_selector(EclipseButtonMLHook::onToggleRenderer)
@@ -48,11 +40,11 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         auto& key = keybinds::Manager::get()->registerKeybind("menu.toggle", "Toggle UI", []() {
             gui::Engine::get()->toggle();
             config::save();
+            gui::ThemeManager::get()->saveTheme();
         });
         config::setIfEmpty("menu.toggleKey", keybinds::Keys::Tab);
         key.setKey(config::get<keybinds::Keys>("menu.toggleKey"));
         key.setInitialized(true);
-
         hack::Hack::lateInitializeHacks();
 
         s_isInitialized = true;
@@ -60,18 +52,12 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         return true;
     }
 
-    void onToggleUI(CCObject* sender) {
-        gui::Engine::get()->toggle();
-        config::save();
-    }
-
     void onToggleRenderer(CCObject* sender) {
         auto engine = gui::Engine::get();
-        auto type = engine->getRendererType() == gui::RendererType::ImGui
+        auto type = gui::Engine::getRendererType() == gui::RendererType::ImGui
             ? gui::RendererType::Cocos2d
             : gui::RendererType::ImGui;
         engine->setRenderer(type);
-        config::set("menu.renderer", type);
 
         geode::log::info("Switched renderer to {}", type == gui::RendererType::ImGui ? "ImGui" : "Cocos2d");
     }
@@ -100,7 +86,7 @@ public:
             hack->update();
 
         // Add ability for ImGui to capture right click
-        if (s_isInitialized && gui::Engine::get()->getRendererType() == gui::RendererType::ImGui) {
+        if (s_isInitialized && gui::Engine::getRendererType() == gui::RendererType::ImGui) {
             auto& io = ImGui::GetIO();
             if (keybinds::isKeyPressed(keybinds::Keys::MouseRight)) {
                 io.AddMouseButtonEvent(1, true);
@@ -110,13 +96,12 @@ public:
         }
 
         keybinds::Manager::get()->update();
-
         gui::blur::update(dt);
     }
 };
 
 $on_mod(Loaded) {
-    // Allow user to change between OpenGL 2.0/3.0
+    // Allow user to change disable VBO (resolves issues on older hardware)
     auto* mod = geode::Mod::get();
     ImGuiCocos::get().setForceLegacy(mod->getSettingValue<bool>("legacy-render"));
     geode::listenForSettingChanges<bool>("legacy-render", [](bool value) {
@@ -134,6 +119,40 @@ $on_mod(Loaded) {
 
     // Compile blur shader
     gui::blur::init();
+
+    // Add "Interface" tab to edit theme settings
+    {
+        using namespace gui;
+        auto tab = MenuTab::find("Interface");
+        tab->addInputFloat("UI Scale", "uiScale", 0.4f, 4.f, "x%.3f")
+            ->callback([](float value) { ThemeManager::get()->setUIScale(value); })
+            ->disableSaving();
+
+        tab->addCombo("Layout Type", "layout", {"Tabbed", "Panel"}, 0)
+            ->callback([](int value) {
+                auto mode = static_cast<imgui::LayoutMode>(value);
+                if (auto imgui = imgui::ImGuiRenderer::get())
+                    imgui->setLayoutMode(mode);
+                else ThemeManager::get()->setLayoutMode(mode);
+            })->disableSaving();
+
+        tab->addCombo("Component Style", "theme", imgui::THEME_NAMES, 0)
+            ->callback([](int value) {
+                auto theme = static_cast<imgui::ComponentTheme>(value);
+                if (auto imgui = imgui::ImGuiRenderer::get())
+                    imgui->setComponentTheme(theme);
+                else ThemeManager::get()->setComponentTheme(theme);
+            })->disableSaving();
+
+        auto blurToggle = tab->addToggle("Enable blur", "blurEnabled")
+            ->callback([](bool value) { ThemeManager::get()->setBlurEnabled(value); });
+        blurToggle->addOptions([](auto opt) {
+            opt->addInputFloat("Blur speed", "blurSpeed", 0.f, 10.f, "%.3f s")
+                ->callback([](float value){ ThemeManager::get()->setBlurSpeed(value); })
+                ->disableSaving();
+        });
+        blurToggle->disableSaving();
+    }
 
     // Schedule hack updates
     cocos2d::CCScheduler::get()->scheduleSelector(

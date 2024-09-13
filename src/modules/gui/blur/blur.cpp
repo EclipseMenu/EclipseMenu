@@ -1,5 +1,7 @@
 #include "blur.hpp"
 
+#include <modules/gui/theming/manager.hpp>
+
 // COMPLETELY stolen from cgytrus/SimplePatchLoader (with permission)
 
 #ifdef GEODE_IS_DESKTOP
@@ -28,6 +30,7 @@ namespace eclipse::gui::blur {
     GLint ppShaderRadius = 0;
 
     float blurTimer = 0.f;
+    float blurProgress = 0.f;
 
     geode::Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath) {
         auto vertexSource = geode::utils::file::readString(vertexPath);
@@ -189,7 +192,7 @@ namespace eclipse::gui::blur {
     }
 
     void setupPostProcess() {
-        if (eclipse::utils::shouldUseLegacyDraw()) return;
+        if (utils::shouldUseLegacyDraw()) return;
 
         auto size = cocos2d::CCEGLView::get()->getFrameSize() * geode::utils::getDisplayFactor();
 
@@ -200,11 +203,11 @@ namespace eclipse::gui::blur {
             // positions   // texCoords
             -1.0f,  1.0f,  0.0f, 1.0f,
             -1.0f, -1.0f,  0.0f, 0.0f,
-            1.0f, -1.0f,  1.0f, 0.0f,
+             1.0f, -1.0f,  1.0f, 0.0f,
 
             -1.0f,  1.0f,  0.0f, 1.0f,
-            1.0f, -1.0f,  1.0f, 0.0f,
-            1.0f,  1.0f,  1.0f, 1.0f
+             1.0f, -1.0f,  1.0f, 0.0f,
+             1.0f,  1.0f,  1.0f, 1.0f
         };
         glGenVertexArrays(1, &ppVao);
         glGenBuffers(1, &ppVbo);
@@ -261,21 +264,15 @@ namespace eclipse::gui::blur {
 
     class $modify(BlurCCNHook, cocos2d::CCNode) {
         void visit() override {
-            if (static_cast<cocos2d::CCNode*>(this) != cocos2d::CCScene::get() || ppShader.program == 0) {
-                CCNode::visit();
-                return;
-            }
+            if (static_cast<CCNode*>(this) != cocos2d::CCScene::get() || ppShader.program == 0)
+                return CCNode::visit();
 
-            float blur = 0.05f * (1.f - std::cos(static_cast<float>(std::numbers::pi) * blurTimer)) * 0.5f;
-            if (blur == 0.f) {
-                CCNode::visit();
-                return;
-            }
+            if (blurProgress == 0.f)
+                return CCNode::visit();
 
-            if (gui::Engine::get()->getRendererType() == gui::RendererType::Cocos2d) {
-                CCNode::visit();
-                return;
-            }
+            float blur = 0.05f * (1.f - std::cos(static_cast<float>(std::numbers::pi) * blurProgress)) * 0.5f;
+            if (blur == 0.f)
+                return CCNode::visit();
 
             GLint drawFbo = 0;
             GLint readFbo = 0;
@@ -344,13 +341,21 @@ namespace eclipse::gui::blur {
     }
 
     void update(float) {
-        auto deltaTimeMod = cocos2d::CCDirector::get()->getDeltaTime() / 0.1f;
-        if (eclipse::gui::Engine::get()->isToggled())
-            blurTimer += deltaTimeMod;
-        else
-            blurTimer -= deltaTimeMod;
+        auto tm = ThemeManager::get();
+        auto duration = tm->getBlurSpeed();
+        auto toggled = Engine::get()->isToggled();
 
-        blurTimer = std::clamp(blurTimer, 0.f, 1.f);
+        auto deltaTimeMod = cocos2d::CCDirector::get()->getDeltaTime();
+        blurTimer += toggled ? deltaTimeMod : -deltaTimeMod;
+        blurTimer = std::clamp(blurTimer, 0.f, duration);
+
+        if (!tm->getBlurEnabled() || tm->getRenderer() == RendererType::Cocos2d) {
+            blurProgress = 0.f;
+            return;
+        }
+
+        if (duration == 0.f) blurProgress = toggled ? 1.f : 0.f;
+        else blurProgress = blurTimer / duration;
     }
 
 }

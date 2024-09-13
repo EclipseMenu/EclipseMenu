@@ -26,12 +26,18 @@ namespace eclipse::gui::imgui {
     public:
         void draw();
         void setLayoutMode(LayoutMode mode);
+        void setComponentTheme(ComponentTheme theme);
+
+        void visitComponent(const std::shared_ptr<Component>& component) const;
+        bool beginWindow(const std::string& title) const;
+        void endWindow() const;
 
     private:
         static bool s_initialized;
         bool m_isOpened = false;
+
+        std::unique_ptr<Theme> m_theme;
         std::unique_ptr<Layout> m_layout;
-        LayoutMode m_layoutMode = LayoutMode::Tabbed;
 
         bool m_insideDraw = false;
         LayoutMode m_queuedMode = LayoutMode::Tabbed;
