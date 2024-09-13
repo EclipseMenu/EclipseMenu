@@ -47,9 +47,7 @@ namespace eclipse::gui {
 
         /// @brief Returns a pointer to the color data
         /// @return Pointer to the color data
-        inline float* data() {
-            return &r;
-        }
+        float* data() { return &r; }
 
         /// @brief Creates a new color from HSV values
         /// @param h Hue
@@ -62,7 +60,7 @@ namespace eclipse::gui {
         /// @brief Creates a new color from HSV values
         /// @param hsv HSV values
         /// @return New color
-        inline static Color fromHSV(const ImVec4& hsv) {
+        static Color fromHSV(const ImVec4& hsv) {
             return fromHSV(hsv.x, hsv.y, hsv.z, hsv.w);
         }
 
