@@ -160,7 +160,7 @@ namespace eclipse::gui::imgui {
     /// @brief Auto-stacks windows on screen.
     std::map<Window*, ImVec2> TabbedLayout::getStackedPositions() {
         auto firstColumnLock = config::get<bool>("menu.lockFirstColumn", false);
-        static std::array<std::string, 1> s_builtInWindows = {"Keybinds"}; // TODO: Add all primary windows
+        static std::array<std::string, 2> s_builtInWindows = {"Interface", "Keybinds"}; // TODO: Add all primary windows
         std::vector<std::string> builtInWindows(s_builtInWindows.begin(), s_builtInWindows.end());
         if (!firstColumnLock) {
             builtInWindows.clear();

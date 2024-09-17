@@ -25,14 +25,19 @@ namespace eclipse::utils {
         return ss.str();
     }
 
-    bool hasOpenGLExtension(const std::string& extension) {
-        auto extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+    bool hasOpenGLExtension(std::string_view extension) {
+        static auto extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
         if (!extensions) return false;
-        return std::string(extensions).find(extension) != std::string::npos;
+        static std::string_view extensionsString = extensions;
+        return extensionsString.find(extension) != std::string_view::npos;
     }
 
     bool shouldUseLegacyDraw() {
+#ifdef GEODE_IS_MACOS
+        static bool hasVAO = hasOpenGLExtension("GL_APPLE_vertex_array_object");
+#else
         static bool hasVAO = hasOpenGLExtension("GL_ARB_vertex_array_object");
+#endif
         auto useLegacy = geode::Mod::get()->getSettingValue<bool>("legacy-render");
         return !hasVAO || useLegacy;
     }
@@ -45,10 +50,9 @@ namespace eclipse::utils {
 
         if (hours > 0)
             return fmt::format("{}:{:02d}:{:02d}.{:03d}", hours, minutes, seconds, millis);
-        else if (minutes > 0)
+        if (minutes > 0)
             return fmt::format("{}:{:02d}.{:03d}", minutes, seconds, millis);
-        else
-            return fmt::format("{}.{:03d}", seconds, millis);
+        return fmt::format("{}.{:03d}", seconds, millis);
     }
 
     float getActualProgress(PlayLayer* playLayer) {

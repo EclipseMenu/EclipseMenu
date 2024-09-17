@@ -14,8 +14,8 @@ namespace eclipse::gui::imgui {
 
     void Theme::visit(const std::shared_ptr<Component>& component) const {
 #define CASE(x) case ComponentType::x: \
-    return this->visit##x(std::static_pointer_cast<x##Component>(component))
-
+    this->visit##x(std::static_pointer_cast<x##Component>(component)); break;
+        ImGui::PushID(component->getId().c_str());
         switch (component->getType()) {
             default: break;
             CASE(Label); CASE(Toggle);
@@ -26,6 +26,7 @@ namespace eclipse::gui::imgui {
             CASE(Button); CASE(Keybind);
             CASE(LabelSettings);
         }
+        ImGui::PopID();
 
 #undef CASE
     }
@@ -129,12 +130,14 @@ namespace eclipse::gui::imgui {
         ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar;
         auto tm = ThemeManager::get();
         ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getTitleForegroundColor()));
+        ImGui::PushFont(ImGuiRenderer::get()->getFontManager().getFont().get());
         bool open = ImGui::Begin(title.c_str(), nullptr, flags);
         ImGui::SetWindowFontScale(tm->getGlobalScale());
         return open;
     }
 
     void Theme::endWindow() {
+        ImGui::PopFont();
         ImGui::End();
     }
 
@@ -165,7 +168,7 @@ namespace eclipse::gui::imgui {
 
         if (auto options = toggle->getOptions().lock()) {
             ImGui::PushItemWidth(-1);
-            auto availWidth = ImGui::GetContentRegionAvail().x;
+            auto availWidth = ImGui::GetContentRegionAvail().x * tm->getGlobalScale();
             auto arrowSize = ImVec2(availWidth * 0.115f, 0);
             ImGui::SameLine(availWidth - (arrowSize.x / 2.f), 0);
             ImGui::SetNextItemWidth(arrowSize.x);
@@ -203,7 +206,9 @@ namespace eclipse::gui::imgui {
     void Theme::visitCombo(const std::shared_ptr<ComboComponent>& combo) const {
         auto& items = combo->getItems();
         int value = combo->getValue();
-        if (ImGui::BeginCombo(combo->getTitle().c_str(), items[value].c_str())) {
+        auto title = combo->getTitle();
+        ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * (title.empty() ? .9f : .5f));
+        if (ImGui::BeginCombo(title.c_str(), items[value].c_str())) {
             for (int n = 0; n < items.size(); n++) {
                 const bool is_selected = (value == n);
                 if (ImGui::Selectable(items[n].c_str(), is_selected)) {
@@ -215,6 +220,7 @@ namespace eclipse::gui::imgui {
             }
             ImGui::EndCombo();
         }
+        ImGui::PopItemWidth();
     }
 
     void Theme::visitSlider(const std::shared_ptr<SliderComponent>& slider) const {
@@ -443,7 +449,7 @@ namespace eclipse::gui::imgui {
         ImGui::PopStyleColor(3);
 
         ImGui::PushItemWidth(-1);
-        auto availWidth = ImGui::GetContentRegionAvail().x;
+        auto availWidth = ImGui::GetContentRegionAvail().x * tm->getGlobalScale();
         auto arrowSize = ImVec2(availWidth * 0.115f, 0);
         ImGui::SameLine(availWidth - (arrowSize.x / 2.f), 0);
         ImGui::SetNextItemWidth(arrowSize.x);

@@ -187,7 +187,6 @@ namespace eclipse::gui {
                 break;
         }
 
-        tm->setRenderer(type);
         m_renderer->init();
     }
 
@@ -201,6 +200,7 @@ namespace eclipse::gui {
     }
 
     void Engine::init() {
+        m_initialized = true;
         setRenderer(ThemeManager::get()->getRenderer());
     }
 

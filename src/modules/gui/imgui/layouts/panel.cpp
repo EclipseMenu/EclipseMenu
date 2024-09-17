@@ -1,6 +1,7 @@
 #include "panel.hpp"
 #include <modules/gui/imgui/imgui.hpp>
 #include <modules/gui/gui.hpp>
+#include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::imgui {
 
@@ -40,7 +41,7 @@ namespace eclipse::gui::imgui {
         }
 
         if (ImGui::Button("Toggle layout")) {
-            ImGuiRenderer::get()->setLayoutMode(LayoutMode::Tabbed);
+            ThemeManager::get()->setLayoutMode(LayoutMode::Tabbed);
         }
 
         ImGui::End();

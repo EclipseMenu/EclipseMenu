@@ -58,7 +58,7 @@ namespace eclipse::utils {
     /// @brief Get whether current OpenGL context has an extension.
     /// @param extension Extension to check.
     /// @return Whether current OpenGL context has the extension.
-    bool hasOpenGLExtension(const std::string& extension);
+    bool hasOpenGLExtension(std::string_view extension);
 
     /// @brief Get whether to use legacy rendering functions for OpenGL.
     /// @return Whether to use legacy rendering functions.

@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/imgui/imgui.hpp>
 
 namespace eclipse::gui {
     void ThemeManager::init() {
@@ -65,6 +66,7 @@ namespace eclipse::gui {
     void try_assign(T& v, nlohmann::json const& j, std::string_view key) {
         auto value = json_try_get<T>(j, key);
         if (value) v = *value;
+        else geode::log::warn("Failed to read \"{}\" from theme", key);
     }
 
     bool ThemeManager::loadTheme(const std::filesystem::path& path) {
@@ -84,14 +86,9 @@ namespace eclipse::gui {
         auto layout = json_try_get<int>(json, "layout");
         auto theme = json_try_get<int>(json, "theme");
 
-        if (renderer) Engine::get()->setRenderer(static_cast<RendererType>(*renderer));
-        if (auto imguiRenderer = imgui::ImGuiRenderer::get()) {
-            if (layout) imguiRenderer->setLayoutMode(static_cast<imgui::LayoutMode>(*layout));
-            if (theme) imguiRenderer->setComponentTheme(static_cast<imgui::ComponentTheme>(*theme));
-        } else {
-            if (layout) m_layoutMode = static_cast<imgui::LayoutMode>(*layout);
-            if (theme) m_componentTheme = static_cast<imgui::ComponentTheme>(*theme);
-        }
+        if (renderer) this->setRenderer(static_cast<RendererType>(*renderer));
+        if (layout) this->setLayoutMode(static_cast<imgui::LayoutMode>(*layout));
+        if (theme) this->setComponentTheme(static_cast<imgui::ComponentTheme>(*theme));
 
         try_assign(m_uiScale, json, "uiScale");
         try_assign(m_selectedFont, json, "font");
@@ -120,7 +117,7 @@ namespace eclipse::gui {
         try_assign(m_buttonDisabledColor, json, "buttonDisabledColor");
         try_assign(m_buttonDisabledForeground, json, "buttonDisabledForeground");
         try_assign(m_buttonHoveredColor, json, "buttonHoveredColor");
-        try_assign(m_buttonHoveredForeground, json, "buttonSelectedForeground");
+        try_assign(m_buttonHoveredForeground, json, "buttonHoveredForeground");
         try_assign(m_buttonActivatedColor, json, "buttonActivatedColor");
         try_assign(m_buttonActiveForeground, json, "buttonActiveForeground");
 
@@ -221,5 +218,55 @@ namespace eclipse::gui {
         globThemes(geode::Mod::get()->getConfigDir() / "themes");
 
         return themes;
+    }
+
+    void ThemeManager::setRenderer(RendererType renderer) {
+        auto engine = Engine::get();
+        if (engine->isInitialized()) {
+            engine->setRenderer(renderer);
+        }
+        m_renderer = renderer;
+    }
+
+    void ThemeManager::setLayoutMode(imgui::LayoutMode mode) {
+        if (auto imgui = imgui::ImGuiRenderer::get()) {
+            geode::log::debug("ThemeManager::setLayoutMode - setting new layout");
+            imgui->setLayoutMode(mode);
+        }
+        m_layoutMode = mode;
+    }
+
+    void ThemeManager::setComponentTheme(imgui::ComponentTheme theme) {
+        if (auto imgui = imgui::ImGuiRenderer::get()) {
+            imgui->setComponentTheme(theme);
+        }
+        m_componentTheme = theme;
+    }
+
+    void ThemeManager::setSelectedFont(const std::string &value) {
+        if (auto imgui = imgui::ImGuiRenderer::get()) {
+            imgui->getFontManager().setFont(value);
+        }
+        m_selectedFont = value;
+    }
+
+    void ThemeManager::setSelectedFont(int index) {
+        auto fonts = getFontNames();
+        if (fonts.size() <= index) return;
+        setSelectedFont(fonts[index]);
+    }
+
+    std::vector<std::string> ThemeManager::getFontNames() {
+        auto fonts = imgui::FontManager::fetchAvailableFonts();
+        std::vector<std::string> result;
+        result.reserve(fonts.size());
+        for (auto& font : fonts) {
+            result.emplace_back(font.getName());
+        }
+        return result;
+    }
+
+    void ThemeManager::setFontSize(float value) {
+        m_fontSize = value;
     }
 }

@@ -208,6 +208,7 @@ namespace eclipse::gui {
 
         /// @brief Get the combo items.
         [[nodiscard]] const std::vector<std::string>& getItems() const { return m_items; }
+        void setItems(const std::vector<std::string>& items) { m_items = items; }
 
         /// @brief Set the combo value (selected item index).
         void setValue(int value) const;
@@ -787,10 +788,12 @@ namespace eclipse::gui {
         std::shared_ptr<MenuTab> findTab(std::string_view name);
 
         [[nodiscard]] const Tabs& getTabs() const { return m_tabs; }
+        [[nodiscard]] bool isInitialized() const { return m_initialized; }
 
     private:
         std::shared_ptr<Renderer> m_renderer;
         Tabs m_tabs;
+        bool m_initialized = false;
     };
 
 }

@@ -4,12 +4,16 @@
 #include <modules/gui/gui.hpp>
 #include <modules/gui/imgui/imgui.hpp>
 
-#define PROPERTY(type, member, name) private: type member; \
-public: type get##name() const { return member; } \
+#define PROPERTY_CS(type, member, name) private: type member; \
+public: type get##name() const { return member; }
+
+#define CR_PROPERTY_CS(type, member, name) private: type member; \
+public: type const& get##name() const { return member; }
+
+#define PROPERTY(type, member, name) PROPERTY_CS(type, member, name) \
 void set##name(type value) { member = value; }
 
-#define CR_PROPERTY(type, member, name) private: type member; \
-public: type const& get##name() const { return member; } \
+#define CR_PROPERTY(type, member, name) CR_PROPERTY_CS(type, member, name) \
 void set##name(type const& value) { member = value; }
 
 #define COLOR_PROPERTY(member, name) CR_PROPERTY(Color, member, name)
@@ -75,20 +79,27 @@ namespace eclipse::gui {
         CR_PROPERTY(std::string, m_themeAuthor, ThemeAuthor)
 
         /// Current renderer engine
-        PROPERTY(RendererType, m_renderer, Renderer)
+        PROPERTY_CS(RendererType, m_renderer, Renderer)
+        void setRenderer(RendererType renderer);
 
         /// [ImGui] Layout mode
-        PROPERTY(imgui::LayoutMode, m_layoutMode, LayoutMode)
+        PROPERTY_CS(imgui::LayoutMode, m_layoutMode, LayoutMode)
+        void setLayoutMode(imgui::LayoutMode mode);
         /// [ImGui] Component theme
-        PROPERTY(imgui::ComponentTheme, m_componentTheme, ComponentTheme)
+        PROPERTY_CS(imgui::ComponentTheme, m_componentTheme, ComponentTheme)
+        void setComponentTheme(imgui::ComponentTheme theme);
 
         /// [ImGui] Global UI Scale
         PROPERTY(float, m_uiScale, UIScale)
 
         /// [ImGui] Font file name
-        CR_PROPERTY(std::string, m_selectedFont, SelectedFont)
+        CR_PROPERTY_CS(std::string, m_selectedFont, SelectedFont)
+        void setSelectedFont(const std::string& value);
+        void setSelectedFont(int index);
+        static std::vector<std::string> getFontNames() ;
         /// [ImGui] Font size
-        PROPERTY(float, m_fontSize, FontSize)
+        PROPERTY_CS(float, m_fontSize, FontSize)
+        void setFontSize(float value);
 
         /// Frame padding
         PROPERTY(float, m_framePadding, FramePadding)

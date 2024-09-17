@@ -7,6 +7,7 @@ namespace eclipse::gui::imgui {
 
     class PanelLayout : public Layout {
     public:
+        PanelLayout() { m_mode = LayoutMode::Panel; }
         ~PanelLayout() override = default;
 
         void init() override;

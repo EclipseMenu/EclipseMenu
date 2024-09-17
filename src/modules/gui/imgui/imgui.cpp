@@ -12,6 +12,77 @@ namespace eclipse::gui::imgui {
 
     bool ImGuiRenderer::s_initialized = false;
 
+    std::string_view FontManager::FontMetadata::getName() const {
+        return m_name;
+    }
+
+    ImFont* FontManager::FontMetadata::get() {
+        if (m_font) return m_font;
+
+        this->load();
+        return m_font;
+    }
+
+    void FontManager::FontMetadata::load() {
+        auto fontSize = ThemeManager::get()->getFontSize();
+        m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(m_path.string().c_str(), fontSize);
+    }
+
+    std::vector<FontManager::FontMetadata> FontManager::fetchAvailableFonts() {
+        std::vector<FontMetadata> result;
+        auto globFonts = [&](std::filesystem::path const& path) {
+            std::filesystem::create_directories(path);
+            for (auto& entry : std::filesystem::directory_iterator(path)) {
+                if (entry.path().extension() != ".ttf") continue;
+                auto filename = entry.path().stem().string();
+                FontMetadata font {filename, entry.path()};
+                result.push_back(font);
+            }
+        };
+
+        globFonts(geode::Mod::get()->getResourcesDir());
+        globFonts(geode::Mod::get()->getConfigDir() / "fonts");
+
+        return result;
+    }
+
+    void FontManager::fetchFonts() {
+        m_availableFonts = fetchAvailableFonts();
+    }
+
+    const std::vector<FontManager::FontMetadata>& FontManager::getAvailableFonts() {
+        return m_availableFonts;
+    }
+
+    void FontManager::init() {
+        this->fetchFonts();
+
+        // load all fonts
+        for (auto& font : m_availableFonts) {
+            font.load();
+        }
+
+        // pick current font
+        this->setFont(ThemeManager::get()->getSelectedFont());
+    }
+
+    void FontManager::setFont(std::string_view name) {
+        if (m_availableFonts.empty()) {
+            geode::log::warn("Tried to select a non-existent font: {}", name);
+            return;
+        }
+
+        for (int i = 0; i < m_availableFonts.size(); i++) {
+            if (m_availableFonts[i].getName() != name)
+                continue;
+
+            m_selectedFontIndex = i;
+            ImGui::GetIO().FontDefault = getFont().get();
+            config::setTemp("fontIndex", i);
+            return;
+        }
+    }
+
     void ImGuiRenderer::init() {
         if (s_initialized) return;
 
@@ -26,6 +97,7 @@ namespace eclipse::gui::imgui {
                 io.IniFilename = nullptr;
                 style.DisplaySafeAreaPadding = ImVec2(0, 0);
                 if (m_theme) m_theme->init();
+                m_fontManager.init();
             })
             .draw([this] {
                 if (!s_initialized) return;
@@ -41,7 +113,7 @@ namespace eclipse::gui::imgui {
         config::setTemp("ui.scale", scale);
 
         m_insideDraw = true;
-        if (m_insideDraw) m_theme->update();
+        if (m_theme) m_theme->update();
         if (m_layout) m_layout->draw();
         m_insideDraw = false;
         setLayoutMode(m_queuedMode);
@@ -64,8 +136,7 @@ namespace eclipse::gui::imgui {
     }
 
     void ImGuiRenderer::setLayoutMode(LayoutMode mode) {
-        auto tm = ThemeManager::get();
-        if (tm->getLayoutMode() == mode && m_layout) return;
+        if (m_layout && m_layout->getMode() == mode) return;
         if (m_insideDraw) {
             // replacing layout during rendering is a bad idea
             // so we queue the change after the frame is finished
@@ -82,8 +153,6 @@ namespace eclipse::gui::imgui {
         }
         m_layout->init();
         if (s_initialized) m_layout->toggle(m_isOpened);
-
-        tm->setLayoutMode(mode);
         m_queuedMode = mode;
     }
 
@@ -100,7 +169,6 @@ namespace eclipse::gui::imgui {
                 break;
         }
         if (s_initialized) m_theme->init();
-        tm->setComponentTheme(theme);
     }
 
     void ImGuiRenderer::visitComponent(const std::shared_ptr<Component>& component) const {

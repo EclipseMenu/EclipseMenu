@@ -53,11 +53,10 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
     }
 
     void onToggleRenderer(CCObject* sender) {
-        auto engine = gui::Engine::get();
         auto type = gui::Engine::getRendererType() == gui::RendererType::ImGui
             ? gui::RendererType::Cocos2d
             : gui::RendererType::ImGui;
-        engine->setRenderer(type);
+        gui::ThemeManager::get()->setRenderer(type);
 
         geode::log::info("Switched renderer to {}", type == gui::RendererType::ImGui ? "ImGui" : "Cocos2d");
     }
@@ -125,23 +124,31 @@ $on_mod(Loaded) {
         using namespace gui;
         auto tab = MenuTab::find("Interface");
         tab->addInputFloat("UI Scale", "uiScale", 0.4f, 4.f, "x%.3f")
-            ->callback([](float value) { ThemeManager::get()->setUIScale(value); })
-            ->disableSaving();
+            ->callback([](float value) {
+                ThemeManager::get()->setUIScale(value);
+            })->disableSaving();
+
+        auto fontCombo = tab->addCombo("Font", "fontIndex", ThemeManager::getFontNames(), 0);
+        fontCombo->callback([](int value) {
+            ThemeManager::get()->setSelectedFont(value);
+        })->disableSaving();
+        tab->addInputFloat("Font Size", "fontSize", 1.f, 64.f)
+            ->callback([](float value) {
+                ThemeManager::get()->setFontSize(value);
+            })->disableSaving();
+        tab->addButton("Reload Fonts")->callback([fontCombo] {
+            ImGuiCocos::get().reload();
+            fontCombo->setItems(ThemeManager::getFontNames());
+        });
 
         tab->addCombo("Layout Type", "layout", {"Tabbed", "Panel"}, 0)
             ->callback([](int value) {
-                auto mode = static_cast<imgui::LayoutMode>(value);
-                if (auto imgui = imgui::ImGuiRenderer::get())
-                    imgui->setLayoutMode(mode);
-                else ThemeManager::get()->setLayoutMode(mode);
+                ThemeManager::get()->setLayoutMode(static_cast<imgui::LayoutMode>(value));
             })->disableSaving();
 
-        tab->addCombo("Component Style", "theme", imgui::THEME_NAMES, 0)
+        tab->addCombo("Style", "theme", imgui::THEME_NAMES, 0)
             ->callback([](int value) {
-                auto theme = static_cast<imgui::ComponentTheme>(value);
-                if (auto imgui = imgui::ImGuiRenderer::get())
-                    imgui->setComponentTheme(theme);
-                else ThemeManager::get()->setComponentTheme(theme);
+                ThemeManager::get()->setComponentTheme(static_cast<imgui::ComponentTheme>(value));
             })->disableSaving();
 
         auto blurToggle = tab->addToggle("Enable blur", "blurEnabled")

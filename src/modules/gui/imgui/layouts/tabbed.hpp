@@ -7,6 +7,7 @@ namespace eclipse::gui::imgui {
 
     class TabbedLayout : public Layout {
     public:
+        TabbedLayout() { m_mode = LayoutMode::Tabbed; }
         ~TabbedLayout() override = default;
 
         void init() override;
