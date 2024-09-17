@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 add_library(third_party INTERFACE)
 
 # Include libraries
-CPMAddPackage("gh:matcool/gd-imgui-cocos#afe25b3")
+CPMAddPackage("gh:matcool/gd-imgui-cocos#2a18eac")
 CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
 CPMAddPackage("gh:EclipseMenu/rift#c3f1c29")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
