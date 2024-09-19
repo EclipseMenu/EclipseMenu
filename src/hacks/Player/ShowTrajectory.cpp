@@ -242,11 +242,11 @@ namespace eclipse::hacks::Player {
 
     class $modify(ShowTrajectoryPLHook, PlayLayer) {
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
-            bool result = PlayLayer::init(level, useReplay, dontCreateObjects);
+            if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
             s_simulation.init();
 
-            return result;
+            return true;
         }
 
         void destroyPlayer(PlayerObject* player, GameObject* gameObject) {

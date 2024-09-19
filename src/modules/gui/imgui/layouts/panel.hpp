@@ -1,6 +1,6 @@
 #pragma once
 #include "layout.hpp"
-#include "../core/window.hpp"
+#include "../core/tab.hpp"
 #include "../animation/move-action.hpp"
 
 namespace eclipse::gui::imgui {
@@ -16,6 +16,9 @@ namespace eclipse::gui::imgui {
 
     public:
         static void recalculateSize();
+
+        std::vector<Tab> m_tabs;
+        unsigned int m_selectedTab = 0;
     };
 
 }
