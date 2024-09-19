@@ -63,6 +63,7 @@ jobs:
 
       - name: Check if has nightly webhook
         id: check
+        if: github.ref == 'refs/heads/main'
         run: echo "has-nightly-webhook=${{ secrets.NIGHTLY_WEBHOOK != '' }}" >> $GITHUB_OUTPUT
 
       - uses: actions/checkout@v4

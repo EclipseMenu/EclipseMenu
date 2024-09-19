@@ -15,8 +15,18 @@ namespace eclipse::gui {
 
     class MenuTab;
 
+    enum class ComponentType {
+        Unknown = -1,
+        Label, Toggle, RadioButton,
+        Combo, Slider, InputFloat, InputInt,
+        FloatToggle, InputText, Color,
+        Button, Keybind, LabelSettings
+    };
+
     class Component {
     public:
+        virtual ~Component() = default;
+
         /// @brief Initialize the component.
         virtual void onInit() = 0;
 
@@ -32,6 +42,16 @@ namespace eclipse::gui {
         /// @brief Get the component's description.
         [[nodiscard]] const std::string& getDescription() const { return m_description; }
 
+        /// @brief Get the component's type (used to skip dynamic casting)
+        [[nodiscard]] ComponentType getType() const { return m_type; }
+
+        /// @brief Excludes value from being saved into main configuration file
+        /// Useful for some internal values. (Uses temporary storage).
+        void disableSaving() { m_noSave = true; }
+
+        /// @brief Whether current component should use temporary storage
+        [[nodiscard]] bool isSaveDisabled() const { return m_noSave; }
+
         /// @brief Set the component's description.
         virtual Component* setDescription(std::string description) {
             m_description = std::move(description);
@@ -39,13 +59,17 @@ namespace eclipse::gui {
         }
 
     protected:
+        ComponentType m_type = ComponentType::Unknown;
+        bool m_noSave = false;
         std::string m_description;
     };
 
     /// @brief Simple label component, that displays a title.
     class LabelComponent : public Component {
     public:
-        explicit LabelComponent(std::string title) : m_title(std::move(title)) {}
+        explicit LabelComponent(std::string title) : m_title(std::move(title)) {
+            m_type = ComponentType::Label;
+        }
 
         void onInit() override {}
         void onUpdate() override {}
@@ -66,7 +90,9 @@ namespace eclipse::gui {
     class ToggleComponent : public Component {
     public:
         explicit ToggleComponent(std::string id, std::string title)
-            : m_id(std::move(id)), m_title(std::move(title)) {}
+            : m_id(std::move(id)), m_title(std::move(title)) {
+            m_type = ComponentType::Toggle;
+        }
 
         void onInit() override {}
         void onUpdate() override {}
@@ -84,7 +110,7 @@ namespace eclipse::gui {
         [[nodiscard]] bool getValue() const;
 
         /// @brief Set the toggle value.
-        void setValue(bool value);
+        void setValue(bool value) const;
 
         /// @brief Allows to set keybinds for the toggle.
         ToggleComponent* handleKeybinds();
@@ -96,11 +122,10 @@ namespace eclipse::gui {
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
-        [[nodiscard]] const std::string& getDescription() const { return m_description; }
         [[nodiscard]] std::weak_ptr<MenuTab> getOptions() const { return m_options; }
         [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
 
-        void triggerCallback(bool value) {
+        void triggerCallback(bool value) const {
             if (m_callback) m_callback(value);
         }
 
@@ -116,7 +141,9 @@ namespace eclipse::gui {
     class RadioButtonComponent : public Component {
     public:
         explicit RadioButtonComponent(std::string id, std::string title, int value)
-            : m_id(std::move(id)), m_title(std::move(title)), m_value(value) {}
+            : m_id(std::move(id)), m_title(std::move(title)), m_value(value) {
+            m_type = ComponentType::RadioButton;
+        }
 
         void onInit() override {}
         void onUpdate() override {}
@@ -128,10 +155,12 @@ namespace eclipse::gui {
         }
 
         /// @brief Get the radio button value.
-        [[nodiscard]] int getValue() const { return m_value; }
+        [[nodiscard]] int getValue() const;
 
         /// @brief Set the radio button value.
-        void setValue(int value) { m_value = value; }
+        void setValue(int value) const;
+
+        [[nodiscard]] int getChoice() const { return m_value; }
 
         /// @brief Allows to set keybinds for the radio button.
         RadioButtonComponent* handleKeybinds();
@@ -140,7 +169,7 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
 
-        void triggerCallback(int value) {
+        void triggerCallback(int value) const {
             if (m_callback) m_callback(value);
         }
 
@@ -161,7 +190,9 @@ namespace eclipse::gui {
     class ComboComponent : public Component {
     public:
         explicit ComboComponent(std::string id, std::string title, std::vector<std::string> items, int value)
-            : m_id(std::move(id)), m_title(std::move(title)), m_items(std::move(items)), m_value(value) {}
+            : m_id(std::move(id)), m_title(std::move(title)), m_value(value), m_items(std::move(items)) {
+            m_type = ComponentType::Combo;
+        }
 
         void onInit() override {}
         void onUpdate() override {}
@@ -172,14 +203,15 @@ namespace eclipse::gui {
             return this;
         }
 
-        /// @brief Get the combo value.
-        [[nodiscard]] int getValue() const { return m_value; }
+        /// @brief Get the combo value (selected item index).
+        [[nodiscard]] int getValue() const;
 
         /// @brief Get the combo items.
         [[nodiscard]] const std::vector<std::string>& getItems() const { return m_items; }
+        void setItems(const std::vector<std::string>& items) { m_items = items; }
 
-        /// @brief Set the combo button value.
-        void setValue(int value) { m_value = value; }
+        /// @brief Set the combo value (selected item index).
+        void setValue(int value) const;
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
@@ -189,7 +221,7 @@ namespace eclipse::gui {
             return this;
         }
 
-        void triggerCallback(int value) {
+        void triggerCallback(int value) const {
             if (m_callback) m_callback(value);
         }
 
@@ -205,7 +237,9 @@ namespace eclipse::gui {
     class SliderComponent : public Component {
     public:
         explicit SliderComponent(std::string title, std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f")
-            : m_title(std::move(title)), m_id(std::move(id)), m_min(min), m_max(max), m_format(std::move(format)) {}
+            : m_id(std::move(id)), m_title(std::move(title)), m_format(std::move(format)), m_min(min), m_max(max) {
+            m_type = ComponentType::Slider;
+        }
 
         void onInit() override {}
         void onUpdate() override {}
@@ -223,12 +257,15 @@ namespace eclipse::gui {
         [[nodiscard]] float getMax() const { return m_max; }
         [[nodiscard]] const std::string& getFormat() const { return m_format; }
 
+        [[nodiscard]] float getValue() const;
+        void setValue(float value) const;
+
         SliderComponent* setDescription(std::string description) override {
             m_description = std::move(description);
             return this;
         }
 
-        void triggerCallback(float value) {
+        void triggerCallback(float value) const {
             if (m_callback) m_callback(value);
         }
 
@@ -245,7 +282,9 @@ namespace eclipse::gui {
     class InputFloatComponent : public Component {
     public:
         explicit InputFloatComponent(std::string title, std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f")
-            : m_title(std::move(title)), m_id(std::move(id)), m_min(min), m_max(max), m_format(std::move(format)) {}
+            : m_id(std::move(id)), m_title(std::move(title)), m_format(std::move(format)), m_min(min), m_max(max) {
+            m_type = ComponentType::InputFloat;
+        }
 
         void onInit() override {}
         void onUpdate() override {}
@@ -263,12 +302,15 @@ namespace eclipse::gui {
         [[nodiscard]] float getMax() const { return m_max; }
         [[nodiscard]] const std::string& getFormat() const { return m_format; }
 
+        [[nodiscard]] float getValue() const;
+        void setValue(float value) const;
+
         InputFloatComponent* setDescription(std::string description) override {
             m_description = std::move(description);
             return this;
         }
 
-        void triggerCallback(float value) {
+        void triggerCallback(float value) const {
             if (m_callback) m_callback(value);
         }
 
@@ -285,7 +327,9 @@ namespace eclipse::gui {
     class InputIntComponent : public Component {
     public:
         explicit InputIntComponent(std::string title, std::string id, int min = INT_MIN, int max = INT_MAX)
-            : m_title(std::move(title)), m_id(std::move(id)), m_min(min), m_max(max) {}
+            : m_id(std::move(id)), m_title(std::move(title)), m_min(min), m_max(max) {
+            m_type = ComponentType::InputInt;
+        }
 
         void onInit() override {}
         void onUpdate() override {}
@@ -302,12 +346,15 @@ namespace eclipse::gui {
         [[nodiscard]] int getMin() const { return m_min; }
         [[nodiscard]] int getMax() const { return m_max; }
 
+        [[nodiscard]] int getValue() const;
+        void setValue(int value) const;
+
         InputIntComponent* setDescription(std::string description) override {
             m_description = std::move(description);
             return this;
         }
 
-        void triggerCallback(int value) {
+        void triggerCallback(int value) const {
             if (m_callback) m_callback(value);
         }
 
@@ -323,7 +370,9 @@ namespace eclipse::gui {
     class FloatToggleComponent : public Component {
     public:
         explicit FloatToggleComponent(std::string title, std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f")
-            : m_title(std::move(title)), m_id(std::move(id)), m_min(min), m_max(max), m_format(std::move(format)) {}
+            : m_id(std::move(id)), m_title(std::move(title)), m_format(std::move(format)), m_min(min), m_max(max) {
+            m_type = ComponentType::FloatToggle;
+        }
 
         void onInit() override {}
         void onUpdate() override {}
@@ -355,10 +404,15 @@ namespace eclipse::gui {
         [[nodiscard]] float getMax() const { return m_max; }
         [[nodiscard]] const std::string& getFormat() const { return m_format; }
 
-        void triggerCallback(float value) {
+        [[nodiscard]] float getValue() const;
+        void setValue(float value) const;
+        [[nodiscard]] bool getState() const;
+        void setState(bool value) const;
+
+        void triggerCallback(float value) const {
             if (m_valueCallback) m_valueCallback(value);
         }
-        void triggerCallback() {
+        void triggerCallback() const {
             if (m_toggleCallback) m_toggleCallback();
         }
 
@@ -378,7 +432,9 @@ namespace eclipse::gui {
     class InputTextComponent : public Component {
     public:
         explicit InputTextComponent(std::string title, std::string id)
-            : m_title(std::move(title)), m_id(std::move(id)) {}
+            : m_id(std::move(id)), m_title(std::move(title)) {
+            m_type = ComponentType::InputText;
+        }
 
         void onInit() override {};
         void onUpdate() override {}
@@ -392,13 +448,16 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
 
+        [[nodiscard]] std::string getValue() const;
+        void setValue(const std::string& value) const;
+
         InputTextComponent* setDescription(std::string description) override {
             m_description = std::move(description);
             return this;
         }
 
-        void triggerCallback(std::string value) {
-            if (m_callback) m_callback(value);
+        void triggerCallback(std::string value) const {
+            if (m_callback) m_callback(std::move(value));
         }
 
     private:
@@ -411,13 +470,15 @@ namespace eclipse::gui {
     class ColorComponent : public Component {
     public:
         explicit ColorComponent(std::string title, std::string id, bool hasOpacity = false)
-            : m_title(std::move(title)), m_id(std::move(id)), m_hasOpacity(hasOpacity) {}
+            : m_id(std::move(id)), m_title(std::move(title)), m_hasOpacity(hasOpacity) {
+            m_type = ComponentType::Color;
+        }
 
         void onInit() override {};
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        ColorComponent* callback(const std::function<void(gui::Color)>& func) { 
+        ColorComponent* callback(const std::function<void(Color)>& func) {
             m_callback = func; 
             return this;
         }
@@ -426,12 +487,15 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] bool hasOpacity() const { return m_hasOpacity; }
 
+        [[nodiscard]] Color getValue() const;
+        void setValue(const Color& value) const;
+
         ColorComponent* setDescription(std::string description) override {
             m_description = std::move(description);
             return this;
         }
 
-        void triggerCallback(gui::Color value) {
+        void triggerCallback(const Color& value) const {
             if (m_callback) m_callback(value);
         }
 
@@ -439,14 +503,16 @@ namespace eclipse::gui {
         std::string m_id;
         std::string m_title;
         bool m_hasOpacity;
-        std::function<void(gui::Color)> m_callback;
+        std::function<void(Color)> m_callback;
     };
 
     /// @brief Button component to execute an action when pressed.
     class ButtonComponent : public Component {
     public:
         explicit ButtonComponent(std::string title)
-            : m_title(std::move(title)) {}
+            : m_title(std::move(title)) {
+            m_type = ComponentType::Button;
+        }
 
         void onInit() override {}
         void onUpdate() override {}
@@ -470,7 +536,7 @@ namespace eclipse::gui {
 
         [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
 
-        void triggerCallback() {
+        void triggerCallback() const {
             if (m_callback) m_callback();
         }
 
@@ -484,7 +550,9 @@ namespace eclipse::gui {
     class KeybindComponent : public Component {
     public:
         explicit KeybindComponent(std::string title, std::string id, bool canDelete = false) :
-            m_title(std::move(title)), m_id(std::move(id)), m_canDelete(canDelete) {}
+            m_id(std::move(id)), m_title(std::move(title)), m_canDelete(canDelete) {
+            m_type = ComponentType::Keybind;
+        }
 
         void onInit() override {}
         void onUpdate() override {}
@@ -504,7 +572,7 @@ namespace eclipse::gui {
             return this;
         }
 
-        void triggerCallback(keybinds::Keys key) {
+        void triggerCallback(keybinds::Keys key) const {
             if (m_callback) m_callback(key);
         }
 
@@ -519,7 +587,9 @@ namespace eclipse::gui {
     class LabelSettingsComponent : public Component {
     public:
         explicit LabelSettingsComponent(labels::LabelSettings* settings)
-            : m_settings(settings) {}
+            : m_settings(settings) {
+            m_type = ComponentType::LabelSettings;
+        }
 
         void onInit() override {}
         void onUpdate() override {}
@@ -527,7 +597,7 @@ namespace eclipse::gui {
         [[nodiscard]] const std::string& getId() const override { return m_settings->text; }
         [[nodiscard]] const std::string& getTitle() const override { return m_settings->text; }
 
-        labels::LabelSettings* getSettings() { return m_settings; }
+        labels::LabelSettings* getSettings() const { return m_settings; }
 
         LabelSettingsComponent* deleteCallback(const std::function<void()>& func) {
             m_deleteCallback = func;
@@ -539,11 +609,11 @@ namespace eclipse::gui {
             return this;
         }
 
-        void triggerDeleteCallback() {
+        void triggerDeleteCallback() const {
             if (m_deleteCallback) m_deleteCallback();
         }
 
-        void triggerEditCallback() {
+        void triggerEditCallback() const {
             if (m_editCallback) m_editCallback();
         }
 
@@ -559,7 +629,7 @@ namespace eclipse::gui {
         explicit MenuTab(std::string title) : m_title(std::move(title)) {}
 
         /// @brief Add a component to the tab.
-        void addComponent(std::shared_ptr<Component> component);
+        void addComponent(const std::shared_ptr<Component>& component);
 
         /// @brief Remove a component from the tab.
         void removeComponent(std::weak_ptr<Component> component);
@@ -601,30 +671,30 @@ namespace eclipse::gui {
 
         /// @brief Add an input float to the tab.
         std::shared_ptr<InputFloatComponent> addInputFloat(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f") {
-            auto inputfloat = std::make_shared<InputFloatComponent>(title, id, min, max, format);
-            addComponent(inputfloat);
-            return inputfloat;
+            auto inputFloat = std::make_shared<InputFloatComponent>(title, id, min, max, format);
+            addComponent(inputFloat);
+            return inputFloat;
         }
 
         /// @brief Add an input int to the tab.
         std::shared_ptr<InputIntComponent> addInputInt(const std::string& title, const std::string& id, int min = INT_MIN, int max = INT_MAX) {
-            auto inputint = std::make_shared<InputIntComponent>(title, id, min, max);
-            addComponent(inputint);
-            return inputint;
+            auto inputInt = std::make_shared<InputIntComponent>(title, id, min, max);
+            addComponent(inputInt);
+            return inputInt;
         }
 
         /// @brief Add an float toggle to the tab.
         std::shared_ptr<FloatToggleComponent> addFloatToggle(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f") {
-            auto floattoggle = std::make_shared<FloatToggleComponent>(title, id, min, max, format);
-            addComponent(floattoggle);
-            return floattoggle;
+            auto floatToggle = std::make_shared<FloatToggleComponent>(title, id, min, max, format);
+            addComponent(floatToggle);
+            return floatToggle;
         }
 
         /// @brief Add an input text to the tab.
         std::shared_ptr<InputTextComponent> addInputText(const std::string& title, const std::string& id) {
-            auto inputtext = std::make_shared<InputTextComponent>(title, id);
-            addComponent(inputtext);
-            return inputtext;
+            auto inputText = std::make_shared<InputTextComponent>(title, id);
+            addComponent(inputText);
+            return inputText;
         }
 
         /// @brief Add a button to the tab.
@@ -662,89 +732,68 @@ namespace eclipse::gui {
         [[nodiscard]] const std::vector<std::shared_ptr<Component>>& getComponents() const { return m_components; }
 
         /// @brief Find a tab by name (or create a new one if it does not exist).
-        static std::shared_ptr<MenuTab> find(const std::string& name);
+        static std::shared_ptr<MenuTab> find(std::string_view name);
 
     private:
         std::string m_title;
         std::vector<std::shared_ptr<Component>> m_components;
     };
 
-    class Style {
-    public:
-        explicit Style() {}
-
-        /// @brief Draw a custom title bar (or just return false if there is none).
-        virtual bool titlebar() { return false; }
-
-        // Component visitors
-
-        virtual void visit(LabelComponent* label) {};
-        virtual void visit(ToggleComponent* toggle) {};
-        virtual void visit(RadioButtonComponent* radio) {};
-        virtual void visit(ComboComponent* combo) {};
-        virtual void visit(SliderComponent* slider) {};
-        virtual void visit(InputFloatComponent* input) {};
-        virtual void visit(InputTextComponent* input) {};
-        virtual void visit(InputIntComponent* input) {};
-        virtual void visit(FloatToggleComponent* floatToggle) {};
-        virtual void visit(ButtonComponent* button) {};
-        virtual void visit(ColorComponent* color) {};
-        virtual void visit(KeybindComponent* keybind) {};
-        virtual void visit(LabelSettingsComponent* labelSettings) {};
-
-        /// @brief Handle the component.
-        void visit(Component* component);
-    };
-
-    class Layout {
-    public:
-        explicit Layout() : m_isToggled(false), m_style(nullptr) {}
-
-        /// @brief Draw the UI.
-        virtual void draw() {}
-
-        /// @brief Handle the component.
-        virtual void visit(std::weak_ptr<Component> component) {}
-
-        /// @brief Toggle the menu.
-        virtual void toggle() {
-            m_isToggled = !m_isToggled;
-        }
-
-        Layout* setStyle(std::shared_ptr<Style> st) { 
-            m_style = st;
-            return this;
-        }
-
-        /// @brief Get if the menu is toggled.
-        [[nodiscard]] bool isToggled() const { return m_isToggled; }
-
-        /// @brief Get the layout's component style.
-        [[nodiscard]] std::weak_ptr<Style> getStyle() { return m_style; }
-
-    protected:
-        bool m_isToggled;
-        std::shared_ptr<Style> m_style;
+    enum class RendererType {
+        ImGui,
+        Cocos2d
     };
 
     /// @brief Abstract class, that wraps all UI function calls.
-    class Engine {
+    class Renderer {
     public:
-        /// @brief Get the UI engine instance. (ImGui for desktop, Cocos2d for mobile)
-        static std::shared_ptr<Engine> get();
+        virtual ~Renderer() = default;
 
-        /// @brief Initialize the UI engine.
+        /// @brief Initialize the renderer.
         virtual void init() = 0;
 
         /// @brief Toggle the UI visibility.
         virtual void toggle() = 0;
 
-        /// @brief Toggle the UI visibility.
-        virtual bool isToggled() = 0;
+        /// @brief Tell the renderer to clean up/unload.
+        virtual void shutdown() = 0;
 
-        /// @brief Find a tab by name.
-        virtual std::shared_ptr<MenuTab> findTab(const std::string& name) = 0;
+        /// @brief Check if the UI is visible.
+        [[nodiscard]] virtual bool isToggled() const = 0;
     };
 
+    using Tabs = std::vector<std::shared_ptr<MenuTab>>;
+
+    /// @brief Main controller for the UI.
+    class Engine {
+    public:
+        static std::shared_ptr<Engine> get();
+
+        void init();
+
+        void toggle() const;
+
+        void setRenderer(RendererType type);
+
+        [[nodiscard]] std::shared_ptr<Renderer> getRenderer() const { return m_renderer; }
+        [[nodiscard]] static RendererType getRendererType();
+
+        /// @brief Check if the UI is visible.
+        [[nodiscard]] bool isToggled() const {
+            if (!m_renderer) return false;
+            return m_renderer->isToggled();
+        }
+
+        /// @brief Find a tab by name.
+        std::shared_ptr<MenuTab> findTab(std::string_view name);
+
+        [[nodiscard]] const Tabs& getTabs() const { return m_tabs; }
+        [[nodiscard]] bool isInitialized() const { return m_initialized; }
+
+    private:
+        std::shared_ptr<Renderer> m_renderer;
+        Tabs m_tabs;
+        bool m_initialized = false;
+    };
 
 }

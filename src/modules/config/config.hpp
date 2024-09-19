@@ -47,7 +47,7 @@ namespace eclipse::config {
     /// @param defaultValue Default value to return if the key does not exist.
     /// @return Value from the configuration or the default value if the key does not exist.
     template<typename T>
-    inline T get(std::string_view key, const T& defaultValue) {
+    T get(std::string_view key, const T& defaultValue) {
         if (!has(key))
             return defaultValue;
 
@@ -60,7 +60,7 @@ namespace eclipse::config {
     /// @param key Key to get the value from.
     /// @return Value from the configuration.
     template<typename T>
-    inline T get(std::string_view key) {
+    T get(std::string_view key) {
         if (!has(key))
             throw std::runtime_error(fmt::format("Key '{}' does not exist", key));
 
@@ -72,7 +72,7 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    inline void set(std::string_view key, const T& value) {
+    void set(std::string_view key, const T& value) {
         getStorage()[key] = value;
     }
 
@@ -81,7 +81,7 @@ namespace eclipse::config {
     /// @param key Key to check.
     /// @return True if the value is of the specified type.
     template<typename T>
-    inline bool is(std::string_view key) {
+    bool is(std::string_view key) {
         if (!has(key))
             return false;
 
@@ -98,7 +98,7 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    inline void setIfEmpty(std::string_view key, const T& value) {
+    void setIfEmpty(std::string_view key, const T& value) {
         if (!has(key))
             set(key, value);
     }
@@ -116,7 +116,7 @@ namespace eclipse::config {
     /// @param defaultValue Default value to return if the key does not exist.
     /// @return Value from the temporary storage or the default value if the key does not exist.
     template<typename T>
-    inline T getTemp(std::string_view key, const T& defaultValue) {
+    T getTemp(std::string_view key, const T& defaultValue) {
         if (!hasTemp(key))
             return defaultValue;
 
@@ -129,7 +129,7 @@ namespace eclipse::config {
     /// @param key Key to get the value from.
     /// @return Value from the temporary storage.
     template<typename T>
-    inline T getTemp(std::string_view key) {
+    T getTemp(std::string_view key) {
         if (!hasTemp(key))
             throw std::runtime_error(fmt::format("Key '{}' does not exist", key));
 
@@ -141,7 +141,7 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    inline void setTemp(std::string_view key, const T& value) {
+    void setTemp(std::string_view key, const T& value) {
         getTempStorage()[key] = value;
     }
 }

@@ -396,11 +396,11 @@ namespace eclipse::keybinds {
     }
 
     void Manager::update() {
-        for (auto& key : m_keyStates)
-            m_lastKeyStates.insert_or_assign(key.first, key.second);
+        for (auto&[key, state] : m_keyStates)
+            m_lastKeyStates.insert_or_assign(key, state);
     }
 
-    void Manager::setKeybindState(const std::string& id, bool state) {
+    void Manager::setKeybindState(std::string_view id, bool state) {
         for (auto& keybind : m_keybinds) {
             if (keybind.getId() == id) {
                 keybind.setInitialized(state);
@@ -426,13 +426,13 @@ namespace eclipse::keybinds {
                         keybindRef.setKey(key);
                     });
 
-                    s_keybindComponents[id] = keybindComponent;
+                    s_keybindComponents[std::string(id)] = keybindComponent;
                 } else {
                     // Reset the keybind to None
                     config::set(fmt::format("keybind.{}.key", id), Keys::None);
 
                     // Remove the keybind from the GUI
-                    if (auto keybindComponent = s_keybindComponents[id]; keybindComponent) {
+                    if (auto keybindComponent = s_keybindComponents[std::string(id)]; keybindComponent) {
                         tab->removeComponent(keybindComponent);
                     }
                 }
@@ -460,7 +460,7 @@ namespace eclipse::keybinds {
         }
     }
 
-    std::optional<std::reference_wrapper<Keybind>> Manager::getKeybind(const std::string& id) {
+    std::optional<std::reference_wrapper<Keybind>> Manager::getKeybind(std::string_view id) {
         for (auto& keybind : m_keybinds) {
             if (keybind.getId() == id)
                 return keybind;
