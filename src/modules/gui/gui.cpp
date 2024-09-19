@@ -3,16 +3,36 @@
 #include <modules/config/config.hpp>
 #include <algorithm>
 
-#include "imgui.hpp"
+#include "imgui/imgui.hpp"
+#include "cocos/cocos.hpp"
+#include "theming/manager.hpp"
 
 namespace eclipse::gui {
 
-    bool ToggleComponent::getValue() const {
-        return config::get<bool>(m_id, false);
+    template <typename T>
+    T get_value(std::string_view key, T defaultValue, bool useTemp) {
+        return useTemp ? config::getTemp<T>(key, defaultValue)
+            : config::get<T>(key, defaultValue);
     }
 
-    void ToggleComponent::setValue(bool value) {
-        config::set(m_id, value);
+    template <typename T>
+    void store_value(std::string_view key, T value, bool useTemp) {
+        useTemp ? config::setTemp<T>(key, value)
+            : config::set<T>(key, value);
+    }
+
+    template <typename T>
+    void store_value_ref(std::string_view key, T const& value, bool useTemp) {
+        useTemp ? config::setTemp<T>(key, value)
+            : config::set<T>(key, value);
+    }
+
+    bool ToggleComponent::getValue() const {
+        return get_value(m_id, false, m_noSave);
+    }
+
+    void ToggleComponent::setValue(bool value) const {
+        store_value(m_id, value, m_noSave);
     }
 
     void ToggleComponent::addOptions(const std::function<void(std::shared_ptr<MenuTab>)>& options) {
@@ -32,25 +52,99 @@ namespace eclipse::gui {
         return this;
     }
 
+    int RadioButtonComponent::getValue() const {
+        return get_value(m_id, 0, m_noSave);
+    }
+
+    void RadioButtonComponent::setValue(int value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
     RadioButtonComponent* RadioButtonComponent::handleKeybinds() {
         auto specialId = fmt::format("{}-{}", m_id, m_value);
         keybinds::Manager::get()->registerKeybind(specialId, m_title, [this](){
             auto value = getValue();
-            config::set(this->getId(), value);
+            setValue(value);
             this->triggerCallback(value);
         });
         m_hasKeybind = true;
         return this;
     }
 
+    int ComboComponent::getValue() const {
+        return get_value(m_id, 0, m_noSave);
+    }
+
+    void ComboComponent::setValue(int value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
+    float SliderComponent::getValue() const {
+        return get_value(m_id, 0.f, m_noSave);
+    }
+
+    void SliderComponent::setValue(float value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
+    float InputFloatComponent::getValue() const {
+        return get_value(m_id, 0.f, m_noSave);
+    }
+
+    void InputFloatComponent::setValue(float value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
+    int InputIntComponent::getValue() const {
+        return get_value(m_id, 0, m_noSave);
+    }
+
+    void InputIntComponent::setValue(int value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
     FloatToggleComponent* FloatToggleComponent::handleKeybinds() {
         keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
             bool value = !config::get<bool>(fmt::format("{}.toggle", this->getId()), false);
-            config::set(fmt::format("{}.toggle", this->getId()), value);
+            auto id = fmt::format("{}.toggle", this->getId());
+            m_noSave ? config::setTemp(id, value)
+                : config::set(id, value);
             this->triggerCallback();
         });
         m_hasKeybind = true;
         return this;
+    }
+
+    float FloatToggleComponent::getValue() const {
+        return get_value(m_id, 0.f, m_noSave);
+    }
+
+    void FloatToggleComponent::setValue(float value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
+    bool FloatToggleComponent::getState() const {
+        return get_value(fmt::format("{}.toggle", this->getId()), false, m_noSave);
+    }
+
+    void FloatToggleComponent::setState(bool value) const {
+        store_value(fmt::format("{}.toggle", this->getId()), value, m_noSave);
+    }
+
+    std::string InputTextComponent::getValue() const {
+        return get_value<std::string>(m_id, "", m_noSave);
+    }
+
+    void InputTextComponent::setValue(const std::string& value) const {
+        store_value_ref(m_id, value, m_noSave);
+    }
+
+    Color ColorComponent::getValue() const {
+        return get_value(m_id, Color::BLACK, m_noSave);
+    }
+
+    void ColorComponent::setValue(const Color& value) const {
+        store_value_ref(m_id, value, m_noSave);
     }
 
     ButtonComponent* ButtonComponent::handleKeybinds() {
@@ -61,12 +155,12 @@ namespace eclipse::gui {
         return this;
     }
 
-    void MenuTab::addComponent(std::shared_ptr<Component> component) {
+    void MenuTab::addComponent(const std::shared_ptr<Component>& component) {
         m_components.push_back(component);
     }
 
     void MenuTab::removeComponent(std::weak_ptr<Component> component) {
-        auto it = std::find_if(m_components.begin(), m_components.end(), [&component](const std::shared_ptr<Component>& c) {
+        auto it = std::ranges::find_if(m_components, [&component](const std::shared_ptr<Component>& c) {
             return component.lock() == c;
         });
 
@@ -74,35 +168,59 @@ namespace eclipse::gui {
         m_components.erase(it);
     }
 
-    std::shared_ptr<MenuTab> MenuTab::find(const std::string& name) {
+    std::shared_ptr<MenuTab> MenuTab::find(std::string_view name) {
         return Engine::get()->findTab(name);
     }
 
+    void Engine::setRenderer(RendererType type) {
+        const auto tm = ThemeManager::get();
+        if (type == tm->getRenderer() && m_renderer) return;
+        if (m_renderer) m_renderer->shutdown();
+
+        switch (type) {
+            case RendererType::ImGui:
+            default:
+                m_renderer = std::make_shared<imgui::ImGuiRenderer>();
+                break;
+            case RendererType::Cocos2d:
+                m_renderer = std::make_shared<cocos::CocosRenderer>();
+                break;
+        }
+
+        m_renderer->init();
+    }
+
+    RendererType Engine::getRendererType() {
+        return ThemeManager::get()->getRenderer();
+    }
+
     std::shared_ptr<Engine> Engine::get() {
-        // TODO: Make this return the correct engine based on platform,
-        // or even switch between engines at runtime.
-        static auto instance = std::make_shared<imgui::ImGuiEngine>();
-        return std::static_pointer_cast<Engine>(instance);
+        static auto s_engine = std::make_shared<Engine>();
+        return s_engine;
     }
 
-#define SUPPORT_COMPONENT(type) (auto* component##__LINE__ = dynamic_cast<type*>(component)) this->visit(component##__LINE__)
-    
-    void Style::visit(Component* component) {
-        if SUPPORT_COMPONENT(ToggleComponent);
-        else if SUPPORT_COMPONENT(SliderComponent);
-        else if SUPPORT_COMPONENT(LabelComponent);
-        else if SUPPORT_COMPONENT(InputFloatComponent);
-        else if SUPPORT_COMPONENT(InputIntComponent);
-        else if SUPPORT_COMPONENT(InputTextComponent);
-        else if SUPPORT_COMPONENT(FloatToggleComponent);
-        else if SUPPORT_COMPONENT(RadioButtonComponent);
-        else if SUPPORT_COMPONENT(ComboComponent);
-        else if SUPPORT_COMPONENT(ButtonComponent);
-        else if SUPPORT_COMPONENT(ColorComponent);
-        else if SUPPORT_COMPONENT(KeybindComponent);
-        else if SUPPORT_COMPONENT(LabelSettingsComponent);
+    void Engine::init() {
+        m_initialized = true;
+        setRenderer(ThemeManager::get()->getRenderer());
     }
 
-#undef SUPPORT_COMPONENT
+    void Engine::toggle() const {
+        if (!m_renderer) return;
+        m_renderer->toggle();
+    }
+
+    std::shared_ptr<MenuTab> Engine::findTab(std::string_view name) {
+        for (auto tab : m_tabs) {
+            if (tab->getTitle() == name) {
+                return tab;
+            }
+        }
+
+        // If the tab does not exist, create a new one.
+        auto tab = std::make_shared<MenuTab>(std::string(name));
+        m_tabs.push_back(tab);
+
+        return tab;
+    }
 
 }

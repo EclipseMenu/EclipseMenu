@@ -1,8 +1,8 @@
-#ifdef GEODE_IS_WINDOWS
 #include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
 
+#ifdef GEODE_IS_WINDOWS
 constexpr float MIN_FPS = 1.f;
 constexpr float MAX_FPS = 100000.f;
 
