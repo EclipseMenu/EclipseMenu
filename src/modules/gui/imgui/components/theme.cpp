@@ -13,8 +13,10 @@ namespace eclipse::gui::imgui {
     };
 
     void Theme::visit(const std::shared_ptr<Component>& component) const {
+
 #define CASE(x) case ComponentType::x: \
     this->visit##x(std::static_pointer_cast<x##Component>(component)); break;
+
         ImGui::PushID(component->getId().c_str());
         switch (component->getType()) {
             default: break;

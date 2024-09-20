@@ -7,6 +7,7 @@
 #include "components/megahack/megahack.hpp"
 #include "layouts/tabbed.hpp"
 #include "layouts/panel.hpp"
+#include "modules/gui/gui.hpp"
 
 namespace eclipse::gui::imgui {
 
@@ -103,6 +104,7 @@ namespace eclipse::gui::imgui {
                 if (!s_initialized) return;
                 ImGuiCocos::get().setInputMode(ImGuiCocos::InputMode::Default);
                 draw();
+                drawFinished();
             });
 
         s_initialized = true;
@@ -187,5 +189,16 @@ namespace eclipse::gui::imgui {
     void ImGuiRenderer::endWindow() const {
         if (!m_theme) return;
         m_theme->endWindow();
+    }
+
+    void ImGuiRenderer::queueAfterDrawing(const std::function<void()>& func) {
+        m_runAfterDrawingQueue.push_back(func);
+    }
+
+    void ImGuiRenderer::drawFinished() {
+        for (const auto& f : m_runAfterDrawingQueue) {
+            f();
+        }
+        m_runAfterDrawingQueue.clear();
     }
 }

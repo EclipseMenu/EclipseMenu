@@ -760,6 +760,8 @@ namespace eclipse::gui {
 
         /// @brief Check if the UI is visible.
         [[nodiscard]] virtual bool isToggled() const = 0;
+
+        virtual void queueAfterDrawing(const std::function<void()>& func) = 0;
     };
 
     using Tabs = std::vector<std::shared_ptr<MenuTab>>;
