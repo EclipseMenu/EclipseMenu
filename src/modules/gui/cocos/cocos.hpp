@@ -19,6 +19,7 @@ namespace eclipse::gui::cocos {
 
         [[nodiscard]] Popup* getPopup() const { return m_popup; }
         bool isPartOfPopup(cocos2d::CCNode* node) const;
+        void queueAfterDrawing(const std::function<void()>& func) override;
 
     private:
         Popup* m_popup = nullptr;

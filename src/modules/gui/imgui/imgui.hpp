@@ -54,6 +54,7 @@ namespace eclipse::gui::imgui {
         void toggle() override;
         [[nodiscard]] bool isToggled() const override;
         void shutdown() override;
+        void queueAfterDrawing(const std::function<void()>& func) override;
 
     public:
         void draw();
@@ -67,6 +68,8 @@ namespace eclipse::gui::imgui {
         FontManager& getFontManager() { return m_fontManager; }
 
     private:
+        void drawFinished();
+
         static bool s_initialized;
         bool m_isOpened = false;
 
@@ -77,6 +80,7 @@ namespace eclipse::gui::imgui {
 
         bool m_insideDraw = false;
         LayoutMode m_queuedMode = LayoutMode::Tabbed;
+        std::vector<std::function<void()>> m_runAfterDrawingQueue;
     };
 
 }

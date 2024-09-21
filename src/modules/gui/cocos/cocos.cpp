@@ -35,4 +35,9 @@ namespace eclipse::gui::cocos {
         return m_popup->isAncestorOf(node);
     }
 
+    //since cocos is retained mode, extra work might not be needed
+    //might need to change in the future IDK
+    void CocosRenderer::queueAfterDrawing(const std::function<void()>& func) {
+        func();
+    }
 }

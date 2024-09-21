@@ -273,22 +273,23 @@ namespace eclipse::hacks::Labels {
                 });
 
             tab->addButton("Add new")->callback([this]{
-                labels::LabelSettings newSetting;
-                if (!s_labels.empty()) {
-                    // Copy some settings from existing labels
-                    auto& last = s_labels.back();
-                    newSetting.color = last.color;
-                    newSetting.font = last.font;
-                    newSetting.scale = last.scale;
-                    newSetting.alignment = last.alignment;
-                }
-                newSetting.name = fmt::format("New label {}", newSetting.id);
-                s_labels.push_back(newSetting);
-                config::set("labels", s_labels);
-                updateLabels(true);
-                createLabelComponent();
+                gui::Engine::get()->getRenderer()->queueAfterDrawing([&](){
+                    labels::LabelSettings newSetting;
+                    if (!s_labels.empty()) {
+                        // Copy some settings from existing labels
+                        auto& last = s_labels.back();
+                        newSetting.color = last.color;
+                        newSetting.font = last.font;
+                        newSetting.scale = last.scale;
+                        newSetting.alignment = last.alignment;
+                    }
+                    newSetting.name = fmt::format("New label {}", newSetting.id);
+                    s_labels.push_back(newSetting);
+                    config::set("labels", s_labels);
+                    updateLabels(true);
+                    createLabelComponent();
+                });
             });
-
             createLabelComponent();
         }
 
@@ -349,16 +350,18 @@ namespace eclipse::hacks::Labels {
             for (auto& setting : s_labels) {
                 auto toggle = tab->addLabelSetting(&setting);
                 toggle->deleteCallback([this, &setting] {
-                    auto it = std::find_if(s_labels.begin(), s_labels.end(), [&setting](const labels::LabelSettings& s) {
-                        return s.id == setting.id;
+                    gui::Engine::get()->getRenderer()->queueAfterDrawing([&](){
+                        auto it = std::find_if(s_labels.begin(), s_labels.end(), [&setting](const labels::LabelSettings& s) {
+                            return s.id == setting.id;
+                        });
+
+                        if (it == s_labels.end()) return;
+
+                        s_labels.erase(it);
+                        config::set("labels", s_labels);
+                        updateLabels(true);
+                        createLabelComponent();
                     });
-
-                    if (it == s_labels.end()) return;
-
-                    s_labels.erase(it);
-                    config::set("labels", s_labels);
-                    updateLabels(true);
-                    createLabelComponent();
                 })
                 ->editCallback([]{
                     config::set("labels", s_labels);
