@@ -406,36 +406,39 @@ namespace eclipse::keybinds {
                 keybind.setInitialized(state);
                 config::set(fmt::format("keybind.{}.active", id), state);
 
-                auto tab = gui::MenuTab::find("Keybinds");
-                if (state) {
-                    // Add the keybind to the GUI
-                    auto keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", id), true);
-                    keybindComponent->callback([tab, keybindComponent, id](Keys key) {
-                        auto keybind = Manager::get()->getKeybind(id);
+                gui::Engine::queueAfterDrawing([id, state, keybind] {
+                    auto tab = gui::MenuTab::find("Keybinds");
+                    if (state) {
+                        // Add the keybind to the GUI
+                        auto keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", id), true);
+                        keybindComponent->callback([tab, keybindComponent, id](Keys key) {
+                            auto keybind = Manager::get()->getKeybind(id);
 
-                        if (!keybind.has_value()) return;
+                            if (!keybind.has_value()) return;
 
-                        auto& keybindRef = keybind->get();
+                            auto& keybindRef = keybind->get();
 
-                        if (key == Keys::None) {
-                            config::set(fmt::format("keybind.{}.active", id), false);
-                            keybindRef.setInitialized(false);
+                            if (key == Keys::None) {
+                                config::set(fmt::format("keybind.{}.active", id), false);
+                                keybindRef.setInitialized(false);
+                                tab->removeComponent(keybindComponent);
+                            }
+
+                            keybindRef.setKey(key);
+                        });
+
+                        s_keybindComponents[std::string(id)] = keybindComponent;
+                    } else {
+                        // Reset the keybind to None
+                        config::set(fmt::format("keybind.{}.key", id), Keys::None);
+
+                        // Remove the keybind from the GUI
+                        if (auto keybindComponent = s_keybindComponents[std::string(id)]; keybindComponent) {
                             tab->removeComponent(keybindComponent);
                         }
-
-                        keybindRef.setKey(key);
-                    });
-
-                    s_keybindComponents[std::string(id)] = keybindComponent;
-                } else {
-                    // Reset the keybind to None
-                    config::set(fmt::format("keybind.{}.key", id), Keys::None);
-
-                    // Remove the keybind from the GUI
-                    if (auto keybindComponent = s_keybindComponents[std::string(id)]; keybindComponent) {
-                        tab->removeComponent(keybindComponent);
                     }
-                }
+                });
+
 
                 return;
             }

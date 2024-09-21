@@ -251,10 +251,10 @@ namespace eclipse::hacks::Labels {
                 {"Noclip Deaths", "Deaths: {noclipDeaths}", false},
             });
 
-            tab->addToggle("Show labels", "labels.visible")
+            tab->addToggle("Show Labels", "labels.visible")
                 ->setDescription("Toggles the visibility of the labels.")
                 ->handleKeybinds();
-            tab->addToggle("Cheat indicator", "labels.cheat-indicator.visible")
+            tab->addToggle("Cheat Indicator", "labels.cheat-indicator.visible")
                 ->callback([](bool) { updateLabels(); })
                 ->setDescription("Shows a red indicator if you have any cheats enabled.")
                 ->handleKeybinds()
@@ -272,8 +272,8 @@ namespace eclipse::hacks::Labels {
                          ->setDescription("The alignment of the cheat indicator.");
                 });
 
-            tab->addButton("Add new")->callback([this]{
-                gui::Engine::get()->getRenderer()->queueAfterDrawing([&](){
+            tab->addButton("Add New")->callback([this]{
+                gui::Engine::queueAfterDrawing([&](){
                     labels::LabelSettings newSetting;
                     if (!s_labels.empty()) {
                         // Copy some settings from existing labels
@@ -350,8 +350,8 @@ namespace eclipse::hacks::Labels {
             for (auto& setting : s_labels) {
                 auto toggle = tab->addLabelSetting(&setting);
                 toggle->deleteCallback([this, &setting] {
-                    gui::Engine::get()->getRenderer()->queueAfterDrawing([&](){
-                        auto it = std::find_if(s_labels.begin(), s_labels.end(), [&setting](const labels::LabelSettings& s) {
+                    gui::Engine::queueAfterDrawing([&](){
+                        auto it = std::ranges::find_if(s_labels, [&setting](const labels::LabelSettings& s) {
                             return s.id == setting.id;
                         });
 

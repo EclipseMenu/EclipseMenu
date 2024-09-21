@@ -589,12 +589,13 @@ namespace eclipse::gui {
         explicit LabelSettingsComponent(labels::LabelSettings* settings)
             : m_settings(settings) {
             m_type = ComponentType::LabelSettings;
+            m_id = fmt::format("label-{}", m_settings->id);
         }
 
         void onInit() override {}
         void onUpdate() override {}
 
-        [[nodiscard]] const std::string& getId() const override { return m_settings->text; }
+        [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_settings->text; }
 
         labels::LabelSettings* getSettings() const { return m_settings; }
@@ -618,6 +619,7 @@ namespace eclipse::gui {
         }
 
     private:
+        std::string m_id;
         labels::LabelSettings* m_settings;
         std::function<void()> m_deleteCallback;
         std::function<void()> m_editCallback;
@@ -761,6 +763,7 @@ namespace eclipse::gui {
         /// @brief Check if the UI is visible.
         [[nodiscard]] virtual bool isToggled() const = 0;
 
+        /// @brief [Implementation specific] Calls the function after the main render loop
         virtual void queueAfterDrawing(const std::function<void()>& func) = 0;
     };
 
@@ -789,6 +792,11 @@ namespace eclipse::gui {
         /// @brief Find a tab by name.
         std::shared_ptr<MenuTab> findTab(std::string_view name);
 
+        /// @brief Calls the function after the main render loop
+        static void queueAfterDrawing(const std::function<void()>& func) {
+            if (auto renderer = get()->m_renderer)
+                renderer->queueAfterDrawing(func);
+            else func(); // fallback
         [[nodiscard]] const Tabs& getTabs() const { return m_tabs; }
         [[nodiscard]] bool isInitialized() const { return m_initialized; }
 
