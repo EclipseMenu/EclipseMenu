@@ -10,16 +10,16 @@ namespace eclipse::hacks::Level {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
 
-            tab->addToggle("Automatic Song Download", "level.autosongdownload")->handleKeybinds();
+            tab->addToggle("Auto Song Download", "level.autosongdownload")->handleKeybinds();
         }
 
-        [[nodiscard]] const char* getId() const override { return "Automatic Song Download"; }
+        [[nodiscard]] const char* getId() const override { return "Auto Song Download"; }
     };
 
     REGISTER_HACK(AutoSongDownload)
 
     class $modify(AutoSongDownloadLILHook, LevelInfoLayer) {
-        void levelDownloadFinished(GJGameLevel* level) {
+        void levelDownloadFinished(GJGameLevel* level) override {
             LevelInfoLayer::levelDownloadFinished(level);
 
             if (m_songWidget->m_downloadBtn->isVisible() && config::get<bool>("level.autosongdownload", false))

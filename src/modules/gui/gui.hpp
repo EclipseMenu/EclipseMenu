@@ -797,6 +797,8 @@ namespace eclipse::gui {
             if (auto renderer = get()->m_renderer)
                 renderer->queueAfterDrawing(func);
             else func(); // fallback
+        }
+
         [[nodiscard]] const Tabs& getTabs() const { return m_tabs; }
         [[nodiscard]] bool isInitialized() const { return m_initialized; }
 

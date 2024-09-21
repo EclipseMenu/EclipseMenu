@@ -16,7 +16,7 @@ namespace eclipse::hacks::Level {
     inline bool robtopHitboxCheck() {
         if (auto* pl = PlayLayer::get())
             return pl->m_isPracticeMode && GameManager::get()->getGameVariable("0166");
-        else if (auto* ed = LevelEditorLayer::get())
+        if (LevelEditorLayer::get())
             return GameManager::get()->getGameVariable("0045");
         return false;
     }

@@ -10,7 +10,7 @@ namespace eclipse::labels {
         "Bottom Left", "Bottom Center", "Bottom Right"
     };
 
-    const std::array<const char*, 62> fontFiles = {
+    constexpr std::array fontFiles = {
         "bigFont.fnt", "chatFont.fnt", "goldFont.fnt", "gjFont01.fnt",
         "gjFont02.fnt", "gjFont03.fnt", "gjFont04.fnt", "gjFont05.fnt",
         "gjFont06.fnt", "gjFont07.fnt", "gjFont08.fnt", "gjFont09.fnt",
@@ -29,7 +29,7 @@ namespace eclipse::labels {
         "gjFont58.fnt", "gjFont59.fnt",
     };
 
-    const std::array<const char*, 62> fontNames = {
+    constexpr std::array fontNames = {
         "Pusab", "Aller", "Gold Pusab", "FONT01",
         "FONT02", "FONT03", "FONT04", "FONT05",
         "FONT06", "FONT07", "FONT08", "FONT09",
@@ -49,7 +49,7 @@ namespace eclipse::labels {
     };
 
     inline int32_t getFontIndex(const std::string& font) {
-        auto it = std::find(fontFiles.begin(), fontFiles.end(), font);
+        auto it = std::ranges::find(fontFiles, font);
         size_t index = it == fontFiles.end() ? 0 : std::distance(fontFiles.begin(), it);
         return static_cast<int32_t>(index);
     }

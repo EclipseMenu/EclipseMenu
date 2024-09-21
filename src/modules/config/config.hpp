@@ -4,6 +4,8 @@
 #include <fmt/format.h>
 #include <string>
 #include <vector>
+#include <optional>
+#include <functional>
 
 namespace eclipse::config {
 
@@ -12,6 +14,9 @@ namespace eclipse::config {
 
     /// @brief Get the container for temporary storage.
     nlohmann::json& getTempStorage();
+
+    /// @brief Used internally to trigger callbacks for a value change
+    void executeCallbacks(std::string_view name);
 
     /// @brief Load the configuration file.
     void load();
@@ -74,6 +79,7 @@ namespace eclipse::config {
     template<typename T>
     void set(std::string_view key, const T& value) {
         getStorage()[key] = value;
+        executeCallbacks(key);
     }
 
     /// @brief Check if the value is of the specified type.
@@ -102,6 +108,11 @@ namespace eclipse::config {
         if (!has(key))
             set(key, value);
     }
+
+    /// @brief Registers a delegate which is called when a specific value in config is changed
+    /// @param key Key of the value which should have a delegate
+    /// @param callback Callback to call when value is changed
+    void addDelegate(std::string_view key, std::function<void()> callback);
 
     /// @brief Check if a key exists in the temporary storage.
     /// @param key Key to check.

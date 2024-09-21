@@ -28,7 +28,7 @@ namespace eclipse::hack {
     public:
         virtual ~Hack() = default;
 
-        /// @brief Adds the hack to thred of hacks.
+        /// @brief Registers a hack to be initialized
         static void registerHack(std::shared_ptr<Hack> hack);
 
         /// @brief Registers a hack by its type.

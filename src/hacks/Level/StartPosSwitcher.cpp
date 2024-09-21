@@ -238,7 +238,7 @@ namespace eclipse::hacks::Level {
 
             currentStartPosIndex = -1;
             if (m_startPosObject) {
-                auto it = std::find(startPosObjects.begin(), startPosObjects.end(), m_startPosObject);
+                auto it = std::ranges::find(startPosObjects, m_startPosObject);
                 if (it != startPosObjects.end())
                     currentStartPosIndex = static_cast<int32_t>(std::distance(startPosObjects.begin(), it));
             }
