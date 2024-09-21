@@ -7,12 +7,19 @@
 #include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
 #include <modules/gui/blur/blur.hpp>
-#include <imgui-cocos.hpp>
+#include <modules/gui/float-button.hpp>
 #include <modules/gui/theming/manager.hpp>
+#include <imgui-cocos.hpp>
 
 using namespace eclipse;
 
 static bool s_isInitialized = false;
+
+static void toggleMenu() {
+    gui::Engine::get()->toggle();
+    config::save();
+    gui::ThemeManager::get()->saveTheme();
+}
 
 class $modify(EclipseButtonMLHook, MenuLayer) {
     bool init() override {
@@ -36,12 +43,13 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         // Initialize the GUI engine.
         gui::Engine::get()->init();
 
+        #ifdef GEODE_IS_MOBILE
+        // This will create the floating button and keep it across scenes
+        gui::FloatingButton::get()->setCallback(toggleMenu);
+        #endif
+
         // Register the keybind
-        auto& key = keybinds::Manager::get()->registerKeybind("menu.toggle", "Toggle UI", []() {
-            gui::Engine::get()->toggle();
-            config::save();
-            gui::ThemeManager::get()->saveTheme();
-        });
+        auto& key = keybinds::Manager::get()->registerKeybind("menu.toggle", "Toggle UI", toggleMenu);
         config::setIfEmpty("menu.toggleKey", keybinds::Keys::Tab);
         key.setKey(config::get<keybinds::Keys>("menu.toggleKey"));
         key.setInitialized(true);
