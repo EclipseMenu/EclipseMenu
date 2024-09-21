@@ -40,9 +40,7 @@ namespace eclipse::hacks::Player {
             float m_tintOpacity = 0.f;
         };
 
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("PlayLayer::destroyPlayer");
-        }
+        ENABLE_SAFE_HOOKS_ALL()
 
         void destroyPlayer(PlayerObject* player, GameObject* object) override {
             if (object == m_anticheatSpike)

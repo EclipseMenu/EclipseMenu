@@ -21,14 +21,8 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(NoRespawnFlash)
 
     class $modify(NoRespawnFlashPOHook, PlayerObject) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("PlayerObject::playSpawnEffect");
-        }
-
-        void playSpawnEffect() {
-            if (!config::get<bool>("player.norespawnflash", false))
-                return PlayerObject::playSpawnEffect();
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("player.norespawnflash")
+        void playSpawnEffect() {}
     };
 
 }

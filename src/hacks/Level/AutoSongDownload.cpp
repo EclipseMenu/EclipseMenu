@@ -19,10 +19,12 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(AutoSongDownload)
 
     class $modify(AutoSongDownloadLILHook, LevelInfoLayer) {
+        ADD_HOOKS_DELEGATE("level.autosongdownload")
+
         void levelDownloadFinished(GJGameLevel* level) override {
             LevelInfoLayer::levelDownloadFinished(level);
 
-            if (m_songWidget->m_downloadBtn->isVisible() && config::get<bool>("level.autosongdownload", false))
+            if (m_songWidget->m_downloadBtn->isVisible())
                 m_songWidget->m_downloadBtn->activate();
         }
     };

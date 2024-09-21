@@ -31,15 +31,16 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(AccuratePercentage)
 
     class $modify(AccuratePercentagePLHook, PlayLayer) {
+        ADD_HOOKS_DELEGATE("level.accuratepercentage")
+
         float customGetProgress() {
             if (config::get<bool>("level.accuratepercent.bugfix", true))
                 return utils::getActualProgress(this);
-            return PlayLayer::getCurrentPercent();
+            return this->getCurrentPercent();
         }
 
         void updateProgressbar() {
             PlayLayer::updateProgressbar();
-            if (!config::get<bool>("level.accuratepercentage", false)) return;
             if (m_percentageLabel == nullptr) return;
 
             if (m_level->isPlatformer()) {

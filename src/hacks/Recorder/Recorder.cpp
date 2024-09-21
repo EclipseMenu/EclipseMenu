@@ -178,9 +178,7 @@ namespace eclipse::hacks::Recorder {
     };
 
     class $modify(InternalRecorderSchedulerHook, cocos2d::CCScheduler) {
-        static void onModify(auto& self) {
-            FIRST_PRIORITY("cocos2d::CCScheduler::update");
-        }
+        ENABLE_SAFE_HOOKS_ALL()
 
         void update(float dt) {
             if (s_recorder.isRecording()) {
@@ -194,7 +192,7 @@ namespace eclipse::hacks::Recorder {
                 dt = 1.f / framerate;
             }
 
-            cocos2d::CCScheduler::update(dt);
+            CCScheduler::update(dt);
         }
     };
 

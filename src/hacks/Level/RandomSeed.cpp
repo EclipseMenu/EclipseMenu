@@ -28,10 +28,9 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(RandomSeed)
 
     class $modify(GameToolbox) {
-        float fast_rand_0_1() {
-            if (!config::get<bool>("level.randomseed", false))
-                return GameToolbox::fast_rand_0_1();
+        ALL_DELEGATES_AND_SAFE_PRIO("level.randomseed")
 
+        float fast_rand_0_1() {
             int newSeed = (214'013 * config::get<int>("level.randomseed.seed", false)) + 2'531'011;
 
             return ((newSeed >> 16) & 0x7FFF) / 32767.f;

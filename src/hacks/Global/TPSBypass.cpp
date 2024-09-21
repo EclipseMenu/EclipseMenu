@@ -25,10 +25,9 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(TPSBypass)
 
     class $modify(TPSBypassGJBGLHook, GJBaseGameLayer) {
-        float getModifiedDelta(float dt) {
-            if (!config::get<bool>("global.tpsbypass.toggle", false))
-                return GJBaseGameLayer::getModifiedDelta(dt);
+        ALL_DELEGATES_AND_SAFE_PRIO("global.tpsbypass.toggle")
 
+        float getModifiedDelta(float dt) {
             auto tps = config::get<float>("global.tpsbypass", 240.f);
             auto spt = 1.f / tps;
 

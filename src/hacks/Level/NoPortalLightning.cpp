@@ -20,14 +20,9 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(NoPortalLightning)
 
     class $modify(NoPortalLightningGJBGLHook, GJBaseGameLayer) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("GJBaseGameLayer::lightningFlash");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("level.noportallightning")
 
         void lightningFlash(cocos2d::CCPoint from, cocos2d::CCPoint to, cocos2d::ccColor3B color, float lineWidth, float duration, int displacement, bool flash, float opacity) {
-            if (!config::get<bool>("level.noportallightning", false))
-                return GJBaseGameLayer::lightningFlash(from, to, color, lineWidth, duration, displacement, flash, opacity);
-
             auto* gm = GameManager::get();
             auto perfMode = gm->m_performanceMode;
             gm->m_performanceMode = true;

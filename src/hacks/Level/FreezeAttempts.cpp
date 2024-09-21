@@ -23,6 +23,12 @@ namespace eclipse::hacks::Level {
             std::uint32_t totalAttempts;
         };
 
+        static void onModify(auto& self) {
+            HOOKS_TOGGLE("level.freeze_attempts", PlayLayer,
+                "updateAttempts", "resetLevel", "onQuit"
+            );
+        }
+
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
             auto* GSM = GameStatsManager::sharedState();
 
@@ -31,24 +37,15 @@ namespace eclipse::hacks::Level {
             return PlayLayer::init(level, useReplay, dontCreateObjects);
         }
 
-        void updateAttempts() {
-            if (config::get<bool>("level.freeze_attempts", false))
-                return;
-
-            PlayLayer::updateAttempts();
-        }
+        void updateAttempts() {}
 
         void resetLevel() {
-            if (config::get<bool>("level.freeze_attempts", false))
-                this->m_level->m_attempts = this->m_level->m_attempts - 1;
-
+            this->m_level->m_attempts = this->m_level->m_attempts - 1;
             PlayLayer::resetLevel();
         }
 
         void onQuit() {
-            if (config::get<bool>("level.freeze_attempts", false))
-                GameStatsManager::sharedState()->setStat("2", m_fields->totalAttempts);
-
+            GameStatsManager::sharedState()->setStat("2", m_fields->totalAttempts);
             PlayLayer::onQuit();
         }
     };

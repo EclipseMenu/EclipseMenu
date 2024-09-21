@@ -22,15 +22,16 @@ namespace eclipse::hacks::Bypass {
     REGISTER_HACK(CharFilter)
 
     class $modify(CharacterFilterCCTINHook, CCTextInputNode) {
+        ADD_HOOKS_DELEGATE("bypass.charfilter")
+
         void updateLabel(gd::string str) {
-            if (config::get<bool>("bypass.charfilter", false))
-                setAllowedChars(
-                    "abcdefghijklmnopqrstuvwxyz"
-                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                    "0123456789!@#$%^&*()-=_+"
-                    "`~[]{}/?.>,<\\|;:'\""
-                    " "
-                );
+            this->setAllowedChars(
+                "abcdefghijklmnopqrstuvwxyz"
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                "0123456789!@#$%^&*()-=_+"
+                "`~[]{}/?.>,<\\|;:'\""
+                " "
+            );
  
             CCTextInputNode::updateLabel(std::move(str));
         }

@@ -21,14 +21,9 @@ namespace eclipse::hacks::Bypass {
     REGISTER_HACK(CheckpointLimit)
 
     class $modify(CheckpointLimitPLHook, PlayLayer) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("PlayLayer::storeCheckpoint");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("bypass.checkpointlimit")
 
         void storeCheckpoint(CheckpointObject* checkpointObject) {
-            if (!config::get<bool>("bypass.checkpointlimit", false))
-                return PlayLayer::storeCheckpoint(checkpointObject);
-
             // Reimplemented without the checkpoint limit
             m_checkpointArray->addObject(checkpointObject);
             PlayLayer::addToSection(checkpointObject->m_physicalCheckpointObject);

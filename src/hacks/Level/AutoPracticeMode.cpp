@@ -21,12 +21,13 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(AutoPracticeMode)
 
     class $modify(AutoPracticeModePLHook, PlayLayer) {
+        ADD_HOOKS_DELEGATE("level.autopracticemode")
+
         bool init(GJGameLevel* p0, bool p1, bool p2) {
-            if (!PlayLayer::init(p0, p1, p2)) return false;
+            if (!PlayLayer::init(p0, p1, p2))
+                return false;
 
-            if (config::get<bool>("level.autopracticemode", false))
-                PlayLayer::togglePracticeMode(true);
-
+            this->togglePracticeMode(true);
             return true;
         }
     };

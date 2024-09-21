@@ -31,17 +31,17 @@ namespace eclipse::hacks::Player {
             bool clicking = false;
         };
 
+        ADD_HOOKS_DELEGATE("player.autoclick")
+
         void processCommands(float dt) {
             GJBaseGameLayer::processCommands(dt);
 
-            if (config::get<bool>("player.autoclick", false)) {
-                auto clickInterval = config::get<float>("player.autoclick.interval", 0.f);
-                m_fields->timer += dt;
-                if (m_fields->timer > clickInterval) { // FIXME: doesn't click
-                    m_fields->clicking = !m_fields->clicking;
-                    GJBaseGameLayer::handleButton(m_fields->clicking, 1, true);
-                    m_fields->timer = 0.f;
-                }
+            auto clickInterval = config::get<float>("player.autoclick.interval", 0.f);
+            m_fields->timer += dt;
+            if (m_fields->timer > clickInterval) {
+                m_fields->clicking = !m_fields->clicking;
+                this->handleButton(m_fields->clicking, 1, true);
+                m_fields->timer = 0.f;
             }
         }
     };

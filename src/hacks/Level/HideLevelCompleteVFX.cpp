@@ -23,10 +23,10 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(HideLevelCompleteVFX)
 
     class $modify(HideLevelCompleteVFXCCCWHook, CCCircleWave) {
+        ADD_HOOKS_DELEGATE("level.hidelevelcomplete")
+
         void setPosition(cocos2d::CCPoint const& p0) {
             CCCircleWave::setPosition(p0);
-
-            if (!config::get<bool>("level.hidelevelcomplete", false)) return;
 
             PlayLayer* pl = PlayLayer::get();
 
@@ -46,14 +46,14 @@ namespace eclipse::hacks::Level {
     };
 
     class $modify(HideLevelCompleteVFXCCLFHook, CCLightFlash) {
+        ADD_HOOKS_DELEGATE("level.hidelevelcomplete")
+
         // i cant believe i need to hook this function with TWENTY params to get things working what the heck :despair:
         void playEffect(cocos2d::CCPoint point, cocos2d::ccColor3B color, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, float p10, float p11, float p12, float p13, float p14, float p15, int p16, bool p17, bool p18, float p19) {
             CCLightFlash::playEffect(
                 point, color, p2, p3, p4, p5, p6, p7, p8, p9, p10,
                 p11, p12, p13, p14, p15, p16, p17, p18, p19
             );
-
-            if (!config::get<bool>("level.hidelevelcomplete", false)) return;
 
             PlayLayer* pl = PlayLayer::get();
 
@@ -85,10 +85,10 @@ namespace eclipse::hacks::Level {
     // backup plan in case something goes terribly wrong with setupVBO() again --raydeeux
     // nvm activate the backup plan NOW bc stuff won't hook
     class $modify(HideLevelCompleteVFXCCPSHook, cocos2d::CCParticleSystem) {
+        ADD_HOOKS_DELEGATE("level.hidelevelcomplete")
+
         void initParticle(cocos2d::sCCParticle* p0) {
             CCParticleSystem::initParticle(p0);
-
-            if (!config::get<bool>("level.hidelevelcomplete", false)) return;
 
             PlayLayer* pl = PlayLayer::get();
 

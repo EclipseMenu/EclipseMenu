@@ -34,6 +34,8 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(AutoKill)
 
     class $modify(AutoKillBGLHook, GJBaseGameLayer) {
+        ADD_HOOKS_DELEGATE("player.autokill")
+
         void killPlayer() {
             auto* playLayer = PlayLayer::get();
             if (!playLayer) return;
@@ -47,9 +49,6 @@ namespace eclipse::hacks::Player {
 
         void update(float p0) override {
             GJBaseGameLayer::update(p0);
-
-            if (!config::get<bool>("player.autokill", false))
-                return;
 
             auto* playLayer = PlayLayer::get();
             if (!playLayer) return;
