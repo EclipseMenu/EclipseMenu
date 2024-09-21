@@ -1,12 +1,12 @@
 {
-	"geode": "3.4.0",
+	"geode": "3.5.0",
 	"gd": {
 		"win": "2.206",
 		"mac": "2.206",
 		"android": "2.206",
 		"ios": "2.206"
 	},
-	"version": "v1.0.0",
+	"version": "v1.0.0-alpha.1",
 	"id": "eclipse.eclipse-menu",
 	"name": "Eclipse",
 	"links": {
@@ -36,9 +36,9 @@
 	"resources": {
 		"files": [
 			"resources/Blur/*.glsl",
-			"resources/Rubik-Regular.ttf",
-			"resources/Themes/*.json",
-			"resources/Themes/*.zip"
+			"resources/Fonts/*.ttf",
+			"resources/Licenses/*.txt",
+			"resources/Themes/*.json"
 		],
 		"sprites": [
 			"resources/ECLIPSE-android.png"

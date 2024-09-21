@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory>
-
+#include <Geode/platform/platform.hpp>
 #include <utils.hpp>
+#include <memory>
 
 #define REGISTER_HACK(hackClass) $execute { eclipse::hack::Hack::registerHack<hackClass>(); }
 
@@ -26,6 +26,8 @@ namespace eclipse::hack {
     /// @brief Base class for all hacks.
     class Hack {
     public:
+        virtual ~Hack() = default;
+
         /// @brief Adds the hack to thred of hacks.
         static void registerHack(std::shared_ptr<Hack> hack);
 

@@ -13,8 +13,8 @@ namespace eclipse::gui::imgui {
     /// Supports drag and drop, can be minimized, supports animations.
     class Window {
     public:
-        inline static const ImVec2 MIN_SIZE{220, 1}; // Minimum window size
-        inline static const ImVec2 MAX_SIZE{220, 1000}; // Maximum window size
+        static constexpr ImVec2 MIN_SIZE{220, 1}; // Minimum window size
+        static constexpr ImVec2 MAX_SIZE{220, 1000}; // Maximum window size
 
     public:
         /// @brief Create new instance of `Window` with default title and draw callback

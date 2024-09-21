@@ -1,6 +1,6 @@
 #include "rendertexture.hpp"
 
-#include <Geode/cocos/platform/CCGL.h>
+#include <Geode/binding/PlayLayer.hpp>
 
 namespace eclipse::recorder {
 
@@ -36,7 +36,7 @@ namespace eclipse::recorder {
 #endif
     }
 
-    void RenderTexture::end() {
+    void RenderTexture::end() const {
         m_texture->release();
     }
 

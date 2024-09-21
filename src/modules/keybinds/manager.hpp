@@ -89,7 +89,7 @@ namespace eclipse::keybinds {
         [[nodiscard]] Keys getKey() const { return m_key; }
 
         /// @brief Execute the keybind's callback.
-        void execute() { m_callback(); }
+        void execute() const { m_callback(); }
 
         /// @brief Get the ID of the keybind.
         [[nodiscard]] const std::string& getId() const { return m_id; }
@@ -142,12 +142,12 @@ namespace eclipse::keybinds {
         /// @brief Get a keybind by its ID.
         /// @param id The ID of the keybind.
         /// @return The keybind with the given ID.
-        [[nodiscard]] std::optional<std::reference_wrapper<Keybind>> getKeybind(const std::string& id);
+        [[nodiscard]] std::optional<std::reference_wrapper<Keybind>> getKeybind(std::string_view id);
 
         /// @brief Set whether a keybind is enabled or not.
         /// @param id The ID of the keybind.
         /// @param state The state of the keybind.
-        void setKeybindState(const std::string& id, bool state);
+        void setKeybindState(std::string_view id, bool state);
 
         /// @brief Register a key press.
         /// @note This function is called from the key callback hook.

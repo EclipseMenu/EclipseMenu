@@ -1,5 +1,7 @@
 #include "window.hpp"
 #include <modules/config/config.hpp>
+#include <modules/gui/imgui/imgui.hpp>
+#include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::imgui {
 
@@ -16,15 +18,13 @@ namespace eclipse::gui::imgui {
         if (!isOnScreen())
             return;
 
-        ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar;
-        // auto scale = config::getGlobal<float>("UIScale");
-        auto scale = 1.0f;
+        auto tm = ThemeManager::get();
+        auto scale = tm->getGlobalScale();
 
         // Calculate distance to the bottom to make window fit the screen
         auto screenSize = ImGui::GetIO().DisplaySize;
         auto maxSizeH = MAX_SIZE.y * scale;
-        // auto bottomMargin = config::get<float>("menu.windowSnap");
-        auto bottomMargin = 4.0f;
+        auto bottomMargin = tm->getWindowMargin();
         if (m_position.y + m_size.y > screenSize.y - bottomMargin - 1) // -1 to prevent flickering
             maxSizeH = screenSize.y - m_position.y - bottomMargin;
 
@@ -33,7 +33,8 @@ namespace eclipse::gui::imgui {
 
         ImGui::SetNextWindowCollapsed(!m_isOpen, ImGuiCond_Always);
 
-        if (ImGui::Begin(m_title.c_str(), nullptr, flags)) {
+
+        if (ImGuiRenderer::get()->beginWindow(m_title)) {
             m_drawCallback();
         }
 
@@ -51,7 +52,7 @@ namespace eclipse::gui::imgui {
 
         ImGui::SetWindowPos(m_drawPosition);
 
-        ImGui::End();
+        ImGuiRenderer::get()->endWindow();
     }
 
     bool Window::isOpen() const { return m_isOpen; }

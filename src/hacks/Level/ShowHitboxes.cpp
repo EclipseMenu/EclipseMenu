@@ -321,6 +321,11 @@ namespace eclipse::hacks::Level {
         }
 
         void determineSlopeDirection() {
+            /*
+             * This is a fix for the slope hitbox becoming flipped during mirror portal transition.
+             * I explained it in details for a Misc Bugfixes PR:
+             * https://github.com/Cvolton/miscbugfixes-geode/pull/10
+             */
             if (s_slopeHitboxFix) return;
             GameObject::determineSlopeDirection();
         }

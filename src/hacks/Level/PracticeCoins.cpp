@@ -43,7 +43,7 @@ namespace eclipse::hacks::Level {
                     continue;
 
                 // check if the player is colliding with the object
-                auto objectRect = obj->EffectGameObject::getObjectRect();
+                auto objectRect = effectSprite->getObjectRect();
                 if (!playerRect.intersectsRect(objectRect))
                     continue;
 

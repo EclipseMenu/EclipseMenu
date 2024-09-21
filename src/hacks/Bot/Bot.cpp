@@ -51,7 +51,7 @@ namespace eclipse::hacks::Bot {
             tab->addButton("Load")->callback(loadReplay);
         }
 
-        [[nodiscard]] bool isCheating() override { return false; }
+        [[nodiscard]] bool isCheating() override { return config::get<int>("bot.state") != 0; } // TODO: add a check for if theres a macro loaded
         [[nodiscard]] const char* getId() const override { return "Bot"; }
     };
 
