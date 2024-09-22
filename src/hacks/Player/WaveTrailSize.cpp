@@ -23,12 +23,11 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(WaveTrailSize)
 
     class $modify(WaveTrailSizeHSHook, HardStreak) {
-        void updateStroke(float dt) {
-            if (config::get<bool>("player.wavetrailsize.toggle", false)) {
-                float trailSize = config::get<float>("player.wavetrailsize", 0.f);
-                this->m_pulseSize = trailSize;
-            }
+        ADD_HOOKS_DELEGATE("player.wavetrailsize.toggle")
 
+        void updateStroke(float dt) {
+            float trailSize = config::get<float>("player.wavetrailsize", 0.f);
+            this->m_pulseSize = trailSize;
             HardStreak::updateStroke(dt);
         }
     };

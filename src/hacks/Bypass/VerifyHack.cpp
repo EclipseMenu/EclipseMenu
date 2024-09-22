@@ -21,10 +21,10 @@ namespace eclipse::hacks::Bypass {
     REGISTER_HACK(VerifyHack)
 
     class $modify(VerifyHackELLHook, EditLevelLayer) {
-        bool init(GJGameLevel* gl) {
-            if (config::get<bool>("bypass.verifyhack", false))
-                gl->m_isVerified = true;
+        ADD_HOOKS_DELEGATE("bypass.verifyhack")
 
+        bool init(GJGameLevel* gl) {
+            gl->m_isVerified = true;
             return EditLevelLayer::init(gl);
         }
     };

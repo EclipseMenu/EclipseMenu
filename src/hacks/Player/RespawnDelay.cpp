@@ -24,26 +24,22 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(RespawnDelay)
 
     class $modify(RespawnDelayPLHook, PlayLayer) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("PlayLayer::destroyPlayer");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("player.respawndelay.toggle")
 
         void destroyPlayer(PlayerObject* player, GameObject* object) override {
             PlayLayer::destroyPlayer(player, object);
 
-            if (config::get<bool>("player.respawndelay.toggle", false)) {
-                auto delay = config::get<float>("player.respawndelay", 1.f);
-                if (auto* respawnSequence = this->getActionByTag(0x10)) {
-                    // Recreate the sequence with the new delay
-                    this->stopAction(respawnSequence);
-                    auto* newSequence = cocos2d::CCSequence::create(
-                        cocos2d::CCDelayTime::create(delay),
-                        cocos2d::CCCallFunc::create(this, callfunc_selector(PlayLayer::delayedResetLevel)),
-                        nullptr
-                    );
-                    newSequence->setTag(0x10);
-                    this->runAction(newSequence);
-                }
+            auto delay = config::get<float>("player.respawndelay", 1.f);
+            if (auto* respawnSequence = this->getActionByTag(0x10)) {
+                // Recreate the sequence with the new delay
+                this->stopAction(respawnSequence);
+                auto* newSequence = cocos2d::CCSequence::create(
+                    cocos2d::CCDelayTime::create(delay),
+                    cocos2d::CCCallFunc::create(this, callfunc_selector(PlayLayer::delayedResetLevel)),
+                    nullptr
+                );
+                newSequence->setTag(0x10);
+                this->runAction(newSequence);
             }
         }
     };

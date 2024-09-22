@@ -42,14 +42,14 @@ namespace eclipse::hacks::Level {
     };
 
     class $modify(GameObject) {
+        ADD_HOOKS_DELEGATE("level.showtriggers")
+
         void customSetup() override {
             bool editorEnabled = this->m_editorEnabled;
-            if (config::get<bool>("level.showtriggers", false)) {
-                int id = this->m_objectID;
-                this->m_editorEnabled = std::any_of(triggerIds.begin(), triggerIds.end(), [id](int id2) {
-                    return id == id2;
-                });
-            }
+            int id = this->m_objectID;
+            this->m_editorEnabled = editorEnabled || std::ranges::any_of(triggerIds, [id](int id2) {
+                return id == id2;
+            });
 
             GameObject::customSetup();
             this->m_editorEnabled = editorEnabled;

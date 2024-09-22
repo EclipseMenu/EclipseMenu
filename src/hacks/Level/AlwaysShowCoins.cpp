@@ -61,12 +61,11 @@ namespace eclipse::hacks::Level {
     static bool skipUniqueCoin = false;
 
     class $modify(AlwaysShowCoinsGOHook, GameObject) {
+        ADD_HOOKS_DELEGATE("level.alwaysshowcoins")
+
         void playDestroyObjectAnim(GJBaseGameLayer* p0) {
-            if (config::get<bool>("level.alwaysshowcoins", false))
-                skipUniqueCoin = true;
-
+            skipUniqueCoin = true;
             GameObject::playDestroyObjectAnim(p0);
-
             skipUniqueCoin = false;
         }
     };

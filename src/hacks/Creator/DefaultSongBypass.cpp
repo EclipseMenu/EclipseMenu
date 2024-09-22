@@ -22,58 +22,36 @@ namespace eclipse::hacks::Creator {
     REGISTER_HACK(DefaultSongBypass)
 
     class $modify(DefaultSongBypassSSNHook, SongSelectNode) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("SongSelectNode::audioPrevious");
-            SAFE_PRIORITY("SongSelectNode::audioNext");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("creator.defaultsongbypass")
 
         void audioPrevious(cocos2d::CCObject* sender) {
-            if (!config::get<bool>("creator.defaultsongbypass", false))
-                return SongSelectNode::audioPrevious(sender);
-
             this->m_selectedSongID = std::max(0, this->m_selectedSongID - 1);
-            SongSelectNode::updateAudioLabel();
+            this->updateAudioLabel();
         }
 
         void audioNext(cocos2d::CCObject* sender) {
-            if (!config::get<bool>("creator.defaultsongbypass", false))
-                return SongSelectNode::audioNext(sender);
-
             this->m_selectedSongID = std::max(0, this->m_selectedSongID + 1);
-            SongSelectNode::updateAudioLabel();
+            this->updateAudioLabel();
         }
     };
 
     class $modify(DefaultSongBypassMSLHook, MoreSearchLayer) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("MoreSearchLayer::audioPrevious");
-            SAFE_PRIORITY("MoreSearchLayer::audioNext");
-            SAFE_PRIORITY("MoreSearchLayer::selectSong");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("creator.defaultsongbypass")
 
         void audioPrevious(cocos2d::CCObject* sender) {
-            if (!config::get<bool>("creator.defaultsongbypass", false))
-                return MoreSearchLayer::audioPrevious(sender);
-
             auto song = GameLevelManager::get()->getIntForKey("song_filter");
             MoreSearchLayer::selectSong(std::max(1, song - 1));
         }
 
         void audioNext(cocos2d::CCObject* sender) {
-            if (!config::get<bool>("creator.defaultsongbypass", false))
-                return MoreSearchLayer::audioNext(sender);
-
             auto song = GameLevelManager::get()->getIntForKey("song_filter");
             MoreSearchLayer::selectSong(std::max(1, song + 1));
         }
 
         void selectSong(int songID) {
-            if (!config::get<bool>("creator.defaultsongbypass", false))
-                return MoreSearchLayer::selectSong(songID);
-
             songID = std::max(1, songID);
             GameLevelManager::get()->setIntForKey(songID, "song_filter");
-            MoreSearchLayer::updateAudioLabel();
+            this->updateAudioLabel();
         }
     };
 

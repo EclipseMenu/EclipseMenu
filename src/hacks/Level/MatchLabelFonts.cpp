@@ -23,8 +23,9 @@ namespace eclipse::hacks::Level {
     static const std::string s_bigFontName = "bigFont.fnt";
 
     class $modify(MatchLabelFontsPLHook, PlayLayer) {
+        ADD_HOOKS_DELEGATE("level.matchlabelfonts")
 
-        bool shouldMatchLabelFonts() {
+        bool shouldMatchLabelFonts() const {
             return m_attemptLabel && m_percentageLabel &&
                 m_percentageLabel->getFntFile() == s_bigFontName &&
                 m_attemptLabel->getFntFile() != s_bigFontName;
@@ -33,14 +34,14 @@ namespace eclipse::hacks::Level {
         void updateProgressbar() {
             PlayLayer::updateProgressbar();
 
-            if (shouldMatchLabelFonts() && config::get<bool>("level.matchlabelfonts", false))
+            if (shouldMatchLabelFonts())
                 m_percentageLabel->setFntFile(m_attemptLabel->getFntFile());
         }
 
         void levelComplete() {
             PlayLayer::levelComplete();
 
-            if (shouldMatchLabelFonts() && config::get<bool>("level.matchlabelfonts", false))
+            if (shouldMatchLabelFonts())
                 m_percentageLabel->setFntFile(m_attemptLabel->getFntFile());
         }
     };

@@ -22,11 +22,10 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(NoShader)
 
     class $modify(NoShaderSLHook, ShaderLayer) {
-        void visit() override {
-            if (config::get<bool>("level.noshader", false))
-                return CCNode::visit();
+        ALL_DELEGATES_AND_SAFE_PRIO("level.noshader")
 
-            ShaderLayer::visit();
+        void visit() override {
+            CCNode::visit();
         }
     };
 }

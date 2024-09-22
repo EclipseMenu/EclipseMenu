@@ -21,12 +21,11 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(NoSpiderDash)
 
     class $modify(NoSpiderDashPOHook, PlayerObject) {
+        ADD_HOOKS_DELEGATE("player.nospiderdash")
+
         void playSpiderDashEffect(cocos2d::CCPoint from, cocos2d::CCPoint to) {
             bool playEffects = m_playEffects;
-
-            if (config::get<bool>("player.nospiderdash", false))
-                m_playEffects = false;
-
+            m_playEffects = false;
             PlayerObject::playSpiderDashEffect(from, to);
             m_playEffects = playEffects;
         }

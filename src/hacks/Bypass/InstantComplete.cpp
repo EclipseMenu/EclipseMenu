@@ -20,26 +20,24 @@ namespace eclipse::hacks::Bypass {
     REGISTER_HACK(InstantComplete)
 
     class $modify(InstantCompletePLHook, PlayLayer) {
+        ADD_HOOKS_DELEGATE("bypass.instantcomplete")
+
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
             if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
-            if (config::get<bool>("bypass.instantcomplete", false)) {
-                if (this->m_isPlatformer)
-                    this->playPlatformerEndAnimationToPos({ .0f, 105.f }, true);
-                else
-                    this->playEndAnimationToPos({ 2.f, 2.f });
-            }
+            if (this->m_isPlatformer)
+                this->playPlatformerEndAnimationToPos({ .0f, 105.f }, true);
+            else
+                this->playEndAnimationToPos({ 2.f, 2.f });
 
             return true;
         }
 
         void levelComplete() {
-            if (config::get<bool>("bypass.instantcomplete", false)) {
-                if (this->m_isPlatformer)
-                    this->m_timePlayed = 10.0;
-                else
-                    this->m_attemptTime = 10.0;
-            }
+            if (this->m_isPlatformer)
+                this->m_timePlayed = 10.0;
+            else
+                this->m_attemptTime = 10.0;
 
             PlayLayer::levelComplete();
         }

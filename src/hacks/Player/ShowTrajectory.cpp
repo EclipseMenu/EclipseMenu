@@ -59,7 +59,7 @@ namespace eclipse::hacks::Player {
                     }
                     else
                         CC_SAFE_DELETE(ret);
-                    
+
                     return ret;
                 }
             };

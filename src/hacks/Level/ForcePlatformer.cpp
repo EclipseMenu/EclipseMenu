@@ -19,9 +19,10 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(ForcePlatformer)
 
     class $modify(ForcePlatformerPLHook, PlayLayer) {
+        ADD_HOOKS_DELEGATE("level.forceplatformer")
+
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
             if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
-            if (!config::get<bool>("level.forceplatformer", false)) return true;
 
             if (m_player1) m_player1->togglePlatformerMode(true);
             if (m_player2) m_player2->togglePlatformerMode(true);

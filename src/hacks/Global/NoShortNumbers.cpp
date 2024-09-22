@@ -21,14 +21,9 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(NoShortNumbers)
 
     class $modify(NoShortNumbersGTHook, GameToolbox) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("GameToolbox::intToShortString");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("global.noshortnumbers")
 
         static gd::string intToShortString(int value) {
-            if (!config::get<bool>("global.noshortnumbers", false))
-                return GameToolbox::intToShortString(value);
-
             gd::string str = fmt::format("{}", value);
             return str;
         }

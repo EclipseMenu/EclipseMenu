@@ -22,10 +22,9 @@ namespace eclipse::hacks::Creator {
     REGISTER_HACK(SliderLimit)
 
     class $modify(SliderLimitSTLHook, SliderTouchLogic) {
-        void ccTouchMoved(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) override {
-            if (!config::get<bool>("creator.sliderlimit", false))
-                return SliderTouchLogic::ccTouchMoved(touch, event);
+        ALL_DELEGATES_AND_SAFE_PRIO("creator.sliderlimit")
 
+        void ccTouchMoved(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) override {
             // We reimplement the function with this one :fire:
             auto touchPos = this->convertTouchToNodeSpace(touch);
             auto position = touchPos - this->m_position;

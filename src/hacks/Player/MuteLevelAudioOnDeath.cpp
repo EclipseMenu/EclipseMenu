@@ -21,6 +21,8 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(MuteLevelAudioOnDeath)
 
     class $modify(MuteLevelAudioOnDeathPOHook, PlayerObject) {
+        ADD_HOOKS_DELEGATE("player.mutelevelaudioondeath")
+
         /*
         originally from erysedits by raydeeux.
         adapted by raydeeux, and improved using 2.206's bindings.
@@ -36,42 +38,40 @@ namespace eclipse::hacks::Player {
             if (this != pl->m_player1 && this != pl->m_player2)
                 return PlayerObject::playerDestroyed(p0);
 
-            if (config::get<bool>("player.mutelevelaudioondeath", false)) {
+            // do nothing if in practice mode BUT practice sync disabled
+            if (pl->m_isPracticeMode && !pl->m_practiceMusicSync)
+                return PlayerObject::playerDestroyed(p0);
 
-                // do nothing if in practice mode BUT practice sync disabled
-                if (pl->m_isPracticeMode && !pl->m_practiceMusicSync)
-                    return PlayerObject::playerDestroyed(p0);
+            const auto fmod = FMODAudioEngine::sharedEngine();
 
-                const auto fmod = FMODAudioEngine::sharedEngine();
+            /*
+            stopAllMusic(), while not inlined, does not represent
+            accurate behavior, and forces music to restart
+            in platformer levels.
+            gd handles restarting music in classic levels.
+            */
+            fmod->pauseAllMusic();
 
+            if (this == pl->m_player2 && pl->m_level->m_twoPlayerMode)
                 /*
-                stopAllMusic(), while not inlined, does not represent
-                accurate behavior, and forces music to restart
-                in platformer levels.
-                gd handles restarting music in classic levels.
+                avoid stopping sfx twice -- thank you clicksounds.
+                this is here in case adam729 ports death sound randomizer,
+                but more importantly because we want to hear player death sfx.
                 */
-                fmod->pauseAllMusic();
+                return PlayerObject::playerDestroyed(p0);
 
-                if (this == pl->m_player2 && pl->m_level->m_twoPlayerMode)
-                    /*
-                    avoid stopping sfx twice -- thank you clicksounds.
-                    this is here in case adam729 ports death sound randomizer,
-                    but more importantly because we want to hear player death sfx.
-                    */
-                    return PlayerObject::playerDestroyed(p0);
+            /*
+            originally the function call was stopAllEffects()
+            which should've sufficed for 90% of SFX,
+            but accuracy > getting the job done in case there's
+            SFX that lasts far, FAR longer.
+            */
+            /*
+            as of august 2nd, 2024, it is probably better
+            to call stopAllEffects to get the death SFX playing.
+            */
+            fmod->stopAllEffects();
 
-                /*
-                originally the function call was stopAllEffects()
-                which should've sufficed for 90% of SFX,
-                but accuracy > getting the job done in case there's
-                SFX that lasts far, FAR longer.
-                */
-                /*
-                as of august 2nd, 2024, it is probably better
-                to call stopAllEffects to get the death SFX playing.
-                */
-                fmod->stopAllEffects();
-            }
             PlayerObject::playerDestroyed(p0);
         }
     };

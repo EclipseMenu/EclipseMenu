@@ -181,7 +181,7 @@ namespace eclipse::hacks::Level {
             borderWidth = abs(borderWidth);
 
             customDraw(this, (gui::Color&) fillColor, borderWidth, (gui::Color&) borderColor);
-            return cocos2d::CCDrawNode::drawPolygon(vertex, count, fillColor, borderWidth, borderColor);
+            return CCDrawNode::drawPolygon(vertex, count, fillColor, borderWidth, borderColor);
         }
 
         bool drawCircle(const cocos2d::CCPoint& position, float radius, const cocos2d::ccColor4F& color,
@@ -189,7 +189,7 @@ namespace eclipse::hacks::Level {
             borderWidth = abs(borderWidth);
 
             customDraw(this, (gui::Color&) color, borderWidth, (gui::Color&) borderColor);
-            return cocos2d::CCDrawNode::drawCircle(position, radius, color, borderWidth, borderColor, segments);
+            return CCDrawNode::drawCircle(position, radius, color, borderWidth, borderColor, segments);
         }
     };
 
@@ -316,9 +316,7 @@ namespace eclipse::hacks::Level {
     };
 
     class $modify(ShowHitboxesGOHook, GameObject) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("GameObject::determineSlopeDirection");
-        }
+        ENABLE_SAFE_HOOKS_ALL()
 
         void determineSlopeDirection() {
             /*

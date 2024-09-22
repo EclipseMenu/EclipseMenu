@@ -68,12 +68,7 @@ namespace eclipse::hacks::Global {
             std::uint32_t totalAttempts;
         };
 
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("PlayLayer::init");
-            SAFE_PRIORITY("PlayLayer::destroyPlayer");
-            SAFE_PRIORITY("PlayLayer::resetLevel");
-            SAFE_PRIORITY("PlayLayer::levelComplete");
-        }
+        ENABLE_SAFE_HOOKS_ALL()
 
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
             auto* GSM = GameStatsManager::sharedState();
@@ -127,9 +122,7 @@ namespace eclipse::hacks::Global {
     };
 
     class $modify(SafeModePOHook, PlayerObject) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("PlayerObject::incrementJumps");
-        }
+        ENABLE_SAFE_HOOKS_ALL()
 
         void incrementJumps() {
             if (config::get<bool>("global.safemode") || AutoSafeMode::shouldEnable() && config::get<bool>("global.safemode.freeze_jumps")) return;

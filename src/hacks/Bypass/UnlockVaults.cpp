@@ -30,6 +30,8 @@ namespace eclipse::hacks::Bypass {
 
     // i hate this (still better than patches/midhooks)
     class $modify(UnlockVaultsGMHook, GameManager) {
+        ADD_HOOKS_DELEGATE("bypass.unlockvaults")
+
         bool getUGV(const char* key) {
             bool result = GameManager::getUGV(key);
             if (s_bypassUGVSkip) {
@@ -52,6 +54,8 @@ namespace eclipse::hacks::Bypass {
     static int s_bypassGameStatValue = 0; // return value
 
     class $modify(UnlockVaultsGSMHook, GameStatsManager) {
+        ADD_HOOKS_DELEGATE("bypass.unlockvaults")
+
         int getStat(const char* key) {
             int value = GameStatsManager::getStat(key);
             if (!s_bypassGameStat) return value;
@@ -64,66 +68,54 @@ namespace eclipse::hacks::Bypass {
                 return true;
 
             // keys 1-3 + master emblem
-            if (type == UnlockType::GJItem && key >= 1 && key <= 4)
-                return config::get<bool>("bypass.unlockvaults", false);
-
-            return false;
+            return type == UnlockType::GJItem && key >= 1 && key <= 4;
         }
     };
 
     class $modify(UnlockVaultsCLHook, CreatorLayer) {
-        void onSecretVault(cocos2d::CCObject* sender) {
-            if (config::get<bool>("bypass.unlockvaults", false)) {
-                s_bypassGameStat = true;
-                s_bypassGameStatValue = 51; // key 13 > 50
-            }
+        ADD_HOOKS_DELEGATE("bypass.unlockvaults")
 
+        void onSecretVault(cocos2d::CCObject* sender) {
+            s_bypassGameStat = true;
+            s_bypassGameStatValue = 51; // key 13 > 50
             CreatorLayer::onSecretVault(sender);
         }
 
         void onTreasureRoom(cocos2d::CCObject* sender) {
-            if (config::get<bool>("bypass.unlockvaults", false))
-                s_bypassUGV = true;
-
+            s_bypassUGV = true;
             CreatorLayer::onTreasureRoom(sender);
         }
 
         bool init() override {
-            if (config::get<bool>("bypass.unlockvaults", false)) {
-                s_bypassUGV = true;
-                s_bypassGameStat = true;
-                s_bypassGameStatValue = 51; // key 13 > 50
-            }
-
+            s_bypassUGV = true;
+            s_bypassGameStat = true;
+            s_bypassGameStatValue = 51; // key 13 > 50
             return CreatorLayer::init();
         }
     };
 
     class $modify(UnlockVaultsOLHook, OptionsLayer) {
-        void onSecretVault(cocos2d::CCObject* sender) {
-            if (config::get<bool>("bypass.unlockvaults", false)) {
-                s_bypassGameStat = true;
-                s_bypassGameStatValue = 11; // key 12 > 10
-            }
+        ADD_HOOKS_DELEGATE("bypass.unlockvaults")
 
+        void onSecretVault(cocos2d::CCObject* sender) {
+            s_bypassGameStat = true;
+            s_bypassGameStatValue = 11; // key 12 > 10
             OptionsLayer::onSecretVault(sender);
         }
     };
 
     class $modify(UnlockVaultsSL2Hook, SecretLayer2) {
-        void onDoor(cocos2d::CCObject* sender) {
-            if (config::get<bool>("bypass.unlockvaults", false))
-                s_bypassUGV = true;
+        ADD_HOOKS_DELEGATE("bypass.unlockvaults")
 
+        void onDoor(cocos2d::CCObject* sender) {
+            s_bypassUGV = true;
             SecretLayer2::onDoor(sender);
         }
     };
 
     class $modify(UnlockVaultsLPHook, LevelPage) {
         void addSecretDoor() {
-            if (config::get<bool>("bypass.unlockvaults", false))
-                s_bypassUGV = true;
-
+            s_bypassUGV = true;
             LevelPage::addSecretDoor();
         }
     };

@@ -232,7 +232,7 @@ namespace eclipse::hacks::Level {
             PlayLayer::createObjectsFromSetupFinished();
             if (startPosObjects.empty()) return;
 
-            std::sort(startPosObjects.begin(), startPosObjects.end(), [](GameObject* a, GameObject* b) {
+            std::ranges::sort(startPosObjects, [](GameObject* a, GameObject* b) {
                 return a->getPositionX() < b->getPositionX();
             });
 

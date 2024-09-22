@@ -20,32 +20,23 @@ namespace eclipse::hacks::Bypass {
     REGISTER_HACK(MenuGameplay)
 
     class $modify(MenuGameplayMGLHook, MenuGameLayer) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("MenuGameLayer::tryJump");
-            SAFE_PRIORITY("MenuGameLayer::update");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("bypass.menugameplay")
 
-        void tryJump(float dt) {
-            // Disable auto-play
-            if (config::get<bool>("bypass.menugameplay", false)) return;
-            MenuGameLayer::tryJump(dt);
-        }
+        void tryJump(float) { /* Disable auto-play */ }
 
-        void update(float dt) {
-            if (config::get<bool>("bypass.menugameplay", false)) {
-                // Spider crashes the game
-                if (m_playerObject && !m_playerObject->m_isSpider) {
-                    const std::array<keybinds::Keys, 3> keys = {
-                        keybinds::Keys::Up,
-                        keybinds::Keys::W,
-                        keybinds::Keys::MouseLeft
-                    };
-                    for (auto key : keys) {
-                        if (keybinds::isKeyPressed(key)) {
-                            m_playerObject->pushButton(PlayerButton::Jump);
-                        } else if (keybinds::isKeyReleased(key)) {
-                            m_playerObject->releaseButton(PlayerButton::Jump);
-                        }
+        void update(float dt) override {
+            // Spider crashes the game
+            if (m_playerObject && !m_playerObject->m_isSpider) {
+                constexpr std::array keys = {
+                    keybinds::Keys::Up,
+                    keybinds::Keys::W,
+                    keybinds::Keys::MouseLeft
+                };
+                for (auto key : keys) {
+                    if (keybinds::isKeyPressed(key)) {
+                        m_playerObject->pushButton(PlayerButton::Jump);
+                    } else if (keybinds::isKeyReleased(key)) {
+                        m_playerObject->releaseButton(PlayerButton::Jump);
                     }
                 }
             }

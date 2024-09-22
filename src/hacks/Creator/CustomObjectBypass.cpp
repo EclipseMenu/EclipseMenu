@@ -21,12 +21,9 @@ namespace eclipse::hacks::Creator {
     REGISTER_HACK(CustomObjectBypass)
 
     class $modify(CustomObjectBypassHook, EditorUI) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("EditorUI::onNewCustomItem");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("creator.customobjectbypass")
+
         void onNewCustomItem(CCObject* sender) {
-            if (!config::get<bool>("creator.customobjectbypass", false))
-                return EditorUI::onNewCustomItem(sender);
             if (auto gameManager = GameManager::sharedState()) {
                 cocos2d::CCArray* newSelectedObjs;
                 if (m_selectedObjects->count() == 0) {

@@ -21,10 +21,8 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(NoPlatformerJumpSquish)
 
     class $modify(NoPlatformerJumpSquishPOHook, PlayerObject) {
-        void animatePlatformerJump(float p0) {
-            if (!config::get<bool>("player.noplatformersquish", false))
-                PlayerObject::animatePlatformerJump(p0);
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("player.noplatformersquish")
+        void animatePlatformerJump(float) {}
     };
 
 }

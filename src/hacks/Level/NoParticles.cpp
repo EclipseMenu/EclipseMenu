@@ -72,9 +72,7 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(NoParticles)
 
     class $modify(NoParticlesBGLHook, GJBaseGameLayer) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("GJBaseGameLayer::spawnParticle");
-        }
+        ENABLE_SAFE_HOOKS_ALL()
 
         cocos2d::CCParticleSystemQuad* spawnParticle(char const* plist, int zOrder, cocos2d::tCCPositionType positionType, cocos2d::CCPoint position) {
             if (config::get<bool>("level.noparticles", false) && config::get<bool>("level.noparticles.nomiscparticles", false))
