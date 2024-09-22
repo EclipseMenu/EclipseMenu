@@ -21,6 +21,7 @@ namespace eclipse::gui::imgui::themes {
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
 
         bool toggled = ImGui::Button(label.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0));
+        if (toggled) value = !value;
         postDraw();
 
         ImGui::PopStyleColor(4);
@@ -58,6 +59,7 @@ namespace eclipse::gui::imgui::themes {
         auto arrowSize = ImVec2(arrowWidth, 0);
 
         bool toggled = ImGui::Button(label.c_str(), buttonSize);
+        if (toggled) value = !value;
         postDraw();
 
         ImGui::SameLine(0, 0);
