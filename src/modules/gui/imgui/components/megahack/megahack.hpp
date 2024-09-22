@@ -5,8 +5,9 @@ namespace eclipse::gui::imgui::themes {
 
 	class Megahack : public Theme {
 
-		void visitToggle(const std::shared_ptr<ToggleComponent>& toggle) const override;
-		void visitButton(const std::shared_ptr<ButtonComponent>& button) const override;
+		bool checkbox(const std::string &label, bool &value, const std::function<void()> &postDraw) const override;
+		bool checkboxWithSettings(const std::string &label, bool &value, const std::function<void()> &callback, const std::function<void()> &postDraw) const override;
+		bool button(const std::string &text) const override;
 
 	};
 

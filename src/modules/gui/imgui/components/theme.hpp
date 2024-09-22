@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace eclipse::gui {
     class Component;
@@ -44,6 +45,8 @@ namespace eclipse::gui::imgui {
         virtual bool beginWindow(const std::string& title);
         virtual void endWindow();
 
+        // == Components == //
+
         virtual void visitLabel(const std::shared_ptr<LabelComponent>& label) const;
         virtual void visitToggle(const std::shared_ptr<ToggleComponent>& toggle) const;
         virtual void visitRadioButton(const std::shared_ptr<RadioButtonComponent>& radio) const;
@@ -57,6 +60,19 @@ namespace eclipse::gui::imgui {
         virtual void visitButton(const std::shared_ptr<ButtonComponent>& button) const;
         virtual void visitKeybind(const std::shared_ptr<KeybindComponent>& keybind) const;
         virtual void visitLabelSettings(const std::shared_ptr<LabelSettingsComponent>& labelSettings) const;
+
+        // == ImGui Widgets == //
+
+        virtual bool checkbox(
+            const std::string& label, bool& value,
+            const std::function<void()>& postDraw = []{}
+        ) const;
+        virtual bool checkboxWithSettings(
+            const std::string& label, bool& value,
+            const std::function<void()>& callback,
+            const std::function<void()>& postDraw = []{}
+        ) const;
+        virtual bool button(const std::string& text) const;
     };
 
     extern std::vector<std::string> THEME_NAMES;

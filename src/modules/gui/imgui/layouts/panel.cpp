@@ -32,8 +32,9 @@ namespace eclipse::gui::imgui {
     void PanelLayout::draw() {
         if (!Engine::get()->isToggled()) return;
 
+        auto scale = ThemeManager::get()->getGlobalScale();
         ImGuiStyle* style = &ImGui::GetStyle();
-        style->WindowRounding = 15.f;
+        style->WindowRounding = 15.f * scale;
 
         // window beginning
 
@@ -43,12 +44,12 @@ namespace eclipse::gui::imgui {
         recalculateSize();
 
         ImGui::Columns(2);
-        ImGui::SetColumnOffset(1, 183);
+        ImGui::SetColumnOffset(1, 183 * scale);
 
         // Logo (not really)
 
         ImGui::BeginGroup(); {
-            ImGui::BeginChild("Logo", ImVec2(188, 50));
+            ImGui::BeginChild("Logo", ImVec2(188 * scale, 50 * scale));
             ImGui::SameLine();
 
             ImGui::SetCursorPosY(11);
@@ -66,10 +67,10 @@ namespace eclipse::gui::imgui {
         // tab buttons
 
         ImGui::PushStyleColor(ImGuiCol_ChildBg, {0,0,0,0});
-        ImGui::BeginChild("tabs", ImVec2(186, 480));
+        ImGui::BeginChild("tabs", ImVec2(186 * scale, 480 * scale));
         ImGui::PopStyleColor();
 
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10 * scale);
 
         Tabs currentTabs = Engine::get()->getTabs();
 
@@ -78,7 +79,7 @@ namespace eclipse::gui::imgui {
             ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5, 0.5));
             ImGui::PushStyleColor(ImGuiCol_Button, m_selectedTab == i ? style->Colors[ImGuiCol_Button] : ImVec4(0, 0, 0, 0));
             ImGui::PushStyleColor(ImGuiCol_Text, style->Colors[ImGuiCol_Text]);
-            if (ImGui::Button(it.c_str(), ImVec2(160, 40))) {
+            if (ImGui::Button(it.c_str(), ImVec2(160 * scale, 40 * scale))) {
                 m_selectedTab = i;
             }
             ImGui::PopStyleVar();
@@ -92,7 +93,7 @@ namespace eclipse::gui::imgui {
 
         // user thing
 
-        ImGui::Dummy(ImVec2(0.0f, ImGui::GetContentRegionAvail().y - 80 - style->ItemSpacing.y));
+        ImGui::Dummy(ImVec2(0.0f, ImGui::GetContentRegionAvail().y - 80 * scale - style->ItemSpacing.y));
         ImGui::BeginChild("User", ImVec2(188, 80));
 
         ImGui::EndChild();

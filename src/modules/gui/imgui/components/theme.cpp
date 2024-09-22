@@ -95,6 +95,8 @@ namespace eclipse::gui::imgui {
         auto tm = ThemeManager::get();
         auto &style = ImGui::GetStyle();
 
+        ImGui::GetIO().FontGlobalScale = tm->getGlobalScale();
+
         // Sizes
         style.WindowPadding = ImVec2(4, 4);
         style.WindowRounding = tm->getWindowRounding();
@@ -134,7 +136,6 @@ namespace eclipse::gui::imgui {
         ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getTitleForegroundColor()));
         ImGui::PushFont(ImGuiRenderer::get()->getFontManager().getFont().get());
         bool open = ImGui::Begin(title.c_str(), nullptr, flags);
-        ImGui::SetWindowFontScale(tm->getGlobalScale());
         return open;
     }
 
@@ -152,42 +153,28 @@ namespace eclipse::gui::imgui {
     void Theme::visitToggle(const std::shared_ptr<ToggleComponent>& toggle) const {
         auto tm = ThemeManager::get();
 
-        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getCheckboxForegroundColor()));
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, static_cast<ImVec4>(tm->getCheckboxCheckmarkColor()));
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, static_cast<ImVec4>(tm->getCheckboxBackgroundColor()));
-
+        bool toggled = false;
         bool value = toggle->getValue();
-        if (ImGui::Checkbox(toggle->getTitle().c_str(), &value)) {
-            toggle->setValue(value);
-            toggle->triggerCallback(value);
+        if (auto options = toggle->getOptions().lock()) {
+            toggled = this->checkboxWithSettings(toggle->getTitle(), value, [this, options] {
+                for (auto& comp : options->getComponents())
+                    this->visit(comp);
+            }, [toggle] {
+                handleTooltip(toggle->getDescription());
+                if (toggle->hasKeybind())
+                    handleKeybindMenu(toggle->getId());
+            });
+        } else {
+            toggled = this->checkbox(toggle->getTitle(), value, [toggle] {
+                handleTooltip(toggle->getDescription());
+                if (toggle->hasKeybind())
+                    handleKeybindMenu(toggle->getId());
+            });
         }
 
-        ImGui::PopStyleColor(3);
-
-        handleTooltip(toggle->getTitle());
-        if (toggle->hasKeybind())
-            handleKeybindMenu(toggle->getId());
-
-        if (auto options = toggle->getOptions().lock()) {
-            ImGui::PushItemWidth(-1);
-            auto availWidth = ImGui::GetContentRegionAvail().x * tm->getGlobalScale();
-            auto arrowSize = ImVec2(availWidth * 0.115f, 0);
-            ImGui::SameLine(availWidth - (arrowSize.x / 2.f), 0);
-            ImGui::SetNextItemWidth(arrowSize.x);
-            bool openPopup = ImGui::ArrowButton(fmt::format("##open_{}", toggle->getId()).c_str(), ImGuiDir_Right);
-            ImGui::PopItemWidth();
-
-            std::string popupName = fmt::format("##{}", toggle->getId());
-            if (openPopup)
-                ImGui::OpenPopup(popupName.c_str());
-
-            ImGui::SetNextWindowSizeConstraints(ImVec2(240 * tm->getGlobalScale(), 0), ImVec2(FLT_MAX, FLT_MAX));
-            if (ImGui::BeginPopup(popupName.c_str(), ImGuiWindowFlags_NoMove)) {
-                for (auto& comp : options->getComponents())
-                    visit(comp);
-
-                ImGui::EndPopup();
-            }
+        if (toggled) {
+            toggle->setValue(value);
+            toggle->triggerCallback(value);
         }
     }
 
@@ -275,22 +262,14 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine(0, 1);
 
-        ImGui::PushItemWidth(-1.0f);
-
-        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getCheckboxForegroundColor()));
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, static_cast<ImVec4>(tm->getCheckboxCheckmarkColor()));
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, static_cast<ImVec4>(tm->getCheckboxBackgroundColor()));
-
-        if (ImGui::Checkbox(floatToggle->getTitle().c_str(), &state)) {
+        if (this->checkbox(floatToggle->getTitle(), state, [floatToggle] {
+            handleTooltip(floatToggle->getDescription());
+            if (floatToggle->hasKeybind())
+                handleKeybindMenu(floatToggle->getId());
+        })) {
             floatToggle->setState(state);
             floatToggle->triggerCallback(value);
         }
-
-        ImGui::PopStyleColor(3);
-
-        handleTooltip(floatToggle->getTitle());
-        if (floatToggle->hasKeybind())
-            handleKeybindMenu(floatToggle->getId());
     }
 
     void Theme::visitInputText(const std::shared_ptr<InputTextComponent>& inputText) const {
@@ -320,19 +299,9 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitButton(const std::shared_ptr<ButtonComponent>& button) const {
-        ImGui::PushItemWidth(-1);
-
-        auto tm = ThemeManager::get();
-        ImGui::PushStyleColor(ImGuiCol_Button, static_cast<ImVec4>(tm->getButtonBackgroundColor()));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, static_cast<ImVec4>(tm->getButtonHoveredBackground()));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, static_cast<ImVec4>(tm->getButtonActivatedBackground()));
-
-        if (ImGui::Button(button->getTitle().c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+        if (this->button(button->getTitle())) {
             button->triggerCallback();
         }
-
-        ImGui::PopStyleColor(3);
-        ImGui::PopItemWidth();
 
         handleTooltip(button->getDescription());
         if (button->hasKeybind())
@@ -436,34 +405,9 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitLabelSettings(const std::shared_ptr<LabelSettingsComponent>& labelSettings) const {
-        auto tm = ThemeManager::get();
         auto* settings = labelSettings->getSettings();
-        ImGui::PushID(fmt::format("label-{}", settings->id).c_str());
 
-        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getCheckboxForegroundColor()));
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, static_cast<ImVec4>(tm->getCheckboxCheckmarkColor()));
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, static_cast<ImVec4>(tm->getCheckboxBackgroundColor()));
-
-        if (ImGui::Checkbox(settings->name.c_str(), &settings->visible)) {
-            labelSettings->triggerEditCallback();
-        }
-
-        ImGui::PopStyleColor(3);
-
-        ImGui::PushItemWidth(-1);
-        auto availWidth = ImGui::GetContentRegionAvail().x * tm->getGlobalScale();
-        auto arrowSize = ImVec2(availWidth * 0.115f, 0);
-        ImGui::SameLine(availWidth - (arrowSize.x / 2.f), 0);
-        ImGui::SetNextItemWidth(arrowSize.x);
-        bool openPopup = ImGui::ArrowButton(fmt::format("##open_label_{}", settings->id).c_str(), ImGuiDir_Right);
-        ImGui::PopItemWidth();
-
-        std::string popupName = fmt::format("##label-settings-{}", settings->id);
-        if (openPopup)
-            ImGui::OpenPopup(popupName.c_str());
-
-        ImGui::SetNextWindowSizeConstraints(ImVec2(240 * tm->getGlobalScale(), 0), ImVec2(FLT_MAX, FLT_MAX));
-        if (ImGui::BeginPopup(popupName.c_str(), ImGuiWindowFlags_NoMove)) {
+        if (this->checkboxWithSettings(settings->name, settings->visible, [this, settings, labelSettings] {
             auto& name = settings->name;
             if (ImGui::InputText("Name", &name)) {
                 settings->name = name;
@@ -506,15 +450,74 @@ namespace eclipse::gui::imgui {
                 labelSettings->triggerEditCallback();
             }
 
-            if (ImGui::Button("Delete")) {
+            if (this->button("Delete")) {
                 labelSettings->triggerDeleteCallback();
                 ImGui::CloseCurrentPopup();
             }
+        })) labelSettings->triggerEditCallback();
+    }
 
+    bool Theme::checkbox(const std::string &label, bool &value, const std::function<void()> &postDraw) const {
+        auto tm = ThemeManager::get();
+
+        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getCheckboxForegroundColor()));
+        ImGui::PushStyleColor(ImGuiCol_CheckMark, static_cast<ImVec4>(tm->getCheckboxCheckmarkColor()));
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, static_cast<ImVec4>(tm->getCheckboxBackgroundColor()));
+
+        bool result = ImGui::Checkbox(label.c_str(), &value);
+        postDraw();
+
+        ImGui::PopStyleColor(3);
+        return result;
+    }
+
+    bool Theme::checkboxWithSettings(const std::string &label, bool &value, const std::function<void()> &callback, const std::function<void()> &postDraw) const {
+        auto tm = ThemeManager::get();
+
+        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getCheckboxForegroundColor()));
+        ImGui::PushStyleColor(ImGuiCol_CheckMark, static_cast<ImVec4>(tm->getCheckboxCheckmarkColor()));
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, static_cast<ImVec4>(tm->getCheckboxBackgroundColor()));
+
+        bool result = ImGui::Checkbox(label.c_str(), &value);
+        postDraw();
+
+        ImGui::PopStyleColor(3);
+
+        ImGui::PushItemWidth(-1);
+        auto availWidth = ImGui::GetContentRegionAvail().x;
+        auto arrowSize = ImVec2(availWidth * 0.18f, 0);
+        ImGui::SameLine(availWidth - (arrowSize.x / 2.f), 0);
+        ImGui::SetNextItemWidth(arrowSize.x);
+        bool openPopup = ImGui::ArrowButton(fmt::format("##open_{}", label).c_str(), ImGuiDir_Right);
+        ImGui::PopItemWidth();
+
+        std::string popupName = fmt::format("##{}", label);
+        if (openPopup)
+            ImGui::OpenPopup(popupName.c_str());
+
+        ImGui::SetNextWindowSizeConstraints(ImVec2(240 * tm->getGlobalScale(), 0), ImVec2(FLT_MAX, FLT_MAX));
+        if (ImGui::BeginPopup(popupName.c_str(), ImGuiWindowFlags_NoMove)) {
+            callback();
             ImGui::EndPopup();
         }
 
-        ImGui::PopID();
+        return result;
+    }
+
+    bool Theme::button(const std::string &text) const {
+        ImGui::PushItemWidth(-1);
+
+        auto tm = ThemeManager::get();
+        ImGui::PushStyleColor(ImGuiCol_Button, static_cast<ImVec4>(tm->getButtonBackgroundColor()));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, static_cast<ImVec4>(tm->getButtonHoveredBackground()));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, static_cast<ImVec4>(tm->getButtonActivatedBackground()));
+
+        bool pressed = ImGui::Button(text.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0));
+
+        ImGui::PopStyleColor(3);
+        ImGui::PopItemWidth();
+
+        return pressed;
     }
 }
 
