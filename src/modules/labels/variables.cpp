@@ -241,6 +241,8 @@ namespace eclipse::labels {
             m_variables["time"] = rift::Value::string(utils::formatTime(gjbgl->m_gameState.m_levelTime));
             m_variables["frame"] = rift::Value::integer(static_cast<int>(gjbgl->m_gameState.m_levelTime * 240.f));
             m_variables["isDead"] = rift::Value::boolean(gjbgl->m_player1->m_isDead);
+            m_variables["noclipDeaths"] = rift::Value::integer(config::getTemp("noclipDeaths", 0));
+            m_variables["noclipAccuracy"] = rift::Value::floating(config::getTemp("noclipAccuracy", 100.f));
             if (auto* pl = gameManager->m_playLayer) {
                 m_variables["editorMode"] = rift::Value::boolean(false);
                 m_variables["progress"] = rift::Value::floating(pl->getCurrentPercent());
@@ -273,6 +275,8 @@ namespace eclipse::labels {
             removeVariable("time");
             removeVariable("frame");
             removeVariable("isDead");
+            removeVariable("noclipDeaths");
+            removeVariable("noclipAccuracy");
             removeVariable("editorMode");
             removeVariable("progress");
             removeVariable("objects");

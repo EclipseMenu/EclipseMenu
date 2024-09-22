@@ -4,6 +4,7 @@
 #include <modules/labels/variables.hpp>
 
 #include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Player {
 
@@ -36,8 +37,11 @@ namespace eclipse::hacks::Player {
         struct Fields {
             cocos2d::CCLayerColor* m_noclipTint = nullptr;
             bool m_wouldDie = false;
+            bool m_wouldDieFrame = false;
+            bool m_deadLastFrame = false;
             float m_tintTimer = 0.f;
             float m_tintOpacity = 0.f;
+            size_t m_deadFrames = 0;
         };
 
         ENABLE_SAFE_HOOKS_ALL()
@@ -63,6 +67,7 @@ namespace eclipse::hacks::Player {
             }
 
             if (config::get<bool>("player.noclip", false)) {
+                fields->m_wouldDieFrame = true;
                 fields->m_wouldDie = true;
                 fields->m_tintTimer = 0.f;
             }
@@ -109,6 +114,48 @@ namespace eclipse::hacks::Player {
             }
 
             PlayLayer::postUpdate(dt);
+        }
+
+        void resetLevel() {
+            PlayLayer::resetLevel();
+            auto& fields = m_fields;
+            fields->m_wouldDie = false;
+            fields->m_wouldDieFrame = false;
+            fields->m_deadFrames = 0;
+            config::setTemp<int>("noclipDeaths", 0);
+        }
+    };
+
+    class $modify(NoClipGJBGLHook, GJBaseGameLayer) {
+        void processCommands(float dt) {
+            GJBaseGameLayer::processCommands(dt);
+
+            if (!PlayLayer::get()) {
+                config::setTemp<int>("noclipDeaths", 0);
+                config::setTemp<float>("noclipAccuracy", 100.f);
+                return;
+            }
+
+            auto pl = reinterpret_cast<NoClipPLHook*>(this);
+            if (pl->m_hasCompletedLevel || pl->m_levelEndAnimationStarted) return;
+
+            auto fields = pl->m_fields.self();
+            if (fields->m_wouldDieFrame) {
+                fields->m_deadFrames++;
+                if (!fields->m_deadLastFrame) {
+                    auto deaths = config::getTemp<int>("noclipDeaths", 0);
+                    config::setTemp<int>("noclipDeaths", deaths + 1);
+                }
+            }
+
+            fields->m_deadLastFrame = fields->m_wouldDieFrame;
+            fields->m_wouldDieFrame = false;
+
+            auto frame = m_gameState.m_currentProgress;
+            if (frame > 0) {
+                float acc = static_cast<float>(frame - fields->m_deadFrames) / static_cast<float>(frame) * 100.f;
+                config::setTemp("noclipAccuracy", acc);
+            }
         }
     };
 

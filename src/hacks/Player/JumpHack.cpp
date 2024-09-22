@@ -46,9 +46,9 @@ namespace eclipse::hacks::Player {
     class $modify(JumpHackPOHook, PlayerObject) {
         ADD_HOOKS_DELEGATE("player.jumphack")
 
-        void pushButton(PlayerButton p0) {
+        bool pushButton(PlayerButton p0) {
             jump = true;
-            PlayerObject::pushButton(p0);
+            return PlayerObject::pushButton(p0);
         }
     };
 }
