@@ -248,7 +248,7 @@ namespace eclipse::hacks::Labels {
                 {"Best Run", "Best run: {runFrom}-{bestRun}%", false},
                 {"Clock", "{clock}", false},
                 {"FPS", "FPS: {round(fps)}", false},
-                {"CPS", "{cps1}/{cps2}/{cps3} CPS", false}, // TODO: Add click trigger
+                {"CPS", "{cps}/{clicks} CPS", false}, // TODO: Add click trigger
                 {"Noclip Accuracy", "Accuracy: {noclipAccuracy}%", false}, // TODO: Add death trigger
                 {"Noclip Deaths", "Deaths: {noclipDeaths}", false},
             });
