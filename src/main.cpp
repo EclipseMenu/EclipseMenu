@@ -131,7 +131,7 @@ $on_mod(Loaded) {
     {
         using namespace gui;
         auto tab = MenuTab::find("Interface");
-        tab->addInputFloat("UI Scale", "uiScale", 0.4f, 4.f, "x%.3f")
+        tab->addInputFloat("UI Scale", "uiScale", 0.75f, 2.f, "x%.3f")
             ->callback([](float value) {
                 ThemeManager::get()->setUIScale(value);
             })->disableSaving();

@@ -38,7 +38,10 @@ namespace eclipse::gui::imgui::themes {
         return toggled;
     }
 
-    bool Megahack::checkboxWithSettings(const std::string &label, bool &value, const std::function<void()> &callback, const std::function<void()> &postDraw) const {
+    bool Megahack::checkboxWithSettings(const std::string &label, bool &value,
+                                        const std::function<void()> &callback,
+                                        const std::function<void()> &postDraw,
+                                        const std::string& popupId) const {
         auto tm = ThemeManager::get();
         auto textColor = value ? tm->getButtonForegroundColor() : tm->getButtonDisabledForeground();
         auto scale = tm->getGlobalScale();
@@ -83,7 +86,7 @@ namespace eclipse::gui::imgui::themes {
             triangleColor
         );
 
-        std::string popupName = fmt::format("##{}", label);
+        std::string popupName = popupId.empty() ? fmt::format("##{}", label) : popupId;
         if (openPopup)
             ImGui::OpenPopup(popupName.c_str());
 

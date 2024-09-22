@@ -70,7 +70,8 @@ namespace eclipse::gui::imgui {
         virtual bool checkboxWithSettings(
             const std::string& label, bool& value,
             const std::function<void()>& callback,
-            const std::function<void()>& postDraw = []{}
+            const std::function<void()>& postDraw = []{},
+            const std::string& popupId = "" // empty = use default
         ) const;
         virtual bool button(const std::string& text) const;
     };

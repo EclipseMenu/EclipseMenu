@@ -454,7 +454,8 @@ namespace eclipse::gui::imgui {
                 labelSettings->triggerDeleteCallback();
                 ImGui::CloseCurrentPopup();
             }
-        })) labelSettings->triggerEditCallback();
+        }, []{}, fmt::format("label-setting-{}", settings->id)))
+            labelSettings->triggerEditCallback();
     }
 
     bool Theme::checkbox(const std::string &label, bool &value, const std::function<void()> &postDraw) const {
@@ -471,7 +472,10 @@ namespace eclipse::gui::imgui {
         return result;
     }
 
-    bool Theme::checkboxWithSettings(const std::string &label, bool &value, const std::function<void()> &callback, const std::function<void()> &postDraw) const {
+    bool Theme::checkboxWithSettings(const std::string &label, bool &value,
+                                     const std::function<void()> &callback,
+                                     const std::function<void()> &postDraw,
+                                     const std::string& popupId) const {
         auto tm = ThemeManager::get();
 
         ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getCheckboxForegroundColor()));
@@ -491,7 +495,7 @@ namespace eclipse::gui::imgui {
         bool openPopup = ImGui::ArrowButton(fmt::format("##open_{}", label).c_str(), ImGuiDir_Right);
         ImGui::PopItemWidth();
 
-        std::string popupName = fmt::format("##{}", label);
+        std::string popupName = popupId.empty() ? fmt::format("##{}", label) : popupId;
         if (openPopup)
             ImGui::OpenPopup(popupName.c_str());
 

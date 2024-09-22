@@ -102,11 +102,11 @@ namespace eclipse::hacks::Labels {
     static ClickStorage s_clicksP2;
 
     class $modify(LabelsPOHook, PlayerObject) {
-        void pushButton(PlayerButton btn) {
-            PlayerObject::pushButton(btn);
+        bool pushButton(PlayerButton btn) {
+            bool result = PlayerObject::pushButton(btn);
 
             const auto* gjbgl = GJBaseGameLayer::get();
-            if (!gjbgl) return;
+            if (!gjbgl) return result;
 
             const bool isP1 = this == gjbgl->m_player1;
             const bool isP2 = this == gjbgl->m_player2;
@@ -115,6 +115,8 @@ namespace eclipse::hacks::Labels {
                 s_clicksP1.addClick(btn);
             else if (isP2)
                 s_clicksP2.addClick(btn);
+
+            return result;
         }
     };
 
