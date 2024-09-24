@@ -103,7 +103,7 @@ namespace eclipse::hacks::Player {
                             fields->m_tintTimer = 0.F;
                             fields->m_tintOpacity = 0.f;
                         } else {
-                            auto startOpacity = config::get<float>("player.noclipflash.opacity", 90.f);
+                            auto startOpacity = config::get<float>("player.noclip.opacity", 90.f);
                             fields->m_tintOpacity = (255.F * (startOpacity / 100.F)) * (1.f - progress);
                         }
                         if (fields->m_tintOpacity <= 0.0F)
@@ -122,6 +122,11 @@ namespace eclipse::hacks::Player {
             fields->m_wouldDie = false;
             fields->m_wouldDieFrame = false;
             fields->m_deadFrames = 0;
+            if (fields->m_noclipTint != nullptr) {
+                fields->m_noclipTint->setOpacity(0);
+                fields->m_tintTimer = 0.F;
+                fields->m_tintOpacity = 0.f;
+            }
             config::setTemp<int>("noclipDeaths", 0);
         }
     };
