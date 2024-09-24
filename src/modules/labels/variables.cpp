@@ -9,6 +9,7 @@
 #include <Geode/binding/PlayLayer.hpp>
 #include <Geode/loader/Mod.hpp>
 #include <Geode/Loader.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::labels {
 
@@ -280,7 +281,34 @@ namespace eclipse::labels {
             removeVariable("editorMode");
             removeVariable("progress");
             removeVariable("objects");
+            removeVariable("runFrom");
+            removeVariable("bestRun");
         }
     }
 
+    class $modify(BestRunHook, PlayLayer) {
+        struct Fields {
+            float m_runFrom = 0.f;
+            float m_lastRunFrom = 0.f;
+            float m_bestRun = 0.f;
+            float m_lastBestRun = 0.f;
+        };
+        
+        void destroyPlayer(PlayerObject* player, GameObject* object) {
+            PlayLayer::destroyPlayer(player, object);
+            m_fields->m_bestRun = getCurrentPercent();
+            if ((m_fields->m_bestRun - m_fields->m_runFrom) >= (m_fields->m_lastBestRun - m_fields->m_lastRunFrom)) {
+                m_fields->m_lastBestRun = m_fields->m_bestRun;
+                m_fields->m_lastRunFrom = m_fields->m_runFrom;
+                auto& manager = labels::VariableManager::get();
+                manager.setVariable("runFrom", rift::Value::floating(m_fields->m_runFrom));
+                manager.setVariable("bestRun", rift::Value::floating(m_fields->m_bestRun));
+            }
+        }
+
+        void resetLevel() {
+            PlayLayer::resetLevel();
+            m_fields->m_runFrom = getCurrentPercent();
+        }
+    };
 }
