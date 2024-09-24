@@ -286,7 +286,7 @@ namespace eclipse::labels {
         }
     }
 
-    class $modify(BestRunHook, PlayLayer) {
+    class $modify(BestRunPLHook, PlayLayer) {
         struct Fields {
             float m_runFrom = 0.f;
             float m_lastRunFrom = 0.f;
@@ -300,7 +300,7 @@ namespace eclipse::labels {
             if ((m_fields->m_bestRun - m_fields->m_runFrom) >= (m_fields->m_lastBestRun - m_fields->m_lastRunFrom)) {
                 m_fields->m_lastBestRun = m_fields->m_bestRun;
                 m_fields->m_lastRunFrom = m_fields->m_runFrom;
-                auto& manager = labels::VariableManager::get();
+                auto& manager = VariableManager::get();
                 manager.setVariable("runFrom", rift::Value::floating(m_fields->m_runFrom));
                 manager.setVariable("bestRun", rift::Value::floating(m_fields->m_bestRun));
             }
