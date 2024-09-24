@@ -293,10 +293,19 @@ namespace eclipse::labels {
             float m_bestRun = 0.f;
             float m_lastBestRun = 0.f;
         };
-        
-        void destroyPlayer(PlayerObject* player, GameObject* object) {
-            PlayLayer::destroyPlayer(player, object);
-            m_fields->m_bestRun = getCurrentPercent();
+
+        bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
+            if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
+
+            auto& manager = VariableManager::get();
+            manager.setVariable("runFrom", rift::Value::floating(0.f));
+            manager.setVariable("bestRun", rift::Value::floating(0.f));
+
+            return true;
+        }
+
+        void saveBestRun() {
+            m_fields->m_bestRun = utils::getActualProgress(this);
             if ((m_fields->m_bestRun - m_fields->m_runFrom) >= (m_fields->m_lastBestRun - m_fields->m_lastRunFrom)) {
                 m_fields->m_lastBestRun = m_fields->m_bestRun;
                 m_fields->m_lastRunFrom = m_fields->m_runFrom;
@@ -306,9 +315,19 @@ namespace eclipse::labels {
             }
         }
 
+        void levelComplete() {
+            PlayLayer::levelComplete();
+            saveBestRun();
+        }
+        
+        void destroyPlayer(PlayerObject* player, GameObject* object) {
+            PlayLayer::destroyPlayer(player, object);
+            if (object != m_anticheatSpike) saveBestRun();
+        }
+
         void resetLevel() {
             PlayLayer::resetLevel();
-            m_fields->m_runFrom = getCurrentPercent();
+            m_fields->m_runFrom = utils::getActualProgress(this);
         }
     };
 }
