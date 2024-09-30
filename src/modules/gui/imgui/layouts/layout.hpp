@@ -4,7 +4,8 @@ namespace eclipse::gui::imgui {
 
     enum class LayoutMode {
         Tabbed,
-        Panel
+        Panel,
+        Sidebar
     };
 
     /// @brief Base class for ImGui window layouts

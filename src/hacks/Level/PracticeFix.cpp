@@ -298,6 +298,8 @@ namespace eclipse::Hacks::Level {
         }
 
         void apply(PlayerObject* player) {
+            if (!PlayLayer::get()->m_isPracticeMode) return;
+
             player->m_wasTeleported = m_wasTeleported;
             player->m_fixGravityBug = m_fixGravityBug;
             player->m_reverseSync = m_reverseSync;

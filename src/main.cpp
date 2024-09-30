@@ -149,7 +149,7 @@ $on_mod(Loaded) {
             fontCombo->setItems(ThemeManager::getFontNames());
         });
 
-        tab->addCombo("Layout Type", "layout", {"Tabbed", "Panel"}, 0)
+        tab->addCombo("Layout Type", "layout", {"Tabbed", "Panel", "Sidebar"}, 0)
             ->callback([](int value) {
                 ThemeManager::get()->setLayoutMode(static_cast<imgui::LayoutMode>(value));
             })->disableSaving();

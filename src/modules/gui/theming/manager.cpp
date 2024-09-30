@@ -3,8 +3,20 @@
 #include <nlohmann/json.hpp>
 #include <modules/config/config.hpp>
 #include <modules/gui/imgui/imgui.hpp>
+#include <Geode/Loader.hpp>
+#include <Geode/utils/cocos.hpp>
 
 namespace eclipse::gui {
+    static auto IMPORT_PICK_OPTIONS = geode::prelude::file::FilePickOptions {
+        std::nullopt,
+        {
+            {
+                "Eclipse Themes",
+                { "*.zip" }
+            }
+        }
+    };
+
     void ThemeManager::init() {
         if (!loadTheme(geode::Mod::get()->getSaveDir() / "theme.json")) {
             // theme not created, load a built-in one
@@ -78,48 +90,55 @@ namespace eclipse::gui {
         if (json.is_discarded()) return false;
 
         setDefaults();
-        try_assign(m_themeName, json, "name");
-        try_assign(m_themeDescription, json, "description");
-        try_assign(m_themeAuthor, json, "author");
+        auto details = json["details"];
+        try_assign(m_themeName, details, "name");
+        try_assign(m_themeDescription, details, "description");
+        try_assign(m_themeAuthor, details, "author");
 
         auto renderer = json_try_get<int>(json, "renderer");
         auto layout = json_try_get<int>(json, "layout");
-        auto theme = json_try_get<int>(json, "theme");
+        auto theme = json_try_get<int>(json, "style");
 
         if (renderer) this->setRenderer(static_cast<RendererType>(*renderer));
         if (layout) this->setLayoutMode(static_cast<imgui::LayoutMode>(*layout));
         if (theme) this->setComponentTheme(static_cast<imgui::ComponentTheme>(*theme));
 
-        try_assign(m_uiScale, json, "uiScale");
-        try_assign(m_selectedFont, json, "font");
-        try_assign(m_fontSize, json, "fontSize");
-        try_assign(m_framePadding, json, "framePadding");
-        try_assign(m_windowMargin, json, "windowMargin");
-        try_assign(m_windowRounding, json, "windowRounding");
-        try_assign(m_frameRounding, json, "frameRounding");
-        try_assign(m_borderSize, json, "borderSize");
-        try_assign(m_enableBlur, json, "blurEnabled");
-        try_assign(m_blurSpeed, json, "blurSpeed");
-        try_assign(m_blurRadius, json, "blurRadius");
+        auto other = json["other"];
+        try_assign(m_uiScale, other, "uiScale");
+        try_assign(m_selectedFont, other, "font");
+        try_assign(m_fontSize, other, "fontSize");
+        try_assign(m_framePadding, other, "framePadding");
+        try_assign(m_windowMargin, other, "windowMargin");
+        try_assign(m_windowRounding, other, "windowRounding");
+        try_assign(m_frameRounding, other, "frameRounding");
+        try_assign(m_borderSize, other, "borderSize");
 
-        try_assign(m_backgroundColor, json, "backgroundColor");
-        try_assign(m_foregroundColor, json, "foregroundColor");
-        try_assign(m_frameBackground, json, "frameBackground");
-        try_assign(m_disabledColor, json, "disabledColor");
-        try_assign(m_borderColor, json, "borderColor");
-        try_assign(m_titleBackgroundColor, json, "titleBackgroundColor");
-        try_assign(m_titleForegroundColor, json, "titleForegroundColor");
-        try_assign(m_checkboxBackgroundColor, json, "checkboxBackgroundColor");
-        try_assign(m_checkboxCheckmarkColor, json, "checkboxCheckmarkColor");
-        try_assign(m_checkboxForegroundColor, json, "checkboxForegroundColor");
-        try_assign(m_buttonBackgroundColor, json, "buttonBackgroundColor");
-        try_assign(m_buttonForegroundColor, json, "buttonForegroundColor");
-        try_assign(m_buttonDisabledColor, json, "buttonDisabledColor");
-        try_assign(m_buttonDisabledForeground, json, "buttonDisabledForeground");
-        try_assign(m_buttonHoveredColor, json, "buttonHoveredColor");
-        try_assign(m_buttonHoveredForeground, json, "buttonHoveredForeground");
-        try_assign(m_buttonActivatedColor, json, "buttonActivatedColor");
-        try_assign(m_buttonActiveForeground, json, "buttonActiveForeground");
+        // blur
+        auto blur = json["blur"];
+        try_assign(m_enableBlur, blur, "blurEnabled");
+        try_assign(m_blurSpeed, blur, "blurSpeed");
+        try_assign(m_blurRadius, blur, "blurRadius");
+
+        // overrides
+        auto colors = json["colors"];
+        try_assign(m_backgroundColor, colors, "backgroundColor");
+        try_assign(m_foregroundColor, colors, "foregroundColor");
+        try_assign(m_frameBackground, colors, "frameBackground");
+        try_assign(m_disabledColor, colors, "disabledColor");
+        try_assign(m_borderColor, colors, "borderColor");
+        try_assign(m_titleBackgroundColor, colors, "titleBackgroundColor");
+        try_assign(m_titleForegroundColor, colors, "titleForegroundColor");
+        try_assign(m_checkboxBackgroundColor, colors, "checkboxBackgroundColor");
+        try_assign(m_checkboxCheckmarkColor, colors, "checkboxCheckmarkColor");
+        try_assign(m_checkboxForegroundColor, colors, "checkboxForegroundColor");
+        try_assign(m_buttonBackgroundColor, colors, "buttonBackgroundColor");
+        try_assign(m_buttonForegroundColor, colors, "buttonForegroundColor");
+        try_assign(m_buttonDisabledColor, colors, "buttonDisabledColor");
+        try_assign(m_buttonDisabledForeground, colors, "buttonDisabledForeground");
+        try_assign(m_buttonHoveredColor, colors, "buttonHoveredColor");
+        try_assign(m_buttonHoveredForeground, colors, "buttonHoveredForeground");
+        try_assign(m_buttonActivatedColor, colors, "buttonActivatedColor");
+        try_assign(m_buttonActiveForeground, colors, "buttonActiveForeground");
 
         return true;
     }
@@ -140,41 +159,44 @@ namespace eclipse::gui {
     }
 
     void ThemeManager::applyValues(nlohmann::json& json) const {
-        json["name"] = m_themeName;
-        json["description"] = m_themeDescription;
-        json["author"] = m_themeAuthor;
-        json["renderer"] = m_renderer;
-        json["layout"] = m_layoutMode;
-        json["theme"] = m_componentTheme;
-        json["uiScale"] = m_uiScale;
-        json["font"] = m_selectedFont;
-        json["fontSize"] = m_fontSize;
-        json["framePadding"] = m_framePadding;
-        json["windowMargin"] = m_windowMargin;
-        json["windowRounding"] = m_windowRounding;
-        json["frameRounding"] = m_frameRounding;
-        json["borderSize"] = m_borderSize;
-        json["blurEnabled"] = m_enableBlur;
-        json["blurSpeed"] = m_blurSpeed;
-        json["blurRadius"] = m_blurRadius;
-        json["backgroundColor"] = m_backgroundColor;
-        json["frameBackground"] = m_frameBackground;
-        json["foregroundColor"] = m_foregroundColor;
-        json["disabledColor"] = m_disabledColor;
-        json["borderColor"] = m_borderColor;
-        json["titleBackgroundColor"] = m_titleBackgroundColor;
-        json["titleForegroundColor"] = m_titleForegroundColor;
-        json["checkboxBackgroundColor"] = m_checkboxBackgroundColor;
-        json["checkboxCheckmarkColor"] = m_checkboxCheckmarkColor;
-        json["checkboxForegroundColor"] = m_checkboxForegroundColor;
-        json["buttonBackgroundColor"] = m_buttonBackgroundColor;
-        json["buttonForegroundColor"] = m_buttonForegroundColor;
-        json["buttonDisabledColor"] = m_buttonDisabledColor;
-        json["buttonDisabledForeground"] = m_buttonDisabledForeground;
-        json["buttonHoveredColor"] = m_buttonHoveredColor;
-        json["buttonHoveredForeground"] = m_buttonHoveredForeground;
-        json["buttonActivatedColor"] = m_buttonActivatedColor;
-        json["buttonActiveForeground"] = m_buttonActiveForeground;
+        json["details"]["name"] = m_themeName;
+        json["details"]["description"] = m_themeDescription;
+        json["details"]["author"] = m_themeAuthor;
+        json["details"]["renderer"] = m_renderer;
+        json["details"]["layout"] = m_layoutMode;
+        json["details"]["style"] = m_componentTheme;
+
+        json["blur"]["blurEnabled"] = m_enableBlur;
+        json["blur"]["blurSpeed"] = m_blurSpeed;
+        json["blur"]["blurRadius"] = m_blurRadius;
+
+        json["other"]["uiScale"] = m_uiScale;
+        json["other"]["font"] = m_selectedFont;
+        json["other"]["fontSize"] = m_fontSize;
+
+        json["colors"]["framePadding"] = m_framePadding;
+        json["colors"]["windowMargin"] = m_windowMargin;
+        json["colors"]["windowRounding"] = m_windowRounding;
+        json["colors"]["frameRounding"] = m_frameRounding;
+        json["colors"]["borderSize"] = m_borderSize;
+        json["colors"]["backgroundColor"] = m_backgroundColor;
+        json["colors"]["frameBackground"] = m_frameBackground;
+        json["colors"]["foregroundColor"] = m_foregroundColor;
+        json["colors"]["disabledColor"] = m_disabledColor;
+        json["colors"]["borderColor"] = m_borderColor;
+        json["colors"]["titleBackgroundColor"] = m_titleBackgroundColor;
+        json["colors"]["titleForegroundColor"] = m_titleForegroundColor;
+        json["colors"]["checkboxBackgroundColor"] = m_checkboxBackgroundColor;
+        json["colors"]["checkboxCheckmarkColor"] = m_checkboxCheckmarkColor;
+        json["colors"]["checkboxForegroundColor"] = m_checkboxForegroundColor;
+        json["colors"]["buttonBackgroundColor"] = m_buttonBackgroundColor;
+        json["colors"]["buttonForegroundColor"] = m_buttonForegroundColor;
+        json["colors"]["buttonDisabledColor"] = m_buttonDisabledColor;
+        json["colors"]["buttonDisabledForeground"] = m_buttonDisabledForeground;
+        json["colors"]["buttonHoveredColor"] = m_buttonHoveredColor;
+        json["colors"]["buttonHoveredForeground"] = m_buttonHoveredForeground;
+        json["colors"]["buttonActivatedColor"] = m_buttonActivatedColor;
+        json["colors"]["buttonActiveForeground"] = m_buttonActiveForeground;
     }
 
     bool ThemeManager::importTheme(const std::filesystem::path& path) {

@@ -7,6 +7,7 @@
 #include "components/megahack/megahack.hpp"
 #include "layouts/tabbed.hpp"
 #include "layouts/panel.hpp"
+#include "layouts/sidebar.hpp"
 #include "modules/gui/gui.hpp"
 
 namespace eclipse::gui::imgui {
@@ -151,6 +152,9 @@ namespace eclipse::gui::imgui {
                 break;
             case LayoutMode::Panel:
                 m_layout = std::make_unique<PanelLayout>();
+                break;
+            case LayoutMode::Sidebar:
+                m_layout = std::make_unique<SidebarLayout>();
                 break;
         }
         m_layout->init();
