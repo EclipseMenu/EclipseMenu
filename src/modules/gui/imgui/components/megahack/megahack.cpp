@@ -48,10 +48,10 @@ namespace eclipse::gui::imgui::themes {
 
         ImGui::PushItemWidth(-1);
 
-        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(textColor));
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
 
+        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(textColor));
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));

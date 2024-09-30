@@ -136,6 +136,7 @@ namespace eclipse::gui::imgui {
         ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getTitleForegroundColor()));
         ImGui::PushFont(ImGuiRenderer::get()->getFontManager().getFont().get());
         bool open = ImGui::Begin(title.c_str(), nullptr, flags);
+        ImGui::PopStyleColor();
         return open;
     }
 

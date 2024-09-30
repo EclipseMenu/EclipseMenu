@@ -126,6 +126,7 @@ $on_mod(Loaded) {
 
     // Compile blur shader
     gui::blur::init();
+    gui::ThemeManager::get();
 
     // Add "Interface" tab to edit theme settings
     {
