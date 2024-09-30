@@ -25,6 +25,9 @@ namespace eclipse::hacks::Labels {
         ClickInfo jumpClicks;
         ClickInfo leftClicks;
         ClickInfo rightClicks;
+        int jumpMaxCPS;
+        int leftMaxCPS;
+        int rightMaxCPS;
 
         void reset() {
             jumpClicks = {};
@@ -43,12 +46,19 @@ namespace eclipse::hacks::Labels {
             removeOld(jumpClicks);
             removeOld(leftClicks);
             removeOld(rightClicks);
+
+            updateMaxCPS(PlayerButton::Jump);
+            updateMaxCPS(PlayerButton::Left);
+            updateMaxCPS(PlayerButton::Right);
         }
 
         void resetOnDeath() {
             jumpClicks.second = 0;
             leftClicks.second = 0;
             rightClicks.second = 0;
+            jumpMaxCPS = 0;
+            leftMaxCPS = 0;
+            rightMaxCPS = 0;
             reset();
         }
 
@@ -82,6 +92,35 @@ namespace eclipse::hacks::Labels {
                     return rightClicks.first.size();
                 default:
                     return 0;
+            }
+        }
+
+        int getMaxCPS(const PlayerButton btn) const {
+            switch (btn) {
+                case PlayerButton::Jump:
+                    return jumpMaxCPS;
+                case PlayerButton::Left:
+                    return leftMaxCPS;
+                case PlayerButton::Right:
+                    return rightMaxCPS;
+                default:
+                    return 0;
+            }
+        }
+
+        void updateMaxCPS(const PlayerButton btn) {
+            auto cps = getCPS(btn);
+            switch (btn) {
+                case PlayerButton::Jump:
+                    jumpMaxCPS = std::max(cps, jumpMaxCPS);
+                    break;
+                case PlayerButton::Left:
+                    leftMaxCPS = std::max(cps, leftMaxCPS);
+                    break;
+                case PlayerButton::Right:
+                    rightMaxCPS = std::max(cps, rightMaxCPS);
+                    break;
+                default: break;
             }
         }
 
@@ -248,7 +287,7 @@ namespace eclipse::hacks::Labels {
                 {"Best Run", "Best run: {runFrom}-{bestRun}%", false},
                 {"Clock", "{clock}", false},
                 {"FPS", "FPS: {round(fps)}", false},
-                {"CPS", "{cps}/{clicks} CPS", false}, // TODO: Add click trigger
+                {"CPS", "{cps}/{clicks}/{maxCps} CPS", false}, // TODO: Add click trigger
                 {"Noclip Accuracy", "Accuracy: {noclipAccuracy}%", false}, // TODO: Add death trigger
                 {"Noclip Deaths", "Deaths: {noclipDeaths}", false},
             });
@@ -310,14 +349,21 @@ namespace eclipse::hacks::Labels {
                 const auto jumpCPS = s_clicksP1.getCPS(PlayerButton::Jump);
                 const auto leftCPS = s_clicksP1.getCPS(PlayerButton::Left);
                 const auto rightCPS = s_clicksP1.getCPS(PlayerButton::Right);
+                const auto maxJumpCPS = s_clicksP1.getMaxCPS(PlayerButton::Jump);
+                const auto maxLeftCPS = s_clicksP1.getMaxCPS(PlayerButton::Left);
+                const auto maxRightCPS = s_clicksP1.getMaxCPS(PlayerButton::Right);
                 manager.setVariable("cps1", rift::Value::from(jumpCPS));
                 manager.setVariable("cps2", rift::Value::from(leftCPS));
                 manager.setVariable("cps3", rift::Value::from(rightCPS));
                 manager.setVariable("clicks1", rift::Value::from(jumpTotal));
                 manager.setVariable("clicks2", rift::Value::from(leftTotal));
                 manager.setVariable("clicks3", rift::Value::from(rightTotal));
+                manager.setVariable("maxCps1", rift::Value::from(maxJumpCPS));
+                manager.setVariable("maxCps2", rift::Value::from(maxLeftCPS));
+                manager.setVariable("maxCps3", rift::Value::from(maxRightCPS));
                 manager.setVariable("cps", rift::Value::from(jumpCPS + leftCPS + rightCPS));
                 manager.setVariable("clicks", rift::Value::from(jumpTotal + leftTotal + rightTotal));
+                manager.setVariable("maxCps", rift::Value::from(maxJumpCPS + maxLeftCPS + maxRightCPS));
             }
 
             // player 2
@@ -329,14 +375,21 @@ namespace eclipse::hacks::Labels {
                 const auto jumpCPS = s_clicksP2.getCPS(PlayerButton::Jump);
                 const auto leftCPS = s_clicksP2.getCPS(PlayerButton::Left);
                 const auto rightCPS = s_clicksP2.getCPS(PlayerButton::Right);
+                const auto maxJumpCPS = s_clicksP2.getMaxCPS(PlayerButton::Jump);
+                const auto maxLeftCPS = s_clicksP2.getMaxCPS(PlayerButton::Left);
+                const auto maxRightCPS = s_clicksP2.getMaxCPS(PlayerButton::Right);
                 manager.setVariable("cps1P2", rift::Value::from(jumpCPS));
                 manager.setVariable("cps2P2", rift::Value::from(leftCPS));
                 manager.setVariable("cps3P2", rift::Value::from(rightCPS));
                 manager.setVariable("clicks1P2", rift::Value::from(jumpTotal));
                 manager.setVariable("clicks2P2", rift::Value::from(leftTotal));
                 manager.setVariable("clicks3P2", rift::Value::from(rightTotal));
+                manager.setVariable("maxCps1P2", rift::Value::from(maxJumpCPS));
+                manager.setVariable("maxCps2P2", rift::Value::from(maxLeftCPS));
+                manager.setVariable("maxCps3P2", rift::Value::from(maxRightCPS));
                 manager.setVariable("cpsP2", rift::Value::from(jumpCPS + leftCPS + rightCPS));
                 manager.setVariable("clicksP2", rift::Value::from(jumpTotal + leftTotal + rightTotal));
+                manager.setVariable("maxCpsP2", rift::Value::from(maxJumpCPS + maxLeftCPS + maxRightCPS));
             }
         }
 
