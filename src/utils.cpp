@@ -1,6 +1,7 @@
 #include "utils.hpp"
 
 #include <fmt/format.h>
+#include <Geode/binding/PlayLayer.hpp>
 #include <Geode/binding/GJGameLevel.hpp>
 #include <Geode/binding/GameManager.hpp>
 #include <Geode/binding/PlatformToolbox.hpp>
@@ -55,12 +56,12 @@ namespace eclipse::utils {
         return fmt::format("{}.{:03d}", seconds, millis);
     }
 
-    float getActualProgress(PlayLayer* playLayer) {
+    float getActualProgress(GJBaseGameLayer* game) {
         float percent;
-        if (playLayer->m_level->m_timestamp > 0) {
-            percent = static_cast<float>(playLayer->m_gameState.m_levelTime * 240.f) / playLayer->m_level->m_timestamp * 100.f;
+        if (game->m_level->m_timestamp > 0) {
+            percent = static_cast<float>(game->m_gameState.m_levelTime * 240.f) / game->m_level->m_timestamp * 100.f;
         } else {
-            percent = reinterpret_cast<cocos2d::CCNode*>(playLayer->m_player1)->getPositionX() / playLayer->m_levelLength * 100.f;
+            percent = reinterpret_cast<cocos2d::CCNode*>(game->m_player1)->getPositionX() / game->m_levelLength * 100.f;
         }
         return std::clamp(percent, 0.f, 100.f);
     }

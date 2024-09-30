@@ -11,6 +11,8 @@
 #include <Geode/Loader.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 
+#include <Geode/modify/PlayLayer.hpp>
+
 namespace eclipse::labels {
 
     VariableManager& VariableManager::get() {
@@ -38,7 +40,7 @@ namespace eclipse::labels {
         m_variables["gameVersion"] = rift::Value::string(loader->getGameVersion());
         auto allMods = loader->getAllMods();
         m_variables["totalMods"] = rift::Value::integer(static_cast<int>(allMods.size()));
-        m_variables["enabledMods"] = rift::Value::integer(static_cast<int>(std::count_if(allMods.begin(), allMods.end(), [](auto* mod) {
+        m_variables["enabledMods"] = rift::Value::integer(static_cast<int>(std::ranges::count_if(allMods, [](auto* mod) {
             return mod->shouldLoad();
         })));
 
@@ -232,25 +234,30 @@ namespace eclipse::labels {
                 m_variables["best"] = rift::Value::integer(level->m_normalPercent);
 
             // Player
+            m_variables["playerX"] = rift::Value::floating(gjbgl->m_player1->m_position.x);
+            m_variables["playerY"] = rift::Value::floating(gjbgl->m_player1->m_position.y);
+            m_variables["player2X"] = rift::Value::floating(gjbgl->m_player2->m_position.x);
+            m_variables["player2Y"] = rift::Value::floating(gjbgl->m_player2->m_position.y);
             m_variables["attempt"] = rift::Value::integer(gjbgl->m_attempts);
             m_variables["isTestMode"] = rift::Value::boolean(gjbgl->m_isTestMode);
             m_variables["isPracticeMode"] = rift::Value::boolean(gjbgl->m_isPracticeMode);
             m_variables["isPlatformer"] = rift::Value::boolean(gjbgl->m_isPlatformer);
             m_variables["levelTime"] = rift::Value::floating(static_cast<float>(gjbgl->m_gameState.m_levelTime));
             m_variables["levelLength"] = rift::Value::floating(gjbgl->m_levelLength);
-            m_variables["levelDuration"] = rift::Value::floating(gjbgl->m_level->m_timestamp / 1000.f);
+            m_variables["levelDuration"] = rift::Value::floating(gjbgl->m_level->m_timestamp / 240.f);
             m_variables["time"] = rift::Value::string(utils::formatTime(gjbgl->m_gameState.m_levelTime));
             m_variables["frame"] = rift::Value::integer(static_cast<int>(gjbgl->m_gameState.m_levelTime * 240.f));
             m_variables["isDead"] = rift::Value::boolean(gjbgl->m_player1->m_isDead);
             m_variables["noclipDeaths"] = rift::Value::integer(config::getTemp("noclipDeaths", 0));
             m_variables["noclipAccuracy"] = rift::Value::floating(config::getTemp("noclipAccuracy", 100.f));
+            m_variables["progress"] = rift::Value::floating(utils::getActualProgress(gjbgl));
             if (auto* pl = gameManager->m_playLayer) {
                 m_variables["editorMode"] = rift::Value::boolean(false);
-                m_variables["progress"] = rift::Value::floating(pl->getCurrentPercent());
+                m_variables["realProgress"] = rift::Value::floating(pl->getCurrentPercent());
                 m_variables["objects"] = rift::Value::integer(level->m_objectCount);
             } else if (auto* ed = gameManager->m_levelEditorLayer) {
                 m_variables["editorMode"] = rift::Value::boolean(true);
-                m_variables["progress"] = rift::Value::floating(0.f);
+                m_variables["realProgress"] = rift::Value::floating(0.f);
                 m_variables["objects"] = rift::Value::integer(static_cast<int>(ed->m_objects->count()));
             }
         } else {
@@ -266,6 +273,10 @@ namespace eclipse::labels {
             removeVariable("bestPercent");
             removeVariable("bestTime");
             removeVariable("best");
+            removeVariable("playerX");
+            removeVariable("playerY");
+            removeVariable("player2X");
+            removeVariable("player2Y");
             removeVariable("attempt");
             removeVariable("isTestMode");
             removeVariable("isPracticeMode");
@@ -280,6 +291,7 @@ namespace eclipse::labels {
             removeVariable("noclipAccuracy");
             removeVariable("editorMode");
             removeVariable("progress");
+            removeVariable("realProgress");
             removeVariable("objects");
             removeVariable("runFrom");
             removeVariable("bestRun");

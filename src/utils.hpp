@@ -1,7 +1,7 @@
 #pragma once
 
 #include <random>
-#include <Geode/binding/PlayLayer.hpp>
+#include <Geode/binding/GJBaseGameLayer.hpp>
 
 namespace eclipse::utils {
 
@@ -70,9 +70,9 @@ namespace eclipse::utils {
     std::string formatTime(double time);
 
     /// @brief Bugfixed version of getCurrentPercent.
-    /// @param playLayer PlayLayer to get the progress from.
+    /// @param game GJBaseGameLayer to get the progress from.
     /// @return Actual progress of the level.
-    float getActualProgress(PlayLayer* playLayer);
+    float getActualProgress(GJBaseGameLayer* game);
 
     /// @brief Make the cursor visible/hidden under certain conditions
     void updateCursorState(bool visible);
