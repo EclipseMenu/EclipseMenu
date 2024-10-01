@@ -55,7 +55,7 @@ namespace eclipse::gui::imgui {
             ImGui::BeginChild("Logo", ImVec2(188 * scale, 50 * scale));
             ImGui::SameLine();
 
-            ImGui::SetCursorPosY(11);
+            ImGui::SetCursorPosY(11 * scale);
             ImGui::TextUnformatted("Eclipse Menu");
 
             ImGui::EndChild();
@@ -85,9 +85,8 @@ namespace eclipse::gui::imgui {
             if (ImGui::Button(it.c_str(), ImVec2(160 * scale, 40 * scale))) {
                 m_selectedTab = i;
             }
+            ImGui::PopStyleColor(2);
             ImGui::PopStyleVar();
-            ImGui::PopStyleColor();
-            ImGui::PopStyleColor();
         }
 
         ImGui::PopStyleVar();
@@ -97,7 +96,7 @@ namespace eclipse::gui::imgui {
         // user thing
 
         ImGui::Dummy(ImVec2(0.0f, ImGui::GetContentRegionAvail().y - 80 * scale - style->ItemSpacing.y));
-        ImGui::BeginChild("User", ImVec2(188, 80));
+        ImGui::BeginChild("User", ImVec2(188 * scale, 80 * scale));
 
         ImGui::EndChild();
 
@@ -108,10 +107,7 @@ namespace eclipse::gui::imgui {
 		ImGui::BeginChild("modules-wrapper", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y), false);
 		ImGui::PopStyleColor();
 
-        // Render tabs
-        for (int i = 0; i < m_tabs.size(); i++) {
-            if (m_selectedTab == i) m_tabs[i].draw();
-        }
+        m_tabs[m_selectedTab].draw();
 
         ImGui::EndChild();
 
