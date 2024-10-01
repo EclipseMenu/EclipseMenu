@@ -50,7 +50,7 @@ namespace eclipse::gui {
         void saveTheme() const;
 
         /// @brief Stores theme values to a json object
-        void applyValues(nlohmann::json& json) const;
+        void applyValues(nlohmann::json& json, bool flatten = false) const;
 
         /// @brief Imports a ZIP file with theme settings and fonts
         /// @return True if import was successful, or False in case an error happened

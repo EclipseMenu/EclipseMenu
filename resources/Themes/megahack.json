@@ -33,6 +33,7 @@
         "titleForegroundColor": "FFFFFFFF"
     },
     "other": {
+        "borderSize": 0.0,
         "font": "Poppins",
         "fontSize": 18.0,
         "framePadding": 0.0,
