@@ -317,13 +317,14 @@ namespace eclipse::labels {
         }
 
         void saveBestRun() {
-            m_fields->m_bestRun = utils::getActualProgress(this);
-            if ((m_fields->m_bestRun - m_fields->m_runFrom) >= (m_fields->m_lastBestRun - m_fields->m_lastRunFrom)) {
-                m_fields->m_lastBestRun = m_fields->m_bestRun;
-                m_fields->m_lastRunFrom = m_fields->m_runFrom;
+            auto fields = m_fields.self();
+            fields->m_bestRun = utils::getActualProgress(this);
+            if ((fields->m_bestRun - fields->m_runFrom) >= (fields->m_lastBestRun - fields->m_lastRunFrom)) {
+                fields->m_lastBestRun = fields->m_bestRun;
+                fields->m_lastRunFrom = fields->m_runFrom;
                 auto& manager = VariableManager::get();
-                manager.setVariable("runFrom", rift::Value::floating(m_fields->m_runFrom));
-                manager.setVariable("bestRun", rift::Value::floating(m_fields->m_bestRun));
+                manager.setVariable("runFrom", rift::Value::floating(fields->m_runFrom));
+                manager.setVariable("bestRun", rift::Value::floating(fields->m_bestRun));
             }
         }
 

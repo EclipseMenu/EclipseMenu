@@ -54,7 +54,7 @@ namespace eclipse::hacks::Player {
             if (object == m_anticheatSpike)
                 return PlayLayer::destroyPlayer(player, object);
 
-            auto& fields = m_fields;
+            auto fields = m_fields.self();
 
             if (!fields->m_noclipTint && config::get<bool>("player.noclip.tint", false)) {
                 auto color = config::get<gui::Color>("player.noclip.color", gui::Color::RED).toCCColor3B();
@@ -85,7 +85,7 @@ namespace eclipse::hacks::Player {
         }
 
         void postUpdate(float dt) override {
-            auto& fields = m_fields;
+            auto fields = m_fields.self();
             if (config::get<bool>("player.noclip.tint", false) && fields->m_noclipTint && !m_hasCompletedLevel && !m_player1->m_isDead) {
                 float time = config::get<float>("player.noclip.time", 0.f);
                 if (time == 0.f) { // this doesnt really work but ok ninx
@@ -126,7 +126,7 @@ namespace eclipse::hacks::Player {
 
         void resetLevel() {
             PlayLayer::resetLevel();
-            auto& fields = m_fields;
+            auto fields = m_fields.self();
             fields->m_wouldDie = false;
             fields->m_wouldDieFrame = false;
             fields->m_deadFrames = 0;
