@@ -12,6 +12,8 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
 
+            config::setIfEmpty("player.noclip.p1", true);
+            config::setIfEmpty("player.noclip.p2", true);
             config::setIfEmpty("player.noclip.opacity", 90.f);
             config::setIfEmpty("player.noclip.time", 0.f);
             config::setIfEmpty("player.noclip.color", gui::Color::RED);
@@ -20,6 +22,8 @@ namespace eclipse::hacks::Player {
                 ->setDescription("Disables player death")
                 ->handleKeybinds()
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                    options->addToggle("Player 1", "player.noclip.p1");
+                    options->addToggle("Player 2", "player.noclip.p2");
                     options->addToggle("Noclip Tint", "player.noclip.tint");
                     options->addColorComponent("Tint Color", "player.noclip.color");
                     options->addInputFloat("Tint Opacity", "player.noclip.opacity", 0.f, 100.f, "%.0f%");
@@ -66,14 +70,18 @@ namespace eclipse::hacks::Player {
                 }
             }
 
-            if (config::get<bool>("player.noclip", false)) {
+            bool noclipActive = config::get<bool>("player.noclip", false);
+            if (!noclipActive) return PlayLayer::destroyPlayer(player, object);
+
+            bool player1 = config::get<bool>("player.noclip.p1", true) && player == m_player1;
+            bool player2 = config::get<bool>("player.noclip.p2", true) && player == m_player2;
+            if (player1 || player2) {
                 fields->m_wouldDieFrame = true;
                 fields->m_wouldDie = true;
                 fields->m_tintTimer = 0.f;
-            }
-
-            if (!config::get<bool>("player.noclip", false))
+            } else {
                 PlayLayer::destroyPlayer(player, object);
+            }
         }
 
         void postUpdate(float dt) override {
