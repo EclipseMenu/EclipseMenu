@@ -105,8 +105,8 @@ namespace eclipse::recorder {
             if (m_frameHasData) {
                 const geode::ByteVector frame = m_currentFrame;
                 m_frameHasData = false;
-                m_lock.unlock();
                 m_ffmpegCLI->write(frame.data(), frame.size());
+                m_lock.unlock();
             }
             else m_lock.unlock();
         }

@@ -28,8 +28,9 @@ namespace eclipse::hacks::Recorder {
     
     void glViewportHook(GLint a, GLint b, GLsizei c, GLsizei d) {
         if (visiting && s_recorder.isRecording() && inShaderLayer) {
+            ImVec2 displaySize = ImGui::GetIO().DisplaySize;
             //shaderlayer resolutions for each quality mode
-            if (c != 2608 && d != 2608 && c != 1304 && d != 1304 && c != 652 && d != 652) {
+            if (c != 2608 && d != 2608 && c != 1304 && d != 1304 && c != 652 && d != 652 && c == (int)displaySize.x && d == (int)displaySize.y) {
                 c = config::get<int>("recorder.resolution.x", 1920);
                 d = config::get<int>("recorder.resolution.y", 1080);
             }
