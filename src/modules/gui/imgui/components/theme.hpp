@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <Geode/platform/platform.hpp>
 
 namespace eclipse::gui {
     class Component;
