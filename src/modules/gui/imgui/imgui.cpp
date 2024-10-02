@@ -26,7 +26,7 @@ namespace eclipse::gui::imgui {
     }
 
     void FontManager::FontMetadata::load() {
-        auto fontSize = ThemeManager::get()->getFontSize();
+        auto fontSize = ThemeManager::get()->getFontSize() * DEFAULT_SCALE;
         m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(m_path.string().c_str(), fontSize);
     }
 

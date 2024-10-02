@@ -95,7 +95,7 @@ namespace eclipse::gui::imgui {
         auto tm = ThemeManager::get();
         auto &style = ImGui::GetStyle();
 
-        ImGui::GetIO().FontGlobalScale = tm->getGlobalScale();
+        ImGui::GetIO().FontGlobalScale = tm->getGlobalScale() * INV_DEFAULT_SCALE;
 
         // Sizes
         style.WindowPadding = ImVec2(4, 4);

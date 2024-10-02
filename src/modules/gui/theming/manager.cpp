@@ -7,7 +7,7 @@
 #include <Geode/utils/cocos.hpp>
 
 namespace eclipse::gui {
-    static auto IMPORT_PICK_OPTIONS = geode::prelude::file::FilePickOptions {
+    static auto IMPORT_PICK_OPTIONS = geode::utils::file::FilePickOptions {
         std::nullopt,
         {
             {
@@ -95,9 +95,9 @@ namespace eclipse::gui {
         try_assign(m_themeDescription, details, "description");
         try_assign(m_themeAuthor, details, "author");
 
-        auto renderer = json_try_get<int>(json, "renderer");
-        auto layout = json_try_get<int>(json, "layout");
-        auto theme = json_try_get<int>(json, "style");
+        auto renderer = json_try_get<int>(details, "renderer");
+        auto layout = json_try_get<int>(details, "layout");
+        auto theme = json_try_get<int>(details, "style");
 
         if (renderer) this->setRenderer(static_cast<RendererType>(*renderer));
         if (layout) this->setLayoutMode(static_cast<imgui::LayoutMode>(*layout));
@@ -213,7 +213,7 @@ namespace eclipse::gui {
     }
 
     float ThemeManager::getGlobalScale() const {
-        return m_uiScale * config::getTemp<float>("ui.scale", 1.f);
+        return m_uiScale * config::getTemp<float>("ui.scale", 1.f) * imgui::DEFAULT_SCALE;
     }
 
     std::optional<ThemeMeta> ThemeManager::checkTheme(const std::filesystem::path &path) {

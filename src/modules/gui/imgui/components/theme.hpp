@@ -23,6 +23,9 @@ namespace eclipse::gui {
 
 namespace eclipse::gui::imgui {
 
+    constexpr float DEFAULT_SCALE = 1.0f GEODE_ANDROID(* 1.42f);
+    constexpr float INV_DEFAULT_SCALE = 1.0f / DEFAULT_SCALE;
+
     class Theme {
     public:
         virtual ~Theme() = default;
