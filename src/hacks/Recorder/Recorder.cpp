@@ -135,30 +135,32 @@ namespace eclipse::hacks::Recorder {
             tab->addInputInt("Resolution X", "recorder.resolution.x", 1, 15360);
             tab->addInputInt("Resolution Y", "recorder.resolution.y", 1, 8640);
 
-            config::setIfEmpty("recorder.codec", 0);
+            config::setIfEmpty("recorder.codec", static_cast<int>(recorder::Codec::None));
             config::setIfEmpty("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
             config::setIfEmpty("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
             tab->addInputText("Args", "recorder.args");
             tab->addInputText("Extra Args", "recorder.extraargs");
             tab->addInputText("Video Args", "recorder.videoargs");
+
+            tab->addCombo("Codec", "recorder.codec", {"None", "h264_nvenc", "h264_amf", "hevc_nvenc", "hevc_amf", "libx264", "libx265", "libx264rgb"}, 8);
             
             tab->addLabel("Presets");
             tab->addButton("CPU")->callback([] {
-                config::set<int>("recorder.codec", 0);
+                config::set<int>("recorder.codec", static_cast<int>(recorder::Codec::None));
                 config::set<std::string>("recorder.args", "");
                 config::set<std::string>("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
                 config::set<std::string>("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
             });
 
             tab->addButton("NVIDIA")->callback([] {
-                config::set<int>("recorder.codec", 1);
+                config::set<int>("recorder.codec", static_cast<int>(recorder::Codec::h264_nvenc));
                 config::set<std::string>("recorder.args", "-hwaccel cuda -hwaccel_output_format cuda");
                 config::set<std::string>("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
                 config::set<std::string>("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
             });
 
             tab->addButton("AMD")->callback([] {
-                config::set<int>("recorder.codec", 2);
+                config::set<int>("recorder.codec", static_cast<int>(recorder::Codec::h264_amf));
                 config::set<std::string>("recorder.args", "");
                 config::set<std::string>("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
                 config::set<std::string>("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");

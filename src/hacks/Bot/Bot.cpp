@@ -14,7 +14,6 @@ using namespace geode::prelude;
 namespace eclipse::hacks::Bot {
 
     static bot::Bot s_bot;
-    bool resetFrame = false;
 
     void saveReplay() {
         std::filesystem::path replayDirectory = Mod::get()->getSaveDir() / "replays";
@@ -57,19 +56,6 @@ namespace eclipse::hacks::Bot {
 
     REGISTER_HACK(Bot)
 
-    //temporary, player->m_isDead is wrong
-    class $modify(BotPOHook, PlayerObject) {
-        struct Fields {
-            bool m_isDead = false;
-        };
-
-        void playerDestroyed(bool idk) {
-            if (auto* gjbgl = GJBaseGameLayer::get())
-                m_fields->m_isDead = gjbgl->m_player1 == this || gjbgl->m_player2 == this;
-            PlayerObject::playerDestroyed(idk);
-        }
-    };
-
     class $modify(BotPLHook, PlayLayer) {
         bool init(GJGameLevel* gj, bool p1, bool p2) {
             bool result = PlayLayer::init(gj, p1, p2);
@@ -78,17 +64,16 @@ namespace eclipse::hacks::Bot {
         }
 
         void resetLevel() {
-            resetFrame = true;
-            PlayLayer::resetLevel();
-            resetFrame = false;
+            bool p1hold = m_player1->m_holdingButtons[1];
+            bool p2hold = m_player2->m_holdingButtons[1];
 
-            //temporary, player->m_isDead is wrong
-            static_cast<BotPOHook*>(m_player1)->m_fields->m_isDead = false;
-            static_cast<BotPOHook*>(m_player2)->m_fields->m_isDead = false;
+            PlayLayer::resetLevel();
 
             if (s_bot.getState() == bot::State::RECORD) {
-                s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, true, false);
-                if (m_gameState.m_isDualMode)
+                //gd does this automatically for holding but not releases so we do it manually
+                if(!p1hold)
+                    s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, true, false);
+                if (m_gameState.m_isDualMode && m_levelSettings->m_twoPlayerMode && !p2hold)
                     s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, false, false);
             }
 
@@ -102,10 +87,7 @@ namespace eclipse::hacks::Bot {
         }
 
         CheckpointObject* markCheckpoint() {
-            if (
-                s_bot.getState() == bot::State::RECORD &&
-                (static_cast<BotPOHook*>(m_player1)->m_fields->m_isDead || static_cast<BotPOHook*>(m_player2)->m_fields->m_isDead)
-            )
+            if (s_bot.getState() == bot::State::RECORD && (m_player1->m_isDead || m_player2->m_isDead))
                 return nullptr;
 
             return PlayLayer::markCheckpoint();
@@ -132,14 +114,20 @@ namespace eclipse::hacks::Bot {
 
             std::optional<gdr::Input> input = std::nullopt;
 
-            while ((input = s_bot.poll(m_gameState.m_currentProgress)) != std::nullopt)
+            while ((input = s_bot.poll(m_gameState.m_currentProgress)) != std::nullopt) {
                 GJBaseGameLayer::handleButton(input->down, (int) input->button, !input->player2);
+            }
         }
 
         void handleButton(bool down, int button, bool player1) {
             GJBaseGameLayer::handleButton(down, button, player1);
 
-            if (s_bot.getState() != bot::State::RECORD || resetFrame)
+            if (s_bot.getState() != bot::State::RECORD)
+                return;
+
+            std::optional<gdr::Input> lastInput = s_bot.findLastInputForPlayer(player1, (PlayerButton) button);
+
+            if(lastInput && lastInput->down == down)
                 return;
 
             s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !player1, down);

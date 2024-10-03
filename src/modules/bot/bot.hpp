@@ -37,6 +37,9 @@ namespace eclipse::bot {
         /// @brief Add an input to the currently loaded replay.
         void recordInput(int frame, PlayerButton button, bool player1, bool pressed);
 
+        /// @brief Find the last input for the given player.
+        [[nodiscard]] std::optional<gdr::Input> findLastInputForPlayer(bool player1, PlayerButton button);
+
         /// @brief Get the next available input from the currently loaded replay.
         /// @param frame The current frame of the playback.
         /// @return The next input from the currently loaded replay, if available.
@@ -53,6 +56,8 @@ namespace eclipse::bot {
         /// @brief Sets the level info.
         /// @param levelInfo The level info.
         void setLevelInfo(gdr::Level levelInfo);
+
+        [[nodiscard]] std::optional<gdr::Input> getPrevious(bool player1);
 
     protected:
         State m_state = State::DISABLED;

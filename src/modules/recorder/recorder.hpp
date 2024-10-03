@@ -9,17 +9,22 @@
 
 namespace eclipse::recorder {
 
-    enum Codec {
+    enum class Codec : int {
         None = 0,
         h264_nvenc = 1,
         h264_amf = 2,
+        hevc_nvenc = 3,
+        hevc_amf = 4,
+        libx264 = 5,
+        libx265 = 6,
+        libx264rgb = 7,
     };
 
     struct RenderSettings {
         uint32_t m_width = 1920;
         uint32_t m_height = 1080;
         uint32_t m_fps = 60;
-        Codec m_codec = None;
+        Codec m_codec = Codec::None;
         float m_bitrate = 30;
         std::string m_args;
         std::string m_extraArgs;

@@ -21,12 +21,20 @@ namespace eclipse::bot {
     }
 
     void Bot::removeInputsAfter(int frame) {
-        const auto check = [&](const gdr::Input& input) -> bool { return input.frame > frame; };
         std::erase_if(m_replay.inputs, [&](const gdr::Input& input) -> bool { return input.frame > frame; });
     }
 
     void Bot::recordInput(int frame, PlayerButton button, bool player2, bool pressed) {
         m_replay.inputs.emplace_back(frame, static_cast<int>(button), player2, pressed);
+    }
+
+    std::optional<gdr::Input> Bot::findLastInputForPlayer(bool player1, PlayerButton button) {
+        for (int i = m_replay.inputs.size() - 1; i >= 0; i--) {
+            if (m_replay.inputs[i].player2 == !player1 && m_replay.inputs[i].button == static_cast<int>(button))
+                return m_replay.inputs[i];
+        }
+
+        return std::nullopt;
     }
 
     std::optional<gdr::Input> Bot::poll(int frame) {
@@ -36,6 +44,15 @@ namespace eclipse::bot {
         if (m_replay.inputs[m_inputIndex].frame <= frame)
             return m_replay.inputs[m_inputIndex++];
         
+        return std::nullopt;
+    }
+
+    std::optional<gdr::Input> Bot::getPrevious(bool player1) {
+        for (int i = m_inputIndex - 2; i >= 0; i--) {
+            if (m_replay.inputs[i].player2 == !player1)
+                return m_replay.inputs[i];
+        }
+
         return std::nullopt;
     }
 
