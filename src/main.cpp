@@ -155,7 +155,7 @@ $on_mod(Loaded) {
                 ThemeManager::get()->setLayoutMode(static_cast<imgui::LayoutMode>(value));
             })->disableSaving();
 
-        tab->addCombo("Style", "theme", imgui::THEME_NAMES, 0)
+        tab->addCombo("Style", "style", imgui::THEME_NAMES, 0)
             ->callback([](int value) {
                 ThemeManager::get()->setComponentTheme(static_cast<imgui::ComponentTheme>(value));
             })->disableSaving();
