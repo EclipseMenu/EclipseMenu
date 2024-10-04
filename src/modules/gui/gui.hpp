@@ -10,6 +10,7 @@
 #include <functional>
 #include <memory>
 #include "color.hpp"
+#include "popup.hpp"
 
 namespace eclipse::gui {
 
@@ -835,6 +836,9 @@ namespace eclipse::gui {
 
         /// @brief [Implementation specific] Calls the function after the main render loop
         virtual void queueAfterDrawing(const std::function<void()>& func) = 0;
+
+        /// @brief Opens a modal popup with provided configuration.
+        virtual void showPopup(const Popup& popup) = 0;
     };
 
     using Tabs = std::vector<std::shared_ptr<MenuTab>>;
@@ -867,6 +871,10 @@ namespace eclipse::gui {
             if (auto renderer = get()->m_renderer)
                 renderer->queueAfterDrawing(func);
             else func(); // fallback
+        }
+
+        void showPopup(const Popup& popup) const {
+            if (m_renderer) m_renderer->showPopup(popup);
         }
 
         [[nodiscard]] const Tabs& getTabs() const { return m_tabs; }

@@ -40,4 +40,15 @@ namespace eclipse::gui::cocos {
     void CocosRenderer::queueAfterDrawing(const std::function<void()>& func) {
         func();
     }
+
+    void CocosRenderer::showPopup(const eclipse::Popup &popup) {
+        if (popup.isPrompt()) return; // TODO: Implement prompt
+
+        geode::createQuickPopup(
+            popup.getTitle().c_str(), popup.getMessage().c_str(),
+            popup.getButton1().c_str(),
+            popup.getButton2().empty() ? nullptr : popup.getButton2().c_str(),
+            [callback = popup.getCallback()](auto, bool result) { callback(result); }
+        )->show();
+    }
 }
