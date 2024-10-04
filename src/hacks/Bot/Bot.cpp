@@ -26,9 +26,7 @@ namespace eclipse::hacks::Bot {
     }
 
     void loadReplay() {
-        auto replayDirectory = Mod::get()->getSaveDir() / "replays";
-        auto replayName = config::get<std::string>("bot.replayname", "temp") + ".gdr";
-        std::filesystem::path replayPath = replayDirectory / replayName;
+        std::filesystem::path replayPath = config::get<std::string>("bot.selectedreplay", "");
         s_bot.load(replayPath);
     }
 
@@ -46,6 +44,7 @@ namespace eclipse::hacks::Bot {
             tab->addRadioButton("Playback", "bot.state", 2)->callback(updateBotState)->handleKeybinds();
 
             tab->addInputText("Replay Name", "bot.replayname");
+            tab->addFilesystemCombo("Replays", "bot.selectedreplay", Mod::get()->getSaveDir() / "replays");
             tab->addButton("Save")->callback(saveReplay);
             tab->addButton("Load")->callback(loadReplay);
         }

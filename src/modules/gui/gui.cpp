@@ -79,6 +79,25 @@ namespace eclipse::gui {
         store_value(m_id, value, m_noSave);
     }
 
+    std::filesystem::path FilesystemComboComponent::getValue() const {
+        return get_value(m_id, std::filesystem::path(), m_noSave);
+    }
+
+    void FilesystemComboComponent::setValue(std::filesystem::path path) const {
+        store_value(m_id, path, m_noSave);
+    }
+
+    void FilesystemComboComponent::setValue(int index) {
+        setValue(m_items[index]);
+    }
+
+    void FilesystemComboComponent::globFiles() {
+        m_items.clear();
+
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(m_directory))
+            m_items.push_back(entry.path());
+    }
+
     float SliderComponent::getValue() const {
         return get_value(m_id, 0.f, m_noSave);
     }
@@ -157,6 +176,7 @@ namespace eclipse::gui {
 
     void MenuTab::addComponent(const std::shared_ptr<Component>& component) {
         m_components.push_back(component);
+        component->onInit();
     }
 
     void MenuTab::removeComponent(std::weak_ptr<Component> component) {

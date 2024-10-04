@@ -11,6 +11,7 @@ namespace eclipse::gui {
     class ToggleComponent;
     class RadioButtonComponent;
     class ComboComponent;
+    class FilesystemComboComponent;
     class SliderComponent;
     class InputFloatComponent;
     class InputIntComponent;
@@ -55,6 +56,7 @@ namespace eclipse::gui::imgui {
         virtual void visitToggle(const std::shared_ptr<ToggleComponent>& toggle) const;
         virtual void visitRadioButton(const std::shared_ptr<RadioButtonComponent>& radio) const;
         virtual void visitCombo(const std::shared_ptr<ComboComponent>& combo) const;
+        virtual void visitFilesystemCombo(const std::shared_ptr<FilesystemComboComponent>& combo) const;
         virtual void visitSlider(const std::shared_ptr<SliderComponent>& slider) const;
         virtual void visitInputFloat(const std::shared_ptr<InputFloatComponent>& inputFloat) const;
         virtual void visitInputInt(const std::shared_ptr<InputIntComponent>& inputInt) const;

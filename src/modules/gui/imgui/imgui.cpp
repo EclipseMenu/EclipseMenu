@@ -179,6 +179,7 @@ namespace eclipse::gui::imgui {
 
     void ImGuiRenderer::visitComponent(const std::shared_ptr<Component>& component) const {
         if (!m_theme) return;
+        component->onUpdate();
         m_theme->visit(component);
     }
 

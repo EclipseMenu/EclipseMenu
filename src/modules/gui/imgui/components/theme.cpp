@@ -1,6 +1,7 @@
 #include "theme.hpp"
 
 #include <imgui-cocos.hpp>
+#include <imgui_internal.h>
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
 #include <modules/gui/theming/manager.hpp>
@@ -26,7 +27,7 @@ namespace eclipse::gui::imgui {
             CASE(InputInt); CASE(FloatToggle);
             CASE(InputText); CASE(Color);
             CASE(Button); CASE(Keybind);
-            CASE(LabelSettings);
+            CASE(LabelSettings); CASE(FilesystemCombo);
         }
         ImGui::PopID();
 
@@ -211,6 +212,30 @@ namespace eclipse::gui::imgui {
                 }
 
                 if (is_selected) ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::PopItemWidth();
+    }
+
+    void Theme::visitFilesystemCombo(const std::shared_ptr<FilesystemComboComponent>& combo) const {
+        auto& items = combo->getItems();
+        std::filesystem::path value = combo->getValue();
+        auto title = combo->getTitle();
+        ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * (title.empty() ? .9f : .5f));
+        if (ImGui::BeginCombo(title.c_str(), value.empty() ? "None" : value.filename().stem().string().c_str())) {
+            ImGui::InputText("##search", combo->getSearchBuffer());
+            for (int n = 0; n < items.size(); n++) {
+                std::string option = items[n].filename().stem().string();
+                if(option.find(*combo->getSearchBuffer()) != std::string::npos) {
+                    const bool is_selected = (value == items[n]);
+                    if (ImGui::Selectable(option.c_str(), is_selected)) {
+                        combo->setValue(n);
+                        combo->triggerCallback(n);
+                    }
+
+                    if (is_selected) ImGui::SetItemDefaultFocus();
+                }
             }
             ImGui::EndCombo();
         }
