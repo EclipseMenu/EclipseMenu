@@ -24,15 +24,17 @@
     </a>
 </div>
 <br>
+<div>
+   <h1>Tabbed Style</h1>
+   <img src="screenshots/image1.png" alt="Tabbed Style">
+   <h1>Panel Style</h1>
+   <img src="screenshots/image2.png" alt="Panel Style">
+</div>
 <!--
 <div>
    <h1>Credits</h1>
 </div>
 -->
-<div align="center">
-    <h1 align="center">NOTICE</h1>
-    <p align="center">This README is still going under revisions! This may be updated more and more in the future.</p>
-</div>
 <div align="center">
     <h1 align="center">NOTICE</h1>
     <p align="center">This README is still going under revisions! This may be updated more and more in the future.</p>
