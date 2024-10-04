@@ -24,7 +24,7 @@ static void toggleMenu() {
 class $modify(EclipseButtonMLHook, MenuLayer) {
     bool init() override {
         if (!MenuLayer::init()) return false;
-
+/*
         {
             auto menu = this->getChildByID("bottom-menu");
             auto rendererSwitchButton = CCMenuItemSpriteExtra::create(
@@ -35,7 +35,7 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
             menu->addChild(rendererSwitchButton);
             menu->updateLayout();
         }
-
+*/
         if (s_isInitialized) return true;
 
         geode::log::info("Eclipse Menu commit hash: {}", GIT_HASH);
