@@ -168,6 +168,16 @@ $on_mod(Loaded) {
                 ->disableSaving();
         });
         blurToggle->disableSaving();
+
+        auto accentColor = tab->addColorComponent("Accent Color", "accent", true);
+        accentColor->callback([](const Color& color) {
+            ThemeManager::get()->applyAccentColor(color);
+        })->disableSaving();
+
+        auto backgroundColor = tab->addColorComponent("Background Color", "background", true);
+        backgroundColor->callback([](const Color& color) {
+            ThemeManager::get()->applyBackgroundColor(color);
+        })->disableSaving();
     }
 
     // Schedule hack updates

@@ -141,6 +141,84 @@ namespace eclipse::gui {
         };
     }
 
+    constexpr float hue2rgb(float p, float q, float t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1.0f / 6) return p + (q - p) * 6 * t;
+        if (t < 1.0f / 2) return q;
+        if (t < 2.0f / 3) return p + (q - p) * (2.0f / 3 - t) * 6;
+        return p;
+    }
+
+    Color::HSL Color::HSL::fromColor(const Color& color) {
+        auto max = std::max({color.r, color.g, color.b});
+        auto min = std::min({color.r, color.g, color.b});
+        float h, s, l = (max + min) / 2;
+
+        if (max == min) {
+            h = s = 0;
+        } else {
+            float d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+            if (max == color.r) {
+                h = (color.g - color.b) / d + (color.g < color.b ? 6 : 0);
+            } else if (max == color.g) {
+                h = (color.b - color.r) / d + 2;
+            } else {
+                h = (color.r - color.g) / d + 4;
+            }
+
+            h /= 6;
+        }
+
+        return {h, s, l};
+    }
+
+    Color Color::HSL::toColor(const HSL& hsl) {
+        float r, g, b;
+
+        if (hsl.s == 0.f) {
+            r = g = b = hsl.l;
+        } else {
+            auto q = hsl.l < 0.5 ? hsl.l * (1 + hsl.s) : hsl.l + hsl.s - hsl.l * hsl.s;
+            auto p = 2 * hsl.l - q;
+            r = hue2rgb(p, q, hsl.h + 1.0f / 3);
+            g = hue2rgb(p, q, hsl.h);
+            b = hue2rgb(p, q, hsl.h - 1.0f / 3);
+        }
+
+        return {r, g, b};
+    }
+
+    Color::HSL Color::toHSL() const {
+        return HSL::fromColor(*this);
+    }
+
+    Color Color::fromHSL(const HSL& hsl) const {
+        return HSL::toColor(hsl);
+    }
+
+    float Color::luminance() const {
+        return 0.2126f * r + 0.7152f * g + 0.0722f * b;
+    }
+
+    Color Color::darken(float factor) const {
+        auto hsl = this->toHSL();
+        hsl.l = std::max(0.f, hsl.l - factor);
+        Color rgb = hsl;
+        rgb.a = a;
+        return rgb;
+    }
+
+    Color Color::lighten(float factor) const {
+        auto hsl = this->toHSL();
+        hsl.l = std::min(1.f, hsl.l + factor);
+        Color rgb = hsl;
+        rgb.a = a;
+        return rgb;
+    }
+
     void to_json(nlohmann::json& j, const Color& e) {
         auto str = e.toString();
         j = str;

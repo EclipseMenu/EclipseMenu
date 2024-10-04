@@ -94,6 +94,28 @@ namespace eclipse::gui {
         /// @brief Converts the color to a CCColor3B
         /// @return CCColor3B color
         [[nodiscard]] cocos2d::ccColor3B toCCColor3B() const;
+
+        struct HSL {
+            float h, s, l;
+
+            HSL() : h(0), s(0), l(0) {}
+            HSL(float h, float s, float l) : h(h), s(s), l(l) {}
+            HSL(const HSL& other) = default;
+
+            static HSL fromColor(const Color& color);
+            static Color toColor(const HSL& hsl);
+
+            operator Color() const { return toColor(*this); }
+        };
+
+        [[nodiscard]] HSL toHSL() const;
+        [[nodiscard]] Color fromHSL(const HSL& hsl) const;
+
+        /// @brief Gets the luminance of the color (0-1)
+        [[nodiscard]] float luminance() const;
+
+        [[nodiscard]] Color darken(float factor) const;
+        [[nodiscard]] Color lighten(float factor) const;
     };
 
     void to_json(nlohmann::json& j, const Color& e);

@@ -69,6 +69,21 @@ namespace eclipse::gui {
         /// @brief Returns a vector of all available built-in and custom themes
         static std::vector<ThemeMeta> listAvailableThemes();
 
+    /// === Meta-colors
+
+        /// @brief Calculates colors based on the accent color for:
+        /// m_disabledColor, m_titleBackgroundColor,
+        /// m_titleForegroundColor, m_checkboxCheckmarkColor,
+        /// m_buttonBackgroundColor, m_buttonForegroundColor,
+        /// m_buttonDisabledColor, m_buttonDisabledForeground,
+        /// m_buttonHoveredColor, m_buttonHoveredForeground,
+        /// m_buttonActivatedColor, m_buttonActiveForeground
+        void applyAccentColor(const Color& color);
+        /// @brief Calculates colors based on the background color for:
+        /// m_backgroundColor, m_frameBackground, m_borderColor,
+        /// m_foregroundColor, m_checkboxForegroundColor, m_checkboxBackgroundColor
+        void applyBackgroundColor(const Color& color);
+
     /// === Properties
 
         /// [Meta] Theme name

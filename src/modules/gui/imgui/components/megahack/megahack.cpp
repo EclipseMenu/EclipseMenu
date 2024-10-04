@@ -8,7 +8,7 @@
 namespace eclipse::gui::imgui::themes {
     bool Megahack::checkbox(const std::string &label, bool &value, const std::function<void()> &postDraw) const {
         auto tm = ThemeManager::get();
-        auto textColor = value ? tm->getButtonForegroundColor() : tm->getButtonDisabledForeground();
+        auto textColor = value ? tm->getCheckboxForegroundColor() : tm->getButtonDisabledForeground();
         auto scale = tm->getGlobalScale();
 
         ImGui::PushItemWidth(-1);
@@ -43,7 +43,7 @@ namespace eclipse::gui::imgui::themes {
                                         const std::function<void()> &postDraw,
                                         const std::string& popupId) const {
         auto tm = ThemeManager::get();
-        auto textColor = value ? tm->getButtonForegroundColor() : tm->getButtonDisabledForeground();
+        auto textColor = value ? tm->getCheckboxForegroundColor() : tm->getButtonDisabledForeground();
         auto scale = tm->getGlobalScale();
 
         ImGui::PushItemWidth(-1);

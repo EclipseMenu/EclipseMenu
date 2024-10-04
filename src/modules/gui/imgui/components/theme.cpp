@@ -119,6 +119,10 @@ namespace eclipse::gui::imgui {
         // Base colors
         auto& colors = style.Colors;
         colors[ImGuiCol_WindowBg] = tm->getBackgroundColor();
+        colors[ImGuiCol_PopupBg] = tm->getBackgroundColor();
+        colors[ImGuiCol_Button] = tm->getButtonBackgroundColor();
+        colors[ImGuiCol_ButtonHovered] = tm->getButtonHoveredBackground();
+        colors[ImGuiCol_ButtonActive] = tm->getButtonHoveredBackground();
         colors[ImGuiCol_Border] = tm->getBorderColor();
         colors[ImGuiCol_Text] = tm->getForegroundColor();
         colors[ImGuiCol_TitleBg] = tm->getTitleBackgroundColor();

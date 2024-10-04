@@ -23,15 +23,13 @@ namespace eclipse::gui {
             auto themes = listAvailableThemes();
             if (themes.empty()) {
                 // okay, we're screwed, just set the defaults
+                applyValues(config::getTempStorage(), true);
                 return setDefaults();
             }
 
             // TODO: add a priority for default theme
             loadTheme(themes[0].path);
         }
-
-        // load values into temp storage for use with other components
-        applyValues(config::getTempStorage(), true);
     }
 
     void ThemeManager::setDefaults() {
@@ -140,6 +138,7 @@ namespace eclipse::gui {
         try_assign(m_buttonActivatedColor, colors, "buttonActivatedColor");
         try_assign(m_buttonActiveForeground, colors, "buttonActiveForeground");
 
+        applyValues(config::getTempStorage(), true);
         return true;
     }
 
@@ -202,6 +201,11 @@ namespace eclipse::gui {
         colors["buttonHoveredForeground"] = m_buttonHoveredForeground;
         colors["buttonActivatedColor"] = m_buttonActivatedColor;
         colors["buttonActiveForeground"] = m_buttonActiveForeground;
+
+        if (flatten) { // flatten is only ever used for temp config
+            json["accent"] = m_titleBackgroundColor;
+            json["background"] = m_backgroundColor;
+        }
     }
 
     bool ThemeManager::importTheme(const std::filesystem::path& path) {
@@ -246,6 +250,36 @@ namespace eclipse::gui {
         globThemes(geode::Mod::get()->getConfigDir() / "themes");
 
         return themes;
+    }
+
+    void ThemeManager::applyAccentColor(const Color& color) {
+        auto isDark = color.luminance() < 0.5f;
+        auto foreground = isDark ? Color::WHITE : Color::BLACK;
+
+        m_disabledColor = isDark ? color.lighten(0.5f) : color.darken(0.5f);
+        m_titleBackgroundColor = color;
+        m_titleForegroundColor = foreground;
+        m_checkboxCheckmarkColor = color;
+        m_buttonBackgroundColor = color;
+        m_buttonForegroundColor = foreground;
+        m_buttonDisabledColor = isDark ? color.lighten(0.3f) : color.darken(0.3f);
+        m_buttonDisabledForeground = isDark ? foreground.darken(0.3f) : foreground.lighten(0.3f);
+        m_buttonHoveredColor = isDark ? color.lighten(0.1f) : color.darken(0.1f);
+        m_buttonHoveredForeground = foreground;
+        m_buttonActivatedColor = isDark ? color.lighten(0.2f) : color.darken(0.2f);
+        m_buttonActiveForeground = foreground;
+    }
+
+    void ThemeManager::applyBackgroundColor(const Color& color) {
+        auto isDark = color.luminance() < 0.5f;
+        auto foreground = isDark ? Color::WHITE : Color::BLACK;
+
+        m_backgroundColor = color;
+        m_frameBackground = isDark ? color.lighten(0.1f) : color.darken(0.1f);
+        m_borderColor = color.lighten(0.2f);
+        m_foregroundColor = foreground;
+        m_checkboxForegroundColor = foreground;
+        m_checkboxBackgroundColor = color.lighten(0.1f);
     }
 
     void ThemeManager::setRenderer(RendererType renderer) {
