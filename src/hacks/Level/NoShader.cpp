@@ -24,8 +24,8 @@ namespace eclipse::hacks::Level {
     class $modify(NoShaderSLHook, ShaderLayer) {
         ALL_DELEGATES_AND_SAFE_PRIO("level.noshader")
 
-        void visit() override {
-            CCNode::visit();
+        void performCalculations() {
+            m_state.m_usesShaders = false;
         }
     };
 }
