@@ -1,3 +1,4 @@
+#include <modules/gui/popup.hpp>
 #include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
@@ -15,6 +16,18 @@ namespace eclipse::hacks::Bot {
 
     static bot::Bot s_bot;
 
+    void newReplay() {
+        Popup::prompt("New replay", "Enter a name for the new replay:", [&](bool result, std::string name) {
+            if(!result)
+                return;
+            
+            config::set("bot.replayname", name);
+            s_bot.save(Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
+            config::set("bot.selectedreplay", Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
+
+        }, "Create", "Cancel", "");
+    }
+
     void saveReplay() {
         std::filesystem::path replayDirectory = Mod::get()->getSaveDir() / "replays";
 
@@ -22,12 +35,45 @@ namespace eclipse::hacks::Bot {
             std::filesystem::create_directory(replayDirectory);
 
         std::filesystem::path replayPath = replayDirectory / (config::get<std::string>("bot.replayname", "temp") + ".gdr");
+
+        if(std::filesystem::exists(replayPath) && replayPath != config::get<std::filesystem::path>("bot.selectedreplay", "")) {
+            Popup::create("Warning", fmt::format("Are you sure you want to overwrite {}?", replayPath.filename().stem().string()), "Yes", "No", [&](bool result) {
+                if(!result)
+                    return;
+
+                std::filesystem::path confirmReplayDirectory = Mod::get()->getSaveDir() / "replays" / (config::get<std::string>("bot.replayname", "temp") + ".gdr");
+
+                s_bot.save(confirmReplayDirectory);
+                Popup::create("Replay saved", fmt::format("Replay {} saved with {} inputs", confirmReplayDirectory.filename().stem().string(), s_bot.getInputCount()));
+                
+                config::set("bot.selectedreplay", confirmReplayDirectory);
+            });
+            return;
+        }
+
         s_bot.save(replayPath);
+        Popup::create("Replay saved", fmt::format("Replay {} saved with {} inputs", replayPath.filename().stem().string(), s_bot.getInputCount()));
+        config::set("bot.selectedreplay", replayPath);
     }
 
     void loadReplay() {
         std::filesystem::path replayPath = config::get<std::string>("bot.selectedreplay", "");
+
+        if(s_bot.getInputCount() > 0) {
+            Popup::create("Warning", "Your current replay will be overwritten. Are you sure?", "Yes", "No", [&](bool result) {
+                if(!result)
+                    return;
+
+                std::filesystem::path confirmReplayPath = config::get<std::string>("bot.selectedreplay", "");
+
+                s_bot.load(confirmReplayPath);
+                Popup::create("Replay loaded", fmt::format("Replay {} loaded with {} inputs", confirmReplayPath.filename().stem().string(), s_bot.getInputCount()));
+            });
+            return;
+        }
+
         s_bot.load(replayPath);
+        Popup::create("Replay loaded", fmt::format("Replay {} loaded with {} inputs", replayPath.filename().stem().string(), s_bot.getInputCount()));
     }
 
     class Bot : public hack::Hack {
@@ -43,8 +89,8 @@ namespace eclipse::hacks::Bot {
             tab->addRadioButton("Record", "bot.state", 1)->callback(updateBotState)->handleKeybinds();
             tab->addRadioButton("Playback", "bot.state", 2)->callback(updateBotState)->handleKeybinds();
 
-            tab->addInputText("Replay Name", "bot.replayname");
             tab->addFilesystemCombo("Replays", "bot.selectedreplay", Mod::get()->getSaveDir() / "replays");
+            tab->addButton("New")->callback(newReplay);
             tab->addButton("Save")->callback(saveReplay);
             tab->addButton("Load")->callback(loadReplay);
         }
@@ -70,10 +116,14 @@ namespace eclipse::hacks::Bot {
 
             if (s_bot.getState() == bot::State::RECORD) {
                 //gd does this automatically for holding but not releases so we do it manually
-                if(!p1hold)
+                if(!p1hold) {
                     s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, true, false);
-                if (m_gameState.m_isDualMode && m_levelSettings->m_twoPlayerMode && !p2hold)
+                    m_player1->m_isDashing = false;
+                }
+                if (m_gameState.m_isDualMode && m_levelSettings->m_twoPlayerMode && !p2hold) {
                     s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, false, false);
+                    m_player2->m_isDashing = false;
+                }
             }
 
             if (m_checkpointArray->count() > 0) return;
@@ -124,12 +174,15 @@ namespace eclipse::hacks::Bot {
             if (s_bot.getState() != bot::State::RECORD)
                 return;
 
-            std::optional<gdr::Input> lastInput = s_bot.findLastInputForPlayer(player1, (PlayerButton) button);
+            bool realPlayer1 = !m_levelSettings->m_twoPlayerMode || player1 || !m_gameState.m_isDualMode;
+            std::optional<gdr::Input> lastInput = s_bot.findLastInputForPlayer(realPlayer1, (PlayerButton) button);
 
-            if(lastInput && lastInput->down == down)
+            PlayerObject* plr = (realPlayer1 ? m_player1 : m_player2);
+
+            if((plr->m_isShip || plr->m_isDart) && lastInput && lastInput->down == down)
                 return;
 
-            s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !player1, down);
+            s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !realPlayer1, down);
         }
     };
 

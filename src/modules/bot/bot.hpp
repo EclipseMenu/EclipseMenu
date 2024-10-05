@@ -24,6 +24,8 @@ namespace eclipse::bot {
         /// @brief Get the current state of the bot.
         [[nodiscard]] State getState() const { return m_state; }
 
+        [[nodiscard]] size_t getInputCount() const { return m_replay.inputs.size(); }
+
         /// @brief Removes all inputs from the currently loaded replay.
         void clearInputs();
 
@@ -35,7 +37,7 @@ namespace eclipse::bot {
         void removeInputsAfter(int frame);
         
         /// @brief Add an input to the currently loaded replay.
-        void recordInput(int frame, PlayerButton button, bool player1, bool pressed);
+        void recordInput(int frame, PlayerButton button, bool player2, bool pressed);
 
         /// @brief Find the last input for the given player.
         [[nodiscard]] std::optional<gdr::Input> findLastInputForPlayer(bool player1, PlayerButton button);

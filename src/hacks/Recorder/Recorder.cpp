@@ -17,6 +17,7 @@ namespace eclipse::hacks::Recorder {
     bool visiting = false;
     bool inShaderLayer = false;
     bool levelDone = false;
+    bool popupShown = false;
 
     float totalTime = 0.f;
     float afterEndTimer = 0.f;
@@ -25,6 +26,15 @@ namespace eclipse::hacks::Recorder {
     double lastFrameTime = 0.;
 
     intptr_t glViewportAddress = 0;
+
+    void endPopup() {
+        Popup::create("Info", "Recording finished!", "OK", "Open folder", [](bool result) {
+            if(result)
+                return;
+
+            geode::utils::file::openFolder(geode::Mod::get()->getSaveDir() / "renders");
+        });
+    }
     
     void glViewportHook(GLint a, GLint b, GLsizei c, GLsizei d) {
         if (visiting && s_recorder.isRecording() && inShaderLayer) {
@@ -51,6 +61,7 @@ namespace eclipse::hacks::Recorder {
 
         visiting = false;
         levelDone = false;
+        popupShown = false;
         totalTime = 0.f;
         extraTime = 0.;
         lastFrameTime = 0.;
@@ -95,6 +106,7 @@ namespace eclipse::hacks::Recorder {
         }
 
         levelDone = false;
+        popupShown = false;
         afterEndTimer = 0.f;
 
         if (PlayLayer::get()->getChildByID("EndLevelLayer"))
@@ -128,6 +140,10 @@ namespace eclipse::hacks::Recorder {
             config::setIfEmpty("recorder.bitrate", 30.f);
             config::setIfEmpty("recorder.resolution.x", 1920.f);
             config::setIfEmpty("recorder.resolution.y", 1080.f);
+            config::setIfEmpty("recorder.audio", 2);
+            config::setIfEmpty("recorder.codec", 0);
+
+            tab->addCombo("Audio mode", "recorder.audio", {"Don't record", "Ask first", "Always record"}, 0);
 
             tab->addInputFloat("Framerate", "recorder.fps", 1.f, 360.f, "%.0f FPS");
             tab->addInputFloat("Endscreen Duration", "recorder.endscreen", 0.f, 30.f, "%.2fs.");
@@ -231,10 +247,33 @@ namespace eclipse::hacks::Recorder {
 
             if (levelDone) {
                 if (afterEndTimer > endscreen) {
-                    if (s_recorder.isRecording())
-                        startAudio();
-                    else if (s_recorder.isRecordingAudio())
+                    if (s_recorder.isRecording() && !popupShown) {
+                        switch(config::get<int>("recorder.audio", 2)) {
+                            case 1:
+                                popupShown = true;
+                                Popup::create("Audio", "Record audio?", "Yes", "No", [&](bool result) {
+                                    if(result) {
+                                        startAudio();
+                                        return;
+                                    }
+                                    stop();
+                                    endPopup();
+                                });
+                                break;
+                            case 2:
+                                startAudio();
+                                break;
+                            default:
+                            case 0:
+                                stop();
+                                endPopup();
+                                break;
+                        }
+                    }
+                    else if (s_recorder.isRecordingAudio()) {
                         stopAudio();
+                        endPopup();
+                    }
                     
                     return GJBaseGameLayer::update(dt);
                 }
@@ -282,6 +321,7 @@ namespace eclipse::hacks::Recorder {
 
         void resetLevel() {
             levelDone = false;
+            popupShown = false;
             PlayLayer::resetLevel();
         }
 
