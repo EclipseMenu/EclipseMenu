@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/gui/gui.hpp>
+#include <modules/gui/imgui/imgui.hpp>
 
 #ifdef GEODE_IS_WINDOWS
 #include <Geode/modify/CCEGLView.hpp>
@@ -448,14 +449,19 @@ namespace eclipse::keybinds {
     }
 
     void Manager::registerKeyPress(Keys key) {
+        auto menuToggle = getKeybind("menu.toggle");
         m_keyStates[key] = true;
 
-        if (config::get<bool>("keybind.in-game-only", false) && !PlayLayer::get()) {
-            // only check if this is the menu toggle keybind
-            if (auto keybind = getKeybind("menu.toggle"); keybind.has_value() && keybind->get().getKey() == key)
-                keybind->get().execute();
+        if (menuToggle && key == menuToggle.value().get().getKey()) {
+            menuToggle.value().get().execute();
             return;
         }
+
+        if (gui::imgui::ImGuiRenderer::get() && ImGui::GetIO().WantTextInput)
+            return;
+
+        if (config::get<bool>("keybind.in-game-only", false) && !PlayLayer::get())
+            return;
 
         for (auto& keybind : m_keybinds) {
             if (keybind.getKey() == key && keybind.isInitialized())

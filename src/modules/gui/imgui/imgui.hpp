@@ -46,7 +46,7 @@ namespace eclipse::gui::imgui {
     public:
         static std::shared_ptr<ImGuiRenderer> get() {
             auto engine = Engine::get();
-            if (engine->getRendererType() != RendererType::ImGui) return nullptr;
+            if (!engine->isInitialized() || engine->getRendererType() != RendererType::ImGui) return nullptr;
             return std::static_pointer_cast<ImGuiRenderer>(engine->getRenderer());
         }
 
