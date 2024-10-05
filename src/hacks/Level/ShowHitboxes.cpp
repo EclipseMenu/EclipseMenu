@@ -41,7 +41,11 @@ namespace eclipse::hacks::Level {
             gui::ToggleComponent* toggle = tab->addToggle("Show Hitboxes", "level.showhitboxes")->handleKeybinds();
 
             toggle->callback([](bool value) {
-                if (PlayLayer::get()) PlayLayer::get()->updateProgressbar();
+                if (auto pl = PlayLayer::get()) {
+                    // since progress bar isn't added immediately, we need to check if it exists
+                    if (pl->m_progressBar == nullptr) return;
+                    pl->updateProgressbar();
+                }
 
                 if (LevelEditorLayer::get()) {
                     LevelEditorLayer::get()->updateEditor(0);
