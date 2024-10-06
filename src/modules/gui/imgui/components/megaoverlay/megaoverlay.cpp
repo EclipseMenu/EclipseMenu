@@ -52,6 +52,7 @@ namespace eclipse::gui::imgui::themes {
 
 		bool hovered, held;
 		bool pressed = ButtonBehavior(total_bb, id, &hovered, &held);
+		postDraw();
 		if (pressed) value = !value;
 		ImVec2 text_pos = text_bb.GetTL();
 		if (hovered) {
