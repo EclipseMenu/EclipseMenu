@@ -22,7 +22,7 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(NoHideTrigger)
 
     class $modify(NoHideTriggerEGOHook, EffectGameObject) {
-        ALL_DELEGATES_AND_SAFE_PRIO("player.noghosttrail")
+        ALL_DELEGATES_AND_SAFE_PRIO("player.nohidetrigger")
 
         void triggerObject(GJBaseGameLayer* bgl, int p1, gd::vector<int> const* p2) override {
             switch (m_objectID) {

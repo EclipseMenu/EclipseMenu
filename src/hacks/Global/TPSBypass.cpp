@@ -4,7 +4,7 @@
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
-#ifdef GEODE_IS_WINDOWS
+#ifndef GEODE_IS_MACOS
 constexpr float MIN_TPS = 0.f;
 constexpr float MAX_TPS = 100000.f;
 

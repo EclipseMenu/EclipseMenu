@@ -12,7 +12,10 @@ namespace eclipse::hacks::Global {
 
             tab->addToggle("No Short Numbers", "global.noshortnumbers")
                 ->setDescription("Removes any abbreviation. (Example: 23.4K -> 23400)")
-                ->handleKeybinds();
+                ->handleKeybinds()
+                ->addOptions([](auto options) {
+                    options->addToggle("Thousands Separator", "global.noshortnumbers.thousands");
+                });
         }
 
         [[nodiscard]] const char* getId() const override { return "No Short Numbers"; }
@@ -24,7 +27,9 @@ namespace eclipse::hacks::Global {
         ALL_DELEGATES_AND_SAFE_PRIO("global.noshortnumbers")
 
         static gd::string intToShortString(int value) {
-            gd::string str = fmt::format("{}", value);
+            bool thousands = config::get<bool>("global.noshortnumbers.thousands", false);
+            gd::string str = thousands ? fmt::format("{}", fmt::group_digits(value))
+                                       : fmt::format("{}", value);
             return str;
         }
     };
