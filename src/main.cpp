@@ -132,6 +132,17 @@ $on_mod(Loaded) {
     {
         using namespace gui;
         auto tab = MenuTab::find("Interface");
+        std::vector<std::string> themeNames = {};
+        for (ThemeMeta theme : ThemeManager::get()->listAvailableThemes()) {
+            themeNames.push_back(theme.name);
+        }
+        if (!themeNames.empty()) {
+            auto themeCombo = tab->addCombo("Theme", "themeIndex", themeNames, 0);
+            themeCombo->callback([](int value) {
+                ThemeManager::get()->loadTheme(ThemeManager::get()->listAvailableThemes()[value].path);
+                ThemeManager::get()->setUIScale(config::getTemp<float>("uiScale"));
+            });
+        }
         tab->addInputFloat("UI Scale", "uiScale", 0.75f, 2.f, "x%.3f")
             ->callback([](float value) {
                 ThemeManager::get()->setUIScale(value);

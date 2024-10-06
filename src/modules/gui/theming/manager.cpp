@@ -28,7 +28,7 @@ namespace eclipse::gui {
             }
 
             // TODO: add a priority for default theme
-            loadTheme(themes[0].path);
+            loadTheme(themes[config::get<int>("themeIndex", 0)].path);
         }
     }
 

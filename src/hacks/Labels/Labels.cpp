@@ -160,6 +160,24 @@ namespace eclipse::hacks::Labels {
     };
 
     class $modify(LabelsPLHook, PlayLayer) {
+        bool init(GJGameLevel* level, bool unk1, bool unk2) {
+            if (!PlayLayer::init(level, unk1, unk2)) return false;
+
+            // removes the testmode label (thank you mat for this :D)
+            if (this->getChildrenCount()) {
+                geode::cocos::CCArrayExt<cocos2d::CCNode*> children = this->getChildren();
+                for (auto* child : children) {
+                    using namespace std::literals::string_view_literals;
+                    if (auto* label = geode::cast::typeinfo_cast<cocos2d::CCLabelBMFont*>(child); label && label->getString() == "Testmode"sv) {
+                        label->setVisible(false);
+                        break;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         void resetLevel() {
             PlayLayer::resetLevel();
             s_clicksP1.resetOnDeath();
