@@ -28,15 +28,6 @@ namespace eclipse::bot {
         m_replay.inputs.emplace_back(frame, static_cast<int>(button), player2, pressed);
     }
 
-    std::optional<gdr::Input> Bot::findLastInputForPlayer(bool player1, PlayerButton button) {
-        for (int i = m_replay.inputs.size() - 1; i >= 0; i--) {
-            if (m_replay.inputs[i].player2 == !player1 && m_replay.inputs[i].button == static_cast<int>(button))
-                return m_replay.inputs[i];
-        }
-
-        return std::nullopt;
-    }
-
     std::optional<gdr::Input> Bot::poll(int frame) {
         if (m_inputIndex >= m_replay.inputs.size())
             return std::nullopt;

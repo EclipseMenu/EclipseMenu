@@ -21,7 +21,6 @@ namespace eclipse::hacks::Bot {
             if(!result)
                 return;
             
-            config::set("bot.replayname", name);
             s_bot.save(Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
             config::set("bot.selectedreplay", Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
 
@@ -34,14 +33,14 @@ namespace eclipse::hacks::Bot {
         if (!std::filesystem::exists(replayDirectory))
             std::filesystem::create_directory(replayDirectory);
 
-        std::filesystem::path replayPath = replayDirectory / (config::get<std::string>("bot.replayname", "temp") + ".gdr");
+        std::filesystem::path replayPath = config::get<std::filesystem::path>("bot.selectedreplay", "temp");
 
-        if(std::filesystem::exists(replayPath) && replayPath != config::get<std::filesystem::path>("bot.selectedreplay", "")) {
+        if(std::filesystem::exists(replayPath)) {
             Popup::create("Warning", fmt::format("Are you sure you want to overwrite {}?", replayPath.filename().stem().string()), "Yes", "No", [&](bool result) {
                 if(!result)
                     return;
 
-                std::filesystem::path confirmReplayDirectory = Mod::get()->getSaveDir() / "replays" / (config::get<std::string>("bot.replayname", "temp") + ".gdr");
+                std::filesystem::path confirmReplayDirectory = config::get<std::filesystem::path>("bot.selectedreplay", "temp");
 
                 s_bot.save(confirmReplayDirectory);
                 Popup::create("Replay saved", fmt::format("Replay {} saved with {} inputs", confirmReplayDirectory.filename().stem().string(), s_bot.getInputCount()));
@@ -116,12 +115,10 @@ namespace eclipse::hacks::Bot {
 
             if (s_bot.getState() == bot::State::RECORD) {
                 //gd does this automatically for holding but not releases so we do it manually
-                if(!p1hold) {
+                s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, false, false);
+                m_player1->m_isDashing = false; // temporary, find better way to fix dash orbs
+                if (m_gameState.m_isDualMode && m_levelSettings->m_twoPlayerMode) {
                     s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, true, false);
-                    m_player1->m_isDashing = false;
-                }
-                if (m_gameState.m_isDualMode && m_levelSettings->m_twoPlayerMode && !p2hold) {
-                    s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, false, false);
                     m_player2->m_isDashing = false;
                 }
             }
@@ -175,12 +172,6 @@ namespace eclipse::hacks::Bot {
                 return;
 
             bool realPlayer1 = !m_levelSettings->m_twoPlayerMode || player1 || !m_gameState.m_isDualMode;
-            std::optional<gdr::Input> lastInput = s_bot.findLastInputForPlayer(realPlayer1, (PlayerButton) button);
-
-            PlayerObject* plr = (realPlayer1 ? m_player1 : m_player2);
-
-            if((plr->m_isShip || plr->m_isDart) && lastInput && lastInput->down == down)
-                return;
 
             s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !realPlayer1, down);
         }

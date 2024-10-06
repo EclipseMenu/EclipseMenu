@@ -39,9 +39,6 @@ namespace eclipse::bot {
         /// @brief Add an input to the currently loaded replay.
         void recordInput(int frame, PlayerButton button, bool player2, bool pressed);
 
-        /// @brief Find the last input for the given player.
-        [[nodiscard]] std::optional<gdr::Input> findLastInputForPlayer(bool player1, PlayerButton button);
-
         /// @brief Get the next available input from the currently loaded replay.
         /// @param frame The current frame of the playback.
         /// @return The next input from the currently loaded replay, if available.
