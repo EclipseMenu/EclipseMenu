@@ -118,12 +118,28 @@ namespace eclipse::gui {
 
         /// Frame padding
         PROPERTY(float, m_framePadding, FramePadding)
+        /// Frame rounding in px
+        PROPERTY(float, m_frameRounding, FrameRounding)
+
         /// Window margin (also used for stacking distance)
         PROPERTY(float, m_windowMargin, WindowMargin)
         /// Window rounding in px
         PROPERTY(float, m_windowRounding, WindowRounding)
-        /// Frame rounding in px
-        PROPERTY(float, m_frameRounding, FrameRounding)
+        /// Window padding in px
+        PROPERTY(float, m_windowPadding, WindowPadding)
+
+        /// Vertical spacing between components in px
+        PROPERTY(float, m_verticalSpacing, VerticalSpacing)
+        /// Horizontal spacing between components in px
+        PROPERTY(float, m_horizontalSpacing, HorizontalSpacing)
+        /// Vertical inner spacing between components in px
+        PROPERTY(float, m_verticalInnerSpacing, VerticalInnerSpacing)
+        /// Horizontal inner spacing between components in px
+        PROPERTY(float, m_horizontalInnerSpacing, HorizontalInnerSpacing)
+
+        /// Indent spacing in px
+        PROPERTY(float, m_indentSpacing, IndentSpacing)
+
         /// Border size in px
         PROPERTY(float, m_borderSize, BorderSize)
 

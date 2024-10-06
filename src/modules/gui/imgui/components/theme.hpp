@@ -86,6 +86,7 @@ namespace eclipse::gui::imgui {
     enum class ComponentTheme {
         ImGui, /// Classic Dear ImGui look
         MegaHack, /// MegaHack v8 style
+        MegaOverlay, /// GDMegaOverlay style
     };
 
 }

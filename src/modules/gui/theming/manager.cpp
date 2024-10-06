@@ -105,11 +105,18 @@ namespace eclipse::gui {
         try_assign(m_uiScale, other, "uiScale");
         try_assign(m_selectedFont, other, "font");
         try_assign(m_fontSize, other, "fontSize");
+
+        try_assign(m_borderSize, other, "borderSize");
         try_assign(m_framePadding, other, "framePadding");
+        try_assign(m_frameRounding, other, "frameRounding");
         try_assign(m_windowMargin, other, "windowMargin");
         try_assign(m_windowRounding, other, "windowRounding");
-        try_assign(m_frameRounding, other, "frameRounding");
-        try_assign(m_borderSize, other, "borderSize");
+        try_assign(m_windowPadding, other, "windowPadding");
+        try_assign(m_verticalSpacing, other, "verticalSpacing");
+        try_assign(m_horizontalSpacing, other, "horizontalSpacing");
+        try_assign(m_verticalInnerSpacing, other, "verticalInnerSpacing");
+        try_assign(m_horizontalInnerSpacing, other, "horizontalInnerSpacing");
+        try_assign(m_indentSpacing, other, "indentSpacing");
 
         // blur
         auto blur = json["blur"];
@@ -177,11 +184,17 @@ namespace eclipse::gui {
         other["uiScale"] = m_uiScale;
         other["font"] = m_selectedFont;
         other["fontSize"] = m_fontSize;
+        other["borderSize"] = m_borderSize;
         other["framePadding"] = m_framePadding;
+        other["frameRounding"] = m_frameRounding;
         other["windowMargin"] = m_windowMargin;
         other["windowRounding"] = m_windowRounding;
-        other["frameRounding"] = m_frameRounding;
-        other["borderSize"] = m_borderSize;
+        other["windowPadding"] = m_windowPadding;
+        other["verticalSpacing"] = m_verticalSpacing;
+        other["horizontalSpacing"] = m_horizontalSpacing;
+        other["verticalInnerSpacing"] = m_verticalInnerSpacing;
+        other["horizontalInnerSpacing"] = m_horizontalInnerSpacing;
+        other["indentSpacing"] = m_indentSpacing;
 
         colors["backgroundColor"] = m_backgroundColor;
         colors["frameBackground"] = m_frameBackground;

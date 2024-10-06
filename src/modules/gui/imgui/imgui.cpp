@@ -7,6 +7,7 @@
 #include <misc/cpp/imgui_stdlib.h>
 
 #include "components/megahack/megahack.hpp"
+#include "components/megaoverlay/megaoverlay.hpp"
 #include "layouts/tabbed.hpp"
 #include "layouts/panel.hpp"
 #include "layouts/sidebar.hpp"
@@ -175,6 +176,9 @@ namespace eclipse::gui::imgui {
             case ComponentTheme::MegaHack:
             default:
                 m_theme = std::make_unique<themes::Megahack>();
+                break;
+            case ComponentTheme::MegaOverlay:
+                m_theme = std::make_unique<themes::MegaOverlay>();
                 break;
         }
         if (s_initialized) m_theme->init();

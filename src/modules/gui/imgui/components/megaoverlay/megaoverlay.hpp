@@ -1,0 +1,12 @@
+#pragma once
+#include <modules/gui/imgui/components/theme.hpp>
+
+namespace eclipse::gui::imgui::themes {
+
+    class MegaOverlay : public Theme {
+        bool checkbox(
+            const std::string &label, bool &value,
+            const std::function<void()> &postDraw
+        ) const override;
+    };
+}

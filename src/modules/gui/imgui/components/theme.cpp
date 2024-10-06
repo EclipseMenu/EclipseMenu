@@ -10,7 +10,7 @@
 namespace eclipse::gui::imgui {
 
     std::vector<std::string> THEME_NAMES = {
-        "ImGui", "MegaHack"
+        "ImGui", "MegaHack", "MegaOverlay"
     };
 
     void Theme::visit(const std::shared_ptr<Component>& component) const {
@@ -99,15 +99,15 @@ namespace eclipse::gui::imgui {
         ImGui::GetIO().FontGlobalScale = tm->getGlobalScale() * INV_DEFAULT_SCALE;
 
         // Sizes
-        style.WindowPadding = ImVec2(4, 4);
+        style.WindowPadding = ImVec2(tm->getWindowPadding(), tm->getWindowPadding());
         style.WindowRounding = tm->getWindowRounding();
-        style.FramePadding = ImVec2(4, 2);
+        style.FramePadding = ImVec2(tm->getFramePadding(), tm->getFramePadding());
         style.FrameRounding = tm->getFrameRounding();
         style.PopupRounding = tm->getFrameRounding();
-        style.ItemSpacing = ImVec2(12, 2);
-        style.ItemInnerSpacing = ImVec2(8, 6);
+        style.ItemSpacing = ImVec2(tm->getHorizontalSpacing(), tm->getVerticalSpacing());
+        style.ItemInnerSpacing = ImVec2(tm->getHorizontalInnerSpacing(), tm->getVerticalInnerSpacing());
         style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
-        style.IndentSpacing = 25.0f;
+        style.IndentSpacing = tm->getIndentSpacing();
         style.ScrollbarSize = 15.0f;
         style.ScrollbarRounding = 9.0f;
         style.GrabMinSize = 5.0f;
@@ -508,14 +508,7 @@ namespace eclipse::gui::imgui {
                                      const std::string& popupId) const {
         auto tm = ThemeManager::get();
 
-        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getCheckboxForegroundColor()));
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, static_cast<ImVec4>(tm->getCheckboxCheckmarkColor()));
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, static_cast<ImVec4>(tm->getCheckboxBackgroundColor()));
-
-        bool result = ImGui::Checkbox(label.c_str(), &value);
-        postDraw();
-
-        ImGui::PopStyleColor(3);
+        bool result = this->checkbox(label, value, postDraw);
 
         ImGui::PushItemWidth(-1);
         auto availWidth = ImGui::GetContentRegionAvail().x;
