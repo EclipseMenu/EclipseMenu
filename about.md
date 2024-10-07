@@ -26,7 +26,7 @@ This mod menu would not be possible without the developers from other mod menus 
 - [SpaghettDev](https://github.com/SpaghettDev)
 
 Additionally, thank you to our testers, contributors, and supporters for improving and helping make Eclipse Menu possible!
-- **Tallen** - Tester & Helped support **Eclipse Menu** by donating!
+- [Tallen](https://tallensuired.carrd.co/) - Tester & Helped support **Eclipse Menu** by donating!
 - [hiimjustin000](https://github.com/hiimjustin000) - Contributor
 - [RayDeeUx](https://github.com/RayDeeUx) - Contributor
 - [iAndyHD3](https://github.com/iAndyHD3) - Contributor
