@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
 
@@ -18,13 +19,13 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(ForcePlatformer)
 
-    class $modify(ForcePlatformerPLHook, GJBaseGameLayer) {
+    class $modify(ForcePlatformerGJBLHook, GJBaseGameLayer) {
         ADD_HOOKS_DELEGATE("level.forceplatformer")
 
         void loadLevelSettings() {
             if(!PlayLayer::get() || m_levelSettings->m_platformerMode) return GJBaseGameLayer::loadLevelSettings(); 
 
-
+            //length is changed by loadLevelSettings
             m_levelSettings->m_platformerMode = true;
             int originalLength = m_levelSettings->m_level->m_levelLength;
             GJBaseGameLayer::loadLevelSettings();
@@ -32,4 +33,14 @@ namespace eclipse::hacks::Level {
             m_levelSettings->m_platformerMode = false;
         }
     };
-}
+
+    class $modify(ForcePlatformerPLHook, PlayLayer) {
+        void resetLevel() {
+            auto val = config ::get("level.forceplatformer", false);
+            if(val != m_isPlatformer) {
+                this->loadLevelSettings();
+            }
+            PlayLayer::resetLevel();
+        }
+    };
+};
