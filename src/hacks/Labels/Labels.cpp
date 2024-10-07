@@ -206,7 +206,7 @@ namespace eclipse::hacks::Labels {
                 auto* cheatIndicator = SmartLabel::create(".", "bigFont.fnt");
                 cheatIndicator->setHeightMultiplier(0.37f);
                 cheatIndicator->setID("cheat-indicator"_spr);
-                auto* container = m_fields->m_containers[config::get<int>("labels.cheat-indicator.alignment", 1)];
+                auto* container = m_fields->m_containers[config::get<int>("labels.cheat-indicator.alignment", 0)];
                 container->addLabel(cheatIndicator, [](SmartLabel* label) {
                     label->setScale(config::get<float>("labels.cheat-indicator.scale", 0.5f));
                     bool isCheating = config::getTemp("hasCheats", false);

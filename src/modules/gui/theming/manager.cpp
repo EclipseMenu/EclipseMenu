@@ -17,6 +17,14 @@ namespace eclipse::gui {
         }
     };
 
+    int getDefaultThemeIndex(std::vector<ThemeMeta> const& themes) {
+        static auto defaultPath = geode::Mod::get()->getResourcesDir() / "megaoverlay.json";
+        for (auto i = 0; i < themes.size(); i++) {
+            if (themes[i].path == defaultPath) return i;
+        }
+        return 0;
+    }
+
     void ThemeManager::init() {
         if (!loadTheme(geode::Mod::get()->getSaveDir() / "theme.json")) {
             // theme not created, load a built-in one
@@ -28,6 +36,7 @@ namespace eclipse::gui {
             }
 
             // TODO: add a priority for default theme
+            config::setIfEmpty("themeIndex", getDefaultThemeIndex(themes));
             loadTheme(themes[config::get<int>("themeIndex", 0)].path);
         }
     }
