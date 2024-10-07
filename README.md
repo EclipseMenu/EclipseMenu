@@ -20,7 +20,7 @@
       <img src="https://img.shields.io/github/issues/EclipseMenu/EclipseMenu" alt="Issues">
     </a>
     <a href="https://discord.gg/NnpwFRDMND">
-      <img src="https://img.shields.io/discord/0?label=discord&logo=discord" alt="Discord">
+      <img src="https://img.shields.io/discord/1256092297829945414?label=discord&logo=discord" alt="Discord">
     </a>
 </div>
 <br>
