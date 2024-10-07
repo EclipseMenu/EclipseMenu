@@ -42,6 +42,7 @@ namespace eclipse::gui {
 #endif
 
         m_componentTheme = imgui::ComponentTheme::MegaHack;
+        m_schemaVersion = THEME_SCHEMA_VERSION;
 
         m_uiScale = 1.f;
         m_borderSize = 1.f;
@@ -89,6 +90,12 @@ namespace eclipse::gui {
 
         setDefaults();
         auto details = json["details"];
+
+        int schemaVersion = 0;
+        try_assign(schemaVersion, details, "schema");
+        if (schemaVersion != THEME_SCHEMA_VERSION) return false;
+        m_schemaVersion = schemaVersion;
+
         try_assign(m_themeName, details, "name");
         try_assign(m_themeDescription, details, "description");
         try_assign(m_themeAuthor, details, "author");
@@ -104,7 +111,9 @@ namespace eclipse::gui {
         auto other = json["other"];
         try_assign(m_uiScale, other, "uiScale");
         try_assign(m_selectedFont, other, "font");
-        try_assign(m_fontSize, other, "fontSize");
+        float fontSize = m_fontSize;
+        try_assign(fontSize, other, "fontSize");
+        this->setFontSize(fontSize);
 
         try_assign(m_borderSize, other, "borderSize");
         try_assign(m_framePadding, other, "framePadding");
@@ -176,6 +185,7 @@ namespace eclipse::gui {
         details["renderer"] = m_renderer;
         details["layout"] = m_layoutMode;
         details["style"] = m_componentTheme;
+        details["schema"] = m_schemaVersion;
 
         blur["blurEnabled"] = m_enableBlur;
         blur["blurSpeed"] = m_blurSpeed;
@@ -319,6 +329,7 @@ namespace eclipse::gui {
     }
 
     void ThemeManager::setSelectedFont(const std::string &value) {
+        TRACE_FUNCTION();
         if (auto imgui = imgui::ImGuiRenderer::get()) {
             imgui->getFontManager().setFont(value);
         }
@@ -342,6 +353,11 @@ namespace eclipse::gui {
     }
 
     void ThemeManager::setFontSize(float value) {
+        if (m_fontSize == value) return;
+
         m_fontSize = value;
+        if (auto imgui = imgui::ImGuiRenderer::get()) {
+            imgui->reload();
+        }
     }
 }

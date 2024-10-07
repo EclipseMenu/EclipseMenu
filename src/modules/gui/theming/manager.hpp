@@ -20,6 +20,8 @@ void set##name(type const& value) { member = value; }
 
 namespace eclipse::gui {
 
+    constexpr auto THEME_SCHEMA_VERSION = 1;
+
     struct ThemeMeta {
         std::string name;
         std::filesystem::path path;
@@ -92,6 +94,8 @@ namespace eclipse::gui {
         CR_PROPERTY(std::string, m_themeDescription, ThemeDescription)
         /// [Meta] Theme author
         CR_PROPERTY(std::string, m_themeAuthor, ThemeAuthor)
+        /// [Meta] Schema version
+        CR_PROPERTY(int, m_schemaVersion, SchemaVersion)
 
         /// Current renderer engine
         PROPERTY_CS(RendererType, m_renderer, Renderer)
@@ -111,7 +115,7 @@ namespace eclipse::gui {
         CR_PROPERTY_CS(std::string, m_selectedFont, SelectedFont)
         void setSelectedFont(const std::string& value);
         void setSelectedFont(int index);
-        static std::vector<std::string> getFontNames() ;
+        static std::vector<std::string> getFontNames();
         /// [ImGui] Font size
         PROPERTY_CS(float, m_fontSize, FontSize)
         void setFontSize(float value);

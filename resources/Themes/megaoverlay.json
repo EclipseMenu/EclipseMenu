@@ -30,6 +30,7 @@
     "layout": 0,
     "name": "MegaOverlay",
     "renderer": 0,
+    "schema": 1,
     "style": 2
   },
   "other": {

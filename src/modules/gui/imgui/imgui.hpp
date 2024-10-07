@@ -65,6 +65,7 @@ namespace eclipse::gui::imgui {
         void visitComponent(const std::shared_ptr<Component>& component) const;
         bool beginWindow(const std::string& title) const;
         void endWindow() const;
+        void reload() const;
 
         FontManager& getFontManager() { return m_fontManager; }
 

@@ -5,6 +5,7 @@
         "description": "",
         "layout": 0,
         "renderer": 0,
+        "schema": 1,
         "style": 1
     },
     "blur": {

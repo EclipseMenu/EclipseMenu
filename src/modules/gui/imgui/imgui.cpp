@@ -203,6 +203,10 @@ namespace eclipse::gui::imgui {
         m_theme->endWindow();
     }
 
+    void ImGuiRenderer::reload() const {
+        ImGuiCocos::get().reload();
+    }
+
     void ImGuiRenderer::queueAfterDrawing(const std::function<void()>& func) {
         m_runAfterDrawingQueue.push_back(func);
     }
