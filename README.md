@@ -19,7 +19,7 @@
     <a href="https://github.com/EclipseMenu/EclipseMenu/issues">
       <img src="https://img.shields.io/github/issues/EclipseMenu/EclipseMenu" alt="Issues">
     </a>
-    <a href="">
+    <a href="https://discord.gg/NnpwFRDMND">
       <img src="https://img.shields.io/discord/0?label=discord&logo=discord" alt="Discord">
     </a>
 </div>
@@ -41,7 +41,7 @@
 ## How to use
 1. On PC, press `TAB` to open and close the mod menu.
 2. Set or toggle any hack / mod you want to use.
-3. For any questions or general support, join our [Support Discord Server]()!
+3. For any questions or general support, join our [Support Discord Server](https://discord.gg/NnpwFRDMND)!
 4. Have fun using our mod!
 
 ## Features
