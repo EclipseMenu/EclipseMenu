@@ -297,10 +297,10 @@ namespace eclipse::gui {
         auto isDark = color.luminance() < 0.5f;
         auto foreground = isDark ? Color::WHITE : Color::BLACK;
 
-        m_disabledColor = isDark ? color.lighten(0.5f) : color.darken(0.5f);
+        m_disabledColor = isDark ? foreground.darken(0.4f) : foreground.lighten(0.4f);
         m_titleBackgroundColor = color;
         m_titleForegroundColor = foreground;
-        m_checkboxCheckmarkColor = color;
+        // m_checkboxCheckmarkColor = color;
         m_buttonBackgroundColor = color;
         m_buttonForegroundColor = foreground;
         m_buttonDisabledColor = isDark ? color.lighten(0.3f) : color.darken(0.3f);

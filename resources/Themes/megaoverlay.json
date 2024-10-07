@@ -12,17 +12,17 @@
     "buttonBackgroundColor": "30303080",
     "buttonDisabledColor": "D393AFFF",
     "buttonDisabledForeground": "B2B2B2FF",
-    "buttonForegroundColor": "AAAAAAFF",
+    "buttonForegroundColor": "BBBBBBFF",
     "buttonHoveredColor": "553A57AA",
     "buttonHoveredForeground": "FFFFFFFF",
     "checkboxBackgroundColor": "2B2B2BF9",
     "checkboxCheckmarkColor": "0E850EFF",
-    "checkboxForegroundColor": "AAAAAAFF",
-    "disabledColor": "5F5F5FFF",
-    "foregroundColor": "AAAAAAFF",
+    "checkboxForegroundColor": "BBBBBBFF",
+    "disabledColor": "909090FF",
+    "foregroundColor": "BBBBBBFF",
     "frameBackground": "282828AA",
     "titleBackgroundColor": "AB2CB7FF",
-    "titleForegroundColor": "AAAAAAFF"
+    "titleForegroundColor": "BBBBBBFF"
   },
   "details": {
     "author": "Eclipse Team",
@@ -35,7 +35,7 @@
   },
   "other": {
     "borderSize": 0.0,
-    "font": "Roboto",
+    "font": "Rubik",
     "fontSize": 16.0,
     "framePadding": 5.0,
     "frameRounding": 2.0,
