@@ -8,5 +8,7 @@ namespace eclipse::gui::imgui::themes {
             const std::string &label, bool &value,
             const std::function<void()> &postDraw
         ) const override;
+
+        ComponentTheme getTheme() const override { return ComponentTheme::MegaOverlay; }
     };
 }

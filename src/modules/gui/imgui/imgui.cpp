@@ -168,7 +168,7 @@ namespace eclipse::gui::imgui {
 
     void ImGuiRenderer::setComponentTheme(ComponentTheme theme) {
         auto tm = ThemeManager::get();
-        if (tm->getComponentTheme() == theme && m_theme) return;
+        if (m_theme && theme == m_theme->getTheme()) return;
         switch (theme) {
             case ComponentTheme::ImGui:
                 m_theme = std::make_unique<Theme>();

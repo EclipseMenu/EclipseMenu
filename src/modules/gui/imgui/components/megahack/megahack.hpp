@@ -17,6 +17,7 @@ namespace eclipse::gui::imgui::themes {
 		) const override;
 		bool button(const std::string &text) const override;
 
+		ComponentTheme getTheme() const override { return ComponentTheme::MegaHack; }
 	};
 
 }

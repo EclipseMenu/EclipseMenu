@@ -28,6 +28,13 @@ namespace eclipse::gui::imgui {
     constexpr float DEFAULT_SCALE = 1.0f GEODE_ANDROID(* 1.42f);
     constexpr float INV_DEFAULT_SCALE = 1.0f / DEFAULT_SCALE;
 
+    extern std::vector<std::string> THEME_NAMES;
+    enum class ComponentTheme {
+        ImGui, /// Classic Dear ImGui look
+        MegaHack, /// MegaHack v8 style
+        MegaOverlay, /// GDMegaOverlay style
+    };
+
     class Theme {
     public:
         virtual ~Theme() = default;
@@ -80,13 +87,8 @@ namespace eclipse::gui::imgui {
             const std::string& popupId = "" // empty = use default
         ) const;
         virtual bool button(const std::string& text) const;
-    };
 
-    extern std::vector<std::string> THEME_NAMES;
-    enum class ComponentTheme {
-        ImGui, /// Classic Dear ImGui look
-        MegaHack, /// MegaHack v8 style
-        MegaOverlay, /// GDMegaOverlay style
+        virtual ComponentTheme getTheme() const { return ComponentTheme::ImGui; }
     };
 
 }
