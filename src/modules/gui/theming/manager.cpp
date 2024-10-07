@@ -66,6 +66,15 @@ namespace eclipse::gui {
         return instance;
     }
 
+    void ThemeManager::reloadTheme() {
+        auto themes = listAvailableThemes();
+        if (themes.empty()) {
+            applyValues(config::getTempStorage(), true);
+            return setDefaults();
+        }
+        loadTheme(themes[config::get<int>("themeIndex", 0)].path);
+    }
+
     template <typename T>
     std::optional<T> json_try_get(nlohmann::json const& j, std::string_view key) {
         if (!j.is_object()) return std::nullopt;
@@ -329,7 +338,6 @@ namespace eclipse::gui {
     }
 
     void ThemeManager::setSelectedFont(const std::string &value) {
-        TRACE_FUNCTION();
         if (auto imgui = imgui::ImGuiRenderer::get()) {
             imgui->getFontManager().setFont(value);
         }

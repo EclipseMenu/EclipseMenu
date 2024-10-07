@@ -41,6 +41,9 @@ namespace eclipse::gui {
         /// @brief Get the theme manager instance
         static std::shared_ptr<ThemeManager> get();
 
+        /// @brief Reloads the currently selected theme
+        void reloadTheme();
+
         /// @brief Loads a theme from JSON file
         /// @return True if load was successful, or False in case an error happened
         bool loadTheme(const std::filesystem::path& path);

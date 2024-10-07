@@ -205,9 +205,11 @@ namespace eclipse::gui {
             default:
                 m_renderer = std::make_shared<imgui::ImGuiRenderer>();
                 break;
+#if false // TODO: Implement Cocos2d renderer
             case RendererType::Cocos2d:
                 m_renderer = std::make_shared<cocos::CocosRenderer>();
                 break;
+#endif
         }
 
         m_renderer->init();

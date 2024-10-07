@@ -47,9 +47,15 @@
 	"settings": {
 		"legacy-render": {
 			"name": "Use Legacy rendering",
-			"description": "Use OpenGL 2.0 instead of OpenGL 3.0 for rendering, which can solve some rendering issues on older hardware.\nThis setting disables some features like blur and internal recorder.",
+			"description": "Disables some newer OpenGL features, which can solve some rendering issues on older hardware (at the cost of performance).",
 			"type": "bool",
 			"default": false
+		},
+		"reset-theme": {
+			"type": "custom:custom-btn",
+			"name": "Reset theme?",
+			"description": "Reset the theme to the default one.",
+			"default": "Reset"
 		}
 	}
 }
