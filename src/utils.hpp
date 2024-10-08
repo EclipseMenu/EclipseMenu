@@ -76,4 +76,10 @@ namespace eclipse::utils {
 
     /// @brief Make the cursor visible/hidden under certain conditions
     void updateCursorState(bool visible);
+
+    /// @brief Get month name from its number. (0-11)
+    const char* getMonthName(int month);
+
+    /// @brief Get the current timestamp.
+    time_t getTimestamp();
 }

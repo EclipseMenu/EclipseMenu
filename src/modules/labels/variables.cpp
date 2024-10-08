@@ -197,6 +197,7 @@ namespace eclipse::labels {
         m_variables["noclip"] = rift::Value::boolean(config::get("player.noclip", false));
         m_variables["speedhack"] = rift::Value::boolean(config::get("global.speedhack.toggle", false));
         m_variables["speedhackSpeed"] = rift::Value::floating(config::get("global.speedhack", 1.f));
+        m_variables["framestepper"] = rift::Value::boolean(config::get("player.framestepper", false));
 
         // Time
         auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -206,6 +207,7 @@ namespace eclipse::labels {
         m_variables["second"] = rift::Value::integer(localTime->tm_sec);
         m_variables["day"] = rift::Value::integer(localTime->tm_mday);
         m_variables["month"] = rift::Value::integer(localTime->tm_mon + 1);
+        m_variables["monthName"] = rift::Value::string(utils::getMonthName(localTime->tm_mon));
         m_variables["year"] = rift::Value::integer(localTime->tm_year + 1900);
         m_variables["clock"] = rift::Value::string(utils::getClock());
         m_variables["clock12"] = rift::Value::string(utils::getClock(true));
@@ -295,6 +297,7 @@ namespace eclipse::labels {
             removeVariable("objects");
             removeVariable("runFrom");
             removeVariable("bestRun");
+            removeVariable("lastDeath");
         }
     }
 
@@ -333,9 +336,13 @@ namespace eclipse::labels {
             saveBestRun();
         }
         
-        void destroyPlayer(PlayerObject* player, GameObject* object) {
+        void destroyPlayer(PlayerObject* player, GameObject* object) override {
+            auto percentage = utils::getActualProgress(this);
             PlayLayer::destroyPlayer(player, object);
-            if (object != m_anticheatSpike) saveBestRun();
+            if (object != m_anticheatSpike) {
+                VariableManager::get().setVariable("lastDeath", rift::Value::from(percentage));
+                saveBestRun();
+            }
         }
 
         void resetLevel() {

@@ -79,4 +79,18 @@ namespace eclipse::utils {
             PlatformToolbox::hideCursor();
     }
 
+    const char* getMonthName(int month) {
+        constexpr std::array months = {
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        };
+        return months.at(month);
+    }
+
+    time_t getTimestamp() {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::high_resolution_clock::now().time_since_epoch()
+        ).count();
+    }
+
 }
