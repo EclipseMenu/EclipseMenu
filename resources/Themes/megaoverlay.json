@@ -1,6 +1,6 @@
 {
   "blur": {
-    "blurEnabled": true,
+    "blurEnabled": false,
     "blurRadius": 1.0,
     "blurSpeed": 0.30000001192092896
   },

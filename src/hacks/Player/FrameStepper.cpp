@@ -67,7 +67,7 @@ namespace eclipse::hacks::Player {
             // for playlayer, check if the level is not paused/finished (maybe add loading check later?)
             bool usable = false;
             if (auto playLayer = PlayLayer::get())
-                usable = !playLayer->m_isPaused && !playLayer->m_hasCompletedLevel && playLayer->m_started;
+                usable = !playLayer->m_isPaused && !playLayer->m_hasCompletedLevel && playLayer->m_started && !playLayer->m_player1->m_isDead;
 
             // for level editor, check if it's in playback mode
             else if (auto editor = LevelEditorLayer::get())

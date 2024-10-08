@@ -113,8 +113,10 @@ namespace eclipse::hacks::Bot {
 
             PlayLayer::resetLevel();
 
-            if (s_bot.getState() != bot::State::DISABLED && geode::Loader::get()->isModLoaded("syzzi.click_between_frames"))
-                geode::Loader::get()->getLoadedMod("syzzi.click_between_frames")->setSettingValue<bool>("soft-toggle", false);
+
+            static Mod* cbfMod = geode::Loader::get()->getLoadedMod("syzzi.click_between_frames");
+            if (s_bot.getState() != bot::State::DISABLED && cbfMod)
+                cbfMod->setSettingValue<bool>("soft-toggle", true);
 
             if (s_bot.getState() == bot::State::RECORD) {
                 //gd does this automatically for holding but not releases so we do it manually

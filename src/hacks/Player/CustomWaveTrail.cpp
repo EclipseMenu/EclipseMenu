@@ -30,8 +30,6 @@ namespace eclipse::hacks::Player {
                         opt->addColorComponent("Color", "player.customwavetrail.color");
                     });
                 });
-
-            tab->addFloatToggle("Wave Trail Size", "player.wavetrailsize", 0.f, 3.f, "%.2f");
         }
 
         [[nodiscard]] const char* getId() const override { return "Custom Wave Trail"; }
