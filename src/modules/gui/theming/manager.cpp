@@ -103,7 +103,7 @@ namespace eclipse::gui {
         std::ifstream file(path);
         if (!file.is_open()) return false;
 
-        auto json = nlohmann::json::parse(file, nullptr);
+        auto json = nlohmann::json::parse(file, nullptr, false);
         if (json.is_discarded()) return false;
 
         setDefaults();
@@ -268,7 +268,7 @@ namespace eclipse::gui {
         std::ifstream file(path);
         if (!file.is_open()) return std::nullopt;
 
-        auto json = nlohmann::json::parse(file, nullptr);
+        auto json = nlohmann::json::parse(file, nullptr, false);
         if (json.is_discarded()) return std::nullopt;
 
         auto details = json["details"];
