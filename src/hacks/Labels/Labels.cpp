@@ -306,8 +306,8 @@ namespace eclipse::hacks::Labels {
                 {"Clock", "{clock}", false},
                 {"FPS", "FPS: {round(fps)}", false},
                 {"CPS", "{cps}/{clicks}/{maxCps} CPS", false}, // TODO: Add click trigger
-                {"Noclip Accuracy", "Accuracy: {noclipAccuracy}%", false}, // TODO: Add death trigger
-                {"Noclip Deaths", "Deaths: {noclipDeaths}", false},
+                {"Noclip Accuracy", "{ noclip ? 'Accuracy: ' + noclipAccuracy + '%' : ''}", false}, // TODO: Add death trigger
+                {"Noclip Deaths", "{ noclip ? 'Deaths: ' + noclipDeaths : ''}", false},
             });
 
             tab->addToggle("Show Labels", "labels.visible")

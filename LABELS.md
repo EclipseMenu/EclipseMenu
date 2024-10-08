@@ -336,16 +336,17 @@ This list will be split into categories, each having a separate table.
 
 ### Time & Date
 
-| Name      | Description                      | Type    |
-|-----------|----------------------------------|---------|
-| `hour`    | Current hour (24-hour format)    | Integer |
-| `minute`  | Current minute                   | Integer |
-| `second`  | Current second                   | Integer |
-| `day`     | Current date                     | Integer |
-| `month`   | Current month                    | Integer |
-| `year`    | Current year                     | Integer |
-| `clock`   | Time in format: `HH:MM:SS`       | String  |
-| `clock12` | Time in format: `hh:MM:SS AM/PM` | String  |
+| Name        | Description                      | Type    |
+|-------------|----------------------------------|---------|
+| `hour`      | Current hour (24-hour format)    | Integer |
+| `minute`    | Current minute                   | Integer |
+| `second`    | Current second                   | Integer |
+| `day`       | Current date                     | Integer |
+| `month`     | Current month                    | Integer |
+| `monthName` | Current month name               | String  |
+| `year`      | Current year                     | Integer |
+| `clock`     | Time in format: `HH:MM:SS`       | String  |
+| `clock12`   | Time in format: `hh:MM:SS AM/PM` | String  |
 
 ### Hacks
 
@@ -355,6 +356,7 @@ This list will be split into categories, each having a separate table.
 | `noclip`         | Check whether noclip is enabled.              | Boolean |
 | `speedhack`      | Check whether speedhack is enabled.           | Boolean |
 | `speedhackSpeed` | Selected speedhack speed.                     | Float   |
+| `framestepper`   | Check whether frame stepper is active.        | Boolean |
 
 ### Level information
 > Note: these values are only available when playing/editing the level
@@ -377,30 +379,31 @@ This list will be split into categories, each having a separate table.
 ### Gameplay
 > Note: these values are only available when playing/editing the level
 
-| Name             | Description                                           | Type    |
-|------------------|-------------------------------------------------------|---------|
-| `playerX`        | Current player X position.                            | Float   |
-| `playerY`        | Current player Y position.                            | Float   |
-| `player2X`       | Second player X position.                             | Float   |
-| `player2Y`       | Second player Y position.                             | Float   |
-| `attempt`        | Current session attempt.                              | Integer |
-| `isTestMode`     | Whether playing from a StartPos object.               | Boolean |
-| `isPracticeMode` | Whether currently in practice mode.                   | Boolean |
-| `isPlatformer`   | Whether the player is in platformer mode.             | Boolean |
-| `levelTime`      | Current attempt time in seconds.                      | Float   |
-| `levelLength`    | Level length in block units.                          | Float   |
-| `levelDuration`  | Level duration in seconds.                            | Float   |
-| `time`           | Formatted attempt time (HH:MM:SS.mmm).                | String  |
-| `frame`          | Current frame number.                                 | Integer |
-| `isDead`         | Whether the player is currently dead.                 | Boolean |
-| `noclipDeaths`   | How many times you have "died" in noclip.             | Integer |
-| `noclipAccuracy` | Displays a ratio of alive/dead frames in noclip.      | Float   |
-| `progress`       | Current progress in the level.                        | Float   |
-| `realProgress`   | Original level progress, without 0% startpos bug fix. | Float   |
-| `editorMode`     | Whether you're currently in editor mode.              | Boolean |
-| `objects`        | Total objects count in the level.                     | Integer |
-| `runFrom`        | Percentage at which your best run started.            | Float   |
-| `bestRun`        | Percentage at which your best run ended.              | Float   |
+| Name             | Description                                            | Type    |
+|------------------|--------------------------------------------------------|---------|
+| `playerX`        | Current player X position.                             | Float   |
+| `playerY`        | Current player Y position.                             | Float   |
+| `player2X`       | Second player X position.                              | Float   |
+| `player2Y`       | Second player Y position.                              | Float   |
+| `attempt`        | Current session attempt.                               | Integer |
+| `isTestMode`     | Whether playing from a StartPos object.                | Boolean |
+| `isPracticeMode` | Whether currently in practice mode.                    | Boolean |
+| `isPlatformer`   | Whether the player is in platformer mode.              | Boolean |
+| `levelTime`      | Current attempt time in seconds.                       | Float   |
+| `levelLength`    | Level length in block units.                           | Float   |
+| `levelDuration`  | Level duration in seconds.                             | Float   |
+| `time`           | Formatted attempt time (HH:MM:SS.mmm).                 | String  |
+| `frame`          | Current frame number.                                  | Integer |
+| `isDead`         | Whether the player is currently dead.                  | Boolean |
+| `noclipDeaths`   | How many times you have "died" in noclip.              | Integer |
+| `noclipAccuracy` | Displays a ratio of alive/dead frames in noclip.       | Float   |
+| `progress`       | Current progress in the level.                         | Float   |
+| `realProgress`   | Original level progress, without 0% startpos bug fix.  | Float   |
+| `editorMode`     | Whether you're currently in editor mode.               | Boolean |
+| `objects`        | Total objects count in the level.                      | Integer |
+| `runFrom`        | Percentage at which your best run started.             | Float   |
+| `bestRun`        | Percentage at which your best run ended.               | Float   |
+| `lastDeath`      | Progress of your last attempt (null on first attempt). | Float   |
 
 
 ### Clicks information
