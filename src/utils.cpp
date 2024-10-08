@@ -93,4 +93,9 @@ namespace eclipse::utils {
         ).count();
     }
 
+    gui::Color getRainbowColor(float speed, float saturation, float value, float offset) {
+        time_t ms = getTimestamp();
+        float h = std::fmod(ms * speed + offset, 360.0f);
+        return gui::Color::fromHSV(h, saturation, value);
+    }
 }

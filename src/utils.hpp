@@ -1,6 +1,7 @@
 #pragma once
 
 #include <random>
+#include <modules/gui/color.hpp>
 #include <Geode/binding/GJBaseGameLayer.hpp>
 
 namespace eclipse::utils {
@@ -82,4 +83,11 @@ namespace eclipse::utils {
 
     /// @brief Get the current timestamp.
     time_t getTimestamp();
+
+    /// @brief Get a rainbow color for specific parameters
+    /// @param speed The speed of the rainbow effect
+    /// @param saturation The S (saturation) component of the HSV color
+    /// @param value The V (value) component of the HSV color
+    /// @param offset The offset in milliseconds for the rainbow effect
+    gui::Color getRainbowColor(float speed, float saturation, float value, float offset = 0.f);
 }
