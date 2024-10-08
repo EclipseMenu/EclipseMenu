@@ -369,6 +369,16 @@ namespace eclipse::keybinds {
 #endif
 
     static std::map<std::string, std::shared_ptr<gui::KeybindComponent>> s_keybindComponents;
+    static std::shared_ptr<gui::LabelComponent> s_hintLabel;
+
+    void updateHintLabel() {
+        if (!s_hintLabel) return;
+        auto components = gui::MenuTab::find("Keybinds")->getComponents();
+        s_hintLabel->setText(
+            components.size() <= 3 ?
+            "Right-Click on any button or toggle to bind it to a key!" : ""
+        );
+    }
 
     std::shared_ptr<Manager> Manager::get() {
         static auto instance = std::make_shared<Manager>();
@@ -423,6 +433,7 @@ namespace eclipse::keybinds {
                                 config::set(fmt::format("keybind.{}.active", idStr), false);
                                 keybindRef.setInitialized(false);
                                 tab->removeComponent(keybindComponent);
+                                updateHintLabel();
                             }
 
                             keybindRef.setKey(key);
@@ -438,6 +449,8 @@ namespace eclipse::keybinds {
                             tab->removeComponent(keybindComponent);
                         }
                     }
+
+                    updateHintLabel();
                 });
 
 
@@ -522,7 +535,8 @@ namespace eclipse::keybinds {
         tab->addToggle("In-game only", "keybind.in-game-only")
            ->setDescription("Makes keybinds only usable while in a level");
 
-        tab->addLabel("Right-Click on any button or toggle to bind it to a key!");
+        s_hintLabel = tab->addLabel("");
+        updateHintLabel();
     }
 
 }

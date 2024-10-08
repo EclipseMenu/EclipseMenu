@@ -152,6 +152,7 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitLabel(const std::shared_ptr<LabelComponent>& label) const {
+        if (label->getTitle().empty()) return; // skip empty labels
         ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getForegroundColor()));
         ImGui::TextWrapped("%s", label->getTitle().c_str());
         ImGui::PopStyleColor();

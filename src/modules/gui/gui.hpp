@@ -75,6 +75,8 @@ namespace eclipse::gui {
         void onInit() override {}
         void onUpdate() override {}
 
+        void setText(std::string text) { m_title = std::move(text); }
+
         [[nodiscard]] const std::string& getId() const override { return m_title; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
 
