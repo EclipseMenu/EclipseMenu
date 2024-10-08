@@ -66,7 +66,7 @@ namespace eclipse::gui::imgui {
         // tab buttons
 
         ImGui::PushStyleColor(ImGuiCol_ChildBg, {0,0,0,0});
-        ImGui::BeginChild("tabs", ImVec2(186 * scale, 480 * scale));
+        ImGui::BeginChild("tabs");
         ImGui::PopStyleColor();
 
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10 * scale);
