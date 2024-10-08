@@ -19,7 +19,7 @@ namespace eclipse::gui::imgui {
     void SidebarLayout::recalculateSize(bool first) {
         auto screenSize = ImGui::GetIO().DisplaySize;
 
-        auto initialSize = ImVec2(first ? 150 : 250, 700);
+        auto initialSize = ImVec2(first ? 165 * ThemeManager::get()->getGlobalScale() : 250, 700);
         auto xRatio = screenSize.x / 1280;
         auto yRatio = screenSize.y / 720;
         auto ratio = std::min(xRatio, yRatio);

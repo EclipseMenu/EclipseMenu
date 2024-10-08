@@ -113,6 +113,9 @@ namespace eclipse::hacks::Bot {
 
             PlayLayer::resetLevel();
 
+            if (s_bot.getState() != bot::State::DISABLED && geode::Loader::get()->isModLoaded("syzzi.click_between_frames"))
+                geode::Loader::get()->getLoadedMod("syzzi.click_between_frames")->setSettingValue<bool>("soft-toggle", false);
+
             if (s_bot.getState() == bot::State::RECORD) {
                 //gd does this automatically for holding but not releases so we do it manually
                 s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, false, false);

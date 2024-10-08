@@ -125,6 +125,34 @@ namespace eclipse::gui {
         store_value(m_id, value, m_noSave);
     }
 
+    IntToggleComponent* IntToggleComponent::handleKeybinds() {
+        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
+            bool value = !config::get<bool>(fmt::format("{}.toggle", this->getId()), false);
+            auto id = fmt::format("{}.toggle", this->getId());
+            m_noSave ? config::setTemp(id, value)
+                : config::set(id, value);
+            this->triggerCallback();
+        });
+        m_hasKeybind = true;
+        return this;
+    }
+
+    int IntToggleComponent::getValue() const {
+        return get_value(m_id, 0, m_noSave);
+    }
+
+    void IntToggleComponent::setValue(int value) const {
+        store_value(m_id, value, m_noSave);
+    }
+
+    bool IntToggleComponent::getState() const {
+        return get_value(fmt::format("{}.toggle", this->getId()), false, m_noSave);
+    }
+
+    void IntToggleComponent::setState(bool value) const {
+        store_value(fmt::format("{}.toggle", this->getId()), value, m_noSave);
+    }
+
     FloatToggleComponent* FloatToggleComponent::handleKeybinds() {
         keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
             bool value = !config::get<bool>(fmt::format("{}.toggle", this->getId()), false);

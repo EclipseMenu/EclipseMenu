@@ -21,7 +21,7 @@ namespace eclipse::gui {
         Label, Toggle, RadioButton,
         Combo, Slider, InputFloat, InputInt,
         FloatToggle, InputText, Color,
-        Button, Keybind, LabelSettings, FilesystemCombo
+        Button, Keybind, LabelSettings, FilesystemCombo, IntToggle
     };
 
     class Component {
@@ -430,6 +430,66 @@ namespace eclipse::gui {
         std::function<void(int)> m_callback;
     };
 
+    /// @brief Input int component to input a value from a range. Can be toggled.
+    class IntToggleComponent : public Component {
+    public:
+        explicit IntToggleComponent(std::string title, std::string id, int min = INT_MIN, int max = INT_MAX)
+            : m_id(std::move(id)), m_title(std::move(title)), m_min(min), m_max(max) {
+            m_type = ComponentType::IntToggle;
+        }
+
+        void onInit() override {}
+        void onUpdate() override {}
+
+        /// @brief Set a callback function to be called when the component value changes.
+        IntToggleComponent* toggleCallback(const std::function<void()>& func) { 
+            m_toggleCallback = func; 
+            return this;
+        }
+        IntToggleComponent* valueCallback(const std::function<void(int)>& func) { 
+            m_valueCallback = func; 
+            return this;
+        }
+
+        /// @brief Set toggle description.
+        IntToggleComponent* setDescription(std::string description) override {
+            m_description = std::move(description);
+            return this;
+        }
+
+        /// @brief Allows to set keybinds for the toggle.
+        IntToggleComponent* handleKeybinds();
+
+        [[nodiscard]] const std::string& getId() const override { return m_id; }
+        [[nodiscard]] const std::string& getTitle() const override { return m_title; }
+        [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
+
+        [[nodiscard]] int getMin() const { return m_min; }
+        [[nodiscard]] int getMax() const { return m_max; }
+
+        [[nodiscard]] int getValue() const;
+        void setValue(int value) const;
+        [[nodiscard]] bool getState() const;
+        void setState(bool value) const;
+
+        void triggerCallback(int value) const {
+            if (m_valueCallback) m_valueCallback(value);
+        }
+        void triggerCallback() const {
+            if (m_toggleCallback) m_toggleCallback();
+        }
+
+    private:
+        std::string m_id;
+        std::string m_title;
+        std::string m_description;
+        int m_min;
+        int m_max;
+        std::function<void(int)> m_valueCallback;
+        std::function<void()> m_toggleCallback;
+        bool m_hasKeybind = false;
+    };
+
     /// @brief Input float component to input a value from a range. Can be toggled .
     class FloatToggleComponent : public Component {
     public:
@@ -754,6 +814,13 @@ namespace eclipse::gui {
             auto inputInt = std::make_shared<InputIntComponent>(title, id, min, max);
             addComponent(inputInt);
             return inputInt;
+        }
+
+        /// @brief Add an float toggle to the tab.
+        std::shared_ptr<IntToggleComponent> addIntToggle(const std::string& title, const std::string& id, int min = INT_MIN, int max = INT_MAX) {
+            auto intToggle = std::make_shared<IntToggleComponent>(title, id, min, max);
+            addComponent(intToggle);
+            return intToggle;
         }
 
         /// @brief Add an float toggle to the tab.

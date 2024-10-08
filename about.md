@@ -26,15 +26,16 @@ This mod menu would not be possible without the developers from other mod menus 
 - [SpaghettDev](https://github.com/SpaghettDev)
 
 Additionally, thank you to our testers, contributors, and supporters for improving and helping make Eclipse Menu possible!
-- [Tallen](https://tallensuired.carrd.co/) - Tester & Helped support **Eclipse Menu** by donating!
+- [Tallen](https://tallensuired.carrd.co/) - Tester, First Donor, and awesome person!
 - [hiimjustin000](https://github.com/hiimjustin000) - Contributor
 - [RayDeeUx](https://github.com/RayDeeUx) - Contributor
 - [iAndyHD3](https://github.com/iAndyHD3) - Contributor
 - [Tech](https://github.com/TechStudent11) - Contributor
+- [Uproxide](https://github.com/Uproxide) - Contributor
 - [alex](https://www.youtube.com/channel/UC4SWcPASJplMrIT6YI8QcSw) - Tester
-- itsmeatomic - Tester
-- jettjames - Tester
-- doki - Tester
+- [itsmeatomic](https://youtube.com/@itsmeatomic) - Tester
+- [jettjames](https://x.com/JettJamez) - Tester
+- [doki](https://www.youtube.com/@dokitachi) - Tester
 - [Prometheus](https://github.com/Prometheus-03) - Tester
 
 ## License

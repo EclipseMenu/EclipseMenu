@@ -457,7 +457,7 @@ namespace eclipse::keybinds {
             return;
         }
 
-        if (gui::imgui::ImGuiRenderer::get() && ImGui::GetIO().WantTextInput)
+        if ((gui::imgui::ImGuiRenderer::get() && ImGui::GetIO().WantTextInput) || cocos2d::CCIMEDispatcher::sharedDispatcher()->hasDelegate())
             return;
 
         if (config::get<bool>("keybind.in-game-only", false) && !PlayLayer::get())
@@ -521,6 +521,8 @@ namespace eclipse::keybinds {
 
         tab->addToggle("In-game only", "keybind.in-game-only")
            ->setDescription("Makes keybinds only usable while in a level");
+
+        tab->addLabel("Right-Click on any button or toggle to bind it to a key!");
     }
 
 }

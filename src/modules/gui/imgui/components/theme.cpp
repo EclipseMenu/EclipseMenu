@@ -28,6 +28,7 @@ namespace eclipse::gui::imgui {
             CASE(InputText); CASE(Color);
             CASE(Button); CASE(Keybind);
             CASE(LabelSettings); CASE(FilesystemCombo);
+            CASE(IntToggle);
         }
         ImGui::PopID();
 
@@ -275,6 +276,31 @@ namespace eclipse::gui::imgui {
         }
         handleTooltip(inputInt->getDescription());
         ImGui::PopItemWidth();
+    }
+
+    void Theme::visitIntToggle(const std::shared_ptr<IntToggleComponent>& intToggle) const {
+        auto value = intToggle->getValue();
+        auto state = intToggle->getState();
+        auto tm = ThemeManager::get();
+
+        ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
+        if (ImGui::InputInt(fmt::format("##{}", intToggle->getTitle()).c_str(), &value, 0, 0)) {
+            value = std::clamp(value, intToggle->getMin(), intToggle->getMax());
+            intToggle->setValue(value);
+            intToggle->triggerCallback(value);
+        }
+        ImGui::PopItemWidth();
+
+        ImGui::SameLine(0, 1);
+
+        if (this->checkbox(intToggle->getTitle(), state, [intToggle] {
+            handleTooltip(intToggle->getDescription());
+            if (intToggle->hasKeybind())
+                handleKeybindMenu(intToggle->getId());
+        })) {
+            intToggle->setState(state);
+            intToggle->triggerCallback(value);
+        }
     }
 
     void Theme::visitFloatToggle(const std::shared_ptr<FloatToggleComponent>& floatToggle) const {

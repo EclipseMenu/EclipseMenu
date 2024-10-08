@@ -15,6 +15,7 @@ namespace eclipse::gui {
     class SliderComponent;
     class InputFloatComponent;
     class InputIntComponent;
+    class IntToggleComponent;
     class FloatToggleComponent;
     class InputTextComponent;
     class ColorComponent;
@@ -67,6 +68,7 @@ namespace eclipse::gui::imgui {
         virtual void visitSlider(const std::shared_ptr<SliderComponent>& slider) const;
         virtual void visitInputFloat(const std::shared_ptr<InputFloatComponent>& inputFloat) const;
         virtual void visitInputInt(const std::shared_ptr<InputIntComponent>& inputInt) const;
+        virtual void visitIntToggle(const std::shared_ptr<IntToggleComponent>& intToggle) const;
         virtual void visitFloatToggle(const std::shared_ptr<FloatToggleComponent>& floatToggle) const;
         virtual void visitInputText(const std::shared_ptr<InputTextComponent>& inputText) const;
         virtual void visitColor(const std::shared_ptr<ColorComponent>& color) const;

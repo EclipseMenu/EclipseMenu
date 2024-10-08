@@ -17,6 +17,8 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.noclip.opacity", 90.f);
             config::setIfEmpty("player.noclip.time", 0.f);
             config::setIfEmpty("player.noclip.color", gui::Color::RED);
+            config::setIfEmpty("player.noclip.acclimit", 95.f);
+            config::setIfEmpty("player.noclip.deathlimit", 1);
 
             tab->addToggle("Noclip", "player.noclip")
                 ->setDescription("Disables player death")
@@ -24,6 +26,8 @@ namespace eclipse::hacks::Player {
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                     options->addToggle("Player 1", "player.noclip.p1");
                     options->addToggle("Player 2", "player.noclip.p2");
+                    options->addFloatToggle("Accuracy Limit", "player.noclip.acclimit", 0.01f, 100.f, "%.2f")->handleKeybinds();
+                    options->addIntToggle("Death Limit", "player.noclip.deathlimit", 1, 100)->handleKeybinds();
                     options->addToggle("Noclip Tint", "player.noclip.tint");
                     options->addColorComponent("Tint Color", "player.noclip.color");
                     options->addInputFloat("Tint Opacity", "player.noclip.opacity", 0.f, 100.f, "%.0f%");
@@ -51,7 +55,7 @@ namespace eclipse::hacks::Player {
         ENABLE_SAFE_HOOKS_ALL()
 
         void destroyPlayer(PlayerObject* player, GameObject* object) override {
-            if (object == m_anticheatSpike)
+            if (object == m_anticheatSpike || (config::get<bool>("player.noclip.acclimit.toggle", false) && config::getTemp<float>("noclipAccuracy") <= config::get<float>("player.noclip.acclimit", 95.f))) // nullptr = killed by Eclipse
                 return PlayLayer::destroyPlayer(player, object);
 
             auto fields = m_fields.self();
@@ -158,6 +162,8 @@ namespace eclipse::hacks::Player {
                 if (!fields->m_deadLastFrame) {
                     auto deaths = config::getTemp<int>("noclipDeaths", 0);
                     config::setTemp<int>("noclipDeaths", deaths + 1);
+                    if (config::get<bool>("player.noclip.deathlimit.toggle", false) && deaths + 1 >= config::get<int>("player.noclip.deathlimit", 0)) 
+                        PlayLayer::get()->destroyPlayer(m_player1, nullptr);
                 }
             }
 
@@ -168,8 +174,16 @@ namespace eclipse::hacks::Player {
             if (frame > 0) {
                 float acc = static_cast<float>(frame - fields->m_deadFrames) / static_cast<float>(frame) * 100.f;
                 config::setTemp("noclipAccuracy", acc);
+                bool dead = (m_player1 && m_player1->m_isDead) || (m_player2 && m_player2->m_isDead);
+                //if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc <= config::get<float>("player.noclip.acclimit", 95.f) && !dead)
+                    //PlayLayer::get()->destroyPlayer(m_player1, (GameObject*)((int*)1));
             }
         }
     };
 
 }
+/*
+if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc < config::get<float>("player.noclip.acclimit", 95.f)) {
+                    PlayLayer::get()->destroyPlayer(m_player1, nullptr);
+                    config::setTemp("noclipAccuracy", config::get<float>("player.noclip.acclimit", 95.f));
+                }*/

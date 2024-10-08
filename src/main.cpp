@@ -152,9 +152,9 @@ $on_mod(Loaded) {
         fontCombo->callback([](int value) {
             ThemeManager::get()->setSelectedFont(value);
         })->disableSaving();
-        tab->addInputFloat("Font Size", "fontSize", 1.f, 64.f)
+        tab->addInputFloat("Font Size", "fontSize", 10.f, 64.f)
             ->callback([](float value) {
-                ThemeManager::get()->setFontSize(value);
+                if (value >= 10.f) ThemeManager::get()->setFontSize(value);
             })->disableSaving();
         tab->addButton("Reload Fonts")->callback([fontCombo] {
             ImGuiCocos::get().reload();
