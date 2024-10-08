@@ -29,14 +29,14 @@ namespace eclipse::hacks::Level {
         GameObject* getClosestObject(std::vector<GameObject*>& vec, StartPosObject* startPos) {
             GameObject* closest = nullptr;
 
-            std::sort(vec.begin(), vec.end(), [] (GameObject* a, GameObject* b) {
+            std::ranges::sort(vec, [] (GameObject* a, GameObject* b) {
                 return a->getPositionX() < b->getPositionX();
             });
 
             for (auto obj : vec) {
                 if (obj->getPositionX() - 10 > startPos->getPositionX())
                     break;
-                else if (obj->getPositionX() - 10 < startPos->getPositionX())
+                if (obj->getPositionX() - 10 < startPos->getPositionX())
                     closest = obj;
             }
 
@@ -59,7 +59,7 @@ namespace eclipse::hacks::Level {
             obj = getClosestObject(m_fields->m_gamemodePortals, startPos);
 
             if (obj) {
-                switch(obj->m_objectID) {
+                switch (obj->m_objectID) {
                     case 12:
                         startPosSettings->m_startMode = 0;
                         break;
@@ -87,14 +87,16 @@ namespace eclipse::hacks::Level {
                 }
             }
 
-            obj = getClosestObject(m_fields->m_miniPortals, startPos);
+            auto fields = m_fields.self();
+
+            obj = getClosestObject(fields->m_miniPortals, startPos);
 
             if (obj)
                 startPosSettings->m_startMini = obj->m_objectID == 101;
 
-            obj = getClosestObject(m_fields->m_speedChanges, startPos);
+            obj = getClosestObject(fields->m_speedChanges, startPos);
             if (obj) {
-                switch(obj->m_objectID) {
+                switch (obj->m_objectID) {
                     case 200:
                         startPosSettings->m_startSpeed = Speed::Slow;
                         break;
@@ -115,13 +117,14 @@ namespace eclipse::hacks::Level {
         }
 
         bool init(GJGameLevel* level, bool unk1, bool unk2) {
-            m_fields->m_dualPortals.clear();
-            m_fields->m_gamemodePortals.clear();
-            m_fields->m_miniPortals.clear();
-            m_fields->m_miniPortals.clear();
-            m_fields->m_speedChanges.clear();
-            m_fields->m_mirrorPortals.clear();
-            m_fields->m_startPositions.clear();
+            auto fields = m_fields.self();
+            fields->m_dualPortals.clear();
+            fields->m_gamemodePortals.clear();
+            fields->m_miniPortals.clear();
+            fields->m_miniPortals.clear();
+            fields->m_speedChanges.clear();
+            fields->m_mirrorPortals.clear();
+            fields->m_startPositions.clear();
 
             return PlayLayer::init(level, unk1, unk2);
         }
@@ -138,10 +141,10 @@ namespace eclipse::hacks::Level {
         void addObject(GameObject* obj) {
             PlayLayer::addObject(obj);
 
-            switch(obj->m_objectID)
+            switch (obj->m_objectID)
             {
                 case 31:
-                    m_fields->m_startPositions.push_back((StartPosObject*)obj);
+                    m_fields->m_startPositions.push_back(static_cast<StartPosObject *>(obj));
                     break;
                 case 12:
                 case 13:

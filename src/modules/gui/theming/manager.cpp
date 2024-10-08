@@ -129,9 +129,11 @@ namespace eclipse::gui {
         auto other = json["other"];
         try_assign(m_uiScale, other, "uiScale");
         try_assign(m_selectedFont, other, "font");
+
         float fontSize = m_fontSize;
         try_assign(fontSize, other, "fontSize");
         this->setFontSize(fontSize);
+        if (auto imgui = imgui::ImGuiRenderer::get()) imgui->reload();
 
         try_assign(m_borderSize, other, "borderSize");
         try_assign(m_framePadding, other, "framePadding");
@@ -370,11 +372,6 @@ namespace eclipse::gui {
     }
 
     void ThemeManager::setFontSize(float value) {
-        if (m_fontSize == value) return;
-
         m_fontSize = value;
-        if (auto imgui = imgui::ImGuiRenderer::get()) {
-            imgui->reload();
-        }
     }
 }

@@ -9,7 +9,10 @@ namespace eclipse::hacks::Shortcuts {
 
         static void openSettings() {
             if (auto* options = OptionsLayer::create()) {
-                cocos2d::CCScene::get()->addChild(options, 1000);
+                auto scene = cocos2d::CCScene::get();
+                if (!scene) return;
+                auto zOrder = scene->getHighestChildZ();
+                scene->addChild(options, zOrder + 1);
                 options->showLayer(false);
             }
         }
