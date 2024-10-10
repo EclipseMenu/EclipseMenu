@@ -24,7 +24,7 @@ namespace eclipse::hacks::Level {
         ADD_HOOKS_DELEGATE("level.instantmirror")
 
         void toggleFlipped(bool p0, bool p1) {
-            GJBaseGameLayer::toggleFlipped(p0, (p1) ? p1 : config::get<bool>("level.instantmirror"));
+            GJBaseGameLayer::toggleFlipped(p0, true);
         }
     };
 }
