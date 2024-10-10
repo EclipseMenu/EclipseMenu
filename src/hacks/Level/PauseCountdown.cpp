@@ -72,7 +72,7 @@ namespace eclipse::hacks::Level {
             if (!PlayLayer::get()) return GJBaseGameLayer::update(dt);
 
             if (m_fields->pausedt > 0.f) m_fields->pausedt -= dt;
-            if (m_fields->pausedt <= 0.5f || !config::get<bool>("level.pausecount", false))
+            if (m_fields->pausedt <= 0.01f || !config::get<bool>("level.pausecount", false))
                 GJBaseGameLayer::update(dt);
         }
     };
@@ -80,7 +80,7 @@ namespace eclipse::hacks::Level {
     class $modify(PauseCountdownPlayLHook, PlayLayer) {
         void pauseGame(bool paused) {
             if (paused) {
-                if (static_cast<PauseBGLHook*>(GJBaseGameLayer::get())->m_fields->pausedt < 0.5f || !config::get<bool>("level.pausecount", false)) PlayLayer::pauseGame(paused);
+                if (static_cast<PauseBGLHook*>(GJBaseGameLayer::get())->m_fields->pausedt < 0.01f || !config::get<bool>("level.pausecount", false)) PlayLayer::pauseGame(paused);
             } else {
                 PlayLayer::pauseGame(paused);
                 auto* bg = static_cast<PauseBGLHook*>(PauseBGLHook::get());

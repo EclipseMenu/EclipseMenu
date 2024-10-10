@@ -1,5 +1,17 @@
 # Eclipse Menu
 
+## v1.0.0-beta.3
+**Fixes:**
+* <cg>Fixed</c> <co>Pause Countdown</c> taking 2.5 seconds instead of 3 seconds
+
+**Additions**:
+* Added <cg>0% Practice Completion</c>
+* Added <cg>No Mirror</c>
+* Added <cg>Instant Mirror</c>
+* Added <cg>No Trail</c>
+* Added <cg>No Object Glow</c>
+* Macros can now be deleted in the menu itself
+
 ## v1.0.0-beta.2
 **Fixes:**
 * <cg>Fixed</c> <co>Force Platformer</c> not working in online levels
