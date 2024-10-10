@@ -75,6 +75,24 @@ namespace eclipse::hacks::Bot {
         Popup::create("Replay loaded", fmt::format("Replay {} loaded with {} inputs", replayPath.filename().stem().string(), s_bot.getInputCount()));
     }
 
+    void deleteReplay() {
+        std::filesystem::path replayPath = config::get<std::string>("bot.selectedreplay", "");
+        if(!std::filesystem::exists(replayPath)) {
+            Popup::create("Invalid Replay", "Please select a replay you would like to delete.");
+            return;
+        }
+        std::string replayName = replayPath.filename().stem().string();
+        Popup::create("Warning", fmt::format("Are you sure you want to delete {}?", replayName), "Yes", "No", [replayPath, replayName](bool result) {
+            if (!result) return;
+            if (std::filesystem::exists(replayPath)) {
+                Popup::create("Replay deleted", fmt::format("{} has been deleted.", replayName));
+                std::filesystem::remove(replayPath);
+                // apparently i cannot put the Popup below here otherwise some memory corruption happens, WHY? its not even a pointer!!
+                config::set("bot.selectedreplay", "");
+            }
+        });
+    }
+
     class Bot : public hack::Hack {
         void init() override {
             const auto updateBotState = [](int state) { s_bot.setState(static_cast<bot::State>(state)); };
@@ -92,6 +110,7 @@ namespace eclipse::hacks::Bot {
             tab->addButton("New")->callback(newReplay);
             tab->addButton("Save")->callback(saveReplay);
             tab->addButton("Load")->callback(loadReplay);
+            tab->addButton("Delete")->callback(deleteReplay);
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<int>("bot.state") != 0; } // TODO: add a check for if theres a macro loaded
@@ -112,7 +131,6 @@ namespace eclipse::hacks::Bot {
             bool p2hold = m_player2->m_holdingButtons[1];
 
             PlayLayer::resetLevel();
-
 
             static Mod* cbfMod = geode::Loader::get()->getLoadedMod("syzzi.click_between_frames");
             if (s_bot.getState() != bot::State::DISABLED && cbfMod)
