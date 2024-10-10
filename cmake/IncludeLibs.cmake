@@ -17,7 +17,7 @@ set(HAS_IMGUI ON)
 
 CPMAddPackage("gh:matcool/gd-imgui-cocos#2a18eac")
 CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
-CPMAddPackage("gh:EclipseMenu/rift#c3f1c29")
+CPMAddPackage("gh:EclipseMenu/rift#5dda43f")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
 CPMAddPackage(
     NAME nlohmann_json
