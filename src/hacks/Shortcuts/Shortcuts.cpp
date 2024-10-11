@@ -17,6 +17,55 @@ namespace eclipse::hacks::Shortcuts {
             }
         }
 
+        static void uncompleteLevel() {
+            GJGameLevel* level = nullptr;
+
+            // try to find it from either PlayLayer or LevelInfoLayer
+            auto* pl = PlayLayer::get();
+            if (pl) {
+                level = pl->m_level;
+            } else if (auto* lil = geode::cocos::getChildOfType<LevelInfoLayer>(cocos2d::CCScene::get(), 0)) {
+                level = lil->m_level;
+            }
+
+            if (!level) return Popup::create("Error", "You have to open the level first!");
+
+            Popup::create(
+            "Uncomplete level?",
+            fmt::format("Are you sure you want to uncomplete \"{}\"?\nYou can't undo this process.", level->m_levelName),
+            "Yes", "No",[level](bool yes) {
+                if (!yes) return;
+
+                auto gsm = GameStatsManager::sharedState();
+                auto glm = GameLevelManager::sharedState();
+
+                // Delete completion
+                if (level->m_normalPercent >= 100 && gsm->hasCompletedLevel(level)) {
+                    gsm->m_completedLevels->removeObjectForKey(fmt::format("c_{}", level->m_levelID.value()));
+                }
+
+                // Clear progress
+                level->m_practicePercent = 0;
+                level->m_normalPercent = 0;
+                level->m_newNormalPercent2 = 0;
+                level->m_orbCompletion = 0;
+                level->m_54 = 0;
+                level->m_k111 = 0;
+                level->m_bestPoints = 0;
+                level->m_bestTime = 0;
+
+                // Remove coins
+                auto coinDict = gsm->m_verifiedUserCoins;
+                for (auto i = 0; i < level->m_coins; i++) {
+                    auto key = level->getCoinKey(i + 1);
+                    coinDict->removeObjectForKey(key);
+                }
+
+                // Save the level
+                glm->saveLevel(level);
+            });
+        }
+
         static void restartLevel() {
             if (auto* pl = PlayLayer::get())
                 pl->resetLevel();
@@ -72,6 +121,7 @@ namespace eclipse::hacks::Shortcuts {
         void init() override {
             auto tab = gui::MenuTab::find("Shortcuts");
             tab->addButton("Show Options")->setDescription("Open game settings menu")->callback(openSettings)->handleKeybinds();
+            tab->addButton("Uncomplete Level")->setDescription("Clear progress from a level")->callback(uncompleteLevel)->handleKeybinds();
             tab->addButton("Restart Level")->setDescription("Restart the current level")->callback(restartLevel)->handleKeybinds();
             tab->addButton("Toggle Practice Mode")->callback(togglePracticeMode)->handleKeybinds();
             GEODE_WINDOWS(
