@@ -15,9 +15,9 @@ target_sources(imgui INTERFACE
 )
 set(HAS_IMGUI ON)
 
-CPMAddPackage("gh:matcool/gd-imgui-cocos#2a18eac")
+CPMAddPackage("gh:matcool/gd-imgui-cocos#b085ce4")
 CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
-CPMAddPackage("gh:EclipseMenu/rift#5dda43f")
+CPMAddPackage("gh:EclipseMenu/rift#ced2b2f")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
 CPMAddPackage(
     NAME nlohmann_json

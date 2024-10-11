@@ -261,20 +261,10 @@ namespace eclipse::utils {
             m_position = player->m_position;
             m_rotation = player->getRotation();
 
-#ifndef GEODE_IS_ANDROID
             m_rotateObjectsRelated = player->m_rotateObjectsRelated; // unordered_map<int, GJPointDouble>
             m_maybeRotatedObjectsMap = player->m_maybeRotatedObjectsMap; // unordered_map<int, GameObject*>
             m_ringRelatedSet = player->m_ringRelatedSet; // unordered_set<int>
             m_touchedRings = player->m_touchedRings; // unordered_set<int>
-#else
-            // gd::set, gd::unordered_set and gd::unordered_map are just type aliases of arrays of void* on android
-            // until that is fixed, this is a workaround
-
-            std::copy(std::begin(player->m_rotateObjectsRelated), std::end(player->m_rotateObjectsRelated), std::begin(m_rotateObjectsRelated));
-            std::copy(std::begin(player->m_maybeRotatedObjectsMap), std::end(player->m_maybeRotatedObjectsMap), std::begin(m_maybeRotatedObjectsMap));
-            std::copy(std::begin(player->m_ringRelatedSet), std::end(player->m_ringRelatedSet), std::begin(m_ringRelatedSet));
-            std::copy(std::begin(player->m_touchedRings), std::end(player->m_touchedRings), std::begin(m_touchedRings));
-#endif
         }
 
         void apply(PlayerObject* player) {
@@ -529,17 +519,10 @@ namespace eclipse::utils {
             player->setPosition(m_position);
             player->setRotation(m_rotation);
 
-#ifndef GEODE_IS_ANDROID
             player->m_rotateObjectsRelated = m_rotateObjectsRelated;
             player->m_maybeRotatedObjectsMap = m_maybeRotatedObjectsMap;
             player->m_ringRelatedSet = m_ringRelatedSet;
             player->m_touchedRings = m_touchedRings;
-#else
-            std::copy(std::begin(m_rotateObjectsRelated), std::end(m_rotateObjectsRelated), std::begin(player->m_rotateObjectsRelated));
-            std::copy(std::begin(m_maybeRotatedObjectsMap), std::end(m_maybeRotatedObjectsMap), std::begin(player->m_maybeRotatedObjectsMap));
-            std::copy(std::begin(m_ringRelatedSet), std::end(m_ringRelatedSet), std::begin(player->m_ringRelatedSet));
-            std::copy(std::begin(m_touchedRings), std::end(m_touchedRings), std::begin(player->m_touchedRings));
-#endif
         }
 
     private:

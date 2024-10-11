@@ -35,8 +35,8 @@ namespace eclipse::hacks::Level {
                     options->addToggle("Reset Camera", "level.startpos_switcher.reset_camera");
                     options->addToggle("Show Label", "level.startpos_switcher.label")
                         ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                            options->addSlider("Label Scale", "label.startpos_switcher.scale", 0.1f, 2.f, "%.2fx");
-                            options->addSlider("Opacity Modifier", "label.startpos_switcher.alpha_mod", 0.f, 1.f);
+                            options->addInputFloat("Label Scale", "label.startpos_switcher.scale", 0.1f, 2.f, "%.2fx");
+                            options->addInputFloat("Opacity Modifier", "label.startpos_switcher.alpha_mod", 0.f, 1.f);
                             options->addColorComponent("Label Color", "label.startpos_switcher.color", true);
                             options->addToggle("Show Buttons", "label.startpos_switcher.buttons");
                         });
