@@ -18,7 +18,7 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.noclip.time", 0.f);
             config::setIfEmpty("player.noclip.color", gui::Color::RED);
             config::setIfEmpty("player.noclip.acclimit", 95.f);
-            config::setIfEmpty("player.noclip.deathlimit", 1);
+            config::setIfEmpty("player.noclip.deathlimit", 2);
 
             tab->addToggle("Noclip", "player.noclip")
                 ->setDescription("Disables player death")
@@ -55,8 +55,21 @@ namespace eclipse::hacks::Player {
         ENABLE_SAFE_HOOKS_ALL()
 
         void destroyPlayer(PlayerObject* player, GameObject* object) override {
-            if (object == m_anticheatSpike || (config::get<bool>("player.noclip.acclimit.toggle", false) && config::getTemp<float>("noclipAccuracy") <= config::get<float>("player.noclip.acclimit", 95.f))) // nullptr = killed by Eclipse
+            if (object == m_anticheatSpike)
                 return PlayLayer::destroyPlayer(player, object);
+
+            if (config::get<bool>("player.noclip.acclimit.toggle", false)) {
+                auto acc = config::getTemp<float>("noclipAccuracy", 100.f);
+                auto limit = config::get<float>("player.noclip.acclimit", 95.f);
+                if (acc < limit)
+                    return PlayLayer::destroyPlayer(player, object);
+            }
+            if (config::get<bool>("player.noclip.deathlimit.toggle", false)) {
+                auto deaths = config::getTemp<int>("noclipDeaths", 0);
+                auto limit = config::get<int>("player.noclip.deathlimit", 2);
+                if (deaths >= limit)
+                    return PlayLayer::destroyPlayer(player, object);
+            }
 
             auto fields = m_fields.self();
 
