@@ -1,6 +1,3 @@
-#include "Geode/binding/GJGameLevel.hpp"
-#include "Geode/binding/LevelInfoLayer.hpp"
-#include "Geode/cocos/cocoa/CCObject.h"
 #include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
@@ -11,7 +8,7 @@ namespace eclipse::hacks::Bypass {
 
     class CopyBypass : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Bypass");
+            auto tab = gui::MenuTab::find("Creator");
 
             tab->addToggle("Copy Bypass", "bypass.copybypass")
                 ->handleKeybinds()
