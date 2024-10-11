@@ -736,6 +736,11 @@ namespace eclipse::gui {
             return this;
         }
 
+        LabelSettingsComponent* moveCallback(const std::function<void(bool)>& func) {
+            m_moveCallback = func;
+            return this;
+        }
+
         void triggerDeleteCallback() const {
             if (m_deleteCallback) m_deleteCallback();
         }
@@ -744,11 +749,16 @@ namespace eclipse::gui {
             if (m_editCallback) m_editCallback();
         }
 
+        void triggerMoveCallback(bool up) const {
+            if (m_moveCallback) m_moveCallback(up);
+        }
+
     private:
         std::string m_id;
         labels::LabelSettings* m_settings;
         std::function<void()> m_deleteCallback;
         std::function<void()> m_editCallback;
+        std::function<void(bool)> m_moveCallback;
     };
 
     /// @brief Contains a list of components and a title, to be passed into render engine.

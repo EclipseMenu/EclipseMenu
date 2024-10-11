@@ -298,7 +298,7 @@ namespace eclipse::hacks::Labels {
             config::setIfEmpty("labels.cheat-indicator.opacity", 0.35f);
 
             s_labels = config::get<std::vector<labels::LabelSettings>>("labels", {
-                {"Testmode", "{isTestMode ? 'Testmode' : ''}", false},
+                {"Testmode", "{isTestMode ?? 'Testmode'}", false},
                 {"Attempt", "Attempt {attempt}", false},
                 {"Percentage", "{isPlatformer ? time : progress + '%'}", false},
                 {"Level Time", "{time}", false},
@@ -306,8 +306,8 @@ namespace eclipse::hacks::Labels {
                 {"Clock", "{clock}", false},
                 {"FPS", "FPS: {round(fps)}", false},
                 {"CPS", "{cps}/{clicks}/{maxCps} CPS", false}, // TODO: Add click trigger
-                {"Noclip Accuracy", "{ noclip ? 'Accuracy: ' + noclipAccuracy + '%' : ''}", false}, // TODO: Add death trigger
-                {"Noclip Deaths", "{ noclip ? 'Deaths: ' + noclipDeaths : ''}", false},
+                {"Noclip Accuracy", "{ noclip ?? 'Accuracy: ' + noclipAccuracy + '%'}", false}, // TODO: Add death trigger
+                {"Noclip Deaths", "{ noclip ?? 'Deaths: ' + noclipDeaths}", false},
             });
 
             tab->addToggle("Show Labels", "labels.visible")
@@ -439,6 +439,30 @@ namespace eclipse::hacks::Labels {
                 ->editCallback([]{
                     config::set("labels", s_labels);
                     updateLabels(true);
+                })
+                ->moveCallback([this, &setting](bool up) {
+                    auto it = std::ranges::find_if(s_labels, [&setting](const labels::LabelSettings& s) {
+                        return s.id == setting.id;
+                    });
+
+                    if (it == s_labels.end())
+                        return; // should never happen but just in case
+                    if ((up && it == s_labels.begin()) || (!up && it == s_labels.end() - 1))
+                        return; // index out of bounds
+
+                    // swap the elements
+                    auto index = std::distance(s_labels.begin(), it);
+                    auto newIndex = up ? index - 1 : index + 1;
+                    std::iter_swap(it, s_labels.begin() + newIndex);
+
+                    // update the config
+                    config::set("labels", s_labels);
+                    updateLabels(true);
+
+                    // refresh ui
+                    gui::Engine::queueAfterDrawing([this]{
+                        createLabelComponent();
+                    });
                 });
 
                 m_labelToggles.push_back(toggle);

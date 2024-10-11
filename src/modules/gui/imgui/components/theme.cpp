@@ -511,6 +511,14 @@ namespace eclipse::gui::imgui {
                 labelSettings->triggerDeleteCallback();
                 ImGui::CloseCurrentPopup();
             }
+
+            if (this->button("Move Up")) {
+                labelSettings->triggerMoveCallback(true);
+            }
+            if (this->button("Move Down")) {
+                labelSettings->triggerMoveCallback(false);
+            }
+
         }, []{}, fmt::format("label-setting-{}", settings->id)))
             labelSettings->triggerEditCallback();
     }
