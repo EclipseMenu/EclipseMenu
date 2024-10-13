@@ -11,12 +11,12 @@ namespace eclipse::recorder {
         m_texture = new cocos2d::CCTexture2D;
 
         {
-            std::unique_ptr<char, void(*)(void*)> data(static_cast<char*>(malloc(m_width * m_height * 3)), free);
+            std::unique_ptr<char, void(*)(void*)> data(static_cast<char*>(malloc(m_width * m_height * 4)), free);
 
-            memset(data.get(), 0, m_width * m_height * 3);
+            memset(data.get(), 0, m_width * m_height * 4);
             m_texture->initWithData(
                 data.get(),
-                cocos2d::kCCTexture2DPixelFormat_RGB888,
+                cocos2d::kCCTexture2DPixelFormat_RGBA8888,
                 m_width, m_height,
                 cocos2d::CCSize(static_cast<float>(m_width), static_cast<float>(m_height))
             );
@@ -49,12 +49,14 @@ namespace eclipse::recorder {
         glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &m_old_fbo);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo);
 
+        PlayLayer::get()->setScaleY(-1);
         PlayLayer::get()->visit();
+        PlayLayer::get()->setScaleY(1);
 
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
         lock.lock();
         hasDataFlag = true;
-        glReadPixels(0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, data.data());
+        glReadPixels(0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
         lock.unlock();
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_old_fbo);

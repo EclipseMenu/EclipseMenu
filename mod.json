@@ -45,6 +45,13 @@
 			"resources/ECLIPSE-android.png"
 		]
 	},
+	"dependencies": [
+        {
+            "id": "eclipse.ffmpeg-api",
+            "version": ">=1.0.0",
+            "importance": "required"
+        }
+	],
 	"settings": {
 		"legacy-render": {
 			"name": "Use Legacy rendering",

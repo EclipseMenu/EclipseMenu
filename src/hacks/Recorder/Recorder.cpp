@@ -12,7 +12,7 @@
 
 namespace eclipse::hacks::Recorder {
 
-    static recorder::Recorder s_recorder("ffmpeg");
+    static recorder::Recorder s_recorder;
 
     bool visiting = false;
     bool inShaderLayer = false;
@@ -74,20 +74,15 @@ namespace eclipse::hacks::Recorder {
         if (!std::filesystem::exists(renderDirectory))
             std::filesystem::create_directories(renderDirectory);
 
-        recorder::RenderSettings settings;
+        s_recorder.m_renderSettings.m_bitrate = static_cast<int>(config::get<float>("recorder.bitrate", 30.f)) * 1000000;
+        s_recorder.m_renderSettings.m_fps = static_cast<int>(config::get<float>("recorder.fps", 60.f));
+        s_recorder.m_renderSettings.m_width = config::get<int>("recorder.resolution.x", 1920);
+        s_recorder.m_renderSettings.m_height = config::get<int>("recorder.resolution.y", 1080);
+        s_recorder.m_renderSettings.m_codec = config::get<std::string>("recorder.codecString", "h264");
+        s_recorder.m_renderSettings.m_outputFile = renderDirectory / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
+        s_recorder.m_renderSettings.m_hardwareAccelerationType = static_cast<ffmpeg::HardwareAccelerationType>(config::get<int>("recorder.hwType", 0));
 
-        settings.m_bitrate = config::get<float>("recorder.bitrate", 30.f);
-        settings.m_fps = config::get<float>("recorder.fps", 60.f);
-        settings.m_width = config::get<int>("recorder.resolution.x", 1920);
-        settings.m_height = config::get<int>("recorder.resolution.y", 1080);
-        settings.m_codec = (recorder::Codec)config::get<int>("recorder.codec", 0);
-        settings.m_args = config::get<std::string>("recorder.args", "");
-        settings.m_extraArgs = config::get<std::string>("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
-        settings.m_videoArgs = config::get<std::string>("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
-
-        s_recorder.m_renderSettings = settings;
-
-        s_recorder.start(renderDirectory / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value())));
+        s_recorder.start();
     }
 
     void stop() {
@@ -141,9 +136,9 @@ namespace eclipse::hacks::Recorder {
             config::setIfEmpty("recorder.resolution.x", 1920.f);
             config::setIfEmpty("recorder.resolution.y", 1080.f);
             config::setIfEmpty("recorder.audio", 2);
-            config::setIfEmpty("recorder.codec", 0);
+            config::setIfEmpty("recorder.hwType", 0);
 
-            tab->addCombo("Audio mode", "recorder.audio", {"Don't record", "Ask first", "Always record"}, 0);
+            m_codecs = s_recorder.getAvailableCodecs();
 
             tab->addInputFloat("Framerate", "recorder.fps", 1.f, 360.f, "%.0f FPS");
             tab->addInputFloat("Endscreen Duration", "recorder.endscreen", 0.f, 30.f, "%.2fs.");
@@ -151,39 +146,50 @@ namespace eclipse::hacks::Recorder {
             tab->addInputInt("Resolution X", "recorder.resolution.x", 1, 15360);
             tab->addInputInt("Resolution Y", "recorder.resolution.y", 1, 8640);
 
-            config::setIfEmpty("recorder.codec", static_cast<int>(recorder::Codec::None));
-            config::setIfEmpty("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
-            config::setIfEmpty("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
-            tab->addInputText("Args", "recorder.args");
-            tab->addInputText("Extra Args", "recorder.extraargs");
-            tab->addInputText("Video Args", "recorder.videoargs");
+            config::setIfEmpty("recorder.codecString", "libx264");
+            int codecIdx = static_cast<int>(std::distance(m_codecs.begin(), std::find(m_codecs.begin(), m_codecs.end(), "libx264")));
+            config::setIfEmpty("recorder.codecIdx", codecIdx);
 
-            tab->addCombo("Codec", "recorder.codec", {"None", "h264_nvenc", "h264_amf", "hevc_nvenc", "hevc_amf", "libx264", "libx265", "libx264rgb"}, 8);
+            //need to investigate problem with some codec names not working with the find codec function
+            tab->addCombo("Codec", "recorder.codecIdx", m_codecs, codecIdx)->callback([&](int index) {
+                config::set("recorder.codecString", m_codecs[index]);
+            });
+
+            tab->addCombo("HW Type", "recorder.hwIdx", {"None", "CUDA (Nvidia)", "D3D11 (All)"}, 0)->callback([&](int index) {
+                switch(index) {
+                    case 0:
+                        config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::NONE));
+                        break;
+                    case 1:
+                        config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::CUDA));
+                        break;
+                    case 2:
+                        config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::D3D11VA));
+                        break;
+                }
+            });
+
+            tab->addCombo("Audio mode", "recorder.audio", {"Don't record", "Ask first", "Always record"}, 0);
             
             tab->addLabel("Presets");
             tab->addButton("CPU")->callback([] {
-                config::set<int>("recorder.codec", static_cast<int>(recorder::Codec::None));
-                config::set<std::string>("recorder.args", "");
-                config::set<std::string>("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
-                config::set<std::string>("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
+                config::set<std::string>("recorder.codecString", "libx264");
             });
 
             tab->addButton("NVIDIA")->callback([] {
-                config::set<int>("recorder.codec", static_cast<int>(recorder::Codec::h264_nvenc));
-                config::set<std::string>("recorder.args", "-hwaccel cuda -hwaccel_output_format cuda");
-                config::set<std::string>("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
-                config::set<std::string>("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
+                config::set<std::string>("recorder.codecString", "h264_nvenc");
+                config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::CUDA));
             });
 
             tab->addButton("AMD")->callback([] {
-                config::set<int>("recorder.codec", static_cast<int>(recorder::Codec::h264_amf));
-                config::set<std::string>("recorder.args", "");
-                config::set<std::string>("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
-                config::set<std::string>("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
+                config::set<std::string>("recorder.codecString", "h264_amf");
+                config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::D3D11VA));
             });
         }
 
         [[nodiscard]] const char* getId() const override { return "Internal Recorder"; }
+
+        std::vector<std::string> m_codecs;
     };
 
     REGISTER_HACK(InternalRecorder)

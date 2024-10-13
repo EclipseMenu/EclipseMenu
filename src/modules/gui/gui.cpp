@@ -79,6 +79,12 @@ namespace eclipse::gui {
         store_value(m_id, value, m_noSave);
     }
 
+
+    void ComboComponent::setValueIfEmpty(int value) const {
+        if(!config::has(m_id))
+            store_value(m_id, value, m_noSave);
+    }
+
     std::filesystem::path FilesystemComboComponent::getValue() const {
         return get_value(m_id, std::filesystem::path(), m_noSave);
     }
