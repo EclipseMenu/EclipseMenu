@@ -3,13 +3,18 @@
 ## v1.0.0-beta.3
 **Fixes:**
 * <cg>Fixed</c> <co>Pause Countdown</c> taking 2.5 seconds instead of 3 seconds
+* <cg>Fixed</c> <co>Noclip Deaths</c> not working properly
+* <cg>Fixed</c> <co>Respawn Delay</c> not being able to added as a keybind
+* Moved <co>Copy Bypass</c> and <co>Verify Bypass</c> to the Creator tab
+* Fixed several issues with label parser
 
 **Additions**:
 * Added <cg>0% Practice Completion</c>
 * Added <cg>No Mirror</c>
 * Added <cg>Instant Mirror</c>
-* Added <cg>No Trail</c>
 * Added <cg>No Object Glow</c>
+* Added <cg>Level Uncomplete Shortcut</c>
+* Labels can now be reordered
 * Macros can now be deleted in the menu itself
 
 ## v1.0.0-beta.2
