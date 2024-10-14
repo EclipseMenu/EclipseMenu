@@ -74,7 +74,7 @@ namespace eclipse::recorder {
         std::filesystem::rename(tempPath,m_renderSettings.m_outputFile);
     }
 
-    std::vector<std::string> Recorder::getAvailableCodecs() {
+    std::unordered_map<std::string, int> Recorder::getAvailableCodecs() {
         ffmpeg::Recorder ffmpegRecorder;
         return ffmpegRecorder.getAvailableCodecs();
     }

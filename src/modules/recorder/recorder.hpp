@@ -21,7 +21,7 @@ namespace eclipse::recorder {
         bool isRecording() const { return m_recording; }
         bool isRecordingAudio() const { return m_recordingAudio; }
 
-        std::vector<std::string> getAvailableCodecs();
+        std::unordered_map<std::string, int> getAvailableCodecs();
     
     public:
         ffmpeg::RenderSettings m_renderSettings{};
