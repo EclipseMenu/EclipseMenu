@@ -5,6 +5,7 @@
 #include "rendertexture.hpp"
 
 #include <mutex>
+#include <chrono>
 
 namespace eclipse::recorder {
 
@@ -21,7 +22,7 @@ namespace eclipse::recorder {
         bool isRecording() const { return m_recording; }
         bool isRecordingAudio() const { return m_recordingAudio; }
 
-        std::unordered_map<std::string, int> getAvailableCodecs();
+        std::vector<std::string> getAvailableCodecs();
     
     public:
         ffmpeg::RenderSettings m_renderSettings{};

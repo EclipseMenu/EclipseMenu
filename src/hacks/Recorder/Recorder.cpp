@@ -83,7 +83,7 @@ namespace eclipse::hacks::Recorder {
         s_recorder.m_renderSettings.m_fps = static_cast<int>(config::get<float>("recorder.fps", 60.f));
         s_recorder.m_renderSettings.m_width = config::get<int>("recorder.resolution.x", 1920);
         s_recorder.m_renderSettings.m_height = config::get<int>("recorder.resolution.y", 1080);
-        s_recorder.m_renderSettings.m_codecId = config::get<int>("recorder.codecId", 27);
+        s_recorder.m_renderSettings.m_codec = config::get<std::string>("recorder.codecString", "h264");
         s_recorder.m_renderSettings.m_outputFile = renderDirectory / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
         s_recorder.m_renderSettings.m_hardwareAccelerationType = static_cast<ffmpeg::HardwareAccelerationType>(config::get<int>("recorder.hwType", 0));
 
@@ -145,10 +145,9 @@ namespace eclipse::hacks::Recorder {
 
             m_codecs = s_recorder.getAvailableCodecs();
 
-            for(auto& codec : m_codecs)
-                m_codecNames.push_back(codec.first);
+            std::sort(m_codecs.begin(), m_codecs.end());
 
-            int h264Id = m_codecs.at("h264");
+            int codecIdx = static_cast<int>(std::distance(m_codecs.begin(), std::find(m_codecs.begin(), m_codecs.end(), "h264")));
 
             tab->addInputFloat("Framerate", "recorder.fps", 1.f, 360.f, "%.0f FPS");
             tab->addInputFloat("Endscreen Duration", "recorder.endscreen", 0.f, 30.f, "%.2fs.");
@@ -156,10 +155,10 @@ namespace eclipse::hacks::Recorder {
             tab->addInputInt("Resolution X", "recorder.resolution.x", 1, 15360);
             tab->addInputInt("Resolution Y", "recorder.resolution.y", 1, 8640);
 
-            config::setIfEmpty("recorder.codecId", h264Id);
+            config::setIfEmpty("recorder.codecIdx", codecIdx);
 
-            tab->addCombo("Codec", "recorder.codecIdx", m_codecNames, static_cast<int>(std::distance(m_codecNames.begin(), std::find(m_codecNames.begin(), m_codecNames.end(), "h264"))))->callback([&](int index) {
-                config::set("recorder.codecId", m_codecs[m_codecNames[index]]);
+            tab->addCombo("Codec", "recorder.codecIdx", m_codecs, codecIdx)->callback([&](int index) {
+                config::set("recorder.codecString", m_codecs[index]);
             });
 
             tab->addCombo("HW Type", "recorder.hwIdx", {"None", "CUDA (Nvidia)", "D3D11 (All)"}, 0)->callback([&](int index) {
@@ -196,8 +195,7 @@ namespace eclipse::hacks::Recorder {
 
         [[nodiscard]] const char* getId() const override { return "Internal Recorder"; }
 
-        std::vector<std::string> m_codecNames;
-        std::unordered_map<std::string, int> m_codecs;
+        std::vector<std::string> m_codecs;
     };
 
     REGISTER_HACK(InternalRecorder)

@@ -9,6 +9,8 @@
 #include <memory>
 #include <utility>
 
+#include <modules/recorder/DSPRecorder.hpp>
+
 namespace eclipse::recorder {
 
     void Recorder::start() {
@@ -55,26 +57,26 @@ namespace eclipse::recorder {
     }
 
     void Recorder::startAudio(const std::filesystem::path& renderPath) {
-        FMODAudioEngine::sharedEngine()->m_system->setOutput(FMOD_OUTPUTTYPE_WAVWRITER);
+        DSPRecorder::get()->useLocking(false);
+        DSPRecorder::get()->start();
         m_recordingAudio = true;
     }
 
     void Recorder::stopAudio() {
-        FMODAudioEngine::sharedEngine()->m_system->setOutput(FMOD_OUTPUTTYPE_AUTODETECT);
+        DSPRecorder::get()->stop();
+        auto data = DSPRecorder::get()->getData();
         m_recordingAudio = false;
 
         std::filesystem::path tempPath = m_renderSettings.m_outputFile.parent_path() / "music.mp4";
 
         ffmpeg::AudioMixer audioMixer;
-        audioMixer.mixVideoAudio(m_renderSettings.m_outputFile, "fmodoutput.wav", tempPath);
-
-        std::filesystem::remove("fmodoutput.wav");
+        audioMixer.mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath, 44100);
 
         std::filesystem::remove(m_renderSettings.m_outputFile);
         std::filesystem::rename(tempPath,m_renderSettings.m_outputFile);
     }
 
-    std::unordered_map<std::string, int> Recorder::getAvailableCodecs() {
+    std::vector<std::string> Recorder::getAvailableCodecs() {
         ffmpeg::Recorder ffmpegRecorder;
         return ffmpegRecorder.getAvailableCodecs();
     }
