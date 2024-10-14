@@ -8,7 +8,12 @@
 #include <Geode/modify/ShaderLayer.hpp>
 #include <Geode/modify/CCScheduler.hpp>
 
-#ifdef GEODE_IS_WINDOWS
+// android uses custom gd::string class
+#ifdef GEODE_IS_ANDROID
+#define STR(x) std::string(x)
+#else
+#define STR(x) x
+#endif
 
 namespace eclipse::hacks::Recorder {
 
@@ -93,7 +98,7 @@ namespace eclipse::hacks::Recorder {
         stop();
 
         auto lvl = PlayLayer::get()->m_level;
-        std::filesystem::path renderPath = geode::Mod::get()->getSaveDir() / "renders" / lvl->m_levelName / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
+        auto renderPath = geode::Mod::get()->getSaveDir() / "renders" / STR(lvl->m_levelName) / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
 
         if (!std::filesystem::exists(renderPath)) {
             geode::log::error("Render {} not found", renderPath);
@@ -340,5 +345,3 @@ namespace eclipse::hacks::Recorder {
     };
 
 };
-
-#endif

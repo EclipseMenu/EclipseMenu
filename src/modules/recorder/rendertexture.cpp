@@ -1,12 +1,12 @@
 #include "rendertexture.hpp"
 
+#include <Geode/cocos/platform/win32/CCGL.h>
 #include <Geode/binding/PlayLayer.hpp>
 
 namespace eclipse::recorder {
 
     void RenderTexture::begin() {
-#ifndef GEODE_IS_ANDROID
-        glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &m_old_fbo);
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_old_fbo);
 
         m_texture = new cocos2d::CCTexture2D;
 
@@ -22,18 +22,17 @@ namespace eclipse::recorder {
             );
         }
 
-        glGetIntegerv(GL_RENDERBUFFER_BINDING_EXT, &m_old_rbo);
+        glGetIntegerv(GL_RENDERBUFFER_BINDING, &m_old_rbo);
 
-        glGenFramebuffersEXT(1, &m_fbo);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo);
+        glGenFramebuffers(1, &m_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_texture->getName(), 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_texture->getName(), 0);
 
         m_texture->setAliasTexParameters();
 
-        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, m_old_rbo);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_old_fbo);
-#endif
+        glBindRenderbuffer(GL_RENDERBUFFER, m_old_rbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_old_fbo);
     }
 
     void RenderTexture::end() const {
@@ -41,13 +40,12 @@ namespace eclipse::recorder {
     }
 
     void RenderTexture::capture(std::mutex& lock, std::vector<uint8_t>& data, volatile bool& hasDataFlag) {
-#ifndef GEODE_IS_ANDROID
         auto director = cocos2d::CCDirector::sharedDirector();
 
         glViewport(0, 0, m_width, m_height);
 
-        glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &m_old_fbo);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo);
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_old_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
         PlayLayer::get()->setScaleY(-1);
         PlayLayer::get()->visit();
@@ -59,9 +57,8 @@ namespace eclipse::recorder {
         glReadPixels(0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
         lock.unlock();
 
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_old_fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_old_fbo);
         director->setViewport();
-#endif
     }
 
 };
