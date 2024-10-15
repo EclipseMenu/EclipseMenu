@@ -50,7 +50,13 @@ namespace eclipse::hacks::Player {
             in platformer levels.
             gd handles restarting music in classic levels.
             */
-            fmod->pauseAllMusic();
+            /*
+            as of october 14, 2024, and as a direct result of the
+            absolute sin of a death effect in level ID 110961285,
+            i am bringing back the stopAllMusic() call.
+            */
+            if (pl->m_isPlatformer) fmod->pauseAllMusic();
+            else fmod->stopAllMusic();
 
             if (this == pl->m_player2 && pl->m_level->m_twoPlayerMode)
                 /*
