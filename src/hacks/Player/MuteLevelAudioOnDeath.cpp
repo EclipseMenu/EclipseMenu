@@ -84,6 +84,7 @@ namespace eclipse::hacks::Player {
     };
 
     class $modify(MuteLevelAudioOnDeathEGOHook, EffectGameObject) {
+        ADD_HOOKS_DELEGATE("player.mutelevelaudioondeath")
         void triggerObject(GJBaseGameLayer* p0, int p1, gd::vector<int> const* p2) {
             PlayLayer* pl = PlayLayer::get();
 
