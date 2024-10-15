@@ -41,7 +41,7 @@ jobs:
         with:
           bindings: EclipseMenu/bindings
           bindings-ref: main
-          # sdk: nightly
+          sdk: nightly # Using nightly, because Android doesn't build on 3.8.1
           combine: true
           export-pdb: true
           target: ${{ matrix.config.target }}
