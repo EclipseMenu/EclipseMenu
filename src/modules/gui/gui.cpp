@@ -37,7 +37,7 @@ namespace eclipse::gui {
 
     void ToggleComponent::addOptions(const std::function<void(std::shared_ptr<MenuTab>)>& options) {
         if (!m_options)
-            m_options = std::make_shared<MenuTab>("Options");
+            m_options = std::make_shared<MenuTab>(m_title);
 
         options(m_options);
     }
@@ -63,7 +63,7 @@ namespace eclipse::gui {
     RadioButtonComponent* RadioButtonComponent::handleKeybinds() {
         auto specialId = fmt::format("{}-{}", m_id, m_value);
         keybinds::Manager::get()->registerKeybind(specialId, m_title, [this](){
-            auto value = getValue();
+            auto value = getChoice();
             setValue(value);
             this->triggerCallback(value);
         });
@@ -235,15 +235,15 @@ namespace eclipse::gui {
         if (m_renderer) m_renderer->shutdown();
 
         switch (type) {
-            case RendererType::ImGui:
             default:
+#ifndef GEODE_IS_MOBILE
+            case RendererType::ImGui:
                 m_renderer = std::make_shared<imgui::ImGuiRenderer>();
                 break;
-#if false // TODO: Implement Cocos2d renderer
+#endif
             case RendererType::Cocos2d:
                 m_renderer = std::make_shared<cocos::CocosRenderer>();
                 break;
-#endif
         }
 
         m_renderer->init();

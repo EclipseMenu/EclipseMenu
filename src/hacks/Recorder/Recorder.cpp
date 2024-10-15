@@ -51,7 +51,7 @@ namespace eclipse::hacks::Recorder {
             }
         }
 
-        reinterpret_cast<void(__stdcall *)(GLint, GLint, GLsizei, GLsizei)>(glViewportAddress)(a, b, c, d);
+        reinterpret_cast<void(*)(GLint, GLint, GLsizei, GLsizei)>(glViewportAddress)(a, b, c, d);
     }
 
     $execute {
@@ -74,7 +74,7 @@ namespace eclipse::hacks::Recorder {
 
         auto lvl = PlayLayer::get()->m_level;
 
-        std::filesystem::path renderDirectory = geode::Mod::get()->getSaveDir() / "renders" / lvl->m_levelName;
+        std::filesystem::path renderDirectory = geode::Mod::get()->getSaveDir() / "renders" / STR(lvl->m_levelName);
 
         if (!std::filesystem::exists(renderDirectory))
             std::filesystem::create_directories(renderDirectory);
@@ -145,7 +145,7 @@ namespace eclipse::hacks::Recorder {
 
             m_codecs = s_recorder.getAvailableCodecs();
 
-            std::sort(m_codecs.begin(), m_codecs.end());
+            std::ranges::sort(m_codecs);
 
             int codecIdx = static_cast<int>(std::distance(m_codecs.begin(), std::find(m_codecs.begin(), m_codecs.end(), "h264")));
 
@@ -164,6 +164,7 @@ namespace eclipse::hacks::Recorder {
             tab->addCombo("HW Type", "recorder.hwIdx", {"None", "CUDA (Nvidia)", "D3D11 (All)"}, 0)->callback([&](int index) {
                 switch(index) {
                     case 0:
+                    default:
                         config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::NONE));
                         break;
                     case 1:

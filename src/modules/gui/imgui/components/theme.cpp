@@ -205,6 +205,7 @@ namespace eclipse::gui::imgui {
         int value = combo->getValue();
         auto title = combo->getTitle();
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * (title.empty() ? .9f : .5f));
+        if (value >= items.size()) value = 0;
         if (ImGui::BeginCombo(title.c_str(), items[value].c_str())) {
             for (int n = 0; n < items.size(); n++) {
                 const bool is_selected = (value == n);
