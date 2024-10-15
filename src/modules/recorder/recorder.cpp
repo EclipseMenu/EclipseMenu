@@ -1,49 +1,26 @@
-#include <thread>
-#include <memory>
-
 #include "recorder.hpp"
 
+#include <eclipse.ffmpeg-api/include/recorder.hpp>
+#include <eclipse.ffmpeg-api/include/audio_mixer.hpp>
 #include <Geode/binding/FMODAudioEngine.hpp>
 #include <Geode/loader/Log.hpp>
 #include <Geode/utils/general.hpp>
-
-#ifndef GEODE_IS_ANDROID
-
+#include <thread>
+#include <memory>
 #include <utility>
 
-#ifdef GEODE_IS_WINDOWS
-
-#include "ffmpeg/windows/ffmpegWindows.hpp"
-
-#endif
+#include <modules/recorder/DSPRecorder.hpp>
 
 namespace eclipse::recorder {
-    Recorder::Recorder(std::string ffmpegPath) {
-        #ifdef GEODE_IS_WINDOWS
-        m_ffmpegCLI = std::make_unique<ffmpegWindows>();
-        #endif
 
-        m_ffmpegPath = std::move(ffmpegPath);
-    }
-
-    void Recorder::start(std::filesystem::path renderPath) {
-        if (!m_ffmpegCLI)
-            return;
-
-        int result = std::system((m_ffmpegPath + " -version >nul 2>&1").c_str());
-
-        if (result != 0)
-            geode::log::error("FFmpeg not found {}", m_ffmpegPath);
-
-        m_currentFrame.resize(m_renderSettings.m_width * m_renderSettings.m_height * 3, 0);
+    void Recorder::start() {
+        m_currentFrame.resize(m_renderSettings.m_width * m_renderSettings.m_height * 4, 0);
         m_renderTexture.m_width = m_renderSettings.m_width;
         m_renderTexture.m_height = m_renderSettings.m_height;
         m_renderTexture.begin();
 
         m_recording = true;
         m_frameHasData = false;
-
-        m_renderPath = std::move(renderPath);
 
         std::thread(&Recorder::recordThread, this).detach();
     }
@@ -61,76 +38,46 @@ namespace eclipse::recorder {
     }
 
     void Recorder::recordThread() {
-        std::stringstream command;
+        ffmpeg::Recorder ffmpegRecorder;
 
-        command << '"' << m_ffmpegPath << '"';
-        command << " -y -f rawvideo -pix_fmt rgb24 -s " << m_renderSettings.m_width << "x" << m_renderSettings.m_height;
-        command << " -r " << m_renderSettings.m_fps;
-
-        if (!m_renderSettings.m_args.empty())
-            command << " " << m_renderSettings.m_args;
-
-        command << " -i - ";
-
-        std::array<std::string, 8> codecs {"", "-c:v h264_nvenc ", "-c:v h264_amf ", "-c:v hevc_nvenc ", "-c:v hevc_amf ", "-c:v libx264 ", "-c:v libx265 ", "-c:v libx264rgb "};
-
-        command << codecs[static_cast<int>(m_renderSettings.m_codec)];
-
-        command << "-b:v " << m_renderSettings.m_bitrate << "M ";
-
-        if (!m_renderSettings.m_extraArgs.empty())
-            command << m_renderSettings.m_extraArgs << " ";
-
-        command << "-vf \"vflip";
-
-        if (!m_renderSettings.m_videoArgs.empty())
-            command << "," << m_renderSettings.m_videoArgs;
-
-        command << "\" -an " << m_renderPath;
-
-        geode::log::info("Recording to: {}", command.str());
-
-        m_ffmpegCLI->open(command.str());
+        ffmpegRecorder.init(m_renderSettings);
 
         while (m_recording || m_frameHasData) {
             m_lock.lock();
 
             if (m_frameHasData) {
                 m_frameHasData = false;
-                m_ffmpegCLI->write(m_currentFrame.data(), m_currentFrame.size());
+                ffmpegRecorder.writeFrame(m_currentFrame);
                 m_lock.unlock();
             }
             else m_lock.unlock();
         }
 
-        m_ffmpegCLI->close();
+        ffmpegRecorder.stop();
     }
 
     void Recorder::startAudio(const std::filesystem::path& renderPath) {
-        FMODAudioEngine::sharedEngine()->m_system->setOutput(FMOD_OUTPUTTYPE_WAVWRITER);
+        DSPRecorder::get()->useLocking(false);
+        DSPRecorder::get()->start();
         m_recordingAudio = true;
     }
 
     void Recorder::stopAudio() {
-        FMODAudioEngine::sharedEngine()->m_system->setOutput(FMOD_OUTPUTTYPE_AUTODETECT);
+        DSPRecorder::get()->stop();
+        auto data = DSPRecorder::get()->getData();
         m_recordingAudio = false;
 
-        std::filesystem::path tempPath = m_renderPath.parent_path() / "music.mp4";
+        std::filesystem::path tempPath = m_renderSettings.m_outputFile.parent_path() / "music.mp4";
 
-        std::stringstream command;
+        ffmpeg::AudioMixer audioMixer;
+        audioMixer.mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath, 44100);
 
-        command << m_ffmpegPath << " -y -i " << m_renderPath << " -i fmodoutput.wav -c:v copy -map 0:v -map 1:a "
-           << tempPath;
+        std::filesystem::remove(m_renderSettings.m_outputFile);
+        std::filesystem::rename(tempPath,m_renderSettings.m_outputFile);
+    }
 
-        geode::log::info("Recording audio to: {}", command.str());
-
-        m_ffmpegCLI->open(command.str());
-        m_ffmpegCLI->close();
-
-        std::filesystem::remove("fmodoutput.wav");
-
-        std::filesystem::remove(m_renderPath);
-        std::filesystem::rename(tempPath,m_renderPath);
+    std::vector<std::string> Recorder::getAvailableCodecs() {
+        ffmpeg::Recorder ffmpegRecorder;
+        return ffmpegRecorder.getAvailableCodecs();
     }
 }
-#endif

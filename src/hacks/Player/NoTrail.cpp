@@ -6,7 +6,7 @@
 
 namespace eclipse::hacks::Player {
 
-    class NoTrail : public hack::Hack {
+    /*class NoTrail : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
 
@@ -25,5 +25,5 @@ namespace eclipse::hacks::Player {
         ALL_DELEGATES_AND_SAFE_PRIO("player.notrail")
 
         void activateStreak() {}
-    };
+    };*/
 }

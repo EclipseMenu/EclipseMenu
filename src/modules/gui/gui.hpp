@@ -195,6 +195,7 @@ namespace eclipse::gui {
         explicit ComboComponent(std::string id, std::string title, std::vector<std::string> items, int value)
             : m_id(std::move(id)), m_title(std::move(title)), m_value(value), m_items(std::move(items)) {
             m_type = ComponentType::Combo;
+            setValueIfEmpty(m_value);
         }
 
         void onInit() override {}
@@ -215,6 +216,9 @@ namespace eclipse::gui {
 
         /// @brief Set the combo value (selected item index).
         void setValue(int value) const;
+
+        /// @brief Set the combo value if empty (selected item index).
+        void setValueIfEmpty(int value) const;
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
