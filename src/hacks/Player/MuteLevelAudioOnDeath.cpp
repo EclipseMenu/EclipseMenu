@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 
 #include <Geode/modify/PlayerObject.hpp>
+#include <Geode/modify/EffectGameObject.hpp>
 
 namespace eclipse::hacks::Player {
 
@@ -50,7 +51,13 @@ namespace eclipse::hacks::Player {
             in platformer levels.
             gd handles restarting music in classic levels.
             */
-            fmod->pauseAllMusic();
+            /*
+            as of october 14, 2024, and as a direct result of the
+            absolute sin of a death effect in level ID 110961285,
+            i am bringing back the stopAllMusic() call.
+            */
+            if (pl->m_isPlatformer) fmod->pauseAllMusic();
+            else fmod->stopAllMusic();
 
             if (this == pl->m_player2 && pl->m_level->m_twoPlayerMode)
                 /*
@@ -73,6 +80,32 @@ namespace eclipse::hacks::Player {
             fmod->stopAllEffects();
 
             PlayerObject::playerDestroyed(p0);
+        }
+    };
+
+    class $modify(MuteLevelAudioOnDeathEGOHook, EffectGameObject) {
+        ADD_HOOKS_DELEGATE("player.mutelevelaudioondeath")
+        
+        /*
+        as of october 14, 2024, and as a direct result of the
+        absolute sin of a death effect in level ID 110961285,
+        i am bringing his new hook. this hook disables music/sfx
+        from spawn triggers.
+        */
+        void triggerObject(GJBaseGameLayer* p0, int p1, gd::vector<int> const* p2) {
+            PlayLayer* pl = PlayLayer::get();
+
+            // do nothing if playlayer is nullptr
+            if (!pl) return EffectGameObject::triggerObject(p0, p1, p2);
+
+            PlayerObject* player = pl->m_player1;
+
+            // do nothing if player is nullptr
+            if (!player || !player->m_isDead) return EffectGameObject::triggerObject(p0, p1, p2);
+
+            int id = this->m_objectID;
+
+            if (player->m_isDead && id != 3602 && id != 1934) return EffectGameObject::triggerObject(p0, p1, p2);
         }
     };
 
