@@ -1,6 +1,8 @@
 #include "cocos.hpp"
 #include <utils.hpp>
 
+#include "popup/options-popup.hpp"
+
 namespace eclipse::gui::cocos {
 
     void CocosRenderer::init() {}
@@ -22,10 +24,14 @@ namespace eclipse::gui::cocos {
     }
 
     void CocosRenderer::shutdown(bool noCleanup) {
+        for (auto popup : m_optionsPopups)
+            popup->removeFromParentAndCleanup(true);
+        m_optionsPopups.clear();
+
         if (!m_popup) return;
 
         if (!noCleanup)
-            m_popup->removeFromParent();
+            m_popup->removeFromParentAndCleanup(true);
         m_popup = nullptr;
         utils::updateCursorState(isToggled());
     }

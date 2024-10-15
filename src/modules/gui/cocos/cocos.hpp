@@ -4,6 +4,8 @@
 
 namespace eclipse::gui::cocos {
 
+    class OptionsPopup;
+
     class CocosRenderer : public Renderer {
     public:
         static std::shared_ptr<CocosRenderer> get() {
@@ -22,8 +24,12 @@ namespace eclipse::gui::cocos {
         void queueAfterDrawing(const std::function<void()>& func) override;
         void showPopup(const eclipse::Popup& popup) override;
 
+        void registerOptionsPopup(OptionsPopup* popup) { m_optionsPopups.push_back(popup); }
+        void unregisterOptionsPopup(OptionsPopup* popup) { std::erase(m_optionsPopups, popup); }
+
     private:
         Popup* m_popup = nullptr;
+        std::vector<OptionsPopup*> m_optionsPopups;
     };
 
 }

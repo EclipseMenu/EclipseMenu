@@ -24,7 +24,7 @@ static void toggleMenu() {
 class $modify(EclipseButtonMLHook, MenuLayer) {
     bool init() override {
         if (!MenuLayer::init()) return false;
-/*
+
         {
             auto menu = this->getChildByID("bottom-menu");
             auto rendererSwitchButton = CCMenuItemSpriteExtra::create(
@@ -35,10 +35,13 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
             menu->addChild(rendererSwitchButton);
             menu->updateLayout();
         }
-*/
+
         if (s_isInitialized) return true;
 
         geode::log::info("Eclipse Menu commit hash: {}", GIT_HASH);
+
+        // Compile blur shader
+        gui::blur::init();
 
         // Initialize the GUI engine.
         gui::Engine::get()->init();
@@ -124,8 +127,6 @@ $on_mod(Loaded) {
     // Load keybinds
     keybinds::Manager::get()->init();
 
-    // Compile blur shader
-    gui::blur::init();
     gui::ThemeManager::get();
 
     // Add "Interface" tab to edit theme settings
