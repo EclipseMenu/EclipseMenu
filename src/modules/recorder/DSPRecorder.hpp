@@ -31,5 +31,5 @@ private:
 
     bool m_recording = false;
     bool m_useLocking = false;
-    std::atomic<bool> m_canContinue = false;
+    // std::atomic<bool> m_canContinue = false;
 };

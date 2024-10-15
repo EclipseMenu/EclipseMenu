@@ -36,8 +36,8 @@ std::vector<float> DSPRecorder::getData() {
 }
 
 void DSPRecorder::unlock() {
-    m_canContinue = true;
-    m_canContinue.notify_one();
+    // m_canContinue = true;
+    // m_canContinue.notify_one();
 }
 
 void DSPRecorder::init() {
@@ -55,10 +55,10 @@ void DSPRecorder::init() {
             recorder->m_data.insert(recorder->m_data.end(), inbuffer, inbuffer + length * channels);
         }
 
-        if (recorder->m_useLocking) {
-            recorder->m_canContinue.wait(false);
-            recorder->m_canContinue = false;
-        }
+        // if (recorder->m_useLocking) {
+        //     recorder->m_canContinue.wait(false);
+        //     recorder->m_canContinue = false;
+        // }
 
         return FMOD_OK;
     };
