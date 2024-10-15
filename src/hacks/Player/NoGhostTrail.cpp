@@ -21,15 +21,10 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(NoGhostTrail)
 
     class $modify(NoGhostTrailPOHook, PlayerObject) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("PlayerObject::toggleGhostEffect");
-        }
+        ADD_HOOKS_DELEGATE("player.noghosttrail")
 
-        void toggleGhostEffect(GhostType type) {
-            if (config::get<bool>("player.noghosttrail", false))
-                type = GhostType::Disabled;
-
-            PlayerObject::toggleGhostEffect(type);
+        void toggleGhostEffect(GhostType) {
+            PlayerObject::toggleGhostEffect(GhostType::Disabled);
         }
     };
 

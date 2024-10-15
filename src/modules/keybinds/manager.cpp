@@ -3,11 +3,13 @@
 #include <modules/config/config.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/gui/gui.hpp>
+#include <modules/gui/imgui/imgui.hpp>
 
 #ifdef GEODE_IS_WINDOWS
 #include <Geode/modify/CCEGLView.hpp>
-#endif
+#else
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
+#endif
 
 using namespace geode::prelude;
 
@@ -367,6 +369,16 @@ namespace eclipse::keybinds {
 #endif
 
     static std::map<std::string, std::shared_ptr<gui::KeybindComponent>> s_keybindComponents;
+    static std::shared_ptr<gui::LabelComponent> s_hintLabel;
+
+    void updateHintLabel() {
+        if (!s_hintLabel) return;
+        auto components = gui::MenuTab::find("Keybinds")->getComponents();
+        s_hintLabel->setText(
+            components.size() <= 3 ?
+            "Right-Click on any button or toggle to bind it to a key!" : ""
+        );
+    }
 
     std::shared_ptr<Manager> Manager::get() {
         static auto instance = std::make_shared<Manager>();
@@ -395,43 +407,52 @@ namespace eclipse::keybinds {
     }
 
     void Manager::update() {
-        for (auto& key : m_keyStates)
-            m_lastKeyStates.insert_or_assign(key.first, key.second);
+        for (auto&[key, state] : m_keyStates)
+            m_lastKeyStates.insert_or_assign(key, state);
     }
 
-    void Manager::setKeybindState(const std::string& id, bool state) {
+    void Manager::setKeybindState(std::string_view id, bool state) {
         for (auto& keybind : m_keybinds) {
             if (keybind.getId() == id) {
                 keybind.setInitialized(state);
                 config::set(fmt::format("keybind.{}.active", id), state);
+                auto idStr = std::string(id);
+                gui::Engine::queueAfterDrawing([idStr, state, keybind] {
+                    auto tab = gui::MenuTab::find("Keybinds");
+                    if (state) {
+                        // Add the keybind to the GUI
+                        auto keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", idStr), true);
+                        keybindComponent->callback([tab, keybindComponent, idStr](Keys key) {
+                            auto keybind = Manager::get()->getKeybind(idStr);
 
-                auto tab = gui::MenuTab::find("Keybinds");
-                if (state) {
-                    // Add the keybind to the GUI
-                    auto keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", id), true);
-                    keybindComponent->callback([tab, keybindComponent, id](Keys key) {
-                        auto keybind = Manager::get()->getKeybind(id);
+                            if (!keybind.has_value()) return;
 
-                        if (!keybind.has_value()) return;
+                            auto& keybindRef = keybind->get();
 
-                        auto keybindRef = keybind->get();
+                            if (key == Keys::None) {
+                                config::set(fmt::format("keybind.{}.active", idStr), false);
+                                keybindRef.setInitialized(false);
+                                tab->removeComponent(keybindComponent);
+                                updateHintLabel();
+                            }
 
-                        if (key == Keys::None) {
-                            config::set(fmt::format("keybind.{}.active", id), false);
-                            keybindRef.setInitialized(false);
+                            keybindRef.setKey(key);
+                        });
+
+                        s_keybindComponents[idStr] = keybindComponent;
+                    } else {
+                        // Reset the keybind to None
+                        config::set(fmt::format("keybind.{}.key", idStr), Keys::None);
+
+                        // Remove the keybind from the GUI
+                        if (auto keybindComponent = s_keybindComponents[idStr]; keybindComponent) {
                             tab->removeComponent(keybindComponent);
                         }
-
-                        keybindRef.setKey(key);
-                    });
-
-                    s_keybindComponents[id] = keybindComponent;
-                } else {
-                    // Remove the keybind from the GUI
-                    if (auto keybindComponent = s_keybindComponents[id]; keybindComponent) {
-                        tab->removeComponent(keybindComponent);
                     }
-                }
+
+                    updateHintLabel();
+                });
+
 
                 return;
             }
@@ -441,7 +462,19 @@ namespace eclipse::keybinds {
     }
 
     void Manager::registerKeyPress(Keys key) {
+        auto menuToggle = getKeybind("menu.toggle");
         m_keyStates[key] = true;
+
+        if (menuToggle && key == menuToggle.value().get().getKey()) {
+            menuToggle.value().get().execute();
+            return;
+        }
+
+        if ((gui::imgui::ImGuiRenderer::get() && ImGui::GetIO().WantTextInput) || cocos2d::CCIMEDispatcher::sharedDispatcher()->hasDelegate())
+            return;
+
+        if (config::get<bool>("keybind.in-game-only", false) && !PlayLayer::get())
+            return;
 
         for (auto& keybind : m_keybinds) {
             if (keybind.getKey() == key && keybind.isInitialized())
@@ -449,7 +482,7 @@ namespace eclipse::keybinds {
         }
     }
 
-    std::optional<std::reference_wrapper<Keybind>> Manager::getKeybind(const std::string& id) {
+    std::optional<std::reference_wrapper<Keybind>> Manager::getKeybind(std::string_view id) {
         for (auto& keybind : m_keybinds) {
             if (keybind.getId() == id)
                 return keybind;
@@ -498,6 +531,12 @@ namespace eclipse::keybinds {
             if (auto keybind = Manager::get()->getKeybind("menu.toggle"); keybind.has_value())
                 keybind->get().setKey(key);
         });
+
+        tab->addToggle("In-game only", "keybind.in-game-only")
+           ->setDescription("Makes keybinds only usable while in a level");
+
+        s_hintLabel = tab->addLabel("");
+        updateHintLabel();
     }
 
 }

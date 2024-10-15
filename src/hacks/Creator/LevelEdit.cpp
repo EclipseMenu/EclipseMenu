@@ -25,18 +25,13 @@ namespace eclipse::hacks::Creator {
     REGISTER_HACK(LevelEdit)
 
     class $modify(LevelEditPLHook, PauseLayer) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("PauseLayer::customSetup");
-            SAFE_PRIORITY("PauseLayer::onEdit");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("creator.leveledit")
 
         void customSetup() override {
             auto level = PlayLayer::get()->m_level;
             auto levelType = level->m_levelType;
 
-            if (config::get<bool>("creator.leveledit", false))
-                level->m_levelType = GJLevelType::Editor;
-
+            level->m_levelType = GJLevelType::Editor;
             PauseLayer::customSetup();
             level->m_levelType = levelType;
         }
@@ -45,9 +40,7 @@ namespace eclipse::hacks::Creator {
             auto level = PlayLayer::get()->m_level;
             auto levelType = level->m_levelType;
 
-            if (config::get<bool>("creator.leveledit", false))
-                level->m_levelType = GJLevelType::Editor;
-
+            level->m_levelType = GJLevelType::Editor;
             PauseLayer::onEdit(sender);
             level->m_levelType = levelType;
         }
@@ -56,9 +49,7 @@ namespace eclipse::hacks::Creator {
 // due to some mysterious reason, this will crash in Debug mode
 #ifdef NDEBUG
     class $modify(LeveleditLTHook, LevelTools) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("LevelTools::verifyLevelIntegrity");
-        }
+        ENABLE_SAFE_HOOKS_ALL()
 
         static bool verifyLevelIntegrity(gd::string levelString, int levelID) {
             if (LevelTools::verifyLevelIntegrity(std::move(levelString), levelID))

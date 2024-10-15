@@ -24,6 +24,10 @@ namespace eclipse::hacks::Level {
             std::vector<EffectGameObject*> m_coins;
         };
 
+        static void onModify(auto& self) {
+            HOOKS_TOGGLE("level.autopickupcoins", PlayLayer, "resetLevel");
+        }
+
         void addObject(GameObject* obj) {
             PlayLayer::addObject(obj);
             auto id = obj->m_objectID;
@@ -34,12 +38,11 @@ namespace eclipse::hacks::Level {
 
         void resetLevel() {
             PlayLayer::resetLevel();
-            if (!config::get<bool>("level.autopickupcoins", false)) return;
 
             for (auto* coin : m_fields->m_coins) {
                 if (coin == nullptr) continue;
-                PlayLayer::pickupItem(coin);
-                PlayLayer::destroyObject(coin);
+                this->pickupItem(coin);
+                this->destroyObject(coin);
             }
         }
     };

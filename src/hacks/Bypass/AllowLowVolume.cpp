@@ -24,15 +24,9 @@ namespace eclipse::hacks::Bypass {
 #define GET_SLIDER(sender) geode::cast::typeinfo_cast<SliderThumb*>(sender); if (!slider) return
 
     class $modify(AllowLowVolumeOLHook, OptionsLayer) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("OptionsLayer::musicSliderChanged");
-            SAFE_PRIORITY("OptionsLayer::sfxSliderChanged");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("bypass.allowlowvolume")
 
         void musicSliderChanged(cocos2d::CCObject* sender) {
-            if (!config::get<bool>("bypass.allowlowvolume", false))
-                return OptionsLayer::musicSliderChanged(sender);
-
             auto slider = GET_SLIDER(sender);
             auto value = slider->getValue();
             auto* audioEngine = FMODAudioEngine::get();
@@ -43,9 +37,6 @@ namespace eclipse::hacks::Bypass {
         }
 
         void sfxSliderChanged(cocos2d::CCObject* sender) {
-            if (!config::get<bool>("bypass.allowlowvolume", false))
-                return OptionsLayer::sfxSliderChanged(sender);
-
             auto slider = GET_SLIDER(sender);
             auto value = slider->getValue();
             FMODAudioEngine::get()->setEffectsVolume(value);
@@ -53,15 +44,9 @@ namespace eclipse::hacks::Bypass {
     };
 
     class $modify(AllowLowVolumePLHook, PauseLayer) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("PauseLayer::musicSliderChanged");
-            SAFE_PRIORITY("PauseLayer::sfxSliderChanged");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("bypass.allowlowvolume")
 
         void musicSliderChanged(cocos2d::CCObject* sender) {
-            if (!config::get<bool>("bypass.allowlowvolume", false))
-                return PauseLayer::musicSliderChanged(sender);
-
             auto slider = GET_SLIDER(sender);
             auto value = slider->getValue();
             FMODAudioEngine::get()->setBackgroundMusicVolume(value);
@@ -70,9 +55,6 @@ namespace eclipse::hacks::Bypass {
 // Function is merged with the one in OptionsLayer on Windows
 #if !(defined(GEODE_IS_WINDOWS) && GEODE_COMP_GD_VERSION == 22060)
         void sfxSliderChanged(cocos2d::CCObject* sender) {
-            if (!config::get<bool>("bypass.allowlowvolume", false))
-                return PauseLayer::sfxSliderChanged(sender);
-
             auto slider = GET_SLIDER(sender);
             auto value = slider->getValue();
             FMODAudioEngine::get()->setEffectsVolume(value);

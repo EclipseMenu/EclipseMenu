@@ -21,10 +21,9 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(NoRobotFire)
 
     class $modify(NoRobotFirePOHook, PlayerObject) {
-        void update(float dt) override {
-            if (!config::get<bool>("player.norobotfire", false))
-                return PlayerObject::update(dt);
+        ADD_HOOKS_DELEGATE("player.norobotfire")
 
+        void update(float dt) override {
             PlayerObject::update(dt);
             m_robotFire->setVisible(false);
             m_robotBurstParticles->setVisible(false);

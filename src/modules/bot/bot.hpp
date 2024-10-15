@@ -1,7 +1,6 @@
 #pragma once
 
 #include <gdr/gdr.hpp>
-#include <Geode/Enums.hpp>
 
 namespace eclipse::bot {
 
@@ -25,6 +24,8 @@ namespace eclipse::bot {
         /// @brief Get the current state of the bot.
         [[nodiscard]] State getState() const { return m_state; }
 
+        [[nodiscard]] size_t getInputCount() const { return m_replay.inputs.size(); }
+
         /// @brief Removes all inputs from the currently loaded replay.
         void clearInputs();
 
@@ -36,7 +37,7 @@ namespace eclipse::bot {
         void removeInputsAfter(int frame);
         
         /// @brief Add an input to the currently loaded replay.
-        void recordInput(int frame, PlayerButton button, bool player1, bool pressed);
+        void recordInput(int frame, PlayerButton button, bool player2, bool pressed);
 
         /// @brief Get the next available input from the currently loaded replay.
         /// @param frame The current frame of the playback.
@@ -54,6 +55,8 @@ namespace eclipse::bot {
         /// @brief Sets the level info.
         /// @param levelInfo The level info.
         void setLevelInfo(gdr::Level levelInfo);
+
+        [[nodiscard]] std::optional<gdr::Input> getPrevious(bool player1);
 
     protected:
         State m_state = State::DISABLED;

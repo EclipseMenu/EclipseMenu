@@ -2,6 +2,17 @@
 #include <modules/config/config.hpp>
 #include <utils.hpp>
 
+#include <Geode/binding/LevelEditorLayer.hpp>
+#include <Geode/binding/GameManager.hpp>
+#include <Geode/binding/GJGameLevel.hpp>
+#include <Geode/binding/PlayerObject.hpp>
+#include <Geode/binding/PlayLayer.hpp>
+#include <Geode/loader/Mod.hpp>
+#include <Geode/Loader.hpp>
+#include <Geode/modify/PlayLayer.hpp>
+
+#include <Geode/modify/PlayLayer.hpp>
+
 namespace eclipse::labels {
 
     VariableManager& VariableManager::get() {
@@ -29,7 +40,7 @@ namespace eclipse::labels {
         m_variables["gameVersion"] = rift::Value::string(loader->getGameVersion());
         auto allMods = loader->getAllMods();
         m_variables["totalMods"] = rift::Value::integer(static_cast<int>(allMods.size()));
-        m_variables["enabledMods"] = rift::Value::integer(static_cast<int>(std::count_if(allMods.begin(), allMods.end(), [](auto* mod) {
+        m_variables["enabledMods"] = rift::Value::integer(static_cast<int>(std::ranges::count_if(allMods, [](auto* mod) {
             return mod->shouldLoad();
         })));
 
@@ -53,6 +64,8 @@ namespace eclipse::labels {
         m_variables["babyEmoji"] = rift::Value::string("👶");
 
         // Fetch everything else
+        m_variables["fps"] = rift::Value::floating(0.f);
+        m_variables["realFps"] = rift::Value::floating(0.f);
         refetch();
     }
 
@@ -67,7 +80,7 @@ namespace eclipse::labels {
     }
 
     bool VariableManager::hasVariable(const std::string& name) const {
-        return m_variables.find(name) != m_variables.end();
+        return m_variables.contains(name);
     }
 
     void VariableManager::removeVariable(const std::string& name) {
@@ -148,11 +161,7 @@ namespace eclipse::labels {
     static std::string formatTime(int millis) {
         if (millis == 0) return "N/A";
         double seconds = millis / 1000.0;
-        if (seconds < 60.0)
-            return fmt::format("{:.3f}", seconds);
-        int minutes = (int) (seconds / 60.0);
-        seconds -= minutes * 60;
-        return fmt::format("{}:{:06.3f}", minutes, seconds);
+        return utils::formatTime(seconds);
     }
 
     float getFPS() {
@@ -164,17 +173,31 @@ namespace eclipse::labels {
         return static_cast<float>(1'000'000.0 / micros);
     }
 
+    float accumulateFPS(float fps) {
+        static std::deque<float> s_fps;
+        constexpr size_t maxFPS = 100;
+        s_fps.push_back(fps);
+        if (s_fps.size() > maxFPS) s_fps.pop_front();
+        return std::accumulate(s_fps.begin(), s_fps.end(), 0.f) / static_cast<float>(s_fps.size());
+    }
+
+    void VariableManager::updateFPS() {
+        auto fps = getFPS();
+        m_variables["realFps"] = rift::Value::floating(fps);
+        m_variables["fps"] = rift::Value::floating(accumulateFPS(fps));
+    }
+
     void VariableManager::refetch() {
         // Game variables
         auto* gameManager = GameManager::get();
         m_variables["username"] = rift::Value::string(gameManager->m_playerName);
-        m_variables["fps"] = rift::Value::floating(getFPS());
 
         // Hack states (only the important ones)
         m_variables["isCheating"] = rift::Value::boolean(config::getTemp("hasCheats", false));
         m_variables["noclip"] = rift::Value::boolean(config::get("player.noclip", false));
         m_variables["speedhack"] = rift::Value::boolean(config::get("global.speedhack.toggle", false));
         m_variables["speedhackSpeed"] = rift::Value::floating(config::get("global.speedhack", 1.f));
+        m_variables["framestepper"] = rift::Value::boolean(config::get("player.framestepper", false));
 
         // Time
         auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -184,6 +207,7 @@ namespace eclipse::labels {
         m_variables["second"] = rift::Value::integer(localTime->tm_sec);
         m_variables["day"] = rift::Value::integer(localTime->tm_mday);
         m_variables["month"] = rift::Value::integer(localTime->tm_mon + 1);
+        m_variables["monthName"] = rift::Value::string(utils::getMonthName(localTime->tm_mon));
         m_variables["year"] = rift::Value::integer(localTime->tm_year + 1900);
         m_variables["clock"] = rift::Value::string(utils::getClock());
         m_variables["clock12"] = rift::Value::string(utils::getClock(true));
@@ -212,18 +236,30 @@ namespace eclipse::labels {
                 m_variables["best"] = rift::Value::integer(level->m_normalPercent);
 
             // Player
+            m_variables["playerX"] = rift::Value::floating(gjbgl->m_player1->m_position.x);
+            m_variables["playerY"] = rift::Value::floating(gjbgl->m_player1->m_position.y);
+            m_variables["player2X"] = rift::Value::floating(gjbgl->m_player2->m_position.x);
+            m_variables["player2Y"] = rift::Value::floating(gjbgl->m_player2->m_position.y);
             m_variables["attempt"] = rift::Value::integer(gjbgl->m_attempts);
+            m_variables["isTestMode"] = rift::Value::boolean(gjbgl->m_isTestMode);
             m_variables["isPracticeMode"] = rift::Value::boolean(gjbgl->m_isPracticeMode);
             m_variables["isPlatformer"] = rift::Value::boolean(gjbgl->m_isPlatformer);
             m_variables["levelTime"] = rift::Value::floating(static_cast<float>(gjbgl->m_gameState.m_levelTime));
+            m_variables["levelLength"] = rift::Value::floating(gjbgl->m_levelLength);
+            m_variables["levelDuration"] = rift::Value::floating(gjbgl->m_level->m_timestamp / 240.f);
+            m_variables["time"] = rift::Value::string(utils::formatTime(gjbgl->m_gameState.m_levelTime));
             m_variables["frame"] = rift::Value::integer(static_cast<int>(gjbgl->m_gameState.m_levelTime * 240.f));
+            m_variables["isDead"] = rift::Value::boolean(gjbgl->m_player1->m_isDead);
+            m_variables["noclipDeaths"] = rift::Value::integer(config::getTemp("noclipDeaths", 0));
+            m_variables["noclipAccuracy"] = rift::Value::floating(config::getTemp("noclipAccuracy", 100.f));
+            m_variables["progress"] = rift::Value::floating(utils::getActualProgress(gjbgl));
             if (auto* pl = gameManager->m_playLayer) {
                 m_variables["editorMode"] = rift::Value::boolean(false);
-                m_variables["progress"] = rift::Value::floating(pl->getCurrentPercent());
+                m_variables["realProgress"] = rift::Value::floating(pl->getCurrentPercent());
                 m_variables["objects"] = rift::Value::integer(level->m_objectCount);
             } else if (auto* ed = gameManager->m_levelEditorLayer) {
                 m_variables["editorMode"] = rift::Value::boolean(true);
-                m_variables["progress"] = rift::Value::floating(0.f);
+                m_variables["realProgress"] = rift::Value::floating(0.f);
                 m_variables["objects"] = rift::Value::integer(static_cast<int>(ed->m_objects->count()));
             }
         } else {
@@ -239,14 +275,79 @@ namespace eclipse::labels {
             removeVariable("bestPercent");
             removeVariable("bestTime");
             removeVariable("best");
+            removeVariable("playerX");
+            removeVariable("playerY");
+            removeVariable("player2X");
+            removeVariable("player2Y");
             removeVariable("attempt");
+            removeVariable("isTestMode");
             removeVariable("isPracticeMode");
             removeVariable("isPlatformer");
             removeVariable("levelTime");
+            removeVariable("levelLength");
+            removeVariable("levelDuration");
+            removeVariable("time");
+            removeVariable("frame");
+            removeVariable("isDead");
+            removeVariable("noclipDeaths");
+            removeVariable("noclipAccuracy");
             removeVariable("editorMode");
             removeVariable("progress");
+            removeVariable("realProgress");
             removeVariable("objects");
+            removeVariable("runFrom");
+            removeVariable("bestRun");
+            removeVariable("lastDeath");
         }
     }
 
+    class $modify(BestRunPLHook, PlayLayer) {
+        struct Fields {
+            float m_runFrom = 0.f;
+            float m_lastRunFrom = 0.f;
+            float m_bestRun = 0.f;
+            float m_lastBestRun = 0.f;
+        };
+
+        bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
+            if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
+
+            auto& manager = VariableManager::get();
+            manager.setVariable("runFrom", rift::Value::floating(0.f));
+            manager.setVariable("bestRun", rift::Value::floating(0.f));
+
+            return true;
+        }
+
+        void saveBestRun() {
+            auto fields = m_fields.self();
+            fields->m_bestRun = utils::getActualProgress(this);
+            if ((fields->m_bestRun - fields->m_runFrom) >= (fields->m_lastBestRun - fields->m_lastRunFrom)) {
+                fields->m_lastBestRun = fields->m_bestRun;
+                fields->m_lastRunFrom = fields->m_runFrom;
+                auto& manager = VariableManager::get();
+                manager.setVariable("runFrom", rift::Value::floating(fields->m_runFrom));
+                manager.setVariable("bestRun", rift::Value::floating(fields->m_bestRun));
+            }
+        }
+
+        void levelComplete() {
+            PlayLayer::levelComplete();
+            saveBestRun();
+        }
+        
+        void destroyPlayer(PlayerObject* player, GameObject* object) override {
+            auto percentage = utils::getActualProgress(this);
+            PlayLayer::destroyPlayer(player, object);
+            if (object != m_anticheatSpike) {
+                VariableManager::get().setVariable("lastDeath", rift::Value::from(percentage));
+                saveBestRun();
+            }
+        }
+
+        void resetLevel() {
+            PlayLayer::resetLevel();
+            m_fields->m_runFrom = utils::getActualProgress(this);
+        }
+    };
 }

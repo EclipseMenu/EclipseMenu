@@ -20,19 +20,19 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(AutoLDM)
 
     class $modify(AutoLDMELLHook, EditLevelLayer) {
-        bool init(GJGameLevel* level) {
-            if (config::get<bool>("level.autoldm", false))
-                level->m_lowDetailModeToggled = true;
+        ADD_HOOKS_DELEGATE("level.autoldm")
 
+        bool init(GJGameLevel* level) {
+            level->m_lowDetailModeToggled = true;
             return EditLevelLayer::init(level);
         }
     };
 
     class $modify(AutoLDMLILHook, LevelInfoLayer) {
-        bool init(GJGameLevel* level, bool challenge) {
-            if (config::get<bool>("level.autoldm", false))
-                level->m_lowDetailModeToggled = true;
+        ADD_HOOKS_DELEGATE("level.autoldm")
 
+        bool init(GJGameLevel* level, bool challenge) {
+            level->m_lowDetailModeToggled = true;
             return LevelInfoLayer::init(level, challenge);
         }
     };

@@ -16,7 +16,7 @@ namespace eclipse::hacks::Level {
     inline bool robtopHitboxCheck() {
         if (auto* pl = PlayLayer::get())
             return pl->m_isPracticeMode && GameManager::get()->getGameVariable("0166");
-        else if (auto* ed = LevelEditorLayer::get())
+        if (LevelEditorLayer::get())
             return GameManager::get()->getGameVariable("0045");
         return false;
     }
@@ -41,7 +41,11 @@ namespace eclipse::hacks::Level {
             gui::ToggleComponent* toggle = tab->addToggle("Show Hitboxes", "level.showhitboxes")->handleKeybinds();
 
             toggle->callback([](bool value) {
-                if (PlayLayer::get()) PlayLayer::get()->updateProgressbar();
+                if (auto pl = PlayLayer::get()) {
+                    // since progress bar isn't added immediately, we need to check if it exists
+                    if (pl->m_progressBar == nullptr) return;
+                    pl->updateProgressbar();
+                }
 
                 if (LevelEditorLayer::get()) {
                     LevelEditorLayer::get()->updateEditor(0);
@@ -181,7 +185,7 @@ namespace eclipse::hacks::Level {
             borderWidth = abs(borderWidth);
 
             customDraw(this, (gui::Color&) fillColor, borderWidth, (gui::Color&) borderColor);
-            return cocos2d::CCDrawNode::drawPolygon(vertex, count, fillColor, borderWidth, borderColor);
+            return CCDrawNode::drawPolygon(vertex, count, fillColor, borderWidth, borderColor);
         }
 
         bool drawCircle(const cocos2d::CCPoint& position, float radius, const cocos2d::ccColor4F& color,
@@ -189,7 +193,7 @@ namespace eclipse::hacks::Level {
             borderWidth = abs(borderWidth);
 
             customDraw(this, (gui::Color&) color, borderWidth, (gui::Color&) borderColor);
-            return cocos2d::CCDrawNode::drawCircle(position, radius, color, borderWidth, borderColor, segments);
+            return CCDrawNode::drawCircle(position, radius, color, borderWidth, borderColor, segments);
         }
     };
 
@@ -316,11 +320,14 @@ namespace eclipse::hacks::Level {
     };
 
     class $modify(ShowHitboxesGOHook, GameObject) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("GameObject::determineSlopeOrientation");
-        }
+        ENABLE_SAFE_HOOKS_ALL()
 
         void determineSlopeDirection() {
+            /*
+             * This is a fix for the slope hitbox becoming flipped during mirror portal transition.
+             * I explained it in details for a Misc Bugfixes PR:
+             * https://github.com/Cvolton/miscbugfixes-geode/pull/10
+             */
             if (s_slopeHitboxFix) return;
             GameObject::determineSlopeDirection();
         }

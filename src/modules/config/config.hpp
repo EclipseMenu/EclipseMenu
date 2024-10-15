@@ -4,6 +4,8 @@
 #include <fmt/format.h>
 #include <string>
 #include <vector>
+#include <optional>
+#include <functional>
 
 namespace eclipse::config {
 
@@ -13,6 +15,9 @@ namespace eclipse::config {
     /// @brief Get the container for temporary storage.
     nlohmann::json& getTempStorage();
 
+    /// @brief Used internally to trigger callbacks for a value change
+    void executeCallbacks(std::string_view name);
+
     /// @brief Load the configuration file.
     void load();
 
@@ -21,15 +26,15 @@ namespace eclipse::config {
 
     /// @brief Save the configuration file as a profile, to be loaded later.
     /// @param profile Name of the profile to save.
-    void saveProfile(const std::string& profile);
+    void saveProfile(std::string_view profile);
 
     /// @brief Load a configuration profile from profile name.
     /// @param profile Name of the profile to load.
-    void loadProfile(const std::string& profile);
+    void loadProfile(std::string_view profile);
 
     /// @brief Delete a configuration profile.
     /// @param profile Name of the profile to delete.
-    void deleteProfile(const std::string& profile);
+    void deleteProfile(std::string_view profile);
 
     /// @brief Get a list of all configuration profiles.
     std::vector<std::string> getProfiles();
@@ -37,7 +42,7 @@ namespace eclipse::config {
     /// @brief Check if a key exists in the configuration.
     /// @param key Key to check.
     /// @return True if the key exists in the configuration.
-    inline bool has(const std::string& key) {
+    inline bool has(std::string_view key) {
         return getStorage().contains(key);
     }
 
@@ -47,7 +52,7 @@ namespace eclipse::config {
     /// @param defaultValue Default value to return if the key does not exist.
     /// @return Value from the configuration or the default value if the key does not exist.
     template<typename T>
-    inline T get(const std::string& key, const T& defaultValue) {
+    T get(std::string_view key, const T& defaultValue) {
         if (!has(key))
             return defaultValue;
 
@@ -60,7 +65,7 @@ namespace eclipse::config {
     /// @param key Key to get the value from.
     /// @return Value from the configuration.
     template<typename T>
-    inline T get(const std::string& key) {
+    T get(std::string_view key) {
         if (!has(key))
             throw std::runtime_error(fmt::format("Key '{}' does not exist", key));
 
@@ -72,8 +77,9 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    inline void set(const std::string& key, const T& value) {
+    void set(std::string_view key, const T& value) {
         getStorage()[key] = value;
+        executeCallbacks(key);
     }
 
     /// @brief Check if the value is of the specified type.
@@ -81,7 +87,7 @@ namespace eclipse::config {
     /// @param key Key to check.
     /// @return True if the value is of the specified type.
     template<typename T>
-    inline bool is(const std::string& key) {
+    bool is(std::string_view key) {
         if (!has(key))
             return false;
 
@@ -98,15 +104,20 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    inline void setIfEmpty(const std::string& key, const T& value) {
+    void setIfEmpty(std::string_view key, const T& value) {
         if (!has(key))
             set(key, value);
     }
 
+    /// @brief Registers a delegate which is called when a specific value in config is changed
+    /// @param key Key of the value which should have a delegate
+    /// @param callback Callback to call when value is changed
+    void addDelegate(std::string_view key, std::function<void()> callback);
+
     /// @brief Check if a key exists in the temporary storage.
     /// @param key Key to check.
     /// @return True if the key exists in the temporary storage.
-    inline bool hasTemp(const std::string& key) {
+    inline bool hasTemp(std::string_view key) {
         return getTempStorage().contains(key);
     }
 
@@ -116,7 +127,7 @@ namespace eclipse::config {
     /// @param defaultValue Default value to return if the key does not exist.
     /// @return Value from the temporary storage or the default value if the key does not exist.
     template<typename T>
-    inline T getTemp(const std::string& key, const T& defaultValue) {
+    T getTemp(std::string_view key, const T& defaultValue) {
         if (!hasTemp(key))
             return defaultValue;
 
@@ -129,7 +140,7 @@ namespace eclipse::config {
     /// @param key Key to get the value from.
     /// @return Value from the temporary storage.
     template<typename T>
-    inline T getTemp(const std::string& key) {
+    T getTemp(std::string_view key) {
         if (!hasTemp(key))
             throw std::runtime_error(fmt::format("Key '{}' does not exist", key));
 
@@ -141,7 +152,7 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    inline void setTemp(const std::string& key, const T& value) {
+    void setTemp(std::string_view key, const T& value) {
         getTempStorage()[key] = value;
     }
 }

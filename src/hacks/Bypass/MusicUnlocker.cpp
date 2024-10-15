@@ -32,9 +32,7 @@ namespace eclipse::hacks::Cosmetic {
     REGISTER_HACK(MusicCustomizer)
 
     class $modify(MusicCustomizerGSMHook, GameStatsManager) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("GameStatsManager::isItemUnlocked");
-        }
+        ENABLE_SAFE_HOOKS_ALL()
 
         bool isItemUnlocked(UnlockType type, int key) {
             if (GameStatsManager::isItemUnlocked(type, key))

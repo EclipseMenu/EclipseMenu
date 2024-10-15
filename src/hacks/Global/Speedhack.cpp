@@ -10,7 +10,9 @@ namespace eclipse::hacks::Global {
         void init() override {
             auto tab = gui::MenuTab::find("Global");
 
-            config::setIfEmpty("global.speedhack.toggle", false);
+            // speedhack should always be disabled by default
+            // to prevent freezing the game while loading
+            config::set("global.speedhack.toggle", false);
             config::setIfEmpty("global.speedhack", 1.f);
 
             tab->addFloatToggle("Speedhack", "global.speedhack", 0.0001f, 1000.f, "%.4f")
@@ -28,17 +30,17 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(Speedhack)
 
     class $modify(SpeedhackSchedulerHook, cocos2d::CCScheduler) {
-        void update(float dt) {
-            float speedhack = config::get<bool>("global.speedhack.toggle", false)
-                ? config::get<float>("global.speedhack", 1.f)
-                : 1.f;
+        ADD_HOOKS_DELEGATE("global.speedhack.toggle")
 
-            if (speedhack <= 0)
-                speedhack = 1.f;
+        void update(float dt) override {
+            auto speed = config::get<float>("global.speedhack", 1.f);
 
-            dt *= speedhack;
+            if (speed <= 0)
+                speed = 1.f;
 
-            cocos2d::CCScheduler::update(dt);
+            dt *= speed;
+
+            CCScheduler::update(dt);
         }
     };
 

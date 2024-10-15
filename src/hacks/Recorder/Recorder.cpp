@@ -1,4 +1,3 @@
-
 #include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
@@ -9,15 +8,21 @@
 #include <Geode/modify/ShaderLayer.hpp>
 #include <Geode/modify/CCScheduler.hpp>
 
-#ifdef GEODE_IS_WINDOWS
+// android uses custom gd::string class
+#ifdef GEODE_IS_ANDROID
+#define STR(x) std::string(x)
+#else
+#define STR(x) x
+#endif
 
 namespace eclipse::hacks::Recorder {
 
-    static recorder::Recorder s_recorder("ffmpeg");
+    static recorder::Recorder s_recorder;
 
     bool visiting = false;
     bool inShaderLayer = false;
     bool levelDone = false;
+    bool popupShown = false;
 
     float totalTime = 0.f;
     float afterEndTimer = 0.f;
@@ -26,11 +31,21 @@ namespace eclipse::hacks::Recorder {
     double lastFrameTime = 0.;
 
     intptr_t glViewportAddress = 0;
+
+    void endPopup() {
+        Popup::create("Info", "Recording finished!", "OK", "Open folder", [](bool result) {
+            if(result)
+                return;
+
+            geode::utils::file::openFolder(geode::Mod::get()->getSaveDir() / "renders");
+        });
+    }
     
     void glViewportHook(GLint a, GLint b, GLsizei c, GLsizei d) {
         if (visiting && s_recorder.isRecording() && inShaderLayer) {
+            ImVec2 displaySize = ImGui::GetIO().DisplaySize;
             //shaderlayer resolutions for each quality mode
-            if (c != 2608 && d != 2608 && c != 1304 && d != 1304 && c != 652 && d != 652) {
+            if (c != 2608 && d != 2608 && c != 1304 && d != 1304 && c != 652 && d != 652 && c == (int)displaySize.x && d == (int)displaySize.y) {
                 c = config::get<int>("recorder.resolution.x", 1920);
                 d = config::get<int>("recorder.resolution.y", 1080);
             }
@@ -51,6 +66,7 @@ namespace eclipse::hacks::Recorder {
 
         visiting = false;
         levelDone = false;
+        popupShown = false;
         totalTime = 0.f;
         extraTime = 0.;
         lastFrameTime = 0.;
@@ -63,20 +79,15 @@ namespace eclipse::hacks::Recorder {
         if (!std::filesystem::exists(renderDirectory))
             std::filesystem::create_directories(renderDirectory);
 
-        recorder::RenderSettings settings;
+        s_recorder.m_renderSettings.m_bitrate = static_cast<int>(config::get<float>("recorder.bitrate", 30.f)) * 1000000;
+        s_recorder.m_renderSettings.m_fps = static_cast<int>(config::get<float>("recorder.fps", 60.f));
+        s_recorder.m_renderSettings.m_width = config::get<int>("recorder.resolution.x", 1920);
+        s_recorder.m_renderSettings.m_height = config::get<int>("recorder.resolution.y", 1080);
+        s_recorder.m_renderSettings.m_codec = config::get<std::string>("recorder.codecString", "h264");
+        s_recorder.m_renderSettings.m_outputFile = renderDirectory / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
+        s_recorder.m_renderSettings.m_hardwareAccelerationType = static_cast<ffmpeg::HardwareAccelerationType>(config::get<int>("recorder.hwType", 0));
 
-        settings.m_bitrate = config::get<float>("recorder.bitrate", 30.f);
-        settings.m_fps = config::get<float>("recorder.fps", 60.f);
-        settings.m_width = config::get<int>("recorder.resolution.x", 1920);
-        settings.m_height = config::get<int>("recorder.resolution.y", 1080);
-        settings.m_codec = (recorder::Codec)config::get<int>("recorder.codec", 0);
-        settings.m_args = config::get<std::string>("recorder.args", "");
-        settings.m_extraArgs = config::get<std::string>("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
-        settings.m_videoArgs = config::get<std::string>("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
-
-        s_recorder.m_renderSettings = settings;
-
-        s_recorder.start(renderDirectory / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value())));
+        s_recorder.start();
     }
 
     void stop() {
@@ -87,7 +98,7 @@ namespace eclipse::hacks::Recorder {
         stop();
 
         auto lvl = PlayLayer::get()->m_level;
-        std::filesystem::path renderPath = geode::Mod::get()->getSaveDir() / "renders" / lvl->m_levelName / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
+        auto renderPath = geode::Mod::get()->getSaveDir() / "renders" / STR(lvl->m_levelName) / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
 
         if (!std::filesystem::exists(renderPath)) {
             geode::log::error("Render {} not found", renderPath);
@@ -95,6 +106,7 @@ namespace eclipse::hacks::Recorder {
         }
 
         levelDone = false;
+        popupShown = false;
         afterEndTimer = 0.f;
 
         if (PlayLayer::get()->getChildByID("EndLevelLayer"))
@@ -124,10 +136,18 @@ namespace eclipse::hacks::Recorder {
             });
 
             config::setIfEmpty("recorder.fps", 60.f);
-            config::setIfEmpty("recorder.endscreen", 5.f);
+            config::setIfEmpty("recorder.endscreen", 3.4f);
             config::setIfEmpty("recorder.bitrate", 30.f);
             config::setIfEmpty("recorder.resolution.x", 1920.f);
             config::setIfEmpty("recorder.resolution.y", 1080.f);
+            config::setIfEmpty("recorder.audio", 2);
+            config::setIfEmpty("recorder.hwType", 0);
+
+            m_codecs = s_recorder.getAvailableCodecs();
+
+            std::sort(m_codecs.begin(), m_codecs.end());
+
+            int codecIdx = static_cast<int>(std::distance(m_codecs.begin(), std::find(m_codecs.begin(), m_codecs.end(), "h264")));
 
             tab->addInputFloat("Framerate", "recorder.fps", 1.f, 360.f, "%.0f FPS");
             tab->addInputFloat("Endscreen Duration", "recorder.endscreen", 0.f, 30.f, "%.2fs.");
@@ -135,37 +155,47 @@ namespace eclipse::hacks::Recorder {
             tab->addInputInt("Resolution X", "recorder.resolution.x", 1, 15360);
             tab->addInputInt("Resolution Y", "recorder.resolution.y", 1, 8640);
 
-            config::setIfEmpty("recorder.codec", 0);
-            config::setIfEmpty("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
-            config::setIfEmpty("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
-            tab->addInputText("Args", "recorder.args");
-            tab->addInputText("Extra Args", "recorder.extraargs");
-            tab->addInputText("Video Args", "recorder.videoargs");
+            config::setIfEmpty("recorder.codecIdx", codecIdx);
+
+            tab->addCombo("Codec", "recorder.codecIdx", m_codecs, codecIdx)->callback([&](int index) {
+                config::set("recorder.codecString", m_codecs[index]);
+            });
+
+            tab->addCombo("HW Type", "recorder.hwIdx", {"None", "CUDA (Nvidia)", "D3D11 (All)"}, 0)->callback([&](int index) {
+                switch(index) {
+                    case 0:
+                        config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::NONE));
+                        break;
+                    case 1:
+                        config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::CUDA));
+                        break;
+                    case 2:
+                        config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::D3D11VA));
+                        break;
+                }
+            });
+
+            tab->addCombo("Audio mode", "recorder.audio", {"Don't record", "Ask first", "Always record"}, 0);
             
             tab->addLabel("Presets");
             tab->addButton("CPU")->callback([] {
-                config::set<int>("recorder.codec", 0);
-                config::set<std::string>("recorder.args", "");
-                config::set<std::string>("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
-                config::set<std::string>("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
+                config::set<std::string>("recorder.codecString", "h264");
             });
 
             tab->addButton("NVIDIA")->callback([] {
-                config::set<int>("recorder.codec", 1);
-                config::set<std::string>("recorder.args", "-hwaccel cuda -hwaccel_output_format cuda");
-                config::set<std::string>("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
-                config::set<std::string>("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
+                config::set<std::string>("recorder.codecString", "h264_nvenc");
+                config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::CUDA));
             });
 
             tab->addButton("AMD")->callback([] {
-                config::set<int>("recorder.codec", 2);
-                config::set<std::string>("recorder.args", "");
-                config::set<std::string>("recorder.extraargs", "-pix_fmt rgb0 -qp 16 -rc-lookahead 16 -preset slow");
-                config::set<std::string>("recorder.videoargs", "colorspace=all=bt709:iall=bt470bg:fast=1");
+                config::set<std::string>("recorder.codecString", "h264_amf");
+                config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::D3D11VA));
             });
         }
 
         [[nodiscard]] const char* getId() const override { return "Internal Recorder"; }
+
+        std::vector<std::string> m_codecs;
     };
 
     REGISTER_HACK(InternalRecorder)
@@ -179,9 +209,7 @@ namespace eclipse::hacks::Recorder {
     };
 
     class $modify(InternalRecorderSchedulerHook, cocos2d::CCScheduler) {
-        static void onModify(auto& self) {
-            FIRST_PRIORITY("cocos2d::CCScheduler::update");
-        }
+        ENABLE_SAFE_HOOKS_ALL()
 
         void update(float dt) {
             if (s_recorder.isRecording()) {
@@ -195,7 +223,7 @@ namespace eclipse::hacks::Recorder {
                 dt = 1.f / framerate;
             }
 
-            cocos2d::CCScheduler::update(dt);
+            CCScheduler::update(dt);
         }
     };
 
@@ -231,10 +259,33 @@ namespace eclipse::hacks::Recorder {
 
             if (levelDone) {
                 if (afterEndTimer > endscreen) {
-                    if (s_recorder.isRecording())
-                        startAudio();
-                    else if (s_recorder.isRecordingAudio())
+                    if (s_recorder.isRecording() && !popupShown) {
+                        switch(config::get<int>("recorder.audio", 2)) {
+                            case 1:
+                                popupShown = true;
+                                Popup::create("Audio", "Record audio?", "Yes", "No", [&](bool result) {
+                                    if(result) {
+                                        startAudio();
+                                        return;
+                                    }
+                                    stop();
+                                    endPopup();
+                                });
+                                break;
+                            case 2:
+                                startAudio();
+                                break;
+                            default:
+                            case 0:
+                                stop();
+                                endPopup();
+                                break;
+                        }
+                    }
+                    else if (s_recorder.isRecordingAudio()) {
                         stopAudio();
+                        endPopup();
+                    }
                     
                     return GJBaseGameLayer::update(dt);
                 }
@@ -282,6 +333,7 @@ namespace eclipse::hacks::Recorder {
 
         void resetLevel() {
             levelDone = false;
+            popupShown = false;
             PlayLayer::resetLevel();
         }
 
@@ -294,5 +346,3 @@ namespace eclipse::hacks::Recorder {
     };
 
 };
-
-#endif

@@ -21,7 +21,6 @@ namespace eclipse::bot {
     }
 
     void Bot::removeInputsAfter(int frame) {
-        const auto check = [&](const gdr::Input& input) -> bool { return input.frame > frame; };
         std::erase_if(m_replay.inputs, [&](const gdr::Input& input) -> bool { return input.frame > frame; });
     }
 
@@ -39,13 +38,22 @@ namespace eclipse::bot {
         return std::nullopt;
     }
 
+    std::optional<gdr::Input> Bot::getPrevious(bool player1) {
+        for (int i = m_inputIndex - 2; i >= 0; i--) {
+            if (m_replay.inputs[i].player2 == !player1)
+                return m_replay.inputs[i];
+        }
+
+        return std::nullopt;
+    }
+
     void Bot::setLevelInfo(gdr::Level levelInfo) {
         m_replay.levelInfo = levelInfo;
     }
 
     void Bot::save(std::filesystem::path path) {
         m_replay.author = GJAccountManager::sharedState()->m_username;
-        m_replay.duration = m_replay.inputs[m_replay.inputs.size() - 1].frame / m_replay.framerate;
+        m_replay.duration = m_replay.inputs.size() > 0 ? m_replay.inputs[m_replay.inputs.size() - 1].frame / m_replay.framerate : 0;
 
         geode::ByteVector data = m_replay.exportData();
         std::ofstream file(path, std::ios::binary);

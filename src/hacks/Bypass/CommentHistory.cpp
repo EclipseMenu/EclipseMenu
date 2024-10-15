@@ -21,14 +21,12 @@ namespace eclipse::hacks::Bypass {
     REGISTER_HACK(CommentHistory)
 
     class $modify(CommentHistoryPPHook, ProfilePage) {
+        ADD_HOOKS_DELEGATE("bypass.commenthistory")
+
         void loadPageFromUserInfo(GJUserScore* score) {
             int originalCommentHistory = score->m_commentHistoryStatus;
-
-            if (config::get<bool>("bypass.commenthistory", false))
-                score->m_commentHistoryStatus = 0;
-
+            score->m_commentHistoryStatus = 0;
             ProfilePage::loadPageFromUserInfo(score);
-
             score->m_commentHistoryStatus = originalCommentHistory;
         }
     };

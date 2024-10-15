@@ -5,6 +5,8 @@
 
 namespace eclipse::hacks::Labels {
 
+    class LabelsContainer;
+
     /// @brief Class that represents a CCLabelBMFont object with additional functionality.
     class SmartLabel : public cocos2d::CCLabelBMFont {
     public:
@@ -21,6 +23,9 @@ namespace eclipse::hacks::Labels {
         /// @brief Initialize the label with the specified text and font.
         bool init(const std::string& text, const std::string& font);
 
+        /// @brief Set the parent container of the label.
+        void setParentContainer(LabelsContainer* container) { m_parentContainer = container; }
+
         /// @brief Set the height multiplier.
         void setHeightMultiplier(float multiplier) { m_heightMultiplier = multiplier; }
 
@@ -36,17 +41,16 @@ namespace eclipse::hacks::Labels {
         /// @brief Update the label.
         void update();
 
-        [[nodiscard]] const cocos2d::CCSize& getContentSize() const override {
-            return m_contentSize;
-        }
-
     private:
         cocos2d::CCPoint m_customPosition = {0, 0};
-        cocos2d::CCSize m_contentSize;
         float m_heightMultiplier = 1.0f;
         rift::Script* m_script = nullptr;
         std::string m_text;
         std::string m_error;
+
+        // Used to check if the label should call updateLayout on the parent container
+        bool m_wasEmpty = false;
+        LabelsContainer* m_parentContainer = nullptr;
     };
 
 }

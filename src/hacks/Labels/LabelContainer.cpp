@@ -110,6 +110,7 @@ namespace eclipse::hacks::Labels {
     }
 
     void LabelsContainer::addLabel(SmartLabel* label, const std::function<void(SmartLabel*)>& update) {
+        label->setParentContainer(this);
         m_labels.emplace_back(label, update);
 
         // set anchor point

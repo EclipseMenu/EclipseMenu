@@ -31,10 +31,9 @@ namespace eclipse::hacks::Level {
             float m_originalRadius = -1.f;
         };
 
-        cocos2d::CCRect getObjectRect(float x, float y) {
-            if (!config::get<bool>("level.hitbox_multiplier", false))
-                return GameObject::getObjectRect(x, y);
+        ADD_HOOKS_DELEGATE("level.hitbox_multiplier")
 
+        cocos2d::CCRect getObjectRect(float x, float y) {
             s_affectedGameObjects.push_back(this);
 
             if (m_fields->m_originalRadius < 0)

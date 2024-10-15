@@ -1,12 +1,14 @@
 #include "config.hpp"
 
-#include <Geode/Geode.hpp>
 #include <fstream>
+#include <Geode/loader/Mod.hpp>
+#include <Geode/loader/Log.hpp>
 
 namespace eclipse::config {
 
     static nlohmann::json storage;
     static nlohmann::json tempStorage;
+    static std::unordered_map<std::string_view, std::vector<std::function<void()>>> callbacks;
 
     nlohmann::json& getStorage() {
         return storage;
@@ -27,6 +29,18 @@ namespace eclipse::config {
         file.close();
 
         return !getStorage().is_discarded();
+    }
+
+    void executeCallbacks(std::string_view name) {
+        auto it = callbacks.find(name);
+        if (it == callbacks.end()) return;
+        for (const auto& callback : it->second) {
+            callback();
+        }
+    }
+
+    void addDelegate(std::string_view key, std::function<void()> callback) {
+        callbacks[key].push_back(std::move(callback));
     }
 
     void load() {
@@ -50,29 +64,29 @@ namespace eclipse::config {
         saveFile(path);
     }
 
-    void saveProfile(const std::string& profile) {
+    void saveProfile(std::string_view profile) {
         auto profilesDir = geode::Mod::get()->getSaveDir() / "profiles";
         std::filesystem::create_directories(profilesDir);
 
-        auto path = profilesDir / (profile + ".json");
+        auto path = profilesDir / fmt::format("{}.json", profile);
         saveFile(path);
     }
 
-    void loadProfile(const std::string& profile) {
+    void loadProfile(std::string_view profile) {
         auto profilesDir = geode::Mod::get()->getSaveDir() / "profiles";
-        auto path = profilesDir / (profile + ".json");
+        auto path = profilesDir / fmt::format("{}.json", profile);
         if (!loadFile(path)) {
             geode::log::warn("Failed to load profile: {}", profile);
             load(); // Load the default config
         }
     }
 
-    void deleteProfile(const std::string& profile) {
+    void deleteProfile(std::string_view profile) {
         auto profilesDir = geode::Mod::get()->getSaveDir() / "profiles";
-        auto path = profilesDir / (profile + ".json");
-        if (std::filesystem::exists(path)) {
+        auto path = profilesDir / fmt::format("{}.json", profile);
+
+        if (std::filesystem::exists(path))
             std::filesystem::remove(path);
-        }
     }
 
     std::vector<std::string> getProfiles() {

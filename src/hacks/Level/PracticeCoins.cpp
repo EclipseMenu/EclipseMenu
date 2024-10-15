@@ -21,11 +21,10 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(PracticeCoins)
 
     class $modify(PracticeCoinsBGLHook, GJBaseGameLayer) {
+        ADD_HOOKS_DELEGATE("level.practicecoins")
+
         void collisionCheckObjects(PlayerObject* player, gd::vector<GameObject*>* sectionObjects, int p2, float p3) {
             if (!m_isPracticeMode)
-                return GJBaseGameLayer::collisionCheckObjects(player, sectionObjects, p2, p3);
-
-            if (!config::get<bool>("level.practicecoins", false))
                 return GJBaseGameLayer::collisionCheckObjects(player, sectionObjects, p2, p3);
 
             auto playerRect = player->getObjectRect();
@@ -43,7 +42,7 @@ namespace eclipse::hacks::Level {
                     continue;
 
                 // check if the player is colliding with the object
-                auto objectRect = obj->EffectGameObject::getObjectRect();
+                auto objectRect = effectSprite->getObjectRect();
                 if (!playerRect.intersectsRect(objectRect))
                     continue;
 

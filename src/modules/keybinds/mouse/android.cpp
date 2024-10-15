@@ -1,3 +1,4 @@
+#include <Geode/platform/platform.hpp>
 #ifdef GEODE_IS_ANDROID
 #include <modules/keybinds/manager.hpp>
 #include <modules/hack/hack.hpp>

@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 
 #include <Geode/modify/EffectGameObject.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Player {
 
@@ -21,14 +22,9 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(NoHideTrigger)
 
     class $modify(NoHideTriggerEGOHook, EffectGameObject) {
-        static void onModify(auto& self) {
-            SAFE_PRIORITY("EffectGameObject::triggerObject");
-        }
+        ALL_DELEGATES_AND_SAFE_PRIO("player.nohidetrigger")
 
         void triggerObject(GJBaseGameLayer* bgl, int p1, gd::vector<int> const* p2) override {
-            if (!config::get<bool>("player.nohidetrigger", false))
-                return EffectGameObject::triggerObject(bgl, p1, p2);
-
             switch (m_objectID) {
                 case 1612: // Hide Trigger
                 case 1613: // Show Trigger
@@ -36,6 +32,20 @@ namespace eclipse::hacks::Player {
                 default:
                     return EffectGameObject::triggerObject(bgl, p1, p2);
             }
+        }
+    };
+
+    class $modify(NoHideTriggerGJBGLHook, GJBaseGameLayer) {
+        ADD_HOOKS_DELEGATE("player.nohidetrigger")
+
+        void processOptionsTrigger(GameOptionsTrigger* options) {
+            auto originalHideP1 = options->m_hideP1;
+            auto originalHideP2 = options->m_hideP2;
+            options->m_hideP1 = GameOptionsSetting::Disabled;
+            options->m_hideP2 = GameOptionsSetting::Disabled;
+            GJBaseGameLayer::processOptionsTrigger(options);
+            options->m_hideP1 = originalHideP1;
+            options->m_hideP2 = originalHideP2;
         }
     };
 

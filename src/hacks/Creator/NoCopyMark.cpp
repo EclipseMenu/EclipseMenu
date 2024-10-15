@@ -21,10 +21,10 @@ namespace eclipse::hacks::Creator {
     REGISTER_HACK(NoCopyMark)
 
     class $modify(NoCopyMarkELLHook, EditLevelLayer) {
-        void onShare(CCObject* sender) {
-            if (config::get<bool>("creator.nocopymark", false))
-                this->m_level->m_originalLevel = 0;
+        ADD_HOOKS_DELEGATE("creator.nocopymark")
 
+        void onShare(CCObject* sender) {
+            this->m_level->m_originalLevel = 0;
             EditLevelLayer::onShare(sender);
         }
     };

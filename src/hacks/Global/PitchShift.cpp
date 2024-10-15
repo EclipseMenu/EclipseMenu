@@ -23,7 +23,8 @@ namespace eclipse::hacks::Global {
             return;
 
         system->createDSPByType(FMOD_DSP_TYPE_PITCHSHIFT, &pitchShifter);
-        pitchShifter->setParameterFloat(FMOD_DSP_PITCHSHIFT_FFTSIZE, 4096);
+        //pitchShifter->setParameterFloat(FMOD_DSP_PITCHSHIFT_FFTSIZE, 4096);
+        pitchShifter->setParameterFloat(FMOD_DSP_PITCHSHIFT_FFTSIZE, 0x800); // or 0x457 
         pitchShifter->setParameterFloat(FMOD_DSP_PITCHSHIFT_PITCH, pitch);
         FMODAudioEngine::sharedEngine()->m_backgroundMusicChannel->addDSP(0, pitchShifter);
     }
@@ -52,7 +53,7 @@ namespace eclipse::hacks::Global {
         }
 
         [[nodiscard]] const char* getId() const override { return "Pitch Shift"; }
-        [[nodiscard]] int32_t getPriority() const override { return -8; }
+        [[nodiscard]] int32_t getPriority() const override { return -9; }
     };
 
     REGISTER_HACK(PitchShift)

@@ -20,11 +20,26 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(TransparentLists)
 
     class $modify(TransparentListsCCLCHook, cocos2d::CCLayerColor) {
+        ADD_HOOKS_DELEGATE("global.transparentlists")
+
         bool initWithColor(const cocos2d::ccColor4B& yk, float f1, float f2) {
-            if (config::get<bool>("global.transparentlists", false))
-                return cocos2d::CCLayerColor::initWithColor(cocos2d::ccc4(0, 0, 0, 0), 0, 0);
-            else
-                return cocos2d::CCLayerColor::initWithColor(yk, f1, f2);
+            bool ret = CCLayerColor::initWithColor(yk, f1, f2);
+
+            if (yk == cocos2d::ccColor4B{161, 88, 44, 255} || yk == cocos2d::ccColor4B{194, 114, 62, 255}) // the 2 colors GD uses for list cells
+                this->setVisible(false);
+
+            return ret;
+        }
+
+        bool initWithColor(const cocos2d::ccColor4B& yk) {
+            bool ret = CCLayerColor::initWithColor(yk);
+
+            if (yk == cocos2d::ccColor4B{161, 88, 44, 255} || yk == cocos2d::ccColor4B{194, 114, 62, 255}) { // the 2 colors GD uses for list cells
+                this->setOpacity(0);
+                this->setVisible(false);
+            }
+
+            return ret;
         }
     };
 

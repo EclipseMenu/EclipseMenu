@@ -1,6 +1,8 @@
 #pragma once
 
 #include <random>
+#include <modules/gui/color.hpp>
+#include <Geode/binding/GJBaseGameLayer.hpp>
 
 namespace eclipse::utils {
 
@@ -14,7 +16,7 @@ namespace eclipse::utils {
     /// @param max Maximum value.
     /// @return Random number between min and max.
     template<typename T>
-    inline T random(T min, T max) {
+    T random(T min, T max) {
         if constexpr (std::is_integral_v<T>) {
             std::uniform_int_distribution<T> dist(min, max);
             return dist(getRng());
@@ -31,7 +33,7 @@ namespace eclipse::utils {
     /// @param max Maximum value.
     /// @return Random number between 0 and max.
     template<typename T>
-    inline T random(T max) {
+    T random(T max) {
         return random<T>(0, max);
     }
 
@@ -57,9 +59,35 @@ namespace eclipse::utils {
     /// @brief Get whether current OpenGL context has an extension.
     /// @param extension Extension to check.
     /// @return Whether current OpenGL context has the extension.
-    bool hasOpenGLExtension(const std::string& extension);
+    bool hasOpenGLExtension(std::string_view extension);
 
     /// @brief Get whether to use legacy rendering functions for OpenGL.
+    /// @return Whether to use legacy rendering functions.
     bool shouldUseLegacyDraw();
 
+    /// @brief Format time in seconds to a string.
+    /// @param time Time in seconds.
+    /// @return Formatted time string (e.g. "1:23:45.678").
+    std::string formatTime(double time);
+
+    /// @brief Bugfixed version of getCurrentPercent.
+    /// @param game GJBaseGameLayer to get the progress from.
+    /// @return Actual progress of the level.
+    float getActualProgress(GJBaseGameLayer* game);
+
+    /// @brief Make the cursor visible/hidden under certain conditions
+    void updateCursorState(bool visible);
+
+    /// @brief Get month name from its number. (0-11)
+    const char* getMonthName(int month);
+
+    /// @brief Get the current timestamp.
+    time_t getTimestamp();
+
+    /// @brief Get a rainbow color for specific parameters
+    /// @param speed The speed of the rainbow effect
+    /// @param saturation The S (saturation) component of the HSV color
+    /// @param value The V (value) component of the HSV color
+    /// @param offset The offset in milliseconds for the rainbow effect
+    gui::Color getRainbowColor(float speed, float saturation, float value, float offset = 0.f);
 }
