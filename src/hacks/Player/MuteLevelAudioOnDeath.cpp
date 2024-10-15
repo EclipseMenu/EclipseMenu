@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 
 #include <Geode/modify/PlayerObject.hpp>
+#include <Geode/modify/EffectGameObject.hpp>
 
 namespace eclipse::hacks::Player {
 
@@ -79,6 +80,24 @@ namespace eclipse::hacks::Player {
             fmod->stopAllEffects();
 
             PlayerObject::playerDestroyed(p0);
+        }
+    };
+
+    class $modify(MuteLevelAudioOnDeathEGOHook, EffectGameObject) {
+        void triggerObject(GJBaseGameLayer* p0, int p1, gd::vector<int> const* p2) {
+            PlayLayer* pl = PlayLayer::get();
+
+            // do nothing if playlayer is nullptr
+            if (!pl) return EffectGameObject::triggerObject(p0, p1, p2);
+
+            PlayerObject* player = pl->m_player1;
+
+            // do nothing if player is nullptr
+            if (!player || !player->m_isDead) return EffectGameObject::triggerObject(p0, p1, p2);
+
+            int id = this->m_objectID;
+
+            if (player->m_isDead && id != 3602 && id != 1934) return EffectGameObject::triggerObject(p0, p1, p2);
         }
     };
 
