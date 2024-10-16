@@ -38,7 +38,8 @@ namespace eclipse::hacks::Level {
                             options->addInputFloat("Label Scale", "label.startpos_switcher.scale", 0.1f, 2.f, "%.2fx");
                             options->addInputFloat("Opacity Modifier", "label.startpos_switcher.alpha_mod", 0.f, 1.f);
                             options->addColorComponent("Label Color", "label.startpos_switcher.color", true);
-                            options->addToggle("Show Buttons", "label.startpos_switcher.buttons");
+                            options->addToggle("Show Buttons", "label.startpos_switcher.buttons")
+                                ->setDescription("Toggles between showing and hiding the StartPos Switcher UI");
                         });
                 });
         }
