@@ -13,7 +13,7 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("Force Platformer", "level.forceplatformer")
                 ->handleKeybinds()
-                ->setDescription("Forces platformer mode when playing a level.");
+                ->setDescription("Forces platformer mode when playing a level");
         }
 
         [[nodiscard]] const char* getId() const override { return "Force Platformer"; }
