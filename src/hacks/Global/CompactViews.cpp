@@ -13,7 +13,7 @@ namespace eclipse::hacks::Global {
 
             tab->addToggle("Compact Editor Levels", "global.compacteditorlevels")
                 ->handleKeybinds()
-                ->setDescription("Enables the compact view when browsing custom editor levels. Adapted from code by Cvolton. (Created by RayDeeUx)");
+                ->setDescription("Enables the compact view when browsing custom editor levels. (Adapted from code by Cvolton, created by RayDeeUx)");
         }
 
         [[nodiscard]] const char* getId() const override { return "Compact Editor Levels"; }
@@ -24,7 +24,7 @@ namespace eclipse::hacks::Global {
             auto tab = gui::MenuTab::find("Global");
             tab->addToggle("Compact Profile Comments", "global.compactprofilecomments")
                 ->handleKeybinds()
-                ->setDescription("Enables the compact view when viewing profile comments. Adapted from code by Cvolton. (Created by RayDeeUx)");
+                ->setDescription("Enables the compact view when viewing profile comments. (Adapted from code by Cvolton, created by RayDeeUx)");
         }
 
         [[nodiscard]] const char* getId() const override { return "Compact Profile Comments"; }
