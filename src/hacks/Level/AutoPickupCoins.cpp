@@ -12,7 +12,7 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("Auto Pickup Coins", "level.autopickupcoins")
                 ->handleKeybinds()
-                ->setDescription("Automatically picks up coins.");
+                ->setDescription("Automatically picks up coins");
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("level.autopickupcoins", false); }
