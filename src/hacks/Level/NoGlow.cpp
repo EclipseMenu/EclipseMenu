@@ -12,7 +12,7 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("No Object Glow", "level.noglow")
                 ->handleKeybinds()
-                ->setDescription("Disables all glow coming from objects.");
+                ->setDescription("Disables all glow coming from objects");
         }
 
         [[nodiscard]] const char* getId() const override { return "No Object Glow"; }
