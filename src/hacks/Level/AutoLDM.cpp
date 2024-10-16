@@ -13,7 +13,7 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("Auto LDM", "level.autoldm")
                 ->handleKeybinds()
-                ->setDescription("Automatically enables LDM on all levels.");
+                ->setDescription("Automatically enables LDM upon entering a level");
         }
 
         [[nodiscard]] const char* getId() const override { return "Auto LDM"; }
