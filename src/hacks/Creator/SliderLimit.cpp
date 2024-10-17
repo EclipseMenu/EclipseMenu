@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 
 #include <Geode/modify/SliderTouchLogic.hpp>
+#include <Geode/modify/GJScaleControl.hpp>
 
 namespace eclipse::hacks::Creator {
 
@@ -44,6 +45,26 @@ namespace eclipse::hacks::Creator {
 
             if (auto* slider = this->m_slider)
                 slider->updateBar();
+        }
+    };
+
+    class $modify (SliderLimitGJSHook, GJScaleControl) {
+        ADD_HOOKS_DELEGATE("creator.sliderlimit")
+
+        void ccTouchMoved(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) {
+            GJScaleControl::ccTouchMoved(touch, event);
+
+            if (m_sliderXY && m_sliderXY->m_touchLogic->m_activateThumb) {
+                m_sliderXY->getThumb()->setPositionX(this->convertToNodeSpace(touch->getLocation()).x);
+                m_sliderXY->updateBar();
+
+                float value = m_sliderXY->getThumb()->getValue();
+
+                updateLabelXY(value);
+                this->sliderChanged(m_sliderXY->getThumb());
+
+                if (EditorUI::get()) EditorUI::get()->scaleXYChanged(value, value, m_scaleLocked);
+            }
         }
     };
 

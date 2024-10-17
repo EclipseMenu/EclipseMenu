@@ -76,7 +76,9 @@ namespace eclipse::hacks::Global {
             m_fields->totalJumps = GSM->getStat("1");
             m_fields->totalAttempts = GSM->getStat("2");
 
-            return PlayLayer::init(level, useReplay, dontCreateObjects);
+            if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
+
+            return true;
         }
 
         void destroyPlayer(PlayerObject* player, GameObject* object) {

@@ -41,7 +41,7 @@ namespace eclipse::hacks::Recorder {
         });
     }
     
-    void glViewportHook(GLint a, GLint b, GLsizei c, GLsizei d) {
+    /*void glViewportHook(GLint a, GLint b, GLsizei c, GLsizei d) {
         if (visiting && s_recorder.isRecording() && inShaderLayer) {
             ImVec2 displaySize = ImGui::GetIO().DisplaySize;
             //shaderlayer resolutions for each quality mode
@@ -59,7 +59,7 @@ namespace eclipse::hacks::Recorder {
         auto result = geode::Mod::get()->hook(reinterpret_cast<void *>(glViewportAddress), &glViewportHook, "glViewport");
         if (result.isErr())
             geode::log::error("Failed to hook glViewport");
-    }
+    }*/
 
     void start() {
         if (!PlayLayer::get()) return;
@@ -214,9 +214,7 @@ namespace eclipse::hacks::Recorder {
 
         void update(float dt) {
             if (s_recorder.isRecording()) {
-                float framerate = 60.f;
-
-                framerate = GameManager::get()->m_customFPSTarget;
+                float framerate = config::get<float>("recorder.fps", 60.f);
 
                 if (framerate < 1)
                     framerate = 1;
