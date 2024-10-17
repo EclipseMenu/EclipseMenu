@@ -40,8 +40,9 @@ namespace eclipse::hacks::Recorder {
             geode::utils::file::openFolder(geode::Mod::get()->getSaveDir() / "renders");
         });
     }
-    
-    /*void glViewportHook(GLint a, GLint b, GLsizei c, GLsizei d) {
+
+#ifndef GEODE_IS_MACOS
+    void glViewportHook(GLint a, GLint b, GLsizei c, GLsizei d) {
         if (visiting && s_recorder.isRecording() && inShaderLayer) {
             ImVec2 displaySize = ImGui::GetIO().DisplaySize;
             //shaderlayer resolutions for each quality mode
@@ -59,7 +60,8 @@ namespace eclipse::hacks::Recorder {
         auto result = geode::Mod::get()->hook(reinterpret_cast<void *>(glViewportAddress), &glViewportHook, "glViewport");
         if (result.isErr())
             geode::log::error("Failed to hook glViewport");
-    }*/
+    }
+#endif
 
     void start() {
         if (!PlayLayer::get()) return;

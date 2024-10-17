@@ -30,12 +30,15 @@ namespace eclipse::hacks::Global {
 
         float getModifiedDelta(float dt) {
             auto tps = config::get<float>("global.tpsbypass", 240.f);
+            float speedhack = config::get<bool>("global.speedhack.toggle", false) ? config::get<float>("global.speedhack", 1.f) : 1.f;
+            tps *= speedhack;
             auto spt = 1.f / tps;
 
             if (m_resumeTimer > 0) {
                 --m_resumeTimer;
                 dt = 0.f;
             }
+
 
             auto totalDelta = dt + m_unk3248;
             auto timestep = std::min(m_gameState.m_timeWarp, 1.f) * spt;
