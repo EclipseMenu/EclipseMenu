@@ -82,6 +82,7 @@ Additionally, thank you to our testers, contributors, and supporters for improvi
 - jettjames - Tester
 - doki - Tester
 - [Prometheus](https://github.com/Prometheus-03) - Tester
+- [Catto](https://github.com/CattoDev/GatoBot/) - ShaderLayer fix for renderer
 
 ## License
 **Eclipse Menu** is created under the **[Eclipse Public License v2.0](https://choosealicense.com/licenses/epl-2.0/)**, read more by clicking on the highlighted name.

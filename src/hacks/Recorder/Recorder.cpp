@@ -30,7 +30,10 @@ namespace eclipse::hacks::Recorder {
     double extraTime = 0.;
     double lastFrameTime = 0.;
 
-    intptr_t glViewportAddress = 0;
+    cocos2d::CCSize oldDesignResolution;
+    cocos2d::CCSize newDesignResolution;
+    cocos2d::CCSize originalScreenScale;
+    cocos2d::CCSize newScreenScale;
 
     void endPopup() {
         Popup::create("Info", "Recording finished!", "OK", "Open folder", [](bool result) {
@@ -41,27 +44,27 @@ namespace eclipse::hacks::Recorder {
         });
     }
 
-#ifndef GEODE_IS_MACOS
-    void glViewportHook(GLint a, GLint b, GLsizei c, GLsizei d) {
-        if (visiting && s_recorder.isRecording() && inShaderLayer) {
-            ImVec2 displaySize = ImGui::GetIO().DisplaySize;
-            //shaderlayer resolutions for each quality mode
-            if (c != 2608 && d != 2608 && c != 1304 && d != 1304 && c != 652 && d != 652 && c == (int)displaySize.x && d == (int)displaySize.y) {
-                c = config::get<int>("recorder.resolution.x", 1920);
-                d = config::get<int>("recorder.resolution.y", 1080);
-            }
+    void applyWinSize() {
+        if(newDesignResolution.width != 0 && newDesignResolution.height != 0) {
+            auto view = cocos2d::CCEGLView::get();
+            
+            cocos2d::CCDirector::get()->m_obWinSizeInPoints = newDesignResolution;
+            view->setDesignResolutionSize(newDesignResolution.width, newDesignResolution.height, ResolutionPolicy::kResolutionExactFit);
+            view->m_fScaleX = newScreenScale.width;
+            view->m_fScaleY = newScreenScale.height;
         }
-
-        reinterpret_cast<void(*)(GLint, GLint, GLsizei, GLsizei)>(glViewportAddress)(a, b, c, d);
     }
 
-    $execute {
-        glViewportAddress = geode::addresser::getNonVirtual(glViewport);
-        auto result = geode::Mod::get()->hook(reinterpret_cast<void *>(glViewportAddress), &glViewportHook, "glViewport");
-        if (result.isErr())
-            geode::log::error("Failed to hook glViewport");
+    void restoreWinSize() {
+        if(oldDesignResolution.width != 0 && oldDesignResolution.height != 0) {
+            auto view = cocos2d::CCEGLView::get();
+
+            cocos2d::CCDirector::get()->m_obWinSizeInPoints = oldDesignResolution;
+            view->setDesignResolutionSize(oldDesignResolution.width, oldDesignResolution.height, ResolutionPolicy::kResolutionExactFit);
+            view->m_fScaleX = originalScreenScale.width;
+            view->m_fScaleY = originalScreenScale.height;
+        }
     }
-#endif
 
     void start() {
         if (!PlayLayer::get()) return;
@@ -88,6 +91,20 @@ namespace eclipse::hacks::Recorder {
         s_recorder.m_renderSettings.m_codec = config::get<std::string>("recorder.codecString", "h264");
         s_recorder.m_renderSettings.m_outputFile = renderDirectory / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
         s_recorder.m_renderSettings.m_hardwareAccelerationType = static_cast<ffmpeg::HardwareAccelerationType>(config::get<int>("recorder.hwType", 0));
+
+        auto view = cocos2d::CCEGLView::get();
+
+        oldDesignResolution = view->getDesignResolutionSize();
+        float aspectRatio = static_cast<float>(s_recorder.m_renderSettings.m_width) / static_cast<float>(s_recorder.m_renderSettings.m_height);
+        newDesignResolution = cocos2d::CCSize(roundf(320.f * aspectRatio), 320.f);
+
+        originalScreenScale = cocos2d::CCSize(view->m_fScaleX, view->m_fScaleY);
+        newScreenScale = cocos2d::CCSize(static_cast<float>(s_recorder.m_renderSettings.m_width) / newDesignResolution.width, static_cast<float>(s_recorder.m_renderSettings.m_height) / newDesignResolution.height);
+
+        geode::log::debug("Recording started with resolution {}x{} replacing {}x{}", newScreenScale.width, newScreenScale.height, originalScreenScale.width, originalScreenScale.height);
+
+        if(oldDesignResolution != newDesignResolution)
+            applyWinSize();
 
         s_recorder.start();
     }
@@ -222,6 +239,12 @@ namespace eclipse::hacks::Recorder {
                     framerate = 1;
 
                 dt = 1.f / framerate;
+
+                applyWinSize();
+                CCScheduler::update(dt);
+                restoreWinSize();
+
+                return;
             }
 
             CCScheduler::update(dt);
