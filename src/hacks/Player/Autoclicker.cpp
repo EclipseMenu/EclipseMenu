@@ -16,6 +16,7 @@ namespace eclipse::hacks::Player {
 
             tab->addToggle("AutoClicker", "player.autoclick")
                 ->handleKeybinds()
+                ->setDescription("Clicks periodically when playing levels. Applies to both the level editor and actual levels.")
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                     options->addToggle("Player 1", "player.autoclick.p1");
                     options->addToggle("Player 2", "player.autoclick.p2");

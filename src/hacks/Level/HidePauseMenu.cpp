@@ -12,7 +12,7 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("Hide Pause Menu", "level.hidepause")
                 ->handleKeybinds()
-                ->setDescription("Hides the pause menu. Useful for taking screenshots of levels");
+                ->setDescription("Hides the pause menu. Useful for taking screenshots of levels.");
         }
 
         [[nodiscard]] const char* getId() const override { return "Hide Pause Menu"; }

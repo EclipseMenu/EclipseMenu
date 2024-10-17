@@ -10,7 +10,7 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
             tab->addToggle("No Death Effect", "player.nodeatheffect")
-                ->setDescription("Disables player death effect")
+                ->setDescription("Disables the player's death effect.")
                 ->handleKeybinds();
         }
 
