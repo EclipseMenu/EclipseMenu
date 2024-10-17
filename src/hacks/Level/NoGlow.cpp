@@ -10,7 +10,9 @@ namespace eclipse::hacks::Level {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
 
-            tab->addToggle("No Object Glow", "level.noglow")->handleKeybinds();
+            tab->addToggle("No Object Glow", "level.noglow")
+                ->handleKeybinds()
+                ->setDescription("Disables all glow coming from objects");
         }
 
         [[nodiscard]] const char* getId() const override { return "No Object Glow"; }

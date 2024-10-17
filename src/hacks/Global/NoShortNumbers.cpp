@@ -11,7 +11,7 @@ namespace eclipse::hacks::Global {
             auto tab = gui::MenuTab::find("Global");
 
             tab->addToggle("No Short Numbers", "global.noshortnumbers")
-                ->setDescription("Removes any abbreviation. (Example: 23.4K -> 23400)")
+                ->setDescription("Removes any number abbreviations. (Example: 23.4K -> 23400)")
                 ->handleKeybinds()
                 ->addOptions([](auto options) {
                     options->addToggle("Thousands Separator", "global.noshortnumbers.thousands");
