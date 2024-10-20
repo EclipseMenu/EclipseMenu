@@ -24,7 +24,8 @@ namespace eclipse::gui::cocos {
 
     bool ContentView::init(cocos2d::CCSize const &size, const std::shared_ptr<MenuTab> &tab) {
         if (!CCNode::init()) return false;
-        m_contentLayer = geode::ScrollLayer::create(size);
+        //m_contentLayer = geode::ScrollLayer::create(size);
+        m_contentLayer = ScrollLayer::create(size);
 
         this->setContentSize(size);
         this->setID("content-menu"_spr);
@@ -108,5 +109,9 @@ namespace eclipse::gui::cocos {
                 ->setAxisAlignment(cocos2d::AxisAlignment::End)
                 ->setGap(0)
         );
+        m_contentLayer->fixTouchPrio();
+        geode::Loader::get()->queueInMainThread([this, layer]() { // because i apparently have to do this to prevent crashes!?
+            m_contentLayer->setTouchEnabled(layer->getContentHeight() > 260.0F);
+        });
     }
 }

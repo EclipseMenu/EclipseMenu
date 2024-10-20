@@ -2,20 +2,35 @@
 
 #include <modules/gui/gui.hpp>
 #include <modules/gui/cocos/cocos.hpp>
+#include <modules/gui/theming/manager.hpp>
 
 #include "content-view.hpp"
 
 namespace eclipse::gui::cocos {
     bool OptionsPopup::setup(std::shared_ptr<MenuTab> const& tab) {
+        const auto tm = ThemeManager::get();
         this->setTitle(tab->getTitle());
         m_title->setPositionY(225.f);
 
+        // The behind background for the entire popup to get the outline
+        auto bgBehind = cocos2d::extension::CCScale9Sprite::create("GJ_square07.png", { 0.0f, 0.0f, 80.0f, 80.0f });
+        bgBehind->setContentSize(m_mainLayer->getContentSize());
+        bgBehind->setID("bg-behind"_spr);
+        m_mainLayer->addChildAtPosition(bgBehind, cocos2d::Anchor::Center);
+
+        // Background for the entire popup
+        m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        m_bgSprite->setContentSize(m_mainLayer->getContentSize() - 3);
+        m_bgSprite->setColor(tm->getTitleBackgroundColor().toCCColor3B());
+        m_bgSprite->setID("main-bg"_spr);
+        m_mainLayer->addChildAtPosition(m_bgSprite, cocos2d::Anchor::Center);
+
         // Background for content
-        m_contentBG = cocos2d::extension::CCScale9Sprite::create("GJ_square01.png");
+        m_contentBG = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
         m_contentBG->setAnchorPoint({ 0, 1 });
         m_contentBG->setPosition(7.5f, 210.f);
-        m_contentBG->setColor({ 0, 0, 0 });
-        m_contentBG->setOpacity(128);
+        m_contentBG->setColor(tm->getBackgroundColor().toCCColor3B());
+        //m_contentBG->setOpacity(128);
         m_contentBG->setContentSize({ 385.f, 200.f });
         m_contentBG->setID("content-bg"_spr);
         m_mainLayer->addChild(m_contentBG);

@@ -1,6 +1,7 @@
 #include "popup.hpp"
 #include <modules/gui/cocos/cocos.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/theming/manager.hpp>
 
 #include <utility>
 
@@ -9,17 +10,32 @@
 namespace eclipse::gui::cocos {
 
     bool Popup::setup(Tabs const& tabs) {
+        const auto tm = ThemeManager::get();
         auto winSize = cocos2d::CCDirector::get()->getWinSize();
         this->setTitle("");
         m_buttonMenu->setContentSize(winSize);
         m_closeBtn->setPosition(20.f, winSize.height - 20.f);
+        m_bgSprite->removeMeAndCleanup();
+
+        // The behind background for the entire popup to get the outline
+        auto bgBehind = cocos2d::extension::CCScale9Sprite::create("GJ_square07.png", { 0.0f, 0.0f, 80.0f, 80.0f });
+        bgBehind->setContentSize(m_mainLayer->getContentSize());
+        bgBehind->setID("bg-behind"_spr);
+        m_mainLayer->addChildAtPosition(bgBehind, cocos2d::Anchor::Center);
+
+        // Background for the entire popup
+        m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        m_bgSprite->setContentSize(m_mainLayer->getContentSize() - 3);
+        m_bgSprite->setColor(tm->getTitleBackgroundColor().toCCColor3B());
+        m_bgSprite->setID("main-bg"_spr);
+        m_mainLayer->addChildAtPosition(m_bgSprite, cocos2d::Anchor::Center);
 
         // Background for content
-        m_contentBG = cocos2d::extension::CCScale9Sprite::create("GJ_square01.png");
+        m_contentBG = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
         m_contentBG->setAnchorPoint({ 0, 1 });
         m_contentBG->setPosition(125.f, 270.f);
-        m_contentBG->setColor({ 0, 0, 0 });
-        m_contentBG->setOpacity(128);
+        m_contentBG->setColor(tm->getBackgroundColor().toCCColor3B());
+        //m_contentBG->setOpacity(128);
         m_contentBG->setContentSize({ 345.f, 260.f });
         m_contentBG->setID("content-bg"_spr);
         m_mainLayer->addChild(m_contentBG);
