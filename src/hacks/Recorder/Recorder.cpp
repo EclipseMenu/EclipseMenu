@@ -166,7 +166,7 @@ namespace eclipse::hacks::Recorder {
 
             std::ranges::sort(m_codecs);
 
-            int codecIdx = static_cast<int>(std::distance(m_codecs.begin(), std::find(m_codecs.begin(), m_codecs.end(), "h264")));
+            int codecIdx = static_cast<int>(std::distance(m_codecs.begin(), std::ranges::find(m_codecs, "h264")));
 
             tab->addInputFloat("Framerate", "recorder.fps", 1.f, 360.f, "%.0f FPS");
             tab->addInputFloat("Endscreen Duration", "recorder.endscreen", 0.f, 30.f, "%.2fs.");
@@ -313,8 +313,7 @@ namespace eclipse::hacks::Recorder {
                     
                     return GJBaseGameLayer::update(dt);
                 }
-                else
-                    afterEndTimer += dt;
+                afterEndTimer += dt;
             }
 
             if (!s_recorder.isRecording())

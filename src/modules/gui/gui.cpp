@@ -231,7 +231,7 @@ namespace eclipse::gui {
 
     void Engine::setRenderer(RendererType type) {
         const auto tm = ThemeManager::get();
-        if (type == tm->getRenderer() && m_renderer) return;
+        if (m_renderer && type == m_renderer->getType()) return;
         if (m_renderer) m_renderer->shutdown();
 
         switch (type) {
@@ -250,7 +250,10 @@ namespace eclipse::gui {
     }
 
     RendererType Engine::getRendererType() {
-        return ThemeManager::get()->getRenderer();
+        auto engine = Engine::get();
+        if (!engine->isInitialized()) return RendererType::None;
+        if (!engine->m_renderer) return RendererType::None;
+        return engine->m_renderer->getType();
     }
 
     std::shared_ptr<Engine> Engine::get() {

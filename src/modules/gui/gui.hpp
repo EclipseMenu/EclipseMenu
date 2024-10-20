@@ -896,6 +896,7 @@ namespace eclipse::gui {
     };
 
     enum class RendererType {
+        None = -1,
         ImGui,
         Cocos2d
     };
@@ -922,6 +923,9 @@ namespace eclipse::gui {
 
         /// @brief Opens a modal popup with provided configuration.
         virtual void showPopup(const Popup& popup) = 0;
+
+        /// @brief Get the renderer type.
+        [[nodiscard]] virtual RendererType getType() const = 0;
     };
 
     using Tabs = std::vector<std::shared_ptr<MenuTab>>;

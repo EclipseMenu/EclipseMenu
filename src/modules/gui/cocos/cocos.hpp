@@ -18,6 +18,7 @@ namespace eclipse::gui::cocos {
         [[nodiscard]] bool isToggled() const override;
         void shutdown() override;
         void shutdown(bool noCleanup);
+        [[nodiscard]] RendererType getType() const override { return RendererType::Cocos2d; }
 
         [[nodiscard]] Popup* getPopup() const { return m_popup; }
         bool isPartOfPopup(cocos2d::CCNode* node) const;
