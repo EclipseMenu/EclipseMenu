@@ -30,7 +30,9 @@ namespace eclipse::hacks::Global {
             auto tab = gui::MenuTab::find("Global");
 
             config::setIfEmpty("global.autosafemode", true);
-            tab->addToggle("Auto Safe Mode", "global.autosafemode")->handleKeybinds();
+            tab->addToggle("Auto Safe Mode", "global.autosafemode")
+                ->handleKeybinds()
+                ->setDescription("Automatically enables safe mode if cheats are enabled");
         }
 
         void update() override {

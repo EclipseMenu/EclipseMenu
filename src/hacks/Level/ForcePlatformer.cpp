@@ -11,7 +11,9 @@ namespace eclipse::hacks::Level {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
 
-            tab->addToggle("Force Platformer", "level.forceplatformer")->handleKeybinds();
+            tab->addToggle("Force Platformer", "level.forceplatformer")
+                ->handleKeybinds()
+                ->setDescription("Forces platformer mode when playing a level");
         }
 
         [[nodiscard]] const char* getId() const override { return "Force Platformer"; }

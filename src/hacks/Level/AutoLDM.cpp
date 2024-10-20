@@ -11,7 +11,9 @@ namespace eclipse::hacks::Level {
         void init() override {
             auto tab = gui::MenuTab::find("Level");
 
-            tab->addToggle("Auto LDM", "level.autoldm")->handleKeybinds();
+            tab->addToggle("Auto LDM", "level.autoldm")
+                ->handleKeybinds()
+                ->setDescription("Automatically enables LDM upon entering a level");
         }
 
         [[nodiscard]] const char* getId() const override { return "Auto LDM"; }
