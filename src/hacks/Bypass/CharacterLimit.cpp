@@ -12,7 +12,7 @@ namespace eclipse::hacks::Bypass {
 
             tab->addToggle("Character Limit Bypass", "bypass.charlimit")
                 ->handleKeybinds()
-                ->setDescription("Allows you to bypass the character limit of any text field");
+                ->setDescription("Allows you to bypass the character limit of any text field.");
         }
 
         [[nodiscard]] const char* getId() const override { return "Character Limit Bypass"; }

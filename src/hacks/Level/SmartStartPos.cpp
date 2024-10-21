@@ -12,7 +12,7 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("Smart StartPos", "level.smartstartpos")
                 ->handleKeybinds()
-                ->setDescription("Makes the start positions automatically pick the correct gamemode and speed\nOnly works in levels without direction changes");
+                ->setDescription("Makes the start positions automatically pick the correct gamemode and speed. (This only works in levels without directional changes.)");
         }
 
         [[nodiscard]] const char* getId() const override { return "Smart StartPos"; }

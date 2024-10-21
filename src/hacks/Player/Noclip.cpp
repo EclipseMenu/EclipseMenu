@@ -21,7 +21,7 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.noclip.deathlimit", 2);
 
             tab->addToggle("Noclip", "player.noclip")
-                ->setDescription("Disables player death")
+                ->setDescription("Disables player death.")
                 ->handleKeybinds()
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                     options->addToggle("Player 1", "player.noclip.p1");
@@ -175,7 +175,7 @@ namespace eclipse::hacks::Player {
                 if (!fields->m_deadLastFrame) {
                     auto deaths = config::getTemp<int>("noclipDeaths", 0);
                     config::setTemp<int>("noclipDeaths", deaths + 1);
-                    if (config::get<bool>("player.noclip.deathlimit.toggle", false) && deaths + 1 >= config::get<int>("player.noclip.deathlimit", 0)) 
+                    if (config::get<bool>("player.noclip.deathlimit.toggle", false) && deaths + 1 >= config::get<int>("player.noclip.deathlimit", 0))
                         PlayLayer::get()->destroyPlayer(m_player1, nullptr);
                 }
             }

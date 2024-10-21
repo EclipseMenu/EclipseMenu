@@ -12,7 +12,7 @@ namespace eclipse::hacks::Bypass {
 
             tab->addToggle("Verify Bypass", "bypass.verifyhack")
                 ->handleKeybinds()
-                ->setDescription("Automatically verifies levels for you");
+                ->setDescription("Automatically verifies levels for you.");
         }
 
         [[nodiscard]] const char* getId() const override { return "Verify Bypass"; }

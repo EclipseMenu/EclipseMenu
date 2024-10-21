@@ -13,7 +13,7 @@ namespace eclipse::hacks::Bypass {
 
             tab->addToggle("Character Filter Bypass", "bypass.charfilter")
                 ->handleKeybinds()
-                ->setDescription("Allows you to bypass the character filter on any text field");
+                ->setDescription("Allows you to bypass the character filter on any text field.");
         }
 
         [[nodiscard]] const char* getId() const override { return "Character Filter Bypass"; }
