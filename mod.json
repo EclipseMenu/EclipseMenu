@@ -13,6 +13,7 @@
 		"source": "https://github.com/EclipseMenu/EclipseMenu",
         "community": "https://discord.gg/NnpwFRDMND"
 	},
+	"api": { "include": [ "include/*.hpp" ] },
 	"tags": ["cheats", "gameplay", "utility", "customization", "interface"],
 	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev"],
 	"description": "A next-generation mod menu for Geometry Dash.",

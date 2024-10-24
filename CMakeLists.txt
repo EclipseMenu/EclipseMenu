@@ -17,7 +17,7 @@ file(GLOB_RECURSE SOURCES src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${MACOS_SOURCES})
 
 # Make sure we can include headers from src
-target_include_directories(${PROJECT_NAME} PRIVATE src)
+target_include_directories(${PROJECT_NAME} PRIVATE src include)
 
 # Get the latest abbreviated commit hash of the working branch
 execute_process(
