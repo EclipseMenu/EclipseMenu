@@ -394,7 +394,12 @@ namespace eclipse::keybinds {
         }
 
         m_keybinds.emplace_back(Keys::None, id, title, callback);
-        return m_keybinds.back();
+        auto& keybind = m_keybinds.back();
+        if (m_initialized) {
+            keybind.setKey(config::get<Keys>(fmt::format("keybind.{}.key", keybind.getId()), Keys::None));
+            this->setKeybindState(keybind.getId(), config::get<bool>(fmt::format("keybind.{}.active", keybind.getId()), false));
+        }
+        return keybind;
     }
 
     void Manager::init() {
@@ -404,6 +409,8 @@ namespace eclipse::keybinds {
             keybind.setKey(config::get<Keys>(fmt::format("keybind.{}.key", keybind.getId()), Keys::None));
             this->setKeybindState(keybind.getId(), config::get<bool>(fmt::format("keybind.{}.active", keybind.getId()), false));
         }
+
+        m_initialized = true;
     }
 
     void Manager::update() {

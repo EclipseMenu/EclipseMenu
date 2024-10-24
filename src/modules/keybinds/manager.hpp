@@ -161,6 +161,7 @@ namespace eclipse::keybinds {
         std::vector<Keybind> m_keybinds;
         std::unordered_map<Keys, bool> m_keyStates;
         std::unordered_map<Keys, bool> m_lastKeyStates;
+        bool m_initialized = false;
 
         friend bool isKeyDown(Keys key);
         friend bool isKeyPressed(Keys key);
