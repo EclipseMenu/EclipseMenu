@@ -15,9 +15,13 @@ target_sources(imgui INTERFACE
 )
 set(HAS_IMGUI ON)
 
-CPMAddPackage("gh:matcool/gd-imgui-cocos#b085ce4")
+if (NOT ANDROID)
+    set(RAPIDJSONTEST OFF)
+    CPMAddPackage("gh:EclipseMenu/discord-rpc#1259d3a")
+endif()
+CPMAddPackage("gh:matcool/gd-imgui-cocos#8cf1d37")
 CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
-CPMAddPackage("gh:EclipseMenu/rift#ced2b2f")
+CPMAddPackage("gh:EclipseMenu/rift#b8b31d6")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
 CPMAddPackage(
     NAME nlohmann_json
@@ -27,6 +31,7 @@ CPMAddPackage(
 
 # Fix debug build
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
+    target_compile_definitions(discord-rpc PRIVATE _ITERATOR_DEBUG_LEVEL=0)
     target_compile_definitions(rift PRIVATE _HAS_ITERATOR_DEBUGGING=0)
 endif()
 
@@ -39,3 +44,7 @@ target_link_libraries(third_party INTERFACE
     nlohmann_json::nlohmann_json
     rift
 )
+
+if (NOT ANDROID)
+    target_link_libraries(third_party INTERFACE discord-rpc)
+endif()
