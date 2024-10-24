@@ -9,6 +9,8 @@
 
 namespace eclipse::gui {
 
+    size_t Component::m_uniqueID = 0;
+
     template <typename T>
     T get_value(std::string_view key, T defaultValue, bool useTemp) {
         return useTemp ? config::getTemp<T>(key, defaultValue)
@@ -33,6 +35,20 @@ namespace eclipse::gui {
 
     void ToggleComponent::setValue(bool value) const {
         store_value(m_id, value, m_noSave);
+    }
+
+    std::shared_ptr<Component> Component::find(size_t uid) {
+        const auto& engine = Engine::get();
+
+        for (auto& tab : engine->getTabs()) {
+            for (auto& component : tab->getComponents()) {
+                if (component->getUID() == uid) {
+                    return component;
+                }
+            }
+        }
+
+        return nullptr;
     }
 
     void ToggleComponent::addOptions(const std::function<void(std::shared_ptr<MenuTab>)>& options) {

@@ -28,6 +28,14 @@ namespace eclipse::gui {
     public:
         virtual ~Component() = default;
 
+        Component() { m_uid = m_uniqueID++; }
+
+        /// @brief Get the component's unique identifier.
+        [[nodiscard]] size_t getUID() const { return m_uid; }
+
+        /// @brief Find a component by its unique identifier.
+        static std::shared_ptr<Component> find(size_t uid);
+
         /// @brief Initialize the component.
         virtual void onInit() = 0;
 
@@ -60,6 +68,8 @@ namespace eclipse::gui {
         }
 
     protected:
+        static size_t m_uniqueID;
+        size_t m_uid;
         ComponentType m_type = ComponentType::Unknown;
         bool m_noSave = false;
         std::string m_description;
