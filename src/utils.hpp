@@ -4,6 +4,12 @@
 #include <modules/gui/color.hpp>
 #include <Geode/binding/GJBaseGameLayer.hpp>
 
+enum class PlayerMode {
+    Cube, Ship, Ball,
+    UFO, Wave, Robot,
+    Spider, Swing
+};
+
 namespace eclipse::utils {
 
     /// @brief Returns a random device.
@@ -90,4 +96,13 @@ namespace eclipse::utils {
     /// @param value The V (value) component of the HSV color
     /// @param offset The offset in milliseconds for the rainbow effect
     gui::Color getRainbowColor(float speed, float saturation, float value, float offset = 0.f);
+
+    /// @brief Get the current player game mode. If player is nullptr, returns selected profile icon.
+    PlayerMode getGameMode(PlayerObject* player);
+
+    /// @brief Get the name of a game mode.
+    const char* gameModeName(PlayerMode mode);
+
+    /// @brief Get icon frame for a specific mode.
+    int getPlayerIcon(PlayerMode mode);
 }
