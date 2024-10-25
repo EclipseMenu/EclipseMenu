@@ -43,8 +43,8 @@ namespace eclipse::hacks::Player {
     class $modify(NoTrailPOHook, PlayerObject) {
         static void onModify(auto& self) {
             SAFE_HOOKS_ALL();
-            HOOKS_TOGGLE("player.notrail", PlayerObject, activateStreak);
-            HOOKS_TOGGLE("player.alwaystrail", PlayerObject, deactivateStreak);
+            HOOKS_TOGGLE("player.notrail", PlayerObject, "activateStreak");
+            HOOKS_TOGGLE("player.alwaystrail", PlayerObject, "deactivateStreak");
         }
 
         void deactivateStreak(bool p0) {
@@ -72,8 +72,8 @@ namespace eclipse::hacks::Player {
     class $modify(NoTrailCCMSHook, cocos2d::CCMotionStreak) {
         static void onModify(auto& self) {
             SAFE_HOOKS_ALL();
-            HOOKS_TOGGLE("player.notrail", CCMotionStreak, resumeStroke);
-            HOOKS_TOGGLE("player.alwaystrail", CCMotionStreak, stopStroke);
+            HOOKS_TOGGLE("player.notrail", CCMotionStreak, "resumeStroke");
+            HOOKS_TOGGLE("player.alwaystrail", CCMotionStreak, "stopStroke");
         }
 
         void resumeStroke() {}
