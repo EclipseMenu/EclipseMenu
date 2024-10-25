@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 
 #include <Geode/modify/CCMotionStreak.hpp>
+#include <Geode/modify/PlayerObject.hpp>
 
 #if defined(GEODE_IS_ANDROID) || defined(GEODE_IS_ARM_MAC) || defined(GEODE_IS_IOS)
 #define GEODE_IS_ARM 1
