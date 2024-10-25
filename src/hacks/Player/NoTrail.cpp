@@ -4,9 +4,12 @@
 
 #include <Geode/modify/CCMotionStreak.hpp>
 
+#if defined(GEODE_IS_ANDROID) || defined(GEODE_IS_ARM_MAC) || defined(GEODE_IS_IOS)
+#define GEODE_IS_ARM 1
+#endif
+
 namespace eclipse::hacks::Player {
 
-    // why was this commented out? anyways i just took some code from ninny's mod
     class NoTrail : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("Player");
@@ -20,12 +23,6 @@ namespace eclipse::hacks::Player {
     };
 
     REGISTER_HACK(NoTrail)
-
-
-    class $modify(NoTrailCCHook, cocos2d::CCMotionStreak) {
-        ALL_DELEGATES_AND_SAFE_PRIO("player.notrail")
-        void resumeStroke() {}
-    };
 
     class AlwaysTrail : public hack::Hack {
         void init() override {
@@ -41,9 +38,46 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(AlwaysTrail)
 
+    // CCMotionStreak functions are too small to be hooked on ARM
+#ifdef GEODE_IS_ARM
+    class $modify(NoTrailPOHook, PlayerObject) {
+        static void onModify(auto& self) {
+            SAFE_HOOKS_ALL();
+            HOOKS_TOGGLE("player.notrail", PlayerObject, activateStreak);
+            HOOKS_TOGGLE("player.alwaystrail", PlayerObject, deactivateStreak);
+        }
 
-    class $modify(AlwaysTrailCCHook, cocos2d::CCMotionStreak) {
-        ALL_DELEGATES_AND_SAFE_PRIO("player.alwaystrail")
+        void deactivateStreak(bool p0) {
+            if (!this->m_streakRelated4) return;
+            this->m_streakRelated4 = false;
+            this->fadeOutStreak2(this, this->m_playEffects ? 0.2f : 0.6f);
+        }
+
+        void activateStreak() {
+            if (this->levelFlipping()) return;
+            if (GameManager::get()->m_editorEnabled) return;
+            if (this->m_isHidden) return;
+
+            this->m_streakRelated4 = true;
+            if (this->m_isDart) {
+                auto pos = this->getPosition();
+                this->m_waveTrail->m_currentPoint = pos;
+                this->m_waveTrail->stopAllActions();
+                this->m_waveTrail->setOpacity(255);
+                this->m_waveTrail->resumeStroke();
+            }
+        }
+    };
+#else
+    class $modify(NoTrailCCMSHook, cocos2d::CCMotionStreak) {
+        static void onModify(auto& self) {
+            SAFE_HOOKS_ALL();
+            HOOKS_TOGGLE("player.notrail", CCMotionStreak, resumeStroke);
+            HOOKS_TOGGLE("player.alwaystrail", CCMotionStreak, stopStroke);
+        }
+
+        void resumeStroke() {}
         void stopStroke() {}
     };
+#endif
 }
