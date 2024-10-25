@@ -50,7 +50,7 @@ namespace eclipse::hacks::Player {
         void deactivateStreak(bool p0) {
             if (!this->m_streakRelated4) return;
             this->m_streakRelated4 = false;
-            this->fadeOutStreak2(this, this->m_playEffects ? 0.2f : 0.6f);
+            this->fadeOutStreak2(this->m_playEffects ? 0.2f : 0.6f);
         }
 
         void activateStreak() {
