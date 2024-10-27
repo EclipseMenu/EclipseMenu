@@ -23,12 +23,14 @@ namespace eclipse::hacks::Level {
     class $modify(PracticeCoinsBGLHook, GJBaseGameLayer) {
         ADD_HOOKS_DELEGATE("level.practicecoins")
 
-        void collisionCheckObjects(PlayerObject* player, gd::vector<GameObject*>* sectionObjects, int p2, float p3) {
+        void collisionCheckObjects(PlayerObject* player, gd::vector<GameObject*>* sectionObjects, int objectCount, float dt) {
             if (!m_isPracticeMode)
-                return GJBaseGameLayer::collisionCheckObjects(player, sectionObjects, p2, p3);
+                return GJBaseGameLayer::collisionCheckObjects(player, sectionObjects, objectCount, dt);
 
             auto playerRect = player->getObjectRect();
-            for (auto obj : *sectionObjects) {
+            for (int i = 0; i < objectCount; i++) {
+                auto* obj = sectionObjects->at(i);
+
                 // check if the object is a coin
                 if (obj->m_objectType != GameObjectType::SecretCoin && obj->m_objectType != GameObjectType::UserCoin)
                     continue;
@@ -54,7 +56,7 @@ namespace eclipse::hacks::Level {
                 GJBaseGameLayer::gameEventTriggered(GJGameEvent::UserCoin, 0, 0); // event triggers
             }
 
-            GJBaseGameLayer::collisionCheckObjects(player, sectionObjects, p2, p3);
+            GJBaseGameLayer::collisionCheckObjects(player, sectionObjects, objectCount, dt);
         }
     };
 }

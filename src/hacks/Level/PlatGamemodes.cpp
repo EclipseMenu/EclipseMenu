@@ -21,12 +21,14 @@ namespace eclipse::hacks::Level {
     class $modify(PlatGamemodesBGLHook, GJBaseGameLayer) {
         ADD_HOOKS_DELEGATE("level.platgamemodes")
 
-        void collisionCheckObjects(PlayerObject* player, gd::vector<GameObject*>* sectionObjects, int p2, float p3) {
+        void collisionCheckObjects(PlayerObject* player, gd::vector<GameObject*>* sectionObjects, int objectCount, float dt) {
             if (!m_isPlatformer)
-                return GJBaseGameLayer::collisionCheckObjects(player, sectionObjects, p2, p3);
+                return GJBaseGameLayer::collisionCheckObjects(player, sectionObjects, objectCount, dt);
 
             auto playerRect = player->getObjectRect();
-            for (auto obj : *sectionObjects) {
+            for (int i = 0; i < objectCount; i++) {
+                auto obj = sectionObjects->at(i);
+
                 // check if the object is a coin
                 if (obj->m_objectType != GameObjectType::WavePortal && obj->m_objectType != GameObjectType::SwingPortal)
                     continue;
@@ -64,7 +66,7 @@ namespace eclipse::hacks::Level {
                 //     enh->EnhancedGameObject::hasBeenActivatedByPlayer(player);
             }
 
-            GJBaseGameLayer::collisionCheckObjects(player, sectionObjects, p2, p3);
+            GJBaseGameLayer::collisionCheckObjects(player, sectionObjects, objectCount, dt);
         }
     };
 }

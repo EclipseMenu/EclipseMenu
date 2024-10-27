@@ -348,28 +348,25 @@ namespace eclipse::hacks::Player {
         }
 
         //don't trigger objects early
-        void collisionCheckObjects(PlayerObject* p0, gd::vector<GameObject*>* vec, int p2, float p3) {
+        void collisionCheckObjects(PlayerObject* player, gd::vector<GameObject*>* vec, int objectsCount, float dt) {
             if (s_simulation.isSimulating()) {
-                gd::vector<GameObject*> extra = *vec;
+                gd::vector<GameObject*> extra;
+                extra.reserve(objectsCount);
+                for (int i = 0; i < objectsCount; i++) {
+                    GameObject* obj = vec->at(i);
+                    if (obj->m_objectType == GameObjectType::Solid ||
+                        obj->m_objectType == GameObjectType::Hazard ||
+                        obj->m_objectType == GameObjectType::AnimatedHazard ||
+                        obj->m_objectType == GameObjectType::Slope) {
+                        extra.push_back(obj);
+                    }
+                }
 
-                auto new_end = std::remove_if(vec->begin(), vec->end(), [&](GameObject* p1) {
-                    bool result = p1->m_objectType != GameObjectType::Solid &&
-                                p1->m_objectType != GameObjectType::Hazard &&
-                                p1->m_objectType != GameObjectType::AnimatedHazard &&
-                                p1->m_objectType != GameObjectType::Slope;
-                    return result;
-                });
-
-                vec->erase(new_end, vec->end());
-                p2 = vec->size();
-
-                GJBaseGameLayer::collisionCheckObjects(p0, vec, p2, p3);
-
-                *vec = extra;
+                GJBaseGameLayer::collisionCheckObjects(player, &extra, extra.size(), dt);
                 return;
             }
 
-            GJBaseGameLayer::collisionCheckObjects(p0, vec, p2, p3);
+            GJBaseGameLayer::collisionCheckObjects(player, vec, objectsCount, dt);
         }
 
         void playerTouchedRing(PlayerObject* player, RingObject* ring) {
