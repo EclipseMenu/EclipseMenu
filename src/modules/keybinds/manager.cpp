@@ -439,8 +439,10 @@ namespace eclipse::keybinds {
                             if (key == Keys::None) {
                                 config::set(fmt::format("keybind.{}.active", idStr), false);
                                 keybindRef.setInitialized(false);
-                                tab->removeComponent(keybindComponent);
-                                updateHintLabel();
+                                gui::Engine::queueAfterDrawing([tab, keybindComponent] {
+                                    tab->removeComponent(keybindComponent);
+                                    updateHintLabel();
+                                });
                             }
 
                             keybindRef.setKey(key);

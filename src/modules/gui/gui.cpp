@@ -109,7 +109,7 @@ namespace eclipse::gui {
         store_value(m_id, path, m_noSave);
     }
 
-    void FilesystemComboComponent::setValue(int index) {
+    void FilesystemComboComponent::setValue(int index) const {
         setValue(m_items[index]);
     }
 

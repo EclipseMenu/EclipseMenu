@@ -284,7 +284,7 @@ namespace eclipse::gui {
         void setValue(std::filesystem::path path) const;
 
         /// @brief Set the combo value.
-        void setValue(int index);
+        void setValue(int index) const;
 
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
