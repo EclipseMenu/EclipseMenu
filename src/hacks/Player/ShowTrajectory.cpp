@@ -351,7 +351,9 @@ namespace eclipse::hacks::Player {
         void collisionCheckObjects(PlayerObject* player, gd::vector<GameObject*>* vec, int objectsCount, float dt) {
             if (s_simulation.isSimulating()) {
                 gd::vector<GameObject*> extra;
+#ifndef GEODE_IS_ANDROID // vector::reserve is not available on Android
                 extra.reserve(objectsCount);
+#endif
                 for (int i = 0; i < objectsCount; i++) {
                     GameObject* obj = vec->at(i);
                     if (obj->m_objectType == GameObjectType::Solid ||
