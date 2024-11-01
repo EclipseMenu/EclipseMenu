@@ -6,12 +6,24 @@ namespace eclipse::api {
 using namespace geode::prelude;
 
 template <config::SupportedType T>
-void createConfigListener() {
+void createGetConfigListener() {
     new EventListener<EventFilter<events::RequestConfigValueEvent<T>>>(+[](events::RequestConfigValueEvent<T>* e) {
         auto useInternal = e->getUseInternal();
         auto exists = useInternal ? config::has(e->getKey()) : config::hasTemp(e->getKey());
         if (!exists) return ListenerResult::Stop;
         e->setValue(useInternal ? config::get<T>(e->getKey()) : config::getTemp<T>(e->getKey()));
+        return ListenerResult::Stop;
+    });
+}
+
+template <config::SupportedType T>
+void createSetConfigListener() {
+    new EventListener<EventFilter<events::SetConfigValueEvent<T>>>(+[](events::SetConfigValueEvent<T>* e) {
+        if (e->getUseInternal()) {
+            config::set<T>(e->getKey(), e->getValue());
+        } else {
+            config::setTemp<T>(e->getKey(), e->getValue());
+        }
         return ListenerResult::Stop;
     });
 }
@@ -48,10 +60,14 @@ $execute {
     });
 
     /* Config */
-    createConfigListener<bool>();
-    createConfigListener<int>();
-    createConfigListener<float>();
-    createConfigListener<std::string>();
+    createGetConfigListener<bool>();
+    createGetConfigListener<int>();
+    createGetConfigListener<float>();
+    createGetConfigListener<std::string>();
+    createSetConfigListener<bool>();
+    createSetConfigListener<int>();
+    createSetConfigListener<float>();
+    createSetConfigListener<std::string>();
 }
 
 }

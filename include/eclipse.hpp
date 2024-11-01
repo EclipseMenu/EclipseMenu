@@ -42,6 +42,13 @@ namespace eclipse {
         std::string m_name;
     };
 
+    namespace config {
+        template <typename T>
+        concept SupportedType = requires(T a) {
+            std::same_as<T, bool> || std::same_as<T, int> || std::same_as<T, float> || std::same_as<T, std::string>;
+        };
+    };
+
     namespace events {
         class CreateMenuTabEvent final : public geode::Event {
         public:
@@ -87,7 +94,7 @@ namespace eclipse {
             std::string m_description;
         };
 
-        template <typename T>
+        template <config::SupportedType T>
         class RequestConfigValueEvent : public geode::Event {
         public:
             explicit RequestConfigValueEvent(std::string key, bool internal = false)
@@ -109,10 +116,30 @@ namespace eclipse {
             bool m_hasValue = false;
         };
 
+        template <config::SupportedType T>
+        class SetConfigValueEvent : public geode::Event {
+        public:
+            SetConfigValueEvent(std::string const& key, T value, bool internal = false)
+                : m_key(key), m_value(value), m_useInternal(internal) {}
+
+            std::string const& getKey() const { return m_key; }
+            T getValue() const { return m_value; }
+            bool getUseInternal() const { return m_useInternal; }
+
+        private:
+            std::string m_key;
+            T m_value;
+            bool m_useInternal = false;
+        };
+
         using RequestBoolConfigValueEvent = RequestConfigValueEvent<bool>;
         using RequestIntConfigValueEvent = RequestConfigValueEvent<int>;
         using RequestStringConfigValueEvent = RequestConfigValueEvent<std::string>;
         using RequestFloatConfigValueEvent = RequestConfigValueEvent<float>;
+        using SetBoolConfigValueEvent = SetConfigValueEvent<bool>;
+        using SetIntConfigValueEvent = SetConfigValueEvent<int>;
+        using SetStringConfigValueEvent = SetConfigValueEvent<std::string>;
+        using SetFloatConfigValueEvent = SetConfigValueEvent<float>;
     }
 
     inline components::Toggle& components::Toggle::setDescription(const std::string& description) {
@@ -138,11 +165,6 @@ namespace eclipse {
     }
 
     namespace config {
-        template <typename T>
-        concept SupportedType = requires(T a) {
-            std::same_as<T, bool> || std::same_as<T, int> || std::same_as<T, float> || std::same_as<T, std::string>;
-        };
-
         template <SupportedType T>
         T get(std::string key, T defaultValue) {
             events::RequestConfigValueEvent<T> event(key);
@@ -163,7 +185,12 @@ namespace eclipse {
 
         template <SupportedType T>
         void set(std::string key, T value) {
-            /* TODO: Implement */
+            events::SetConfigValueEvent<T>(key, value, false).post();
+        }
+
+        template <SupportedType T>
+        void setInternal(std::string key, T value) {
+            events::SetConfigValueEvent<T>(key, value, true).post();
         }
     }
 }
