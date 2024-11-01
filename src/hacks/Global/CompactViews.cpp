@@ -66,7 +66,7 @@ namespace eclipse::hacks::Global {
 
             if (config::get<bool>("global.compacteditorlevels", false) && m_mainLayer) {
                 m_mainLayer->setPositionY(-3.5f);
-                if (const auto localLevelName = geode::cocos::getChildOfType<cocos2d::CCLabelBMFont>(m_mainLayer, 0))
+                if (const auto localLevelName = m_mainLayer->getChildByType<cocos2d::CCLabelBMFont>(0))
                     if (std::string(localLevelName->getString()) == std::string(m_level->m_levelName))
                         localLevelName->limitLabelWidth(200.f, .6f, .01f);
             }

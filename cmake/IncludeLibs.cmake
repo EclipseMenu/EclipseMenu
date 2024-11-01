@@ -19,9 +19,9 @@ if (NOT ANDROID)
     set(RAPIDJSONTEST OFF)
     CPMAddPackage("gh:EclipseMenu/discord-rpc#1259d3a")
 endif()
-CPMAddPackage("gh:matcool/gd-imgui-cocos#8cf1d37")
+CPMAddPackage("gh:matcool/gd-imgui-cocos#324dc5d")
 CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
-CPMAddPackage("gh:EclipseMenu/rift#b8b31d6")
+CPMAddPackage("gh:EclipseMenu/rift#e1997ce")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
 CPMAddPackage(
     NAME nlohmann_json

@@ -23,10 +23,9 @@ namespace eclipse::hacks::Shortcuts {
             GJGameLevel* level = nullptr;
 
             // try to find it from either PlayLayer or LevelInfoLayer
-            auto* pl = PlayLayer::get();
-            if (pl) {
+            if (auto* pl = PlayLayer::get()) {
                 level = pl->m_level;
-            } else if (auto* lil = geode::cocos::getChildOfType<LevelInfoLayer>(scene, 0)) {
+            } else if (auto* lil = scene->getChildByType<LevelInfoLayer>(0)) {
                 level = lil->m_level;
             }
 
