@@ -11,9 +11,33 @@
 #include <Geode/Loader.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 
-#include <Geode/modify/PlayLayer.hpp>
+#include <rift/config.hpp>
 
 namespace eclipse::labels {
+
+    rift::Value getConfigValue(std::span<rift::Value> args) {
+        if (args.size() != 1)
+            return rift::Value::from("<cfg requires string argument>");
+        auto key = args[0].toString();
+        if (!config::has(key))
+            return rift::Value::null();
+        switch (config::getType(key)) {
+            case nlohmann::detail::value_t::string:
+                return rift::Value::string(config::get<std::string>(key));
+            case nlohmann::detail::value_t::boolean:
+                return rift::Value::boolean(config::get<bool>(key));
+            case nlohmann::detail::value_t::number_integer:
+                return rift::Value::integer(config::get<int>(key));
+            case nlohmann::detail::value_t::number_float:
+                return rift::Value::floating(config::get<float>(key));
+            default:
+                return rift::Value::null();
+        }
+    }
+
+    $on_mod(Loaded) {
+        rift::config::addRuntimeFunction("cfg", getConfigValue);
+    }
 
     VariableManager& VariableManager::get() {
         static VariableManager instance;
@@ -31,6 +55,7 @@ namespace eclipse::labels {
 
         // Mod variables
         m_variables["modVersion"] = rift::Value::string(mod->getVersion().toNonVString());
+        m_variables["geodeVersion"] = rift::Value::string(geode::Loader::get()->getVersion().toNonVString());
         m_variables["platform"] = rift::Value::string(
             GEODE_WINDOWS("Windows")
             GEODE_ANDROID("Android")
@@ -75,7 +100,7 @@ namespace eclipse::labels {
 
     rift::Value VariableManager::getVariable(const std::string& name) const {
         auto it = m_variables.find(name);
-        if (it == m_variables.end()) return {};
+        if (it == m_variables.end()) return rift::Value::null();
         return it->second;
     }
 
@@ -164,21 +189,27 @@ namespace eclipse::labels {
         return utils::formatTime(seconds);
     }
 
-    float getFPS() {
+    static double getFPS() {
         static std::chrono::time_point<std::chrono::system_clock> s_lastUpdate;
         auto now = std::chrono::system_clock::now();
         auto duration = now - s_lastUpdate;
         s_lastUpdate = now;
         double micros = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
-        return static_cast<float>(1'000'000.0 / micros);
+        return 1'000'000.0 / micros;
     }
 
-    float accumulateFPS(float fps) {
-        static std::deque<float> s_fps;
-        constexpr size_t maxFPS = 100;
-        s_fps.push_back(fps);
-        if (s_fps.size() > maxFPS) s_fps.pop_front();
-        return std::accumulate(s_fps.begin(), s_fps.end(), 0.f) / static_cast<float>(s_fps.size());
+    static double accumulateFPS(double fps) {
+        static float s_currentFps = 0.f;
+        static float s_fpsAccumDelta = 0.f;
+        static uint32_t s_frames = 0;
+        s_fpsAccumDelta += 1.f / fps;
+        s_frames++;
+        if (s_fpsAccumDelta >= 0.1f) {
+            s_currentFps = s_frames / s_fpsAccumDelta;
+            s_frames = 0;
+            s_fpsAccumDelta = 0.f;
+        }
+        return s_currentFps;
     }
 
     void VariableManager::updateFPS() {
@@ -187,8 +218,7 @@ namespace eclipse::labels {
         m_variables["fps"] = rift::Value::floating(accumulateFPS(fps));
     }
 
-    void VariableManager::refetch() {
-        // Game variables
+    void VariableManager::fetchGeneralData() {
         auto* gameManager = GameManager::get();
         m_variables["username"] = rift::Value::string(gameManager->m_playerName);
         m_variables["cubeIcon"] = rift::Value::integer(utils::getPlayerIcon(PlayerMode::Cube));
@@ -199,15 +229,9 @@ namespace eclipse::labels {
         m_variables["robotIcon"] = rift::Value::integer(utils::getPlayerIcon(PlayerMode::Robot));
         m_variables["spiderIcon"] = rift::Value::integer(utils::getPlayerIcon(PlayerMode::Spider));
         m_variables["swingIcon"] = rift::Value::integer(utils::getPlayerIcon(PlayerMode::Swing));
+    }
 
-        // Hack states (only the important ones)
-        m_variables["isCheating"] = rift::Value::boolean(config::getTemp("hasCheats", false));
-        m_variables["noclip"] = rift::Value::boolean(config::get("player.noclip", false));
-        m_variables["speedhack"] = rift::Value::boolean(config::get("global.speedhack.toggle", false));
-        m_variables["speedhackSpeed"] = rift::Value::floating(config::get("global.speedhack", 1.f));
-        m_variables["framestepper"] = rift::Value::boolean(config::get("player.framestepper", false));
-
-        // Time
+    void VariableManager::fetchTimeData() {
         auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         auto localTime = std::localtime(&time);
         m_variables["hour"] = rift::Value::integer(localTime->tm_hour);
@@ -219,105 +243,151 @@ namespace eclipse::labels {
         m_variables["year"] = rift::Value::integer(localTime->tm_year + 1900);
         m_variables["clock"] = rift::Value::string(utils::getClock());
         m_variables["clock12"] = rift::Value::string(utils::getClock(true));
+    }
 
-        // Game state
-        if (auto* gjbgl = gameManager->m_gameLayer) {
-            // Level
-            auto* level = gjbgl->m_level;
-            auto levelID = level->m_levelID;
-            bool isRobtopLevel = (levelID > 0 && levelID < 100) || (levelID >= 3001 && levelID <= 6000);
-            auto levelDifficulty = getLevelDifficulty(level);
-            m_variables["levelID"] = rift::Value::integer(levelID);
-            m_variables["levelName"] = rift::Value::string(level->m_levelName);
-            m_variables["author"] = rift::Value::string(isRobtopLevel ? "RobTop" : gjbgl->m_level->m_creatorName);
-            m_variables["isRobtopLevel"] = rift::Value::boolean(isRobtopLevel);
-            m_variables["levelAttempts"] = rift::Value::integer(level->m_attempts);
-            m_variables["levelStars"] = rift::Value::integer(level->m_stars);
-            m_variables["difficulty"] = rift::Value::string(getLevelDifficultyString(levelDifficulty));
-            m_variables["difficultyKey"] = rift::Value::string(getLevelDifficultyKey(levelDifficulty));
-            m_variables["practicePercent"] = rift::Value::integer(level->m_practicePercent);
-            m_variables["bestPercent"] = rift::Value::integer(level->m_normalPercent);
-            m_variables["bestTime"] = rift::Value::floating(static_cast<float>(level->m_bestTime));
-            if (gjbgl->m_isPlatformer)
-                m_variables["best"] = rift::Value::string(formatTime(level->m_bestTime));
-            else
-                m_variables["best"] = rift::Value::integer(level->m_normalPercent);
+    void VariableManager::fetchHacksData() {
+        m_variables["isCheating"] = rift::Value::boolean(config::getTemp("hasCheats", false));
+        m_variables["noclip"] = rift::Value::boolean(config::get("player.noclip", false));
+        m_variables["speedhack"] = rift::Value::boolean(config::get("global.speedhack.toggle", false));
+        m_variables["speedhackSpeed"] = rift::Value::floating(config::get("global.speedhack", 1.f));
+        m_variables["framestepper"] = rift::Value::boolean(config::get("player.framestepper", false));
+    }
 
-            // Player
-            m_variables["playerX"] = rift::Value::floating(gjbgl->m_player1->m_position.x);
-            m_variables["playerY"] = rift::Value::floating(gjbgl->m_player1->m_position.y);
-            m_variables["player2X"] = rift::Value::floating(gjbgl->m_player2->m_position.x);
-            m_variables["player2Y"] = rift::Value::floating(gjbgl->m_player2->m_position.y);
-            m_variables["attempt"] = rift::Value::integer(gjbgl->m_attempts);
-            m_variables["isTestMode"] = rift::Value::boolean(gjbgl->m_isTestMode);
-            m_variables["isPracticeMode"] = rift::Value::boolean(gjbgl->m_isPracticeMode);
-            m_variables["isPlatformer"] = rift::Value::boolean(gjbgl->m_isPlatformer);
-            m_variables["levelTime"] = rift::Value::floating(static_cast<float>(gjbgl->m_gameState.m_levelTime));
-            m_variables["levelLength"] = rift::Value::floating(gjbgl->m_levelLength);
-            m_variables["levelDuration"] = rift::Value::floating(gjbgl->m_level->m_timestamp / 240.f);
-            m_variables["time"] = rift::Value::string(utils::formatTime(gjbgl->m_gameState.m_levelTime));
-            m_variables["frame"] = rift::Value::integer(static_cast<int>(gjbgl->m_gameState.m_levelTime * 240.f));
-            m_variables["isDead"] = rift::Value::boolean(gjbgl->m_player1->m_isDead);
-            m_variables["isDualMode"] = rift::Value::boolean(gjbgl->m_player2 != nullptr && gjbgl->m_player2->isRunning()); // can m_isDualMode be added already
-            m_variables["noclipDeaths"] = rift::Value::integer(config::getTemp("noclipDeaths", 0));
-            m_variables["noclipAccuracy"] = rift::Value::floating(config::getTemp("noclipAccuracy", 100.f));
-            m_variables["progress"] = rift::Value::floating(utils::getActualProgress(gjbgl));
-            if (auto* pl = gameManager->m_playLayer) {
-                m_variables["editorMode"] = rift::Value::boolean(false);
-                m_variables["realProgress"] = rift::Value::floating(pl->getCurrentPercent());
-                m_variables["objects"] = rift::Value::integer(level->m_objectCount);
-            } else if (auto* ed = gameManager->m_levelEditorLayer) {
-                m_variables["editorMode"] = rift::Value::boolean(true);
-                m_variables["realProgress"] = rift::Value::floating(0.f);
-                m_variables["objects"] = rift::Value::integer(static_cast<int>(ed->m_objects->count()));
+    static std::string cachedBase64Decode(const std::string& str) {
+        static std::string s_lastStr;
+        static std::string s_lastDecoded;
+        if (str == s_lastStr) return s_lastDecoded;
+        s_lastStr = str;
+        if (str.empty()) return s_lastDecoded = "";
+        s_lastDecoded = cocos2d::ZipUtils::base64URLDecode(str);
+        return s_lastDecoded;
+    }
+
+    void VariableManager::fetchLevelData(GJGameLevel* level) {
+        if (!level) {
+            // Reset all level variables
+            constexpr std::array keys = {
+                "levelID", "levelName", "levelDescription", "author",
+                "isRobtopLevel", "levelAttempts", "levelStars",
+                "difficulty", "difficultyKey", "practicePercent",
+                "bestPercent", "bestTime", "best"
+            };
+            for (const auto& key : keys) {
+                removeVariable(key);
             }
+            return;
+        }
 
-            // Player icon
-            auto gamemode = utils::getGameMode(gjbgl->m_player1);
-            m_variables["gamemode"] = rift::Value::string(utils::gameModeName(gamemode));
-            m_variables["playerIcon"] = rift::Value::integer(utils::getPlayerIcon(gamemode));
-        } else {
-            removeVariable("levelID");
-            removeVariable("levelName");
-            removeVariable("author");
-            removeVariable("isRobtopLevel");
-            removeVariable("levelAttempts");
-            removeVariable("levelStars");
-            removeVariable("difficulty");
-            removeVariable("difficultyKey");
-            removeVariable("practicePercent");
-            removeVariable("bestPercent");
-            removeVariable("bestTime");
-            removeVariable("best");
-            removeVariable("playerX");
-            removeVariable("playerY");
-            removeVariable("player2X");
-            removeVariable("player2Y");
-            removeVariable("attempt");
-            removeVariable("isTestMode");
-            removeVariable("isPracticeMode");
-            removeVariable("isPlatformer");
-            removeVariable("levelTime");
-            removeVariable("levelLength");
-            removeVariable("levelDuration");
-            removeVariable("time");
-            removeVariable("frame");
-            removeVariable("isDead");
-            removeVariable("isDualMode");
-            removeVariable("noclipDeaths");
-            removeVariable("noclipAccuracy");
-            removeVariable("editorMode");
-            removeVariable("progress");
-            removeVariable("realProgress");
-            removeVariable("objects");
-            removeVariable("runFrom");
-            removeVariable("bestRun");
-            removeVariable("lastDeath");
+        auto levelID = level->m_levelID;
+        bool isRobtopLevel = (levelID > 0 && levelID < 100) || (levelID >= 3001 && levelID <= 6000);
+        auto levelDifficulty = getLevelDifficulty(level);
+        m_variables["levelID"] = rift::Value::integer(levelID);
+        m_variables["levelName"] = rift::Value::string(level->m_levelName);
+        m_variables["levelDescription"] = rift::Value::string(cachedBase64Decode(level->m_levelDesc));
+        m_variables["author"] = rift::Value::string(isRobtopLevel ? "RobTop" : level->m_creatorName);
+        m_variables["isRobtopLevel"] = rift::Value::boolean(isRobtopLevel);
+        m_variables["levelAttempts"] = rift::Value::integer(level->m_attempts);
+        m_variables["levelStars"] = rift::Value::integer(level->m_stars);
+        m_variables["difficulty"] = rift::Value::string(getLevelDifficultyString(levelDifficulty));
+        m_variables["difficultyKey"] = rift::Value::string(getLevelDifficultyKey(levelDifficulty));
+        m_variables["practicePercent"] = rift::Value::integer(level->m_practicePercent);
+        m_variables["bestPercent"] = rift::Value::integer(level->m_normalPercent);
+        m_variables["bestTime"] = rift::Value::floating(level->m_bestTime);
+        if (GJBaseGameLayer::get()->m_isPlatformer)
+            m_variables["best"] = rift::Value::string(formatTime(level->m_bestTime));
+        else
+            m_variables["best"] = rift::Value::integer(level->m_normalPercent);
+    }
 
-            auto gamemode = utils::getGameMode(nullptr);
+    void VariableManager::fetchPlayerData(PlayerObject* player, bool isPlayer2) {
+        if (!player) {
+            // Reset all player variables
+            constexpr std::array keys = {
+                "playerX", "playerY", "player2X", "player2Y"
+            };
+            for (const auto& key : keys) {
+                removeVariable(key);
+            }
+            if (!isPlayer2) {
+                auto gamemode = utils::getGameMode(nullptr);
+                m_variables["gamemode"] = rift::Value::string(utils::gameModeName(gamemode));
+                m_variables["playerIcon"] = rift::Value::integer(utils::getPlayerIcon(gamemode));
+            }
+            return;
+        }
+
+        m_variables[isPlayer2 ? "player2X" : "playerX"] = rift::Value::floating(player->m_position.x);
+        m_variables[isPlayer2 ? "player2Y" : "playerY"] = rift::Value::floating(player->m_position.y);
+
+        if (!isPlayer2) {
+            auto gamemode = utils::getGameMode(player);
             m_variables["gamemode"] = rift::Value::string(utils::gameModeName(gamemode));
             m_variables["playerIcon"] = rift::Value::integer(utils::getPlayerIcon(gamemode));
         }
+    }
+
+    void VariableManager::fetchGameplayData(GJBaseGameLayer* gameLayer) {
+        if (!gameLayer) {
+            // Reset all gameplay variables
+            constexpr std::array keys = {
+                "attempt", "isTestMode", "isPracticeMode", "isPlatformer",
+                "levelTime", "levelLength", "levelDuration", "time", "frame",
+                "isDead", "isDualMode", "noclipDeaths", "noclipAccuracy", "progress",
+                "editorMode", "realProgress", "objects"
+            };
+            for (const auto& key : keys) {
+                removeVariable(key);
+            }
+
+            // Reset level and player data
+            fetchLevelData(nullptr);
+            fetchPlayerData(nullptr, false);
+            fetchPlayerData(nullptr, true);
+            return;
+        }
+
+        m_variables["attempt"] = rift::Value::integer(gameLayer->m_attempts);
+        m_variables["isTestMode"] = rift::Value::boolean(gameLayer->m_isTestMode);
+        m_variables["isPracticeMode"] = rift::Value::boolean(gameLayer->m_isPracticeMode);
+        m_variables["isPlatformer"] = rift::Value::boolean(gameLayer->m_isPlatformer);
+        m_variables["levelTime"] = rift::Value::floating(gameLayer->m_gameState.m_levelTime);
+        m_variables["levelLength"] = rift::Value::floating(gameLayer->m_levelLength);
+        m_variables["levelDuration"] = rift::Value::floating(gameLayer->m_level->m_timestamp / 240.f);
+        m_variables["time"] = rift::Value::string(utils::formatTime(gameLayer->m_gameState.m_levelTime));
+        m_variables["frame"] = rift::Value::integer(gameLayer->m_gameState.m_levelTime * 240.0);
+        m_variables["isDead"] = rift::Value::boolean(gameLayer->m_player1->m_isDead);
+        m_variables["isDualMode"] = rift::Value::boolean(gameLayer->m_player2 != nullptr && gameLayer->m_player2->isRunning()); // can m_isDualMode be added already
+        m_variables["noclipDeaths"] = rift::Value::integer(config::getTemp("noclipDeaths", 0));
+        m_variables["noclipAccuracy"] = rift::Value::floating(config::getTemp("noclipAccuracy", 100.f));
+        m_variables["progress"] = rift::Value::floating(utils::getActualProgress(gameLayer));
+
+        if (auto* pl = PlayLayer::get()) {
+            m_variables["editorMode"] = rift::Value::boolean(false);
+            m_variables["realProgress"] = rift::Value::floating(pl->getCurrentPercent());
+            m_variables["objects"] = rift::Value::integer(gameLayer->m_level->m_objectCount);
+        } else if (auto* ed = LevelEditorLayer::get()) {
+            m_variables["editorMode"] = rift::Value::boolean(true);
+            m_variables["realProgress"] = rift::Value::floating(0.f);
+            m_variables["objects"] = rift::Value::integer(ed->m_objects->count());
+        }
+
+        fetchLevelData(gameLayer->m_level);
+        fetchPlayerData(gameLayer->m_player1, false);
+        fetchPlayerData(gameLayer->m_player2, true);
+    }
+
+    void VariableManager::refetch() {
+        // Game variables
+        fetchGeneralData();
+
+        // Hack states (only the important ones
+        fetchHacksData();
+
+        // Time
+        fetchTimeData();
+
+        // Game state
+        fetchGameplayData(GJBaseGameLayer::get());
     }
 
     class $modify(BestRunPLHook, PlayLayer) {

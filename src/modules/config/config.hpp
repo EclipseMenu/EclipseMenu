@@ -82,6 +82,11 @@ namespace eclipse::config {
         executeCallbacks(key);
     }
 
+    /// @brief Get the type of value by key in the configuration.
+    /// @param key Key to get the type of.
+    /// @return Type of the value.
+    nlohmann::detail::value_t getType(std::string_view key);
+
     /// @brief Check if the value is of the specified type.
     /// @tparam T Type to check.
     /// @param key Key to check.
@@ -91,12 +96,18 @@ namespace eclipse::config {
         if (!has(key))
             return false;
 
-        try {
-            get<T>(key);
-            return true;
-        } catch (...) {
-            return false;
+        auto type = getType(key);
+        if constexpr (std::is_same_v<T, std::string>) {
+            return type == nlohmann::detail::value_t::string;
+        } else if constexpr (std::is_same_v<T, bool>) {
+            return type == nlohmann::detail::value_t::boolean;
+        } else if constexpr (std::is_same_v<T, int>) {
+            return type == nlohmann::detail::value_t::number_integer;
+        } else if constexpr (std::is_same_v<T, float>) {
+            return type == nlohmann::detail::value_t::number_float;
         }
+
+        return false;
     }
 
     /// @brief Set a value by key in the configuration if the key does not exist.

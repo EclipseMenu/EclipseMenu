@@ -37,6 +37,13 @@ namespace eclipse::labels {
         void updateFPS();
 
     private:
+        void fetchGeneralData();
+        void fetchTimeData();
+        void fetchHacksData();
+        void fetchLevelData(GJGameLevel* level);
+        void fetchPlayerData(PlayerObject* player, bool isPlayer2);
+        void fetchGameplayData(GJBaseGameLayer* gameLayer);
+
         VarMap m_variables;
     };
 
