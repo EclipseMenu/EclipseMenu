@@ -204,8 +204,8 @@ namespace eclipse::hacks::Level {
 
         bool onDeath = config::get<bool>("level.showhitboxes.ondeath", false);
 
-        if (!show) return;
-        if (onDeath) {
+        if (!show && !onDeath) return;
+        if (!show && onDeath) {
             self->m_debugDrawNode->setVisible(s_isDead || robtopShow);
             if (!s_isDead && !editor) return;
         }
