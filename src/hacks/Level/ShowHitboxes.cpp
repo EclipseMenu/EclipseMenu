@@ -143,7 +143,8 @@ namespace eclipse::hacks::Level {
         GJBaseGameLayer* bgl = GJBaseGameLayer::get();
 
         if (!bgl || drawNode != bgl->m_debugDrawNode) return;
-        if (!config::get<bool>("level.showhitboxes", false)) return;
+        if (!config::get<bool>("level.showhitboxes", false) && !config::get<bool>("level.showhitboxes.ondeath", false)) return;
+        if (!config::get<bool>("level.showhitboxes", false) && (!s_isDead && config::get<bool>("level.showhitboxes.ondeath", false))) return;
 
         bool hidePlayer = false;
 
@@ -207,7 +208,7 @@ namespace eclipse::hacks::Level {
         if (!show && !onDeath) return;
         if (!show && onDeath) {
             self->m_debugDrawNode->setVisible(s_isDead || robtopShow);
-            if (!s_isDead && !editor) return;
+            //if (!s_isDead && !editor) return;
         }
 
         if (!config::get<bool>("level.showhitboxes.hideplayer", false)) {
