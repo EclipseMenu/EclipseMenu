@@ -4,6 +4,7 @@
 
 #include <modules/gui/cocos/components/ToggleComponent.hpp>
 #include <modules/gui/cocos/components/ButtonComponent.hpp>
+#include <modules/gui/cocos/components/ColorComponent.hpp>
 
 namespace eclipse::gui::cocos {
 
@@ -97,6 +98,9 @@ namespace eclipse::gui::cocos {
                             ->setGap(2.5f)
                     );
                     layer->addChild(menu);
+                } break;
+                case ComponentType::Color: {
+                    layer->addChild(ColorComponentNode::create(component, size.width));
                 } break;
                 default: break;
             }

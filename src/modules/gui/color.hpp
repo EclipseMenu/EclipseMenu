@@ -95,6 +95,11 @@ namespace eclipse::gui {
         /// @return CCColor3B color
         [[nodiscard]] cocos2d::ccColor3B toCCColor3B() const;
 
+        /// @brief Creates a new color from a CCColor3B
+        /// @param color CCColor3B color in proper format
+        /// @return New color
+        static Color fromCCColor3B(cocos2d::ccColor3B const& color);
+
         struct HSL {
             float h, s, l;
 

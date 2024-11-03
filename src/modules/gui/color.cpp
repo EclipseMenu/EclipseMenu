@@ -133,6 +133,10 @@ namespace eclipse::gui {
         return fmt::format("{:08X}", c);
     }
 
+    Color Color::fromCCColor3B(cocos2d::ccColor3B const& color) {
+        return Color(color.r / 255.F, color.g / 255.F, color.b / 255.F);
+    }
+
     cocos2d::ccColor3B Color::toCCColor3B() const {
         return {
             static_cast<uint8_t>(r * 255),
