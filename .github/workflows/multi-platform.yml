@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build the mod
-        uses: geode-sdk/build-geode-mod@main
+        uses: prevter/build-geode-mod@fix-mod-json
         with:
           bindings: EclipseMenu/bindings
           bindings-ref: main
