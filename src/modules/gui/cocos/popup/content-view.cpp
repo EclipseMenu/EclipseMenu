@@ -3,7 +3,6 @@
 #include <modules/gui/gui.hpp>
 
 #include <modules/gui/cocos/components/ToggleComponent.hpp>
-#include <modules/gui/cocos/components/InputFloatComponent.hpp>
 #include <modules/gui/cocos/components/ButtonComponent.hpp>
 #include <modules/gui/cocos/components/ColorComponent.hpp>
 

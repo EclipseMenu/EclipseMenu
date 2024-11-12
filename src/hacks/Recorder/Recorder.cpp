@@ -91,6 +91,7 @@ namespace eclipse::hacks::Recorder {
         s_recorder.m_renderSettings.m_codec = config::get<std::string>("recorder.codecString", "h264");
         s_recorder.m_renderSettings.m_outputFile = renderDirectory / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
         s_recorder.m_renderSettings.m_hardwareAccelerationType = static_cast<ffmpeg::HardwareAccelerationType>(config::get<int>("recorder.hwType", 0));
+        s_recorder.m_renderSettings.m_colorspaceFilters = config::get<std::string>("recorder.colorspace", "");
 
         auto view = cocos2d::CCEGLView::get();
 
@@ -100,8 +101,6 @@ namespace eclipse::hacks::Recorder {
 
         originalScreenScale = cocos2d::CCSize(view->m_fScaleX, view->m_fScaleY);
         newScreenScale = cocos2d::CCSize(static_cast<float>(s_recorder.m_renderSettings.m_width) / newDesignResolution.width, static_cast<float>(s_recorder.m_renderSettings.m_height) / newDesignResolution.height);
-
-        geode::log::debug("Recording started with resolution {}x{} replacing {}x{}", newScreenScale.width, newScreenScale.height, originalScreenScale.width, originalScreenScale.height);
 
         if(oldDesignResolution != newDesignResolution)
             applyWinSize();
@@ -161,6 +160,7 @@ namespace eclipse::hacks::Recorder {
             config::setIfEmpty("recorder.resolution.y", 1080.f);
             config::setIfEmpty("recorder.audio", 2);
             config::setIfEmpty("recorder.hwType", 0);
+            config::setIfEmpty("recorder.colorspace", "");
 
             m_codecs = s_recorder.getAvailableCodecs();
 
@@ -180,22 +180,25 @@ namespace eclipse::hacks::Recorder {
                 config::set("recorder.codecString", m_codecs[index]);
             });
 
-            tab->addCombo("HW Type", "recorder.hwIdx", {"None", "CUDA (Nvidia)", "D3D11 (All)"}, 0)->callback([&](int index) {
-                switch(index) {
-                    case 0:
-                    default:
-                        config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::NONE));
-                        break;
-                    case 1:
-                        config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::CUDA));
-                        break;
-                    case 2:
-                        config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::D3D11VA));
-                        break;
-                }
-            });
+            //i honestly dont think hw is working rn, will remove this for now
+            // tab->addCombo("HW Type", "recorder.hwIdx", {"None", "CUDA (Nvidia)", "D3D11 (All)"}, 0)->callback([&](int index) {
+            //     switch(index) {
+            //         case 0:
+            //         default:
+            //             config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::NONE));
+            //             break;
+            //         case 1:
+            //             config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::CUDA));
+            //             break;
+            //         case 2:
+            //             config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::D3D11VA));
+            //             break;
+            //     }
+            // });
 
             tab->addCombo("Audio mode", "recorder.audio", {"Don't record", "Ask first", "Always record"}, 0);
+
+            tab->addInputText("Colorspace Args", "recorder.colorspace");
             
             tab->addLabel("Presets");
             tab->addButton("CPU")->callback([] {
