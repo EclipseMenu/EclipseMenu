@@ -2,7 +2,7 @@
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
 
-#include <Geode/modify/CCScheduler.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/UILayer.hpp>
 
 namespace eclipse::hacks::Player {
@@ -53,17 +53,13 @@ namespace eclipse::hacks::Player {
     static double s_holdDelayTimer = 0;
     static uint32_t s_holdAdvanceTimer = 0;
 
-    class $modify(FrameStepperSchedulerHook, cocos2d::CCScheduler) {
+    class $modify(FrameStepperSchedulerHook, GJBaseGameLayer) {
         static void onModify(auto& self) {
             FIRST_PRIORITY("cocos2d::CCScheduler::update"); // required to avoid conflict with speedhack
             HOOKS_TOGGLE_ALL("player.framestepper");
         }
 
         void update(float dt) override {
-            // Make it only work on GJBGL
-            if (!GJBaseGameLayer::get())
-                return CCScheduler::update(dt);
-
             // for playlayer, check if the level is not paused/finished (maybe add loading check later?)
             bool usable = false;
             if (auto playLayer = PlayLayer::get())
@@ -74,7 +70,7 @@ namespace eclipse::hacks::Player {
                 usable = editor->m_playbackMode == PlaybackMode::Playing;
 
             if (!usable)
-                return CCScheduler::update(dt);
+                return GJBaseGameLayer::update(dt);
 
             auto step = 240.f; // TODO: Change this after Physics Bypass is added
 
@@ -105,7 +101,7 @@ namespace eclipse::hacks::Player {
 
             s_frameStepperPressed = false;
             dt = shouldStep ? 1.f / step : 0.f;
-            CCScheduler::update(dt);
+            GJBaseGameLayer::update(dt);
         }
     };
 
