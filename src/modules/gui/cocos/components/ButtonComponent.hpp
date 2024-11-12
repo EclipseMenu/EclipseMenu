@@ -19,7 +19,7 @@ namespace eclipse::gui::cocos {
             bg->setColor(tm->getButtonBackgroundColor().toCCColor3B());
             label->setColor(tm->getButtonActivatedForeground().toCCColor3B());
             label->setScale(0.5F);
-            bg->addChildAtPosition(label, cocos2d::Anchor::Center);
+            bg->addChildAtPosition(label, geode::Anchor::Center);
             if (!bg || !label) return false;
             if (!CCMenuItemSpriteExtra::init(
                 bg, nullptr, this,

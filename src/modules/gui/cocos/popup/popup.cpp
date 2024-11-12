@@ -22,14 +22,14 @@ namespace eclipse::gui::cocos {
         bgBehind->setContentSize(m_mainLayer->getContentSize() * tm->getBorderSize());
         m_bgSprite->setColor(tm->getBorderColor().toCCColor3B());
         bgBehind->setID("bg-behind"_spr);
-        m_mainLayer->addChildAtPosition(bgBehind, cocos2d::Anchor::Center);
+        m_mainLayer->addChildAtPosition(bgBehind, geode::Anchor::Center);
 
         // Background for the entire popup
         m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
         m_bgSprite->setContentSize(m_mainLayer->getContentSize() - 3);
         m_bgSprite->setColor(tm->getTitleBackgroundColor().toCCColor3B());
         m_bgSprite->setID("main-bg"_spr);
-        m_mainLayer->addChildAtPosition(m_bgSprite, cocos2d::Anchor::Center);
+        m_mainLayer->addChildAtPosition(m_bgSprite, geode::Anchor::Center);
 
         // Background for content
         m_contentBG = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");

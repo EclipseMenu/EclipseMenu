@@ -37,7 +37,7 @@ namespace eclipse::gui::cocos {
 
             m_colorBtn->setAnchorPoint({ 0.5, 0.5f });
             m_colorSprite->setColor(m_component->getValue().toCCColor3B());
-            this->addChildAtPosition(m_colorBtn, cocos2d::Anchor::Left, { 15.f, 0.f });
+            this->addChildAtPosition(m_colorBtn, geode::Anchor::Left, { 15.f, 0.f });
 
             auto labelSize = width - 35.f;
             auto offset = 0.f;
@@ -49,14 +49,14 @@ namespace eclipse::gui::cocos {
                     )->show();
                 });
                 m_infoButton->setAnchorPoint({ 0.5, 0.5f });
-                this->addChildAtPosition(m_infoButton, cocos2d::Anchor::Right, { offset - 10.f, 0.f });
+                this->addChildAtPosition(m_infoButton, geode::Anchor::Right, { offset - 10.f, 0.f });
                 labelSize -= 15.f;
             }
 
             m_label = cocos2d::CCLabelBMFont::create(m_component->getTitle().c_str(), "bigFont.fnt");
             m_label->setAnchorPoint({0, 0.5f});
             m_label->limitLabelWidth(labelSize, 0.6f, 0.25f);
-            this->addChildAtPosition(m_label, cocos2d::Anchor::Left, { 30.f, 0.f });
+            this->addChildAtPosition(m_label, geode::Anchor::Left, { 30.f, 0.f });
 
             return true;
         }

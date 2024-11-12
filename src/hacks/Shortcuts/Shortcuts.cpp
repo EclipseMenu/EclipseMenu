@@ -102,7 +102,7 @@ namespace eclipse::hacks::Shortcuts {
 #ifdef GEODE_IS_WINDOWS
         static void injectDll() {
             static geode::EventListener<FileEvent> m_listener;
-            geode::FileSetting::Filter filter;
+            geode::utils::file::FilePickOptions::Filter filter;
             filter.description = "Dynamic Link Library (*.dll)";
             filter.files.insert("*.dll");
 

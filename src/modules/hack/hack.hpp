@@ -49,7 +49,7 @@ do {\
             geode::log::warn("Hook '{}' not found in " #class, f);\
             continue;\
         }\
-        auto hook = res.value();\
+        auto hook = res.unwrap();\
         hooks.push_back(hook);\
     }\
     geode::queueInMainThread([hooks]{\

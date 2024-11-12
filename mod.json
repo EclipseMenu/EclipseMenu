@@ -1,10 +1,10 @@
 {
-	"geode": "3.9.0",
+	"geode": "4.0.0",
 	"gd": {
-		"win": "2.206",
-		"mac": "2.206",
-		"android": "2.206",
-		"ios": "2.206"
+		"win": "2.2074",
+		"mac": "2.2074",
+		"android": "2.2074",
+		"ios": "2.2074"
 	},
 	"version": "v1.0.0-beta.3",
 	"id": "eclipse.eclipse-menu",

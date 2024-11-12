@@ -40,11 +40,11 @@ namespace eclipse::hacks::Global {
             }
 
 
-            auto totalDelta = dt + m_unk3248;
+            auto totalDelta = dt + m_extraDelta;
             auto timestep = std::min(m_gameState.m_timeWarp, 1.f) * spt;
             auto steps = std::round(totalDelta / timestep);
             auto newDelta = steps * timestep;
-            m_unk3248 = totalDelta - newDelta;
+            m_extraDelta = totalDelta - newDelta;
             return static_cast<float>(newDelta);
         }
     };

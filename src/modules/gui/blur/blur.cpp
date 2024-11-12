@@ -6,7 +6,7 @@
 
 #ifdef GEODE_IS_DESKTOP
 
-#include <Geode/loader/SettingEvent.hpp>
+#include <Geode/loader/Setting.hpp>
 #include <Geode/modify/CCEGLViewProtocol.hpp>
 #include <Geode/modify/GameManager.hpp>
 #include <Geode/modify/CCScheduler.hpp>
@@ -58,8 +58,9 @@ namespace eclipse::gui::blur {
         GLint res;
 
         vertex = glCreateShader(GL_VERTEX_SHADER);
-        auto oglSucks = vertexSource.unwrap().c_str();
-        glShaderSource(vertex, 1, &oglSucks, nullptr);
+        auto oglSucks = vertexSource.unwrap();
+        auto oglSucksP = oglSucks.c_str();
+        glShaderSource(vertex, 1, &oglSucksP, nullptr);
         glCompileShader(vertex);
         auto vertexLog = getShaderLog(vertex);
 
@@ -71,8 +72,9 @@ namespace eclipse::gui::blur {
         }
 
         fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        oglSucks = fragmentSource.unwrap().c_str();
-        glShaderSource(fragment, 1, &oglSucks, nullptr);
+        oglSucks = fragmentSource.unwrap();
+        oglSucksP = oglSucks.c_str();
+        glShaderSource(fragment, 1, &oglSucksP, nullptr);
         glCompileShader(fragment);
         auto fragmentLog = getShaderLog(fragment);
 
@@ -231,8 +233,8 @@ namespace eclipse::gui::blur {
         glBindAttribLocation(ppShader.program, 0, "aPosition");
         glBindAttribLocation(ppShader.program, 1, "aTexCoords");
 
-        res = ppShader.link();
-        if (!res) return geode::log::error("Failed to link shader: {}", res.unwrapErr());
+        auto res2 = ppShader.link();
+        if (!res2) return geode::log::error("Failed to link shader: {}", res2.unwrapErr());
         // log::info("{}", res.unwrap());
 
         cocos2d::ccGLUseProgram(ppShader.program);

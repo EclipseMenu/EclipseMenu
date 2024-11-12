@@ -253,7 +253,7 @@ namespace eclipse::labels {
         m_variables["framestepper"] = rift::Value::boolean(config::get("player.framestepper", false));
     }
 
-    static std::string cachedBase64Decode(const std::string& str) {
+    static std::string const& cachedBase64Decode(const std::string& str) {
         static std::string s_lastStr;
         static std::string s_lastDecoded;
         if (str == s_lastStr) return s_lastDecoded;

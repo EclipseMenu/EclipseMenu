@@ -1,4 +1,4 @@
-#include <Geode/loader/SettingEvent.hpp>
+#include <Geode/loader/Setting.hpp>
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/modify/UILayer.hpp>
 #include <Geode/modify/CCScheduler.hpp>
@@ -9,6 +9,7 @@
 #include <modules/gui/blur/blur.hpp>
 #include <modules/gui/float-button.hpp>
 #include <modules/gui/theming/manager.hpp>
+#include <modules/debug/trace.hpp>
 #include <imgui-cocos.hpp>
 
 using namespace eclipse;
@@ -37,6 +38,7 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         }
 
         if (s_isInitialized) return true;
+        TRACE_FUNCTION();
 
         geode::log::info("Eclipse Menu commit hash: {}", GIT_HASH);
 
@@ -111,6 +113,7 @@ public:
 };
 
 $on_mod(Loaded) {
+    TRACE_SCOPE("$on_mod(Loaded)");
     // Allow user to change disable VBO (resolves issues on older hardware)
     auto* mod = geode::Mod::get();
     ImGuiCocos::get().setForceLegacy(mod->getSettingValue<bool>("legacy-render"));

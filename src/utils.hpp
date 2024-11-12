@@ -3,6 +3,7 @@
 #include <random>
 #include <modules/gui/color.hpp>
 #include <Geode/binding/GJBaseGameLayer.hpp>
+#include <modules/debug/trace.hpp>
 
 enum class PlayerMode {
     Cube, Ship, Ball,

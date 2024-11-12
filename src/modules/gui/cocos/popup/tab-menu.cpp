@@ -60,15 +60,15 @@ namespace eclipse::gui::cocos {
         }
 
         // setup layout
-        auto layout = cocos2d::AxisLayout::create(cocos2d::Axis::Column);
+        auto layout = geode::AxisLayout::create(geode::Axis::Column);
         layout->setAxisReverse(true);
         layout->setAutoScale(true);
         layout->setGrowCrossAxis(false);
         layout->setCrossAxisOverflow(true);
         layout->setGap(0.5f);
-        layout->setAxisAlignment(cocos2d::AxisAlignment::End);
-        layout->setCrossAxisAlignment(cocos2d::AxisAlignment::Start);
-        layout->setCrossAxisLineAlignment(cocos2d::AxisAlignment::Start);
+        layout->setAxisAlignment(geode::AxisAlignment::End);
+        layout->setCrossAxisAlignment(geode::AxisAlignment::Start);
+        layout->setCrossAxisLineAlignment(geode::AxisAlignment::Start);
         this->setAnchorPoint({0.f, 1.f});
         this->setContentHeight(260.f);
         this->setLayout(layout, true);
@@ -89,13 +89,13 @@ namespace eclipse::gui::cocos {
         m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", { 0.0f, 0.0f, 80.0f, 80.0f });
         m_bgSprite->setContentSize({size.width, size.height + 8.F}); // minimum 36
         m_bgSprite->setScaleY(.75F);
-        this->addChildAtPosition(m_bgSprite, cocos2d::Anchor::Center);
-        this->addChildAtPosition(m_label, cocos2d::Anchor::Center);
+        this->addChildAtPosition(m_bgSprite, geode::Anchor::Center);
+        this->addChildAtPosition(m_label, geode::Anchor::Center);
         return true;
     }
 
     void TabButton::setState(bool active) {
-        // this definitely wont be a problem in the future
+        // this definitely won't be a problem in the future
         if (m_bgSprite == nullptr || m_label == nullptr) return;
         const auto tm = ThemeManager::get();
         auto colorLbl = (!active) ? tm->getButtonForegroundColor() : tm->getButtonActivatedForeground();

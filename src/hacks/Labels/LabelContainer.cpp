@@ -11,7 +11,7 @@ namespace eclipse::hacks::Labels {
         m_alignment = alignment;
         updatePosition();
 
-        auto* layout = cocos2d::AxisLayout::create(cocos2d::Axis::Column);
+        auto* layout = geode::AxisLayout::create(geode::Axis::Column);
         layout->setAxisReverse(true);
         layout->setAutoScale(false);
         layout->setGrowCrossAxis(false);
@@ -19,9 +19,9 @@ namespace eclipse::hacks::Labels {
         layout->setGap(0.f);
 
 #define SET_ALIGNMENT(axis, crossAxis, crossAxisLine) \
-        layout->setAxisAlignment(cocos2d::AxisAlignment:: axis);               \
-        layout->setCrossAxisAlignment(cocos2d::AxisAlignment:: crossAxis);     \
-        layout->setCrossAxisLineAlignment(cocos2d::AxisAlignment:: crossAxisLine);
+        layout->setAxisAlignment(geode::AxisAlignment:: axis);               \
+        layout->setCrossAxisAlignment(geode::AxisAlignment:: crossAxis);     \
+        layout->setCrossAxisLineAlignment(geode::AxisAlignment:: crossAxisLine);
 
         switch (m_alignment) {
             case Alignment::TopLeft:
@@ -148,7 +148,7 @@ namespace eclipse::hacks::Labels {
     }
 
     void LabelsContainer::removeLabel(SmartLabel* label) {
-        auto it = std::find_if(m_labels.begin(), m_labels.end(), [label](const auto& pair) {
+        auto it = std::ranges::find_if(m_labels, [label](const auto& pair) {
             return pair.first == label;
         });
 

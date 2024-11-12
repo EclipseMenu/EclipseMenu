@@ -9,7 +9,7 @@ protected:
     std::string m_buttonCaption = "OK";
 
 public:
-    static Result<std::shared_ptr<CustomButton>> parse(std::string const& key, std::string const& modID, matjson::Value const& json) {
+    static Result<std::shared_ptr<SettingV3>> parse(std::string const& key, std::string const& modID, matjson::Value const& json) {
         auto res = std::make_shared<CustomButton>();
         auto root = checkJson(json, "CustomButton");
 
@@ -19,11 +19,11 @@ public:
         res->parseButtonCaption(json, "default");
 
         root.checkUnknownKeys();
-        return root.ok(res);
+        return root.ok(std::static_pointer_cast<SettingV3>(res));
     }
 
     void parseButtonCaption(matjson::Value const& json, std::string const& key) {
-        m_buttonCaption = json[key].as_string();
+        m_buttonCaption = json[key].asString().unwrap();
     }
     bool load(matjson::Value const& json) override { return true; }
     bool save(matjson::Value& json) const override { return true; }
