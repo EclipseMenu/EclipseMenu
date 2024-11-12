@@ -54,6 +54,7 @@ namespace eclipse::hacks::Level {
                 toggleOffHitboxes();
             });
 
+            config::setIfEmpty("level.showhitboxes.editor", true);
             config::setIfEmpty("level.showhitboxes.bordersize", 0.25f);
             config::setIfEmpty("level.showhitboxes.fillalpha", 0.25f);
             config::setIfEmpty("level.showhitboxes.traillength", 240.0f);
@@ -66,6 +67,7 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.showhitboxes.other_color", gui::Color::GREEN);
 
             toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                options->addToggle("Show In Editor", "level.showhitboxes.editor");
                 options->addToggle("Hide Player", "level.showhitboxes.hideplayer");
                 options->addToggle("Hitboxes On Death", "level.showhitboxes.ondeath")->handleKeybinds();
                 options->addToggle("Custom Colors", "level.showhitboxes.customcolors")->addOptions([](std::shared_ptr<gui::MenuTab> optionsColor) {
@@ -115,7 +117,7 @@ namespace eclipse::hacks::Level {
 
     inline void drawRect(cocos2d::CCDrawNode* node, const cocos2d::CCRect& rect, const gui::Color& color,
                          float borderWidth, const gui::Color& borderColor) {
-        std::vector<cocos2d::CCPoint> vertices = {
+        std::array vertices = {
             cocos2d::CCPoint(rect.getMinX(), rect.getMinY()),
             cocos2d::CCPoint(rect.getMinX(), rect.getMaxY()),
             cocos2d::CCPoint(rect.getMaxX(), rect.getMaxY()),
@@ -199,6 +201,7 @@ namespace eclipse::hacks::Level {
     };
 
     void forceDraw(GJBaseGameLayer* self, bool editor) {
+        if (editor && config::get<bool>("level.showhitboxes.editor", false)) return;
         bool show = config::get<bool>("level.showhitboxes", false);
         bool robtopShow = editor || robtopHitboxCheck();
         self->m_debugDrawNode->setVisible(show || robtopShow);
@@ -312,7 +315,8 @@ namespace eclipse::hacks::Level {
             auto ptr1 = reinterpret_cast<uintptr_t>(this);
             auto ptr2 = reinterpret_cast<uintptr_t>(LevelEditorLayer::get());
             // unlock hitboxes in editor even if they are disabled
-            if (ptr1 == ptr2) this->m_isDebugDrawEnabled |= config::get<bool>("level.showhitboxes", false);
+            if (ptr1 == ptr2 && config::get<bool>("level.showhitboxes.editor", false))
+                this->m_isDebugDrawEnabled |= config::get<bool>("level.showhitboxes", false);
 
             s_slopeHitboxFix = true;
             GJBaseGameLayer::updateDebugDraw();
