@@ -19,7 +19,7 @@ if (NOT ANDROID)
     set(RAPIDJSONTEST OFF)
     CPMAddPackage("gh:EclipseMenu/discord-rpc#1259d3a")
 endif()
-CPMAddPackage("gh:matcool/gd-imgui-cocos#7260c5e") # FIXME: This commit is still broken
+CPMAddPackage("gh:matcool/gd-imgui-cocos#fbd4103")
 CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
 CPMAddPackage("gh:EclipseMenu/rift#e1997ce")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
