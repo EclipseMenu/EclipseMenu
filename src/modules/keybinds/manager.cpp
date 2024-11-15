@@ -385,7 +385,19 @@ namespace eclipse::keybinds {
         return instance;
     }
 
-    Keybind& Manager::registerKeybind(const std::string& id, const std::string& title, const std::function<void()>& callback) {
+    inline Keys getCfgKeyInternal(std::string_view id) {
+        return config::get<Keys>(id, Keys::None);
+    }
+
+    inline Keys getCfgKey(std::string_view id) {
+        return config::get<Keys>(fmt::format("keybind.{}.key", id), Keys::None);
+    }
+
+    inline bool getCfgState(std::string_view id) {
+        return config::get<bool>(fmt::format("keybind.{}.active", id), false);
+    }
+
+    Keybind& Manager::registerKeybindInternal(const std::string& id, const std::string& title, const std::function<void(bool)>& callback, bool internal) {
         // check if this id already exists
         for (auto& keybind : m_keybinds) {
             if (keybind.getId() == id) {
@@ -393,21 +405,35 @@ namespace eclipse::keybinds {
             }
         }
 
-        m_keybinds.emplace_back(Keys::None, id, title, callback);
+        m_keybinds.emplace_back(Keys::None, id, title, callback, internal);
         auto& keybind = m_keybinds.back();
-        if (m_initialized) {
-            keybind.setKey(config::get<Keys>(fmt::format("keybind.{}.key", keybind.getId()), Keys::None));
-            this->setKeybindState(keybind.getId(), config::get<bool>(fmt::format("keybind.{}.active", keybind.getId()), false));
+        if (internal) {
+            keybind.setKey(getCfgKeyInternal(keybind.getId()));
+            this->setKeybindState(id, true);
+        } else if (m_initialized) {
+            keybind.setKey(getCfgKey(keybind.getId()));
+            this->setKeybindState(keybind.getId(), getCfgState(keybind.getId()));
         }
+
         return keybind;
+    }
+
+    Keybind& Manager::registerKeybind(const std::string& id, const std::string& title, const std::function<void(bool)>& callback) {
+        return this->registerKeybindInternal(id, title, callback, false);
+    }
+
+    Keybind& Manager::addListener(const std::string& id, const std::function<void(bool)>& callback) {
+        return this->registerKeybindInternal(id, id, callback, true);
     }
 
     void Manager::init() {
         setupTab();
 
         for (auto& keybind : m_keybinds) {
-            keybind.setKey(config::get<Keys>(fmt::format("keybind.{}.key", keybind.getId()), Keys::None));
-            this->setKeybindState(keybind.getId(), config::get<bool>(fmt::format("keybind.{}.active", keybind.getId()), false));
+            if (!keybind.isInternal()) {
+                keybind.setKey(getCfgKey(keybind.getId()));
+                this->setKeybindState(keybind.getId(), getCfgState(keybind.getId()));
+            }
         }
 
         m_initialized = true;
@@ -423,6 +449,9 @@ namespace eclipse::keybinds {
             if (keybind.getId() == id) {
                 keybind.setInitialized(state);
                 config::set(fmt::format("keybind.{}.active", id), state);
+                log::debug("Keybind '{}' is now {}", id, state ? "active" : "inactive");
+                if (keybind.isInternal()) return;
+
                 auto idStr = std::string(id);
                 gui::Engine::queueAfterDrawing([idStr, state, keybind] {
                     auto tab = gui::MenuTab::find("Keybinds");
@@ -470,24 +499,38 @@ namespace eclipse::keybinds {
         geode::log::warn("Keybind with ID '{}' not found", id);
     }
 
+    inline bool shouldIgnoreInputs() {
+        // Ignore if imgui is capturing inputs or if the keyboard is being used
+        if (gui::imgui::ImGuiRenderer::get() && ImGui::GetIO().WantTextInput)
+            return true;
+
+        // Ignore if the keyboard is being used
+        if (CCIMEDispatcher::sharedDispatcher()->hasDelegate())
+            return true;
+
+        return false;
+    }
+
     void Manager::registerKeyPress(Keys key) {
-        auto menuToggle = getKeybind("menu.toggle");
         m_keyStates[key] = true;
 
+        auto menuToggle = getKeybind("menu.toggle");
         if (menuToggle && key == menuToggle.value().get().getKey()) {
-            menuToggle.value().get().execute();
+            menuToggle.value().get().push();
             return;
         }
 
-        if ((gui::imgui::ImGuiRenderer::get() && ImGui::GetIO().WantTextInput) || cocos2d::CCIMEDispatcher::sharedDispatcher()->hasDelegate())
+        if (shouldIgnoreInputs())
             return;
 
-        if (config::get<bool>("keybind.in-game-only", false) && !PlayLayer::get())
-            return;
+        bool ignoreInPlayLayer = !PlayLayer::get() && config::get<bool>("keybind.in-game-only", false);
 
         for (auto& keybind : m_keybinds) {
-            if (keybind.getKey() == key && keybind.isInitialized())
-                keybind.execute();
+            if (keybind.getKey() == key && (keybind.isInitialized() || keybind.isInternal())) {
+                if (ignoreInPlayLayer && !keybind.isInternal())
+                    continue;
+                keybind.push();
+            }
         }
     }
 
@@ -502,6 +545,24 @@ namespace eclipse::keybinds {
 
     void Manager::registerKeyRelease(Keys key) {
         m_keyStates[key] = false;
+
+        auto menuToggle = getKeybind("menu.toggle");
+        if (menuToggle && key == menuToggle.value().get().getKey()) {
+            return; // on release, we don't want to toggle the menu
+        }
+
+        if (shouldIgnoreInputs())
+            return;
+
+        bool ignoreInPlayLayer = !PlayLayer::get() && config::get<bool>("keybind.in-game-only", false);
+
+        for (auto& keybind : m_keybinds) {
+            if (keybind.getKey() == key && (keybind.isInitialized() || keybind.isInternal())) {
+                if (ignoreInPlayLayer && !keybind.isInternal())
+                    continue;
+                keybind.release();
+            }
+        }
     }
 
     bool isKeyDown(Keys key) {

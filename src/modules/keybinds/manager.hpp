@@ -82,14 +82,21 @@ namespace eclipse::keybinds {
         /// @param id The ID of the keybind.
         /// @param title The title of the keybind.
         /// @param callback The callback to execute when the keybind is pressed.
-        Keybind(Keys key, std::string id, std::string title, std::function<void()> callback)
-            : m_key(key), m_id(std::move(id)), m_title(std::move(title)), m_callback(std::move(callback)) {}
+        /// @param internal Whether the keybind is internal or not.
+        Keybind(Keys key, std::string id, std::string title, std::function<void(bool)> callback, bool internal = false)
+            : m_key(key), m_id(std::move(id)), m_title(std::move(title)), m_callback(std::move(callback)), m_internal(internal) {}
 
         /// @brief Get the key of the keybind.
         [[nodiscard]] Keys getKey() const { return m_key; }
 
-        /// @brief Execute the keybind's callback.
-        void execute() const { m_callback(); }
+        /// @brief Execute the keybind's callback with the given state.
+        void execute(bool down) const { m_callback(down); }
+
+        /// @brief Execute the pressed callback.
+        void push() const { execute(true); }
+
+        /// @brief Execute the released callback.
+        void release() const { execute(false); }
 
         /// @brief Get the ID of the keybind.
         [[nodiscard]] const std::string& getId() const { return m_id; }
@@ -99,6 +106,9 @@ namespace eclipse::keybinds {
 
         /// @brief Check if the keybind is initialized.
         [[nodiscard]] bool isInitialized() const { return m_initialized; }
+
+        /// @brief Check if the keybind is initialized.
+        [[nodiscard]] bool isInternal() const { return m_internal; }
 
         /// @brief Set the keybind as initialized.
         void setInitialized(bool initialized) { m_initialized = initialized; }
@@ -110,8 +120,9 @@ namespace eclipse::keybinds {
         Keys m_key;
         std::string m_id;
         std::string m_title;
-        std::function<void()> m_callback;
+        std::function<void(bool)> m_callback;
         bool m_initialized = false;
+        bool m_internal = false;
     };
 
     /// @brief A manager for keybinds.
@@ -124,7 +135,12 @@ namespace eclipse::keybinds {
         /// @param id The ID of the keybind.
         /// @param title The title of the keybind.
         /// @param callback The callback to execute when the keybind is pressed.
-        Keybind& registerKeybind(const std::string& id, const std::string& title, const std::function<void()>& callback);
+        Keybind& registerKeybind(const std::string& id, const std::string& title, const std::function<void(bool)>& callback);
+
+        /// @brief Register a keybind without adding it to the keybinds UI tab. Useful for internal keybinds.
+        /// @param id The ID of the keybind.
+        /// @param callback The callback to execute when the keybind is pressed.
+        Keybind& addListener(const std::string& id, const std::function<void(bool)>& callback);
 
         /// @brief Load keybinds from config.
         void init();
@@ -162,6 +178,8 @@ namespace eclipse::keybinds {
         std::unordered_map<Keys, bool> m_keyStates;
         std::unordered_map<Keys, bool> m_lastKeyStates;
         bool m_initialized = false;
+
+        Keybind& registerKeybindInternal(const std::string& id, const std::string& title, const std::function<void(bool)>& callback, bool internal);
 
         friend bool isKeyDown(Keys key);
         friend bool isKeyPressed(Keys key);

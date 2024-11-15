@@ -53,11 +53,17 @@ namespace eclipse::debug {
     };
 
 
-#define TRACE_SCOPE_LINE2(name, line) \
+#define TRACE_FUNC_LINE2(name, line) \
     constexpr auto newName_##line = eclipse::debug::removeFromString(name, "__cdecl ");\
     eclipse::debug::Trace trace_##line(newName_##line)
-#define TRACE_SCOPE_LINE(name, line) TRACE_SCOPE_LINE2(name, line)
-#define TRACE_SCOPE(name) TRACE_SCOPE_LINE(name, __LINE__)
-#define TRACE_FUNCTION() TRACE_SCOPE(TRACE_FUNC_SIG)
+#define TRACE_FUNC_LINE1(name, line) TRACE_FUNC_LINE2(name, line)
+#define TRACE_FUNC_LINE0(name) TRACE_FUNC_LINE1(name, __LINE__)
+#define TRACE_FUNCTION() TRACE_FUNC_LINE0(TRACE_FUNC_SIG)
+
+#define TRACE_SCOPE_LINE2(name, line) \
+    eclipse::debug::Trace trace_##line(name)
+#define TRACE_SCOPE_LINE1(name, line) TRACE_SCOPE_LINE2(name, line)
+#define TRACE_SCOPE_LINE0(name, line) TRACE_SCOPE_LINE1(name, line)
+#define TRACE_SCOPE(name) TRACE_SCOPE_LINE1(name, __LINE__)
 
 }

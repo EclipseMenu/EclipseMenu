@@ -142,7 +142,12 @@ namespace eclipse::hacks::Shortcuts {
         }
 
         void init() override {
+            config::setIfEmpty("shortcut.p1jump", keybinds::Keys::None);
+            config::setIfEmpty("shortcut.p2jump", keybinds::Keys::None);
+
             auto tab = gui::MenuTab::find("Shortcuts");
+            tab->addKeybind("P1 Jump", "shortcut.p1jump", true)->setInternal();
+            tab->addKeybind("P2 Jump", "shortcut.p2jump", true)->setInternal();
             tab->addButton("Show Options")->setDescription("Open game settings menu")->callback(openSettings)->handleKeybinds();
             tab->addButton("Uncomplete Level")->setDescription("Clear progress from a level")->callback(uncompleteLevel)->handleKeybinds();
             tab->addButton("Restart Level")->setDescription("Restart the current level")->callback(restartLevel)->handleKeybinds();
@@ -151,6 +156,18 @@ namespace eclipse::hacks::Shortcuts {
                 tab->addButton("Inject DLL")->setDescription("Pick a DLL file to inject")->callback(injectDll)->handleKeybinds();
             )
             tab->addButton("Save folder")->setDescription("Open the game's save folder")->callback(openSaveFolder)->handleKeybinds();
+
+            auto manager = keybinds::Manager::get();
+            manager->addListener("shortcut.p1jump", [](bool down) {
+                auto gameLayer = GJBaseGameLayer::get();
+                if (!gameLayer) return;
+                gameLayer->handleButton(down, 1, true);
+            });
+            manager->addListener("shortcut.p2jump", [](bool down) {
+                auto gameLayer = GJBaseGameLayer::get();
+                if (!gameLayer) return;
+                gameLayer->handleButton(down, 1, false);
+            });
         }
 
         [[nodiscard]] const char* getId() const override { return "Shortcuts"; }

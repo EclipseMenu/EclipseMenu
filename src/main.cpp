@@ -16,7 +16,7 @@ using namespace eclipse;
 
 static bool s_isInitialized = false;
 
-static void toggleMenu() {
+static void toggleMenu(bool down = true) {
     gui::Engine::get()->toggle();
     config::save();
     gui::ThemeManager::get()->saveTheme();
@@ -50,7 +50,7 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
 
         #ifdef GEODE_IS_MOBILE
         // This will create the floating button and keep it across scenes
-        gui::FloatingButton::get()->setCallback(toggleMenu);
+        gui::FloatingButton::get()->setCallback([]{ toggleMenu(); });
         #endif
 
         // Register the keybind

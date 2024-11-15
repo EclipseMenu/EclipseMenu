@@ -59,7 +59,8 @@ namespace eclipse::gui {
     }
 
     ToggleComponent* ToggleComponent::handleKeybinds() {
-        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
+        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](bool down){
+            if (!down) return;
             bool value = !getValue();
             setValue(value);
             this->triggerCallback(value);
@@ -78,7 +79,8 @@ namespace eclipse::gui {
 
     RadioButtonComponent* RadioButtonComponent::handleKeybinds() {
         auto specialId = fmt::format("{}-{}", m_id, m_value);
-        keybinds::Manager::get()->registerKeybind(specialId, m_title, [this](){
+        keybinds::Manager::get()->registerKeybind(specialId, m_title, [this](bool down){
+            if (!down) return;
             auto value = getChoice();
             setValue(value);
             this->triggerCallback(value);
@@ -148,7 +150,8 @@ namespace eclipse::gui {
     }
 
     IntToggleComponent* IntToggleComponent::handleKeybinds() {
-        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
+        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](bool down){
+            if (!down) return;
             bool value = !config::get<bool>(fmt::format("{}.toggle", this->getId()), false);
             auto id = fmt::format("{}.toggle", this->getId());
             m_noSave ? config::setTemp(id, value)
@@ -176,7 +179,8 @@ namespace eclipse::gui {
     }
 
     FloatToggleComponent* FloatToggleComponent::handleKeybinds() {
-        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](){
+        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](bool down){
+            if (!down) return;
             bool value = !config::get<bool>(fmt::format("{}.toggle", this->getId()), false);
             auto id = fmt::format("{}.toggle", this->getId());
             m_noSave ? config::setTemp(id, value)
@@ -220,7 +224,8 @@ namespace eclipse::gui {
     }
 
     ButtonComponent* ButtonComponent::handleKeybinds() {
-        keybinds::Manager::get()->registerKeybind(fmt::format("button.{}", m_title), m_title, [this](){
+        keybinds::Manager::get()->registerKeybind(fmt::format("button.{}", m_title), m_title, [this](bool down){
+            if (!down) return;
             this->triggerCallback();
         });
         m_hasKeybind = true;

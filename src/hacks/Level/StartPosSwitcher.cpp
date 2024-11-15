@@ -30,8 +30,8 @@ namespace eclipse::hacks::Level {
                 ->handleKeybinds()
                 ->setDescription("Allows you to switch between StartPos objects.")
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addKeybind("Previous StartPos", "level.startpos_switcher.previous");
-                    options->addKeybind("Next StartPos", "level.startpos_switcher.next");
+                    options->addKeybind("Previous StartPos", "level.startpos_switcher.previous")->setInternal();
+                    options->addKeybind("Next StartPos", "level.startpos_switcher.next")->setInternal();
                     options->addToggle("Reset Camera", "level.startpos_switcher.reset_camera");
                     options->addToggle("Show Label", "level.startpos_switcher.label")
                         ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
@@ -42,6 +42,22 @@ namespace eclipse::hacks::Level {
                                 ->setDescription("Toggles between showing and hiding the arrow buttons in the StartPos Switcher UI");
                         });
                 });
+
+            auto manager = keybinds::Manager::get();
+            manager->addListener("level.startpos_switcher.previous", [](bool down) {
+                if (!down) return;
+                auto* playLayer = PlayLayer::get();
+                if (!playLayer) return;
+                if (!config::get<bool>("level.startpos_switcher", false)) return;
+                pickStartPos(playLayer, currentStartPosIndex - 1);
+            });
+            manager->addListener("level.startpos_switcher.next", [](bool down) {
+                if (!down) return;
+                auto* playLayer = PlayLayer::get();
+                if (!playLayer) return;
+                if (!config::get<bool>("level.startpos_switcher", false)) return;
+                pickStartPos(playLayer, currentStartPosIndex + 1);
+            });
         }
 
         static void pickStartPos(PlayLayer* playLayer, int32_t index) {
@@ -66,18 +82,6 @@ namespace eclipse::hacks::Level {
             playLayer->resetLevel();
             playLayer->startMusic();
             playLayer->updateTestModeLabel();
-        }
-
-        void update() override {
-            auto* playLayer = PlayLayer::get();
-            if (!playLayer) return;
-
-            if (!config::get<bool>("level.startpos_switcher", false)) return;
-
-            if (keybinds::isKeyPressed(config::get<keybinds::Keys>("level.startpos_switcher.previous")))
-                pickStartPos(playLayer, currentStartPosIndex - 1);
-            else if (keybinds::isKeyPressed(config::get<keybinds::Keys>("level.startpos_switcher.next")))
-                pickStartPos(playLayer, currentStartPosIndex + 1);
         }
 
         [[nodiscard]] const char* getId() const override { return "StartPos Switcher"; }

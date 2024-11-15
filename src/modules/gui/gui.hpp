@@ -703,6 +703,17 @@ namespace eclipse::gui {
             return this;
         }
 
+        /// @brief Sets the default callback for internal keybinds.
+        KeybindComponent* setInternal() {
+            m_callback = [this](keybinds::Keys key) {
+                auto keybind = keybinds::Manager::get()->getKeybind(m_id);
+                if (!keybind.has_value()) return;
+                auto& keybindRef = keybind->get();
+                keybindRef.setKey(key);
+            };
+            return this;
+        }
+
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] bool canDelete() const { return m_canDelete; }
