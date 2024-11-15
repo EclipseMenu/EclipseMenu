@@ -65,11 +65,11 @@ namespace eclipse::config {
     /// @param key Key to get the value from.
     /// @return Value from the configuration.
     template<typename T>
-    T get(std::string_view key) {
+    geode::Result<T> get(std::string_view key) {
         if (!has(key))
-            throw std::runtime_error(fmt::format("Key '{}' does not exist", key));
+            return geode::Err(fmt::format("Key '{}' does not exist", key));
 
-        return getStorage().at(key).get<T>();
+        return geode::Ok(getStorage().at(key).get<T>());
     }
 
     /// @brief Set a value by key in the configuration.
@@ -151,11 +151,11 @@ namespace eclipse::config {
     /// @param key Key to get the value from.
     /// @return Value from the temporary storage.
     template<typename T>
-    T getTemp(std::string_view key) {
+    geode::Result<T> getTemp(std::string_view key) {
         if (!hasTemp(key))
-            throw std::runtime_error(fmt::format("Key '{}' does not exist", key));
+            return geode::Err(fmt::format("Key '{}' does not exist", key));
 
-        return getTempStorage().at(key).get<T>();
+        return geode::Ok(getTempStorage().at(key).get<T>());
     }
 
     /// @brief Set a value by key in the temporary storage.

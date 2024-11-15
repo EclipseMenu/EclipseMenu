@@ -231,7 +231,7 @@ namespace eclipse::hacks::Global {
                     opt->addInputFloat("Update interval (ms)", "global.discordrpc.interval", 100, FLT_MAX, "%.0f");
                     opt->addCombo("Time mode", "global.discordrpc.timemode",
                         {"Disabled", "Total playtime", "Level playtime", "Total+Level playtime"},
-                        config::get<int>("global.discordrpc.timemode")
+                        config::get<int>("global.discordrpc.timemode", 1)
                     )->setDescription(
                         "Defines how the time is displayed in the RPC.\n"
                         "Disabled: Time is not displayed.\n"

@@ -56,8 +56,8 @@ namespace eclipse::hacks::Player {
             absolute sin of a death effect in level ID 110961285,
             i am bringing back the stopAllMusic() call.
             */
-            if (pl->m_isPlatformer) fmod->pauseAllMusic();
-            else fmod->stopAllMusic();
+            if (pl->m_isPlatformer) fmod->pauseAllMusic(true);
+            else fmod->stopAllMusic(true);
 
             if (this == pl->m_player2 && pl->m_level->m_twoPlayerMode)
                 /*

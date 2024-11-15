@@ -199,10 +199,10 @@ namespace eclipse::hacks::Level {
         }
 
     private:
-        CCMenuItemSpriteExtra* m_previous;
-        CCMenuItemSpriteExtra* m_next;
-        cocos2d::CCLabelBMFont* m_label;
-        PlayLayer* m_playLayer;
+        CCMenuItemSpriteExtra* m_previous{};
+        CCMenuItemSpriteExtra* m_next{};
+        cocos2d::CCLabelBMFont* m_label{};
+        PlayLayer* m_playLayer{};
         std::string m_labelText;
         float m_timeSinceAction = 0.f;
     };
@@ -245,6 +245,7 @@ namespace eclipse::hacks::Level {
             }
 
             auto* switcher = StartposSwitcherNode::create(this);
+            if (!switcher) return;
             switcher->setID("startpos-switcher"_spr);
             if (auto uiMenu = geode::cast::typeinfo_cast<cocos2d::CCMenu*>(m_uiLayer->getChildByID("eclipse-ui"_spr))) {
                 uiMenu->addChild(switcher, 1000);

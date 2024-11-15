@@ -113,7 +113,11 @@ namespace eclipse::hacks::Bot {
             tab->addButton("Delete")->callback(deleteReplay);
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<int>("bot.state") != 0; } // TODO: add a check for if theres a macro loaded
+        [[nodiscard]] bool isCheating() override {
+            auto state = config::get<int>("bot.state", 0);
+            // only check if we are in playback mode and there are inputs
+            return state != 2 && s_bot.getInputCount() != 0;
+        }
         [[nodiscard]] const char* getId() const override { return "Bot"; }
     };
 

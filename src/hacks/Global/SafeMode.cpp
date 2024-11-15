@@ -85,16 +85,16 @@ namespace eclipse::hacks::Global {
 
         void destroyPlayer(PlayerObject* player, GameObject* object) {
             bool original = this->m_isTestMode;
-            bool safeMode = config::get<bool>("global.safemode");
+            bool safeMode = config::get<bool>("global.safemode", false);
 
             if (safeMode || AutoSafeMode::shouldEnable()) {
                 this->m_isTestMode = true;
 
                 auto* GSM = GameStatsManager::sharedState();
 
-                if (config::get<bool>("global.safemode.freeze_jumps"))
+                if (config::get<bool>("global.safemode.freeze_jumps", true))
                     GSM->setStat("1", m_fields->totalJumps);
-                if (config::get<bool>("global.safemode.freeze_attempts"))
+                if (config::get<bool>("global.safemode.freeze_attempts", true))
                     GSM->setStat("2", m_fields->totalAttempts);
             }
 
@@ -104,9 +104,9 @@ namespace eclipse::hacks::Global {
         }
 
         void resetLevel() {
-            bool safeMode = config::get<bool>("global.safemode");
+            bool safeMode = config::get<bool>("global.safemode", false);
 
-            if ((safeMode || AutoSafeMode::shouldEnable()) && config::get<bool>("global.safemode.freeze_attempts"))
+            if ((safeMode || AutoSafeMode::shouldEnable()) && config::get<bool>("global.safemode.freeze_attempts", true))
                 this->m_level->m_attempts = this->m_level->m_attempts - 1;
 
             PlayLayer::resetLevel();
@@ -114,7 +114,7 @@ namespace eclipse::hacks::Global {
 
         void levelComplete() {
             bool original = this->m_isTestMode;
-            bool safeMode = config::get<bool>("global.safemode");
+            bool safeMode = config::get<bool>("global.safemode", false);
 
             if (safeMode || AutoSafeMode::shouldEnable())
                 this->m_isTestMode = true;
@@ -129,7 +129,8 @@ namespace eclipse::hacks::Global {
         ENABLE_SAFE_HOOKS_ALL()
 
         void incrementJumps() {
-            if (config::get<bool>("global.safemode") || AutoSafeMode::shouldEnable() && config::get<bool>("global.safemode.freeze_jumps")) return;
+            if (config::get<bool>("global.safemode", false) || AutoSafeMode::shouldEnable() && config::get<bool>("global.safemode.freeze_jumps", true))
+                return;
 
             PlayerObject::incrementJumps();
         }

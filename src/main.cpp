@@ -56,7 +56,7 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         // Register the keybind
         auto& key = keybinds::Manager::get()->registerKeybind("menu.toggle", "Toggle UI", toggleMenu);
         config::setIfEmpty("menu.toggleKey", keybinds::Keys::Tab);
-        key.setKey(config::get<keybinds::Keys>("menu.toggleKey"));
+        key.setKey(config::get<keybinds::Keys>("menu.toggleKey", keybinds::Keys::Tab));
         key.setInitialized(true);
         hack::Hack::lateInitializeHacks();
 
@@ -144,7 +144,7 @@ $on_mod(Loaded) {
             auto themeCombo = tab->addCombo("Theme", "themeIndex", themeNames, 0);
             themeCombo->callback([](int value) {
                 ThemeManager::get()->loadTheme(ThemeManager::get()->listAvailableThemes()[value].path);
-                ThemeManager::get()->setUIScale(config::getTemp<float>("uiScale"));
+                ThemeManager::get()->setUIScale(config::getTemp<float>("uiScale", 1.f));
             });
         }
         tab->addInputFloat("UI Scale", "uiScale", 0.75f, 2.f, "x%.3f")

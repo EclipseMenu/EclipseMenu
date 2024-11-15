@@ -23,13 +23,13 @@ namespace eclipse::labels {
             return rift::Value::null();
         switch (config::getType(key)) {
             case nlohmann::detail::value_t::string:
-                return rift::Value::string(config::get<std::string>(key));
+                return rift::Value::string(config::get<std::string>(key).unwrap());
             case nlohmann::detail::value_t::boolean:
-                return rift::Value::boolean(config::get<bool>(key));
+                return rift::Value::boolean(config::get<bool>(key).unwrap());
             case nlohmann::detail::value_t::number_integer:
-                return rift::Value::integer(config::get<int>(key));
+                return rift::Value::integer(config::get<int>(key).unwrap());
             case nlohmann::detail::value_t::number_float:
-                return rift::Value::floating(config::get<float>(key));
+                return rift::Value::floating(config::get<float>(key).unwrap());
             default:
                 return rift::Value::null();
         }

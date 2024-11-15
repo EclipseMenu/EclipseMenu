@@ -9,9 +9,9 @@ template <config::SupportedType T>
 void createGetConfigListener() {
     new EventListener<EventFilter<events::RequestConfigValueEvent<T>>>(+[](events::RequestConfigValueEvent<T>* e) {
         auto useInternal = e->getUseInternal();
-        auto exists = useInternal ? config::has(e->getKey()) : config::hasTemp(e->getKey());
-        if (!exists) return ListenerResult::Stop;
-        e->setValue(useInternal ? config::get<T>(e->getKey()) : config::getTemp<T>(e->getKey()));
+        auto res = useInternal ? config::get<T>(e->getKey()) : config::getTemp<T>(e->getKey());
+        if (!res) return ListenerResult::Stop;
+        e->setValue(res.unwrap());
         return ListenerResult::Stop;
     });
 }
