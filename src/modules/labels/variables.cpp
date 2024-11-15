@@ -93,6 +93,7 @@ namespace eclipse::labels {
         // Fetch everything else
         m_variables["fps"] = rift::Value::floating(0.f);
         m_variables["realFps"] = rift::Value::floating(0.f);
+        m_variables["tps"] = rift::Value::floating(0.f);
         refetch();
     }
 
@@ -356,7 +357,8 @@ namespace eclipse::labels {
         m_variables["levelLength"] = rift::Value::floating(gameLayer->m_levelLength);
         m_variables["levelDuration"] = rift::Value::floating(gameLayer->m_level->m_timestamp / 240.f);
         m_variables["time"] = rift::Value::string(utils::formatTime(gameLayer->m_gameState.m_levelTime));
-        m_variables["frame"] = rift::Value::integer(gameLayer->m_gameState.m_levelTime * 240.0);
+        m_variables["frame"] = rift::Value::integer(gameLayer->m_gameState.m_currentProgress);
+        m_variables["frameReal"] = rift::Value::integer(gameLayer->m_gameState.m_levelTime * utils::getTPS());
         m_variables["isDead"] = rift::Value::boolean(gameLayer->m_player1->m_isDead);
         m_variables["isDualMode"] = rift::Value::boolean(gameLayer->m_player2 != nullptr && gameLayer->m_player2->isRunning()); // can m_isDualMode be added already
         m_variables["noclipDeaths"] = rift::Value::integer(config::getTemp("noclipDeaths", 0));

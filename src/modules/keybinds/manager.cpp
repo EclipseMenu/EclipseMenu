@@ -449,7 +449,6 @@ namespace eclipse::keybinds {
             if (keybind.getId() == id) {
                 keybind.setInitialized(state);
                 config::set(fmt::format("keybind.{}.active", id), state);
-                log::debug("Keybind '{}' is now {}", id, state ? "active" : "inactive");
                 if (keybind.isInternal()) return;
 
                 auto idStr = std::string(id);

@@ -38,6 +38,24 @@ do {\
     }\
 } while (0)
 
+// Sets specified hooks priority to FIRST_HOOK_PRIORITY
+#define FIRST_HOOKS(class, ...)\
+do {\
+    std::array funcs = { __VA_ARGS__ };\
+    for (auto& func : funcs) {\
+        auto name = fmt::format(#class "::{}", func);\
+        FIRST_PRIORITY(name);\
+    }\
+} while (0)
+
+// Sets all hooks priority to FIRST_HOOK_PRIORITY
+#define FIRST_HOOKS_ALL()\
+do {\
+    for (auto& [name, hook] : self.m_hooks) {\
+        hook->setPriority(FIRST_HOOK_PRIORITY);\
+    }\
+} while (0)
+
 // Adds a delegate toggle for specified methods in the modify class
 #define HOOKS_TOGGLE(id, class, ...)\
 do {\
@@ -92,10 +110,22 @@ static void onModify(auto& self) {\
     SAFE_HOOKS(class, __VA_ARGS__);\
 }
 
+// Creates an onModify method with hooks set to FIRST_PRIORITY
+#define ENABLE_FIRST_HOOKS(class, ...)\
+static void onModify(auto& self) {\
+    FIRST_HOOKS(class, __VA_ARGS__);\
+}
+
 // Creates an onModify method which sets all hooks to SAFE_PRIORITY
 #define ENABLE_SAFE_HOOKS_ALL()\
 static void onModify(auto& self) {\
     SAFE_HOOKS_ALL();\
+}
+
+// Creates an onModify method which sets all hooks to FIRST_PRIORITY
+#define ENABLE_FIRST_HOOKS_ALL()\
+static void onModify(auto& self) {\
+    FIRST_HOOKS_ALL();\
 }
 
 // Creates an onModify method with all hooks added to delegate listener

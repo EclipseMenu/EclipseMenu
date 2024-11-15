@@ -72,7 +72,7 @@ namespace eclipse::hacks::Player {
             if (!usable)
                 return GJBaseGameLayer::update(dt);
 
-            auto step = 240.f; // TODO: Change this after Physics Bypass is added
+            auto step = utils::getTPS();
 
             auto holdSpeed = config::get<int>("player.framestepper.hold_speed", 5);
             bool shouldStep = false;

@@ -7,6 +7,8 @@
 #include <Geode/binding/PlatformToolbox.hpp>
 #include <Geode/loader/Mod.hpp>
 
+#include <modules/config/config.hpp>
+
 namespace eclipse::utils {
 
     std::random_device& getRng() {
@@ -61,7 +63,7 @@ namespace eclipse::utils {
         if (game->m_level->m_timestamp > 0) {
             percent = static_cast<float>(game->m_gameState.m_levelTime * 240.f) / game->m_level->m_timestamp * 100.f;
         } else {
-            percent = reinterpret_cast<cocos2d::CCNode*>(game->m_player1)->getPositionX() / game->m_levelLength * 100.f;
+            percent = game->m_player1->getPositionX() / game->m_levelLength * 100.f;
         }
         return std::clamp(percent, 0.f, 100.f);
     }
@@ -160,5 +162,10 @@ namespace eclipse::utils {
             case PlayerMode::Swing: return gm->m_playerSwing;
         }
         return 1;
+    }
+
+    float getTPS() {
+        if (!config::get("global.tpsbypass.toggle", false)) return 240;
+        return config::get("global.tpsbypass", 240.f);
     }
 }

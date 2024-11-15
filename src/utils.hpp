@@ -106,4 +106,7 @@ namespace eclipse::utils {
 
     /// @brief Get icon frame for a specific mode.
     int getPlayerIcon(PlayerMode mode);
+
+    /// @brief Get current chosen TPS.
+    float getTPS();
 }
