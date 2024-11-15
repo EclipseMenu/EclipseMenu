@@ -9,7 +9,9 @@
 #include <Geode/binding/PlayLayer.hpp>
 #include <Geode/loader/Mod.hpp>
 #include <Geode/Loader.hpp>
+
 #include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
 
 #include <rift/config.hpp>
 
@@ -389,6 +391,25 @@ namespace eclipse::labels {
         // Game state
         fetchGameplayData(GJBaseGameLayer::get());
     }
+
+    class $modify(LabelsGJBGLHook, GJBaseGameLayer) {
+        void processCommands(float dt) {
+            GJBaseGameLayer::processCommands(dt);
+
+            static time_t s_lastUpdate = utils::getTimestamp();
+            static size_t s_frames = 0;
+            s_frames++;
+            auto now = utils::getTimestamp();
+            auto diff = now - s_lastUpdate;
+            constexpr time_t interval = 250;
+            if (diff >= interval) {
+                auto tps = s_frames / (diff / 1000.0);
+                VariableManager::get().setVariable("tps", rift::Value::floating(tps));
+                s_lastUpdate = now;
+                s_frames = 0;
+            }
+        }
+    };
 
     class $modify(BestRunPLHook, PlayLayer) {
         struct Fields {
