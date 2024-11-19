@@ -6,6 +6,8 @@
 #include <utility>
 
 #include <Geode/modify/PauseLayer.hpp>
+#include <Geode/modify/EditorUI.hpp>
+#include <Geode/modify/EditorPauseLayer.hpp>
 #include <Geode/modify/LevelTools.hpp>
 
 namespace eclipse::hacks::Creator {
@@ -46,9 +48,33 @@ namespace eclipse::hacks::Creator {
         }
     };
 
+    // 2.207 added "read-only" mode into editor
+    // we want to disable it
+#if GEODE_COMP_GD_VERSION > 22070
+    class $modify(LevelEditEUIHook, EditorUI) {
+        void onSettings(CCObject* sender) {
+            auto level = this->m_editorLayer->m_level;
+            auto levelType = level->m_levelType;
+            level->m_levelType = GJLevelType::Editor;
+            EditorUI::onSettings(sender);
+            level->m_levelType = levelType;
+        }
+    };
+
+    class $modify(LevelEditEPLHook, EditorPauseLayer) {
+        void customSetup() override {
+            auto level = this->m_editorLayer->m_level;
+            auto levelType = level->m_levelType;
+            level->m_levelType = GJLevelType::Editor;
+            EditorPauseLayer::customSetup();
+            level->m_levelType = levelType;
+        }
+    };
+#endif
+
 // due to some mysterious reason, this will crash in Debug mode
 #ifdef NDEBUG
-    class $modify(LeveleditLTHook, LevelTools) {
+    class $modify(LevelEditLTHook, LevelTools) {
         ENABLE_SAFE_HOOKS_ALL()
 
         static bool verifyLevelIntegrity(gd::string levelString, int levelID) {
