@@ -459,7 +459,9 @@ namespace eclipse::labels {
 
         void resetLevel() {
             PlayLayer::resetLevel();
-            m_fields->m_runFrom = utils::getActualProgress(this);
+            auto from = utils::getActualProgress(this);
+            m_fields->m_runFrom = from;
+            VariableManager::get().setVariable("runStart", rift::Value::floating(from));
         }
     };
 }
