@@ -106,6 +106,13 @@ namespace eclipse::hacks::Shortcuts {
             }
         }
 
+        static void removeCheckpoint() {
+            if (auto* pl = PlayLayer::get()) {
+                if (pl->m_isPracticeMode)
+                    pl->removeCheckpoint(false);
+            }
+        }
+
 #ifdef GEODE_IS_WINDOWS
         static void injectDll() {
             static geode::EventListener<FileEvent> m_listener;
@@ -160,6 +167,7 @@ namespace eclipse::hacks::Shortcuts {
             tab->addButton("Restart Level")->setDescription("Restart the current level")->callback(restartLevel)->handleKeybinds();
             tab->addButton("Toggle Practice Mode")->callback(togglePracticeMode)->handleKeybinds();
             tab->addButton("Place Checkpoint")->callback(placeCheckpoint)->handleKeybinds();
+            tab->addButton("Remove Checkpoint")->callback(removeCheckpoint)->handleKeybinds();
             GEODE_WINDOWS(
                 tab->addButton("Inject DLL")->setDescription("Pick a DLL file to inject")->callback(injectDll)->handleKeybinds();
             )

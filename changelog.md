@@ -26,7 +26,7 @@ No macOS or Android support yet, but we're working on it!
 * Added <cg>Discord RPC</c>
 * Added <cg>Show In Editor</c> option to <co>Show Hitboxes</c>
 * Replaced <co>TPS Bypass</c> with <cg>Physics Bypass</c>
-* Added <co>Place Checkpoint</c> shortcut
+* Added <co>Place Checkpoint</c> and <co>Remove Checkpoint</c> shortcuts
 * Added custom keybinds for P1/P2 jump
 * <cy>New</c> label variables: 
 `isDualMode`, `cubeIcon`, `shipIcon`, `ballIcon`, `ufoIcon`, `waveIcon`, 
@@ -38,7 +38,7 @@ No macOS or Android support yet, but we're working on it!
     * Added <cg>int</c>, <cg>float</c> and <cg>str</c> functions, to convert variable types
     * Added <cg>duration</c> function to convert seconds into a formatted time string
     * Added <cg>$</c> operator to evaluate sub-expressions
-* Added <cg>Eclipse API</c> for developers to interact with the mod
+* Added <cg>Eclipse API</c> for developers to interact with the mod (BetterInfo users might notice a new tab :D)
 
 ## v1.0.0-beta.3
 **Fixes:**
