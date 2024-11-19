@@ -80,7 +80,7 @@ namespace eclipse::hacks::Player {
                 );
                 fields->m_noclipTint->setZOrder(1000);
                 fields->m_noclipTint->setID("nocliptint"_spr);
-                if (auto uiMenu = geode::cast::typeinfo_cast<cocos2d::CCMenu*>(m_uiLayer->getChildByID("eclipse-ui"_spr))) {
+                if (auto uiMenu = utils::getEclipseUILayer()) {
                     uiMenu->addChild(fields->m_noclipTint);
                 } else { // fallback
                     m_uiLayer->addChild(fields->m_noclipTint);

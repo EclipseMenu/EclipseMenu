@@ -109,4 +109,7 @@ namespace eclipse::utils {
 
     /// @brief Get current chosen TPS.
     float getTPS();
+
+    /// @brief Get custom CCMenu created in UILayer.
+    cocos2d::CCMenu* getEclipseUILayer();
 }

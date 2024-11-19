@@ -26,21 +26,18 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
     bool init() override {
         if (!MenuLayer::init()) return false;
 
-        {
-            auto menu = this->getChildByID("bottom-menu");
-            auto rendererSwitchButton = CCMenuItemSpriteExtra::create(
-                cocos2d::CCSprite::createWithSpriteFrameName("GJ_editModeBtn_001.png"),
-                this, menu_selector(EclipseButtonMLHook::onToggleRenderer)
-            );
-            rendererSwitchButton->setID("render-switch"_spr);
-            menu->addChild(rendererSwitchButton);
-            menu->updateLayout();
-        }
+        // {
+        //     auto menu = this->getChildByID("bottom-menu");
+        //     auto rendererSwitchButton = CCMenuItemSpriteExtra::create(
+        //         cocos2d::CCSprite::createWithSpriteFrameName("GJ_editModeBtn_001.png"),
+        //         this, menu_selector(EclipseButtonMLHook::onToggleRenderer)
+        //     );
+        //     rendererSwitchButton->setID("render-switch"_spr);
+        //     menu->addChild(rendererSwitchButton);
+        //     menu->updateLayout();
+        // }
 
         if (s_isInitialized) return true;
-        TRACE_FUNCTION();
-
-        geode::log::info("Eclipse Menu commit hash: {}", GIT_HASH);
 
         // Compile blur shader
         gui::blur::init();
@@ -75,17 +72,6 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
     }
 };
 
-class $modify(EclipseUILayerHook, UILayer) {
-    bool init(GJBaseGameLayer* p0) {
-        if (!UILayer::init(p0)) return false;
-        auto menu = cocos2d::CCMenu::create();
-        menu->setID("eclipse-ui"_spr);
-        this->addChild(menu, 1000);
-        menu->setPosition({0, 0});
-        return true;
-    }
-};
-
 class HackUpdater : public cocos2d::CCObject {
 public:
     static HackUpdater* get() {
@@ -113,7 +99,6 @@ public:
 };
 
 $on_mod(Loaded) {
-    TRACE_SCOPE("$on_mod(Loaded)");
     // Allow user to change disable VBO (resolves issues on older hardware)
     auto* mod = geode::Mod::get();
     ImGuiCocos::get().setForceLegacy(mod->getSettingValue<bool>("legacy-render"));

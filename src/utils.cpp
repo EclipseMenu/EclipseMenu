@@ -168,4 +168,18 @@ namespace eclipse::utils {
         if (!config::get("global.tpsbypass.toggle", false)) return 240;
         return config::get("global.tpsbypass", 240.f);
     }
+
+    cocos2d::CCMenu* getEclipseUILayer() {
+        auto uiLayer = UILayer::get();
+        if (!uiLayer) return nullptr;
+
+        if (auto menu = uiLayer->getChildByID("eclipse-ui"_spr))
+            return static_cast<cocos2d::CCMenu*>(menu);
+
+        auto menu = cocos2d::CCMenu::create();
+        menu->setID("eclipse-ui"_spr);
+        uiLayer->addChild(menu, 1000);
+        menu->setPosition({0, 0});
+        return menu;
+    }
 }
