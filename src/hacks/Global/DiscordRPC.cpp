@@ -7,9 +7,12 @@
 #include <discord_rpc.h>
 #include <rift.hpp>
 
+#include <Geode/modify/GJBaseGameLayer.hpp>
+
 namespace eclipse::hacks::Global {
 
     class DiscordRPC : public hack::Hack {
+    public:
         constexpr static auto DEFAULT_CLIENT_ID = "1212016614325624852";
         static time_t startTimestamp, levelTimestamp;
 
@@ -174,7 +177,7 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.discordrpc.timemode", 1);
 
             startTimestamp = std::time(nullptr);
-            levelTimestamp = std::time(nullptr); // TODO: Level session time
+            levelTimestamp = std::time(nullptr);
 
             // Setting default scripts:
             {
@@ -310,5 +313,13 @@ namespace eclipse::hacks::Global {
     time_t DiscordRPC::levelTimestamp = 0;
 
     REGISTER_HACK(DiscordRPC);
+
+    class $modify(DiscordRPCGJBGLHook, GJBaseGameLayer) {
+        bool init() override {
+            if (!GJBaseGameLayer::init()) return false;
+            DiscordRPC::levelTimestamp = std::time(nullptr);
+            return true;
+        }
+    };
 }
 #endif
