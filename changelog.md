@@ -1,7 +1,8 @@
 # Eclipse Menu
 
-## v1.0.0-beta.4 (???)
-**<cg>Geometry Dash v2.2074</c> support**
+## v1.0.0-beta.4
+**<cg>Geometry Dash v2.2074</c> support**  
+No macOS or Android support yet, but we're working on it!
 
 **Fixes:**
 * <cg>Fixed</c> radio buttons keybinds always setting the first option
@@ -29,14 +30,15 @@
 * Added custom keybinds for P1/P2 jump
 * <cy>New</c> label variables: 
 `isDualMode`, `cubeIcon`, `shipIcon`, `ballIcon`, `ufoIcon`, `waveIcon`, 
-`robotIcon`, `spiderIcon`, `swingIcon`, `gamemode`, `playerIcon`, `levelDescription`, `frameReal`, `tps`
+`robotIcon`, `spiderIcon`, `swingIcon`, `gamemode`, `playerIcon`, `levelDescription`, 
+`frameReal`, `tps`, `runStart`
 * <cy>Updated</c> <co>RIFT</c> scripting with more features:
     * Added <cg>cfg</c> function to get values from settings
     * Improved overall performance and stability
     * Added <cg>int</c>, <cg>float</c> and <cg>str</c> functions, to convert variable types
     * Added <cg>duration</c> function to convert seconds into a formatted time string
     * Added <cg>$</c> operator to evaluate sub-expressions
-* Added <cg>Eclipse API</c> for developers to interact with the mod (TODO: add documentation)
+* Added <cg>Eclipse API</c> for developers to interact with the mod
 
 ## v1.0.0-beta.3
 **Fixes:**
