@@ -17,6 +17,8 @@ No macOS or Android support yet, but we're working on it!
 * <cg>Fixed</c> random crashes with <co>All Modes in Platformer</c>, <co>Practice Coins</c> and <co>Show Trajectory</c>
 * <cg>Fixed</c> <co>Frame Stepper</c> bugging out with <co>Speedhack</c>
 * <co>StartPos Switcher</c> keybinds now trigger instantly
+* <co>Practice Music Sync</c> now auto-toggles the option in settings
+* Replay does not trigger <co>Auto Safe Mode</c> unless you have a loaded macro
 * Added some mod descriptions (#19, #70)
 
 **Additions**:
@@ -27,7 +29,7 @@ No macOS or Android support yet, but we're working on it!
 * Added <cg>Show In Editor</c> option to <co>Show Hitboxes</c>
 * Replaced <co>TPS Bypass</c> with <cg>Physics Bypass</c>
 * Added <co>Place Checkpoint</c> and <co>Remove Checkpoint</c> shortcuts
-* Added custom keybinds for P1/P2 jump
+* Added custom keybinds for <co>P1/P2 jump</c>
 * <cy>New</c> label variables: 
 `isDualMode`, `cubeIcon`, `shipIcon`, `ballIcon`, `ufoIcon`, `waveIcon`, 
 `robotIcon`, `spiderIcon`, `swingIcon`, `gamemode`, `playerIcon`, `levelDescription`, 

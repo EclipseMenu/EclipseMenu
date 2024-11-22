@@ -11,6 +11,9 @@ namespace eclipse::hacks::Cosmetic {
             auto tab = gui::MenuTab::find("Bypass");
 
             tab->addToggle("Practice Music Sync", "bypass.practicemusic")
+                ->callback([](bool v){
+                    GameStatsManager::get()->toggleEnableItem(UnlockType::GJItem, 17, v);
+                })
                 ->handleKeybinds();
         }
 

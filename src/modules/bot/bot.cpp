@@ -61,12 +61,12 @@ namespace eclipse::bot {
         file.close();
     }
 
-    bool Bot::load(std::filesystem::path path) {
+    Result<> Bot::load(std::filesystem::path path) {
         std::ifstream f(path, std::ios::binary);
 
         if (!f) {
             f.close();
-            return false;
+            return Err("Failed to open file");
         }
 
         f.seekg(0, std::ios::end);
@@ -79,7 +79,7 @@ namespace eclipse::bot {
 
         m_replay = BotReplay::importData(data);
 
-        return true;
+        return Ok();
     }
 
 }

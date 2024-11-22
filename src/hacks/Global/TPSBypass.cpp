@@ -21,7 +21,7 @@ namespace eclipse::hacks::Global {
                ->handleKeybinds();
         }
 
-        [[nodiscard]] const char* getId() const override { return "TPSBypass"; }
+        [[nodiscard]] const char* getId() const override { return "Physics Bypass"; }
         [[nodiscard]] int32_t getPriority() const override { return -14; }
         [[nodiscard]] bool isCheating() override {
             return config::get<bool>("global.tpsbypass.toggle", false);

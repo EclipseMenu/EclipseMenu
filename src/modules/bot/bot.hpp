@@ -50,7 +50,7 @@ namespace eclipse::bot {
 
         /// @brief Loads a replay from the given path.
         /// @param path Path to load the replay from.
-        bool load(std::filesystem::path path);
+        geode::Result<> load(std::filesystem::path path);
 
         /// @brief Sets the level info.
         /// @param levelInfo The level info.

@@ -55,6 +55,15 @@ namespace eclipse::hacks::Bot {
         config::set("bot.selectedreplay", replayPath);
     }
 
+    void confirmLoad(std::filesystem::path const& replayPath) {
+        auto res = s_bot.load(replayPath);
+        if (res.isErr()) {
+            Popup::create("Error", fmt::format("Failed to load replay: {}", res.unwrapErr()));
+            return;
+        }
+        Popup::create("Replay loaded", fmt::format("Replay {} loaded with {} inputs", replayPath.filename().stem(), s_bot.getInputCount()));
+    }
+
     void loadReplay() {
         std::filesystem::path replayPath = config::get<std::string>("bot.selectedreplay", "");
 
@@ -65,14 +74,12 @@ namespace eclipse::hacks::Bot {
 
                 std::filesystem::path confirmReplayPath = config::get<std::string>("bot.selectedreplay", "");
 
-                s_bot.load(confirmReplayPath);
-                Popup::create("Replay loaded", fmt::format("Replay {} loaded with {} inputs", confirmReplayPath.filename().stem().string(), s_bot.getInputCount()));
+                confirmLoad(confirmReplayPath);
             });
             return;
         }
 
-        s_bot.load(replayPath);
-        Popup::create("Replay loaded", fmt::format("Replay {} loaded with {} inputs", replayPath.filename().stem().string(), s_bot.getInputCount()));
+        confirmLoad(replayPath);
     }
 
     void deleteReplay() {
