@@ -208,11 +208,24 @@ namespace eclipse::hacks::Labels {
                 cheatIndicator->setID("cheat-indicator"_spr);
                 auto* container = m_fields->m_containers[config::get<int>("labels.cheat-indicator.alignment", 0)];
                 container->addLabel(cheatIndicator, [](SmartLabel* label) {
-                    label->setScale(config::get<float>("labels.cheat-indicator.scale", 0.5f));
+                    bool visible = config::get<bool>("labels.cheat-indicator.visible", false);
+
+                    if (!visible /* || (showOnlyCheating && !(isCheating || hasTripped)) */) {
+                        label->setVisible(false);
+                        return;
+                    }
+
                     bool isCheating = config::getTemp("hasCheats", false);
-                    label->setColor(isCheating ? gui::Color::RED.toCCColor3B() : gui::Color::GREEN.toCCColor3B());
+                    bool hasTripped = config::getTemp("trippedSafeMode", false);
+                    // bool showOnlyCheating = config::get<bool>("labels.cheat-indicator.only-cheating", false);
+
+                    label->setVisible(true);
+                    label->setScale(config::get<float>("labels.cheat-indicator.scale", 0.5f));
                     label->setOpacity(static_cast<GLubyte>(config::get<float>("labels.cheat-indicator.opacity", 0.35f) * 255));
-                    label->setVisible(config::get<bool>("labels.cheat-indicator.visible", false));
+
+                    // Cheating - Red, Tripped - Orange, Normal - Green
+                    auto color = isCheating ? gui::Color::RED : hasTripped ? gui::Color { 0.72f, 0.37f, 0.f } : gui::Color::GREEN;
+                    label->setColor(color.toCCColor3B());
                 });
             }
 
@@ -294,6 +307,7 @@ namespace eclipse::hacks::Labels {
         void init() override {
             auto tab = gui::MenuTab::find("Labels");
             config::setIfEmpty("labels.visible", true);
+            config::setIfEmpty("labels.cheat-indicator.endscreen", true);
             config::setIfEmpty("labels.cheat-indicator.scale", 0.5f);
             config::setIfEmpty("labels.cheat-indicator.opacity", 0.35f);
 
@@ -318,6 +332,10 @@ namespace eclipse::hacks::Labels {
                 ->setDescription("Shows a red indicator if you have any cheats enabled.")
                 ->handleKeybinds()
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                    options->addToggle("Show on Endscreen", "labels.cheat-indicator.endscreen")
+                        ->setDescription("Shows the cheat indicator on the level end screen.");
+                    // options->addToggle("Show only Cheating", "labels.cheat-indicator.only-cheating")
+                    //     ->setDescription("Hides the cheat indicator if you're not cheating.");
                     options->addInputFloat("Scale", "labels.cheat-indicator.scale", 0.1f, 2.f, "%.1f")
                         ->setDescription("The scale of the cheat indicator.")
                         ->callback([](float) { updateLabels(); });

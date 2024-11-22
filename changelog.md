@@ -30,6 +30,8 @@ No macOS or Android support yet, but we're working on it!
 * Replaced <co>TPS Bypass</c> with <cg>Physics Bypass</c>
 * Added <co>Place Checkpoint</c> and <co>Remove Checkpoint</c> shortcuts
 * Added custom keybinds for <co>P1/P2 jump</c>
+* Added <cg>Endscreen Cheat Indicator</c>
+* <co>Auto Safe Mode</c> now stores your attempt state (whether any cheats were active at any time)
 * <cy>New</c> label variables: 
 `isDualMode`, `cubeIcon`, `shipIcon`, `ballIcon`, `ufoIcon`, `waveIcon`, 
 `robotIcon`, `spiderIcon`, `swingIcon`, `gamemode`, `playerIcon`, `levelDescription`, 
