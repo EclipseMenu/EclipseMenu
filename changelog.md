@@ -2,7 +2,7 @@
 
 ## v1.0.0-beta.4
 **<cg>Geometry Dash v2.2074</c> support**  
-No macOS or Android support yet, but we're working on it!
+No Android support yet, but we're working on it!
 
 **Fixes:**
 * <cg>Fixed</c> radio buttons keybinds always setting the first option
@@ -32,6 +32,7 @@ No macOS or Android support yet, but we're working on it!
 * Added custom keybinds for <co>P1/P2 jump</c>
 * Added <cg>Endscreen Cheat Indicator</c>
 * <co>Auto Safe Mode</c> now stores your attempt state (whether any cheats were active at any time)
+* <cg>Click Between Frames</c> toggle if you have the mod installed
 * <cy>New</c> label variables: 
 `isDualMode`, `cubeIcon`, `shipIcon`, `ballIcon`, `ufoIcon`, `waveIcon`, 
 `robotIcon`, `spiderIcon`, `swingIcon`, `gamemode`, `playerIcon`, `levelDescription`, 
