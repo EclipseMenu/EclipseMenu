@@ -40,6 +40,7 @@ No Android support yet, but we're working on it!
 * <cy>Updated</c> <co>RIFT</c> scripting with more features:
     * Added <cg>cfg</c> function to get values from settings
     * Improved overall performance and stability
+    * Fixed some expressions not working as expected
     * Added <cg>int</c>, <cg>float</c> and <cg>str</c> functions, to convert variable types
     * Added <cg>duration</c> function to convert seconds into a formatted time string
     * Added <cg>$</c> operator to evaluate sub-expressions

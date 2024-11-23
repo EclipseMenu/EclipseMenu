@@ -123,7 +123,7 @@ namespace eclipse::hacks::Bot {
         [[nodiscard]] bool isCheating() override {
             auto state = config::get<int>("bot.state", 0);
             // only check if we are in playback mode and there are inputs
-            return state != 2 && s_bot.getInputCount() != 0;
+            return state == 2 && s_bot.getInputCount() != 0;
         }
         [[nodiscard]] const char* getId() const override { return "Bot"; }
     };
