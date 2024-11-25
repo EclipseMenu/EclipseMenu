@@ -47,7 +47,10 @@ namespace eclipse::keybinds {
         MouseLeft, MouseRight, MouseMiddle, MouseButton4, MouseButton5,
 
         // System keys
-        MenuKey, LastKey
+        MenuKey, LastKey,
+
+        // Unknown key
+        Unknown
     };
 
     Keys& operator++(Keys& key);

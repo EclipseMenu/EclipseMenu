@@ -207,7 +207,7 @@ namespace eclipse::keybinds {
             case GLFW_KEY_RIGHT_CONTROL: return Keys::RightControl;
             case GLFW_KEY_RIGHT_ALT: return Keys::RightAlt;
             case GLFW_KEY_RIGHT_SUPER: return Keys::RightSuper;
-            default: return Keys::None;
+            default: return Keys::Unknown;
         }
     }
 
@@ -348,7 +348,7 @@ namespace eclipse::keybinds {
             case KEY_RightContol: return Keys::RightControl;
             //case KEY_RightAlt: return Keys::RightAlt;
             //case KEY_RightSuper: return Keys::RightSuper;
-            default: return Keys::None;
+            default: return Keys::Unknown;
         }
     }
 
