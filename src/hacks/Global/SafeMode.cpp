@@ -214,7 +214,7 @@ namespace eclipse::hacks::Global {
             if (!config::get<bool>("labels.cheat-indicator.endscreen", true))
                 return;
 
-            m_mainMenu->addChild(createCI());
+            m_buttonMenu->addChild(createCI());
         }
     };
 
