@@ -127,8 +127,8 @@ namespace eclipse::hacks::Recorder {
         popupShown = false;
         afterEndTimer = 0.f;
 
-        if (PlayLayer::get()->getChildByID("EndLevelLayer"))
-            PlayLayer::get()->getChildByID("EndLevelLayer")->removeFromParent();
+        if (auto ell = PlayLayer::get()->getChildByType<EndLevelLayer>(0))
+            ell->removeFromParent();
 
         PlayLayer::get()->stopAllActions();
         PlayLayer::get()->startGame();

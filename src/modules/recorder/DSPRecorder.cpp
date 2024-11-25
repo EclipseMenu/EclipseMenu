@@ -45,20 +45,18 @@ void DSPRecorder::init() {
     strcpy(desc.name, "DSP Recorder");
     desc.numinputbuffers = 1;
     desc.numoutputbuffers = 1;
-    desc.read = [](FMOD_DSP_STATE*, float* inbuffer, float*, unsigned int length, int, int* outchannels) {
+    desc.read = [](FMOD_DSP_STATE*, float* inbuffer, float* outbuffer, unsigned int length, int, int* outchannels) {
         auto recorder = DSPRecorder::get();
         if (!recorder->m_recording) return FMOD_OK;
 
+        auto channels = *outchannels;
+
         {
             std::lock_guard lock(recorder->m_lock);
-            auto channels = *outchannels;
             recorder->m_data.insert(recorder->m_data.end(), inbuffer, inbuffer + length * channels);
         }
 
-        // if (recorder->m_useLocking) {
-        //     recorder->m_canContinue.wait(false);
-        //     recorder->m_canContinue = false;
-        // }
+        std::memcpy(outbuffer, inbuffer, length * channels * sizeof(float));
 
         return FMOD_OK;
     };
