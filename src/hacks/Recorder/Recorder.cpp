@@ -77,9 +77,13 @@ namespace eclipse::hacks::Recorder {
         lastFrameTime = 0.;
         afterEndTimer = 0.f;
 
-        auto lvl = PlayLayer::get()->m_level;
+        GJGameLevel* lvl = PlayLayer::get()->m_level;
 
-        std::filesystem::path renderDirectory = geode::Mod::get()->getSaveDir() / "renders" / STR(lvl->m_levelName);
+        std::string trimmedLevelName = lvl->m_levelName;
+        trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '/'), trimmedLevelName.end());
+        trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '\\'), trimmedLevelName.end());
+
+        std::filesystem::path renderDirectory = geode::Mod::get()->getSaveDir() / "renders" / STR(trimmedLevelName);
 
         if (!std::filesystem::exists(renderDirectory))
             std::filesystem::create_directories(renderDirectory);
@@ -89,7 +93,7 @@ namespace eclipse::hacks::Recorder {
         s_recorder.m_renderSettings.m_width = config::get<int>("recorder.resolution.x", 1920);
         s_recorder.m_renderSettings.m_height = config::get<int>("recorder.resolution.y", 1080);
         s_recorder.m_renderSettings.m_codec = config::get<std::string>("recorder.codecString", "h264");
-        s_recorder.m_renderSettings.m_outputFile = renderDirectory / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
+        s_recorder.m_renderSettings.m_outputFile = renderDirectory / (fmt::format("{} - {}.mp4", trimmedLevelName, lvl->m_levelID.value()));
         s_recorder.m_renderSettings.m_hardwareAccelerationType = static_cast<ffmpeg::HardwareAccelerationType>(config::get<int>("recorder.hwType", 0));
         s_recorder.m_renderSettings.m_colorspaceFilters = config::get<std::string>("recorder.colorspace", "");
 
@@ -116,7 +120,10 @@ namespace eclipse::hacks::Recorder {
         stop();
 
         auto lvl = PlayLayer::get()->m_level;
-        auto renderPath = geode::Mod::get()->getSaveDir() / "renders" / STR(lvl->m_levelName) / (fmt::format("{} - {}.mp4", lvl->m_levelName, lvl->m_levelID.value()));
+        std::string trimmedLevelName = lvl->m_levelName;
+        trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '/'), trimmedLevelName.end());
+        trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '\\'), trimmedLevelName.end());
+        auto renderPath = geode::Mod::get()->getSaveDir() / "renders" / STR(trimmedLevelName) / (fmt::format("{} - {}.mp4", trimmedLevelName, lvl->m_levelID.value()));
 
         if (!std::filesystem::exists(renderPath)) {
             geode::log::error("Render {} not found", renderPath);
