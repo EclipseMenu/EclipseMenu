@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 
 project(EclipseMenu VERSION 1.0.0 LANGUAGES CXX)
 
@@ -15,6 +16,9 @@ endif()
 # Sources
 file(GLOB_RECURSE SOURCES src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${MACOS_SOURCES})
+
+# Enable LTO for smaller binaries
+set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 # Make sure we can include headers from src
 target_include_directories(${PROJECT_NAME} PRIVATE src include)

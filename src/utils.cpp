@@ -170,7 +170,7 @@ namespace eclipse::utils {
     }
 
     cocos2d::CCMenu* getEclipseUILayer() {
-        auto uiLayer = GJBaseGameLayer::get()->m_uiLayer;
+        auto uiLayer = UILayer::get();
         if (!uiLayer) return nullptr;
 
         if (auto menu = uiLayer->getChildByID("eclipse-ui"_spr))
