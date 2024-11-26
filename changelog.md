@@ -16,6 +16,7 @@ No Android support yet, but we're working on it!
 * <cg>Fixed</c> keybind deletion crash
 * <cg>Fixed</c> random crashes with <co>All Modes in Platformer</c>, <co>Practice Coins</c> and <co>Show Trajectory</c>
 * <cg>Fixed</c> <co>Frame Stepper</c> bugging out with <co>Speedhack</c>
+* <cg>Fixed</c> an issue with slashes in level name when saving a render
 * <co>StartPos Switcher</c> keybinds now trigger instantly
 * <co>Practice Music Sync</c> now auto-toggles the option in settings
 * Replay does not trigger <co>Auto Safe Mode</c> unless you have a loaded macro

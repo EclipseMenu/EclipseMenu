@@ -85,9 +85,9 @@ namespace eclipse::hacks::Level {
         }
 
         [[nodiscard]] bool isCheating() override {
-            bool enabled = config::get<bool>("level.showhitboxes", false); 
-            bool onDeath = config::get<bool>("level.showhitboxes.ondeath", false);
-            if (onDeath) return false; // on-death hitboxes are fine
+            bool enabled = config::get<bool>("level.showhitboxes", false);
+            if (config::get<bool>("level.showhitboxes.ondeath", false))
+                return false; // on-death hitboxes are fine
 
             if (auto* pl = PlayLayer::get())
                 // if not in practice with enabled hitboxes
@@ -107,10 +107,16 @@ namespace eclipse::hacks::Level {
         Other
     };
 
+    inline bool shouldDrawHitboxes() {
+        return config::get<bool>("level.showhitboxes", false) || (
+            s_isDead && config::get<bool>("level.showhitboxes.ondeath", false)
+        );
+    }
+
     inline HitboxType getHitboxType(const gui::Color& color) {
         if (color.r == 0.0f)
             return color.b == 1.0f ? HitboxType::Solid : HitboxType::Other;
-        else if (color.g == 1.0f)
+        if (color.g == 1.0f)
             return HitboxType::Player;
         return HitboxType::Danger;
     }
@@ -145,16 +151,13 @@ namespace eclipse::hacks::Level {
         GJBaseGameLayer* bgl = GJBaseGameLayer::get();
 
         if (!bgl || drawNode != bgl->m_debugDrawNode) return;
-        if (!config::get<bool>("level.showhitboxes", false) && !config::get<bool>("level.showhitboxes.ondeath", false)) return;
-        if (!config::get<bool>("level.showhitboxes", false) && (!s_isDead && config::get<bool>("level.showhitboxes.ondeath", false))) return;
+        if (!config::get<bool>("level.showhitboxes", false)) return;
 
         bool hidePlayer = false;
 
         bool customColors = config::get<bool>("level.showhitboxes.customcolors", false);
 
-        HitboxType type = getHitboxType(borderColor);
-
-        switch (type) {
+        switch (HitboxType type = getHitboxType(borderColor)) {
             case HitboxType::Solid:
                 borderColor = !customColors ? borderColor : config::get<gui::Color>("level.showhitboxes.solid_color", gui::Color(0, 0.247, 1));
                 break;
@@ -208,10 +211,10 @@ namespace eclipse::hacks::Level {
 
         bool onDeath = config::get<bool>("level.showhitboxes.ondeath", false);
 
-        if (!show && !onDeath) return;
-        if (!show && onDeath) {
+        if (!show) return;
+        if (onDeath) {
             self->m_debugDrawNode->setVisible(s_isDead || robtopShow);
-            //if (!s_isDead && !editor) return;
+            if (!s_isDead && !editor) return;
         }
 
         if (!config::get<bool>("level.showhitboxes.hideplayer", false)) {
@@ -259,7 +262,7 @@ namespace eclipse::hacks::Level {
             PlayLayer::updateProgressbar();
 
             // only call updateDebugDraw if it wasn't called yet to prevent overdraw
-            if (config::get<bool>("level.showhitboxes", false) && !robtopHitboxCheck())
+            if (shouldDrawHitboxes() && !robtopHitboxCheck())
                 PlayLayer::updateDebugDraw();
 
             forceDraw(this, false);
@@ -276,6 +279,8 @@ namespace eclipse::hacks::Level {
     };
 
     class $modify(ShowHitboxesPOHook, PlayerObject) {
+        ENABLE_FIRST_HOOKS_ALL()
+
         void playerDestroyed(bool p0) {
             if (auto* pl = PlayLayer::get())
                 s_isDead = this == pl->m_player1 || this == pl->m_player2;
