@@ -5,6 +5,8 @@
 #include <functional>
 #include <string>
 #include <utility>
+#include <memory>
+#include <Geode/loader/Setting.hpp>
 #include <Geode/loader/Event.hpp>
 
 namespace eclipse::components {
@@ -48,6 +50,7 @@ namespace eclipse {
 
         components::Label addLabel(const std::string& title) const;
         components::Toggle addToggle(const std::string& id, const std::string& title, const std::function<void(bool)> &callback) const;
+        components::Toggle addModSettingToggle(std::shared_ptr<geode::Setting> const& setting) const;
         components::Button addButton(const std::string& title, const std::function<void()>& callback) const;
 
         const std::string& getName() const { return m_name; }
@@ -128,6 +131,31 @@ namespace eclipse {
         events::AddToggleEvent event(this, id, title, callback);
         event.post();
         return components::Toggle(event.getUniqueID(), id);
+    }
+
+    /// @brief A shorthand for adding a mod setting toggle to the tab.
+    /// @param setting The setting to add.
+    inline components::Toggle MenuTab::addModSettingToggle(std::shared_ptr<geode::Setting> const& setting) const {
+        auto mod = setting->getMod();
+        auto settingId = setting->getKey();
+        auto title = setting->getDisplayName();
+        auto description = setting->getDescription().value_or("");
+        auto value = mod->getSettingValue<bool>(settingId);
+
+        // Add the toggle
+        auto toggle = addToggle(mod->expandSpriteName(settingId).data(), title, [mod, settingId](bool v) {
+            mod->setSettingValue(settingId, v);
+        }).setDescription(description);
+
+        // Set the initial value
+        config::set(toggle.getID(), value);
+
+        // Listen for changes
+        geode::listenForSettingChanges<bool>(settingId, [toggle](bool v) {
+            config::set(toggle.getID(), v);
+        }, mod);
+
+        return toggle;
     }
 
     /// @brief Add a button to the tab.

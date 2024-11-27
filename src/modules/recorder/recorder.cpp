@@ -70,7 +70,7 @@ namespace eclipse::recorder {
         std::filesystem::path tempPath = m_renderSettings.m_outputFile.parent_path() / "music.mp4";
 
         ffmpeg::AudioMixer audioMixer;
-        audioMixer.mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath, 44100);
+        audioMixer.mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath);
 
         std::filesystem::remove(m_renderSettings.m_outputFile);
         std::filesystem::rename(tempPath,m_renderSettings.m_outputFile);
