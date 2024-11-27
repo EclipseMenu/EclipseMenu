@@ -8,6 +8,8 @@
 #include <Geode/modify/ShaderLayer.hpp>
 #include <Geode/modify/CCScheduler.hpp>
 
+#include <regex>
+
 // android uses custom gd::string class
 #ifdef GEODE_IS_ANDROID
 #define STR(x) std::string(x)
@@ -82,7 +84,7 @@ namespace eclipse::hacks::Recorder {
         std::string trimmedLevelName = lvl->m_levelName;
         trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '/'), trimmedLevelName.end());
         trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '\\'), trimmedLevelName.end());
-
+        trimmedLevelName = std::regex_replace(trimmedLevelName, std::regex("\\s+"), " ");
         std::filesystem::path renderDirectory = geode::Mod::get()->getSaveDir() / "renders" / STR(trimmedLevelName);
 
         if (!std::filesystem::exists(renderDirectory))
@@ -119,10 +121,13 @@ namespace eclipse::hacks::Recorder {
     void startAudio() {
         stop();
 
+        FMODAudioEngine::get()->stopAllEffects();
+
         auto lvl = PlayLayer::get()->m_level;
         std::string trimmedLevelName = lvl->m_levelName;
         trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '/'), trimmedLevelName.end());
         trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '\\'), trimmedLevelName.end());
+        trimmedLevelName = std::regex_replace(trimmedLevelName, std::regex("\\s+"), " ");
         auto renderPath = geode::Mod::get()->getSaveDir() / "renders" / STR(trimmedLevelName) / (fmt::format("{} - {}.mp4", trimmedLevelName, lvl->m_levelID.value()));
 
         if (!std::filesystem::exists(renderPath)) {
@@ -280,7 +285,7 @@ namespace eclipse::hacks::Recorder {
                     if (channelTime <= 0)
                         continue;
 
-                    if (channelTime - songTime > 0.05f)
+                    if (channelTime - songTime > 0.25f || channelTime - songTime < -0.25f)
                         audioChannel->setPosition(songTime, FMOD_TIMEUNIT_MS);
                 }
             }
