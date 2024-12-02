@@ -766,17 +766,18 @@ namespace eclipse::gui {
             return this;
         }
 
-        void triggerDeleteCallback() const {
-            if (m_deleteCallback) m_deleteCallback();
-        }
+        void triggerDeleteCallback() const;
 
-        void triggerEditCallback() const {
-            if (m_editCallback) m_editCallback();
-        }
+        void triggerEditCallback() const;
 
         void triggerMoveCallback(bool up) const {
             if (m_moveCallback) m_moveCallback(up);
         }
+
+        /// @brief Allows to set keybinds for the label.
+        LabelSettingsComponent* handleKeybinds();
+
+        [[nodiscard]] bool hasKeybind() const { return m_hasKeybind; }
 
     private:
         std::string m_id;
@@ -784,6 +785,7 @@ namespace eclipse::gui {
         std::function<void()> m_deleteCallback;
         std::function<void()> m_editCallback;
         std::function<void(bool)> m_moveCallback;
+        bool m_hasKeybind = false;
     };
 
     /// @brief Contains a list of components and a title, to be passed into render engine.

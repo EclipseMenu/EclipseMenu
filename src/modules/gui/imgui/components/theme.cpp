@@ -520,7 +520,10 @@ namespace eclipse::gui::imgui {
                 labelSettings->triggerMoveCallback(false);
             }
 
-        }, []{}, fmt::format("label-setting-{}", settings->id)))
+        }, [labelSettings, settings] {
+            if (labelSettings->hasKeybind())
+                handleKeybindMenu(fmt::format("label.{}", settings->id));
+        }, fmt::format("label-setting-{}", settings->id)))
             labelSettings->triggerEditCallback();
     }
 

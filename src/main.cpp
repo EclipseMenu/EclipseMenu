@@ -67,8 +67,6 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
             ? gui::RendererType::Cocos2d
             : gui::RendererType::ImGui;
         gui::ThemeManager::get()->setRenderer(type);
-
-        geode::log::info("Switched renderer to {}", type == gui::RendererType::ImGui ? "ImGui" : "Cocos2d");
     }
 };
 

@@ -119,6 +119,9 @@ namespace eclipse::keybinds {
         /// @brief Set the key of the keybind.
         void setKey(Keys key) { m_key = key; }
 
+        /// @brief Set the title of the keybind.
+        void setTitle(std::string title) { m_title = std::move(title); }
+
     private:
         Keys m_key;
         std::string m_id;
@@ -144,6 +147,11 @@ namespace eclipse::keybinds {
         /// @param id The ID of the keybind.
         /// @param callback The callback to execute when the keybind is pressed.
         Keybind& addListener(const std::string& id, const std::function<void(bool)>& callback);
+
+        /// @brief Unregister a keybind from the manager. This will completely remove it from the configuration.
+        /// @param id The ID of the keybind.
+        /// @return Whether the keybind was successfully unregistered.
+        bool unregisterKeybind(const std::string& id);
 
         /// @brief Load keybinds from config.
         void init();

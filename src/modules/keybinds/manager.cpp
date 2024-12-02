@@ -426,6 +426,20 @@ namespace eclipse::keybinds {
         return this->registerKeybindInternal(id, id, callback, true);
     }
 
+    bool Manager::unregisterKeybind(const std::string& id) {
+        for (auto it = m_keybinds.begin(); it != m_keybinds.end(); ++it) {
+            if (it->getId() == id) {
+                // apply disabled state to process the GUI
+                this->setKeybindState(id, false);
+
+                // then delete the keybind from the config
+                m_keybinds.erase(it);
+                return true;
+            }
+        }
+        return false;
+    }
+
     void Manager::init() {
         setupTab();
 

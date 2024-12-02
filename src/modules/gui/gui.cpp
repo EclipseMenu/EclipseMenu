@@ -232,6 +232,35 @@ namespace eclipse::gui {
         return this;
     }
 
+    void LabelSettingsComponent::triggerDeleteCallback() const {
+        if (m_deleteCallback) m_deleteCallback();
+
+        // We also have to clean up the keybind
+        keybinds::Manager::get()->unregisterKeybind(fmt::format("label.{}", m_settings->id));
+    }
+
+    void LabelSettingsComponent::triggerEditCallback() const {
+        if (m_editCallback) m_editCallback();
+
+        // Update the keybind title
+        auto keybind = keybinds::Manager::get()->getKeybind(fmt::format("label.{}", m_settings->id));
+        if (keybind.has_value()) {
+            keybind->get().setTitle(m_settings->name);
+        } else {
+            geode::log::warn("Keybind with ID 'label.{}' not found", m_settings->id);
+        }
+    }
+
+    LabelSettingsComponent* LabelSettingsComponent::handleKeybinds() {
+        keybinds::Manager::get()->registerKeybind(fmt::format("label.{}", m_settings->id), m_settings->name, [this](bool down){
+            if (!down) return;
+            this->m_settings->visible = !this->m_settings->visible;
+            this->triggerEditCallback();
+        });
+        m_hasKeybind = true;
+        return this;
+    }
+
     void MenuTab::addComponent(const std::shared_ptr<Component>& component) {
         m_components.push_back(component);
         component->onInit();
