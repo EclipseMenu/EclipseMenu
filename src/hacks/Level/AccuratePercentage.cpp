@@ -45,7 +45,7 @@ namespace eclipse::hacks::Global {
 
             if (m_level->isPlatformer()) {
                 if (!config::get<bool>("level.accuratepercent.show_minutes", true)) return;
-                auto time = utils::formatTime(m_gameState.m_levelTime);
+                auto time = utils::formatTime(m_timePlayed);
                 m_percentageLabel->setString(time.c_str());
             } else if (config::get<bool>("level.accuratepercent.normal_mode", true)) {
                 float percent = customGetProgress();

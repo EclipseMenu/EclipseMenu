@@ -5,6 +5,7 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
+#include <modules/labels/variables.hpp>
 
 #ifndef GEODE_IS_MACOS
 constexpr float MIN_TPS = 0.f;
@@ -24,7 +25,8 @@ namespace eclipse::hacks::Global {
         [[nodiscard]] const char* getId() const override { return "Physics Bypass"; }
         [[nodiscard]] int32_t getPriority() const override { return -14; }
         [[nodiscard]] bool isCheating() override {
-            return config::get<bool>("global.tpsbypass.toggle", false);
+            return config::get<bool>("global.tpsbypass.toggle", false) &&
+                config::get<float>("global.tpsbypass", 240.f) != 240.f;
         }
     };
 
@@ -119,6 +121,40 @@ namespace eclipse::hacks::Global {
             auto fields = getFields(this);
             if (fields->m_shouldHide) return;
             PlayLayer::postUpdate(fields->m_realDelta);
+        }
+
+        // we also would like to fix the percentage calculation, which uses constant 240 TPS to determine the progress
+        int calculationFix() {
+            auto timestamp = m_level->m_timestamp;
+            auto currentProgress = m_gameState.m_currentProgress;
+            if (timestamp > 0) { // this is only an issue for 2.2+ levels
+                // recalculate m_currentProgress based on the actual time passed
+                auto progress = utils::getActualProgress(this);
+                m_gameState.m_currentProgress = timestamp * progress / 100.f;
+            }
+            return currentProgress;
+        }
+
+        void updateProgressbar() {
+            auto currentProgress = calculationFix();
+            PlayLayer::updateProgressbar();
+            m_gameState.m_currentProgress = currentProgress;
+        }
+
+        void destroyPlayer(PlayerObject* player, GameObject* object) override {
+            auto currentProgress = calculationFix();
+            PlayLayer::destroyPlayer(player, object);
+            m_gameState.m_currentProgress = currentProgress;
+        }
+
+        void levelComplete() {
+            // levelComplete uses m_gameState.m_unkUint2 to store the timestamp
+            // also we can't rely on m_level->m_timestamp, because it might not be updated yet
+            auto oldTimestamp = m_gameState.m_unkUint2;
+            auto ticks = static_cast<uint32_t>(std::round(m_gameState.m_levelTime * 240));
+            m_gameState.m_unkUint2 = ticks;
+            PlayLayer::levelComplete();
+            m_gameState.m_unkUint2 = oldTimestamp;
         }
     };
 
