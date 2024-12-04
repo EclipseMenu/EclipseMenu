@@ -8,7 +8,7 @@
 
 namespace eclipse::gui::imgui::themes {
 
-	bool MegaOverlay::checkbox(const std::string &label, bool &value, const std::function<void()> &postDraw) const {
+	bool MegaOverlay::checkbox(const std::string &label, bool &value, bool isSearchedFor, const std::function<void()> &postDraw) const {
 		auto tm = ThemeManager::get();
 		auto textColor = value ? tm->getCheckboxForegroundColor() : tm->getDisabledColor();
 		auto checkboxColor = value ? tm->getCheckboxCheckmarkColor() : tm->getDisabledColor().darken(0.2f);
@@ -71,7 +71,7 @@ namespace eclipse::gui::imgui::themes {
 		    style.FrameRounding);
 
 		if (label_size.x > 0.0f) {
-			PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(textColor));
+			PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(isSearchedFor ? tm->getSearchedColor() : textColor));
 			RenderText(ImVec2(check_bb.Min.x + cc_sz + cc_pad, text_pos.y), label.c_str());
 			PopStyleColor();
 		}

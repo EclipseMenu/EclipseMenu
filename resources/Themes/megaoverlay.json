@@ -1,52 +1,53 @@
 {
-  "blur": {
-    "blurEnabled": false,
-    "blurRadius": 1.0,
-    "blurSpeed": 0.30000001192092896
-  },
-  "colors": {
-    "backgroundColor": "111111F9",
-    "borderColor": "444444F9",
-    "buttonActivatedColor": "7A537DFF",
-    "buttonActiveForeground": "FFFFFFFF",
-    "buttonBackgroundColor": "30303080",
-    "buttonDisabledColor": "D393AFFF",
-    "buttonDisabledForeground": "B2B2B2FF",
-    "buttonForegroundColor": "BBBBBBFF",
-    "buttonHoveredColor": "553A57AA",
-    "buttonHoveredForeground": "FFFFFFFF",
-    "checkboxBackgroundColor": "2B2B2BF9",
-    "checkboxCheckmarkColor": "0E850EFF",
-    "checkboxForegroundColor": "BBBBBBFF",
-    "disabledColor": "909090FF",
-    "foregroundColor": "BBBBBBFF",
-    "frameBackground": "282828AA",
-    "titleBackgroundColor": "AB2CB7FF",
-    "titleForegroundColor": "BBBBBBFF"
-  },
-  "details": {
-    "author": "Eclipse Team",
-    "description": "A recreation of GD MegaOverlay style",
-    "layout": 0,
-    "name": "MegaOverlay",
-    "renderer": 0,
-    "schema": 1,
-    "style": 2
-  },
-  "other": {
-    "borderSize": 0.0,
-    "font": "Rubik",
-    "fontSize": 16.0,
-    "framePadding": 5.0,
-    "frameRounding": 2.0,
-    "horizontalInnerSpacing": 8.0,
-    "horizontalSpacing": 12.0,
-    "indentSpacing": 25.0,
-    "uiScale": 1.0,
-    "verticalInnerSpacing": 6.0,
-    "verticalSpacing": 8.0,
-    "windowMargin": 4.0,
-    "windowPadding": 15.0,
-    "windowRounding": 0.0
-  }
+    "blur": {
+        "blurEnabled": false,
+        "blurRadius": 1.0,
+        "blurSpeed": 0.30000001192092896
+    },
+    "colors": {
+        "backgroundColor": "111111F9",
+        "borderColor": "444444F9",
+        "buttonActivatedColor": "7A537DFF",
+        "buttonActiveForeground": "FFFFFFFF",
+        "buttonBackgroundColor": "30303080",
+        "buttonDisabledColor": "D393AFFF",
+        "buttonDisabledForeground": "B2B2B2FF",
+        "buttonForegroundColor": "BBBBBBFF",
+        "buttonHoveredColor": "553A57AA",
+        "buttonHoveredForeground": "FFFFFFFF",
+        "checkboxBackgroundColor": "2B2B2BF9",
+        "checkboxCheckmarkColor": "0E850EFF",
+        "checkboxForegroundColor": "BBBBBBFF",
+        "disabledColor": "909090FF",
+        "foregroundColor": "BBBBBBFF",
+        "searchedColor": "FF0000FF",
+        "frameBackground": "282828AA",
+        "titleBackgroundColor": "AB2CB7FF",
+        "titleForegroundColor": "BBBBBBFF"
+    },
+    "details": {
+        "author": "Eclipse Team",
+        "description": "A recreation of GD MegaOverlay style",
+        "layout": 0,
+        "name": "MegaOverlay",
+        "renderer": 0,
+        "schema": 1,
+        "style": 2
+    },
+    "other": {
+        "borderSize": 0.0,
+        "font": "Rubik",
+        "fontSize": 16.0,
+        "framePadding": 5.0,
+        "frameRounding": 2.0,
+        "horizontalInnerSpacing": 8.0,
+        "horizontalSpacing": 12.0,
+        "indentSpacing": 25.0,
+        "uiScale": 1.0,
+        "verticalInnerSpacing": 6.0,
+        "verticalSpacing": 8.0,
+        "windowMargin": 4.0,
+        "windowPadding": 15.0,
+        "windowRounding": 0.0
+    }
 }

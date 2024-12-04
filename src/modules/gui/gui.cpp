@@ -53,7 +53,7 @@ namespace eclipse::gui {
 
     void ToggleComponent::addOptions(const std::function<void(std::shared_ptr<MenuTab>)>& options) {
         if (!m_options)
-            m_options = std::make_shared<MenuTab>(m_title);
+            m_options = std::make_shared<MenuTab>(m_title, false);
 
         options(m_options);
     }
@@ -331,7 +331,7 @@ namespace eclipse::gui {
         }
 
         // If the tab does not exist, create a new one.
-        auto tab = std::make_shared<MenuTab>(std::string(name));
+        auto tab = std::make_shared<MenuTab>(std::string(name), false);
         m_tabs.push_back(tab);
 
         return tab;

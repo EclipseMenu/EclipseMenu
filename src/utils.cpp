@@ -182,4 +182,15 @@ namespace eclipse::utils {
         menu->setPosition({0, 0});
         return menu;
     }
+
+    bool matchesStringFuzzy(const std::string& haystack, const std::string& needle)
+    {
+        auto it = std::search(
+            haystack.begin(), haystack.end(),
+            needle.begin(), needle.end(),
+            [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); }
+        );
+
+        return (it != haystack.end());
+    }
 }

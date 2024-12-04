@@ -165,6 +165,8 @@ namespace eclipse::gui {
         COLOR_PROPERTY(m_foregroundColor, ForegroundColor)
         /// Disabled text color
         COLOR_PROPERTY(m_disabledColor, DisabledColor)
+        /// Searched text color
+        COLOR_PROPERTY(m_searchedColor, SearchedColor)
         /// Primary border color
         COLOR_PROPERTY(m_borderColor, BorderColor)
 

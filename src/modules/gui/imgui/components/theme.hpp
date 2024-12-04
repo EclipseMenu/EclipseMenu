@@ -80,15 +80,17 @@ namespace eclipse::gui::imgui {
 
         virtual bool checkbox(
             const std::string& label, bool& value,
+            bool isSearchedFor,
             const std::function<void()>& postDraw = []{}
         ) const;
         virtual bool checkboxWithSettings(
             const std::string& label, bool& value,
+            bool isSearchedFor,
             const std::function<void()>& callback,
             const std::function<void()>& postDraw = []{},
             const std::string& popupId = "" // empty = use default
         ) const;
-        virtual bool button(const std::string& text) const;
+        virtual bool button(const std::string& text, bool isSearchedFor) const;
 
         virtual ComponentTheme getTheme() const { return ComponentTheme::ImGui; }
     };

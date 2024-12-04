@@ -112,4 +112,7 @@ namespace eclipse::utils {
 
     /// @brief Get custom CCMenu created in UILayer.
     cocos2d::CCMenu* getEclipseUILayer();
+
+    /// @brief Checks if a string matches another one (case-insensitive)
+    bool matchesStringFuzzy(const std::string& strHaystack, const std::string& strNeedle);
 }

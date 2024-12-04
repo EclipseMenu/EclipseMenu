@@ -6,14 +6,14 @@
 #include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::imgui::themes {
-    bool Megahack::checkbox(const std::string &label, bool &value, const std::function<void()> &postDraw) const {
+    bool Megahack::checkbox(const std::string &label, bool &value, bool isSearchedFor, const std::function<void()> &postDraw) const {
         auto tm = ThemeManager::get();
         auto textColor = value ? tm->getCheckboxForegroundColor() : tm->getButtonDisabledForeground();
         auto scale = tm->getGlobalScale();
 
         ImGui::PushItemWidth(-1);
 
-        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(textColor));
+        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(isSearchedFor ? tm->getSearchedColor() : textColor));
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
@@ -38,7 +38,7 @@ namespace eclipse::gui::imgui::themes {
         return toggled;
     }
 
-    bool Megahack::checkboxWithSettings(const std::string &label, bool &value,
+    bool Megahack::checkboxWithSettings(const std::string &label, bool &value, bool isSearchedFor,
                                         const std::function<void()> &callback,
                                         const std::function<void()> &postDraw,
                                         const std::string& popupId) const {
@@ -51,7 +51,7 @@ namespace eclipse::gui::imgui::themes {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
 
-        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(textColor));
+        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(isSearchedFor ? tm->getSearchedColor() : textColor));
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
@@ -99,17 +99,21 @@ namespace eclipse::gui::imgui::themes {
         return toggled;
     }
 
-    bool Megahack::button(const std::string &text) const {
+    bool Megahack::button(const std::string &text, bool isSearchedFor) const {
         ImGui::PushItemWidth(-1);
 
         auto tm = ThemeManager::get();
+
+        if (isSearchedFor)
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getSearchedColor()));
+
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
 
         bool pressed = ImGui::Button(text.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0));
 
-        ImGui::PopStyleColor(3);
+        ImGui::PopStyleColor(isSearchedFor ? 4 : 3);
 
         // Draw two lines
         bool isMouseOver = ImGui::IsItemHovered();
