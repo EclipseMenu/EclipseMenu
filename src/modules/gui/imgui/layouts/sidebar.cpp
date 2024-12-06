@@ -78,7 +78,7 @@ namespace eclipse::gui::imgui {
             std::string it = currentTabs[i]->getTitle().c_str();
             ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5, 0.5));
             ImGui::PushStyleColor(ImGuiCol_Button, m_selectedTab == i ? style->Colors[ImGuiCol_Button] : ImVec4(0, 0, 0, 0));
-            ImGui::PushStyleColor(ImGuiCol_Text, currentTabs[i]->isSearchedFor() ? static_cast<ImVec4>(tm->getSearchedColor()) : style->Colors[ImGuiCol_Text]);
+            ImGui::PushStyleColor(ImGuiCol_Text, (Engine::get()->isSearching() && currentTabs[i]->isSearchedFor() || !Engine::get()->isSearching()) ? style->Colors[ImGuiCol_Text] : static_cast<ImVec4>(tm->getNotSearchedColor()));
             if (ImGui::Button(it.c_str(), ImVec2(160 * scale, 40 * scale))) {
                 m_selectedTab = i;
             }

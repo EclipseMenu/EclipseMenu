@@ -181,10 +181,15 @@ namespace eclipse::gui::imgui {
 
     void Theme::visitLabel(const std::shared_ptr<LabelComponent>& label) const {
         if (label->getTitle().empty()) return; // skip empty labels
-        if (label->isSearchedFor())
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
-        else
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getForegroundColor()));
+
+        auto tm = ThemeManager::get();
+
+        ImGui::PushStyleColor(
+            ImGuiCol_Text,
+            static_cast<ImVec4>((Engine::get()->isSearching() && label->isSearchedFor())
+                ? tm->getForegroundColor()
+                : tm->getNotSearchedColor())
+        );
         ImGui::TextWrapped("%s", label->getTitle().c_str());
         ImGui::PopStyleColor();
     }
@@ -219,19 +224,20 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitRadioButton(const std::shared_ptr<RadioButtonComponent>& radio) const {
+        auto tm = ThemeManager::get();
         int value = radio->getValue();
 
-        if (radio->isSearchedFor())
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
+        if (Engine::get()->isSearching())
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(radio->isSearchedFor() ? tm->getForegroundColor() : tm->getNotSearchedColor()));
 
-        ImGui::PushStyleColor(ImGuiCol_CheckMark, static_cast<ImVec4>(ThemeManager::get()->getCheckboxCheckmarkColor()));
+        ImGui::PushStyleColor(ImGuiCol_CheckMark, static_cast<ImVec4>(tm->getCheckboxCheckmarkColor()));
         if (ImGui::RadioButton(radio->getTitle().c_str(), &value, radio->getChoice())) {
             radio->setValue(value);
             radio->triggerCallback(value);
         }
         ImGui::PopStyleColor();
 
-        if (radio->isSearchedFor())
+        if (Engine::get()->isSearching())
             ImGui::PopStyleColor();
 
         handleTooltip(radio->getDescription());
@@ -240,6 +246,8 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitCombo(const std::shared_ptr<ComboComponent>& combo) const {
+        auto tm = ThemeManager::get();
+
         auto& items = combo->getItems();
         int value = combo->getValue();
         auto& title = combo->getTitle();
@@ -263,16 +271,18 @@ namespace eclipse::gui::imgui {
         ImGui::SetNextItemWidth(5.f);
         ImGui::SameLine();
 
-        if (combo->isSearchedFor())
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
+        if (Engine::get()->isSearching())
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(combo->isSearchedFor() ? tm->getForegroundColor() : tm->getNotSearchedColor()));
 
         ImGui::TextWrapped("%s", title.c_str());
 
-        if (combo->isSearchedFor())
+        if (Engine::get()->isSearching())
             ImGui::PopStyleColor();
     }
 
     void Theme::visitFilesystemCombo(const std::shared_ptr<FilesystemComboComponent>& combo) const {
+        auto tm = ThemeManager::get();
+
         auto& items = combo->getItems();
         std::filesystem::path value = combo->getValue();
         auto title = combo->getTitle();
@@ -299,20 +309,22 @@ namespace eclipse::gui::imgui {
         ImGui::SetNextItemWidth(5.f);
         ImGui::SameLine();
 
-        if (combo->isSearchedFor())
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
+        if (Engine::get()->isSearching())
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(combo->isSearchedFor() ? tm->getForegroundColor() : tm->getNotSearchedColor()));
 
         ImGui::TextWrapped("%s", title.c_str());
 
-        if (combo->isSearchedFor())
+        if (Engine::get()->isSearching())
             ImGui::PopStyleColor();
     }
 
     void Theme::visitSlider(const std::shared_ptr<SliderComponent>& slider) const {
+        auto tm = ThemeManager::get();
+
         auto value = slider->getValue();
 
-        if (slider->isSearchedFor())
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
+        if (Engine::get()->isSearching())
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(slider->isSearchedFor() ? tm->getForegroundColor() : tm->getNotSearchedColor()));
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
         if (ImGui::SliderFloat(slider->getTitle().c_str(), &value, slider->getMin(), slider->getMax(), slider->getFormat().c_str())) {
@@ -320,7 +332,7 @@ namespace eclipse::gui::imgui {
             slider->triggerCallback(value);
         }
 
-        if (slider->isSearchedFor())
+        if (Engine::get()->isSearching())
             ImGui::PopStyleColor();
 
         handleTooltip(slider->getDescription());
@@ -328,6 +340,8 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitInputFloat(const std::shared_ptr<InputFloatComponent> &inputFloat) const {
+        auto tm = ThemeManager::get();
+
         auto value = inputFloat->getValue();
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
@@ -339,12 +353,12 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine();
 
-        if (inputFloat->isSearchedFor())
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
+        if (Engine::get()->isSearching())
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(inputFloat->isSearchedFor() ? tm->getForegroundColor() : tm->getNotSearchedColor()));
 
         ImGui::TextWrapped("%s", inputFloat->getTitle().c_str());
 
-        if (inputFloat->isSearchedFor())
+        if (Engine::get()->isSearching())
             ImGui::PopStyleColor();
 
         handleTooltip(inputFloat->getDescription());
@@ -352,6 +366,8 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitInputInt(const std::shared_ptr<InputIntComponent> &inputInt) const {
+        auto tm = ThemeManager::get();
+
         auto value = inputInt->getValue();
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
@@ -363,12 +379,12 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine();
 
-        if (inputInt->isSearchedFor())
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
+        if (Engine::get()->isSearching())
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(inputInt->isSearchedFor() ? tm->getForegroundColor() : tm->getNotSearchedColor()));
 
         ImGui::TextWrapped("%s", inputInt->getTitle().c_str());
 
-        if (inputInt->isSearchedFor())
+        if (Engine::get()->isSearching())
             ImGui::PopStyleColor();
 
         handleTooltip(inputInt->getDescription());
@@ -426,6 +442,8 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitInputText(const std::shared_ptr<InputTextComponent>& inputText) const {
+        auto tm = ThemeManager::get();
+
         auto value = inputText->getValue();
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
@@ -437,20 +455,20 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine();
 
-        if (inputText->isSearchedFor())
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
+        if (Engine::get()->isSearching())
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(inputText->isSearchedFor() ? tm->getForegroundColor() : tm->getNotSearchedColor()));
 
-        // ImGui::PushTextWrapPos(0.0f);
         ImGui::Text("%s", inputText->getTitle().c_str());
-        // ImGui::PopTextWrapPos();
 
-        if (inputText->isSearchedFor())
+        if (Engine::get()->isSearching())
             ImGui::PopStyleColor();
 
         handleTooltip(inputText->getDescription());
     }
 
     void Theme::visitColor(const std::shared_ptr<ColorComponent>& color) const {
+        auto tm = ThemeManager::get();
+
         auto value = color->getValue();
         bool changed = false;
 
@@ -462,12 +480,12 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine();
 
-        if (color->isSearchedFor())
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
+        if (Engine::get()->isSearching())
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(color->isSearchedFor() ? tm->getForegroundColor() : tm->getNotSearchedColor()));
 
         ImGui::TextWrapped("%s", color->getTitle().c_str());
 
-        if (color->isSearchedFor())
+        if (Engine::get()->isSearching())
             ImGui::PopStyleColor();
 
         if (changed) {
@@ -488,6 +506,8 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitKeybind(const std::shared_ptr<KeybindComponent>& keybind) const {
+        auto tm = ThemeManager::get();
+
         auto& title = keybind->getTitle();
         auto canDelete = keybind->canDelete();
 
@@ -499,8 +519,8 @@ namespace eclipse::gui::imgui {
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 
-        if (keybind->isSearchedFor())
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
+        if (Engine::get()->isSearching())
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(keybind->isSearchedFor() ? tm->getForegroundColor() : tm->getNotSearchedColor()));
 
         auto availWidth = ImGui::GetContentRegionAvail().x;
 
@@ -515,7 +535,7 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine(0, 2);
 
-        ImGui::PopStyleColor(keybind->isSearchedFor() ? 4 : 3);
+        ImGui::PopStyleColor(Engine::get()->isSearching() ? 4 : 3);
         ImGui::PopStyleVar(2);
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0.25f));
@@ -644,7 +664,7 @@ namespace eclipse::gui::imgui {
     bool Theme::checkbox(const std::string &label, bool &value, bool isSearchedFor, const std::function<void()> &postDraw) const {
         auto tm = ThemeManager::get();
 
-        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(isSearchedFor ? tm->getSearchedColor() : tm->getCheckboxForegroundColor()));
+        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>((Engine::get()->isSearching() && isSearchedFor || !Engine::get()->isSearching()) ? tm->getForegroundColor() : tm->getNotSearchedColor()));
         ImGui::PushStyleColor(ImGuiCol_CheckMark, static_cast<ImVec4>(tm->getCheckboxCheckmarkColor()));
         ImGui::PushStyleColor(ImGuiCol_FrameBg, static_cast<ImVec4>(tm->getCheckboxBackgroundColor()));
 
@@ -690,8 +710,8 @@ namespace eclipse::gui::imgui {
 
         auto tm = ThemeManager::get();
 
-        if (isSearchedFor)
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getSearchedColor()));
+        if (Engine::get()->isSearching())
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(isSearchedFor ? tm->getForegroundColor() : tm->getNotSearchedColor()));
 
         ImGui::PushStyleColor(ImGuiCol_Button, static_cast<ImVec4>(tm->getButtonBackgroundColor()));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, static_cast<ImVec4>(tm->getButtonHoveredBackground()));
@@ -699,7 +719,7 @@ namespace eclipse::gui::imgui {
 
         bool pressed = ImGui::Button(text.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0));
 
-        ImGui::PopStyleColor(isSearchedFor ? 4 : 3);
+        ImGui::PopStyleColor(Engine::get()->isSearching() ? 4 : 3);
         ImGui::PopItemWidth();
 
         return pressed;

@@ -63,7 +63,7 @@ namespace eclipse::gui {
         m_blurSpeed = 0.3f;
         m_blurRadius = 1.f;
 
-        m_searchedColor = Color{ 255, 0, 0, 255 };
+        m_notSearchedColor = Color{ 255, 255, 255, 50 };
 
         // TODO: fill this after all properties are figured out
     }
@@ -161,7 +161,7 @@ namespace eclipse::gui {
         try_assign(m_foregroundColor, colors, "foregroundColor");
         try_assign(m_frameBackground, colors, "frameBackground");
         try_assign(m_disabledColor, colors, "disabledColor");
-        try_assign(m_searchedColor, colors, "searchedColor");
+        try_assign(m_notSearchedColor, colors, "notSearchedColor");
         try_assign(m_borderColor, colors, "borderColor");
         try_assign(m_titleBackgroundColor, colors, "titleBackgroundColor");
         try_assign(m_titleForegroundColor, colors, "titleForegroundColor");
@@ -233,7 +233,7 @@ namespace eclipse::gui {
         colors["frameBackground"] = m_frameBackground;
         colors["foregroundColor"] = m_foregroundColor;
         colors["disabledColor"] = m_disabledColor;
-        colors["searchedColor"] = m_searchedColor;
+        colors["notSearchedColor"] = m_notSearchedColor;
         colors["borderColor"] = m_borderColor;
         colors["titleBackgroundColor"] = m_titleBackgroundColor;
         colors["titleForegroundColor"] = m_titleForegroundColor;

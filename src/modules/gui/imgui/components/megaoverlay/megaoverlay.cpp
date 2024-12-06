@@ -71,7 +71,7 @@ namespace eclipse::gui::imgui::themes {
 		    style.FrameRounding);
 
 		if (label_size.x > 0.0f) {
-			PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(isSearchedFor ? tm->getSearchedColor() : textColor));
+			PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>((Engine::get()->isSearching() && isSearchedFor || !Engine::get()->isSearching()) ? textColor : tm->getNotSearchedColor()));
 			RenderText(ImVec2(check_bb.Min.x + cc_sz + cc_pad, text_pos.y), label.c_str());
 			PopStyleColor();
 		}

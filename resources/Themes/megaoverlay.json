@@ -20,7 +20,7 @@
         "checkboxForegroundColor": "BBBBBBFF",
         "disabledColor": "909090FF",
         "foregroundColor": "BBBBBBFF",
-        "searchedColor": "FF0000FF",
+        "notSearchedColor": "FFFFFF32",
         "frameBackground": "282828AA",
         "titleBackgroundColor": "AB2CB7FF",
         "titleForegroundColor": "BBBBBBFF"

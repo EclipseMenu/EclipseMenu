@@ -13,7 +13,7 @@ namespace eclipse::gui::imgui::themes {
 
         ImGui::PushItemWidth(-1);
 
-        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(isSearchedFor ? tm->getSearchedColor() : textColor));
+        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>((Engine::get()->isSearching() && isSearchedFor || !Engine::get()->isSearching()) ? textColor : tm->getNotSearchedColor()));
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
@@ -51,7 +51,7 @@ namespace eclipse::gui::imgui::themes {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
 
-        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(isSearchedFor ? tm->getSearchedColor() : textColor));
+        ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>((Engine::get()->isSearching() && isSearchedFor || !Engine::get()->isSearching()) ? textColor : tm->getNotSearchedColor()));
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
@@ -104,8 +104,8 @@ namespace eclipse::gui::imgui::themes {
 
         auto tm = ThemeManager::get();
 
-        if (isSearchedFor)
-            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getSearchedColor()));
+        if (Engine::get()->isSearching())
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(isSearchedFor ? tm->getForegroundColor() : tm->getNotSearchedColor()));
 
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
@@ -113,7 +113,7 @@ namespace eclipse::gui::imgui::themes {
 
         bool pressed = ImGui::Button(text.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0));
 
-        ImGui::PopStyleColor(isSearchedFor ? 4 : 3);
+        ImGui::PopStyleColor(Engine::get()->isSearching() ? 4 : 3);
 
         // Draw two lines
         bool isMouseOver = ImGui::IsItemHovered();

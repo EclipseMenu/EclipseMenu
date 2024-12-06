@@ -183,6 +183,8 @@ $on_mod(Loaded) {
 
             if (input.empty())
             {
+                Engine::get()->setSearching(false);
+
                 if (hasSearched)
                 {
                     for (auto& tab : Engine::get()->getTabs())
@@ -198,6 +200,7 @@ $on_mod(Loaded) {
             }
             else
             {
+                Engine::get()->setSearching(true);
                 hasSearched = true;
 
                 for (auto& tab : Engine::get()->getTabs())

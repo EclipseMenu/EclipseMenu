@@ -1002,13 +1002,18 @@ namespace eclipse::gui {
             if (m_renderer) m_renderer->showPopup(popup);
         }
 
+        /// @brief Sets whether the user is searching or not.
+        void setSearching(bool state) { m_isSearching = state; }
+
         [[nodiscard]] const Tabs& getTabs() const { return m_tabs; }
         [[nodiscard]] bool isInitialized() const { return m_initialized; }
+        [[nodiscard]] bool isSearching() const { return m_isSearching; }
 
     private:
         std::shared_ptr<Renderer> m_renderer;
         Tabs m_tabs;
         bool m_initialized = false;
+        bool m_isSearching = false;
     };
 
 }
