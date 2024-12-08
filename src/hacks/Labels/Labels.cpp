@@ -238,20 +238,20 @@ namespace eclipse::hacks::Labels {
                     auto* container = m_fields->m_containers[static_cast<int>(setting.alignment)];
                     container->addLabel(label, [&setting](SmartLabel* label) {
                         label->setScript(setting.text);
-                        if (setting.hasEvents()) {
+                        /*if (setting.hasEvents()) {
                             auto [visible, scale, color, font] = setting.processEvents();
                             label->setFntFile(font.c_str());
                             label->setScale(scale);
                             label->setColor(color.toCCColor3B());
                             label->setOpacity(static_cast<GLubyte>(color.a * 255));
                             label->setVisible(visible);
-                        } else {
+                        } else {*/
                             label->setFntFile(setting.font.c_str());
                             label->setScale(setting.scale);
                             label->setColor(setting.color.toCCColor3B());
                             label->setOpacity(static_cast<GLubyte>(setting.color.a * 255));
                             label->setVisible(setting.visible);
-                        }
+                        //}
                     });
                 }
             }
