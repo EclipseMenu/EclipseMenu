@@ -14,16 +14,16 @@
 namespace eclipse::hacks::Player {
     class ShowTrajectory : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            gui::ToggleComponent* toggle = tab->addToggle("Show Trajectory", "player.showtrajectory")
-                ->setDescription("Shows where the player will be if they click/don't click.")
+            gui::ToggleComponent* toggle = tab->addToggle("player.showtrajectory")
+                ->setDescription()
                 ->handleKeybinds();
 
             config::setIfEmpty("player.showtrajectory.iterations", 300);
 
             toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                options->addInputInt("Iterations", "player.showtrajectory.iterations", 1, 1000);
+                options->addInputInt("player.showtrajectory.iterations", "player.showtrajectory.iterations", 1, 1000);
             });
         }
 

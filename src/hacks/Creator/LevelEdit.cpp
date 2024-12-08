@@ -14,11 +14,11 @@ namespace eclipse::hacks::Creator {
 
     class LevelEdit : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
+            auto tab = gui::MenuTab::find("tab.creator");
 
-            tab->addToggle("Level Edit", "creator.leveledit")
+            tab->addToggle("creator.leveledit")
                 ->handleKeybinds()
-                ->setDescription("Allows you to access the level editor from the pause menu in any level.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Level Edit"; }

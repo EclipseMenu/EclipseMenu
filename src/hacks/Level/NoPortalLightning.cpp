@@ -8,9 +8,9 @@ namespace eclipse::hacks::Level {
 
     class NoPortalLightning final : public hack::Hack {
         void init() override {
-            gui::MenuTab::find("Level")
-                ->addToggle("No Portal Lightning", "level.noportallightning")
-                ->setDescription("Disables lightning effects when passing through size change portals and more.")
+            gui::MenuTab::find("tab.level")
+                ->addToggle("level.noportallightning")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

@@ -8,11 +8,11 @@ namespace eclipse::hacks::Level {
 
     class NoGlow : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("No Object Glow", "level.noglow")
+            tab->addToggle("level.noglow")
                 ->handleKeybinds()
-                ->setDescription("Disables all glow coming from objects");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "No Object Glow"; }

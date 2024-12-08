@@ -8,11 +8,11 @@ namespace eclipse::hacks::Bypass {
 
     class CharLimit : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Bypass");
+            auto tab = gui::MenuTab::find("tab.bypass");
 
-            tab->addToggle("Character Limit Bypass", "bypass.charlimit")
+            tab->addToggle("bypass.charlimit")
                 ->handleKeybinds()
-                ->setDescription("Allows you to bypass the character limit of any text field.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Character Limit Bypass"; }

@@ -8,9 +8,9 @@ namespace eclipse::hacks::Level {
 
     class NoMirror : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("No Mirror", "level.nomirror")->handleKeybinds();
+            tab->addToggle("level.nomirror")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "No Mirror"; }

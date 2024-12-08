@@ -40,7 +40,8 @@
 			"resources/Blur/*.glsl",
 			"resources/Fonts/*.ttf",
 			"resources/Licenses/*.txt",
-			"resources/Themes/*.json"
+			"resources/Themes/*.json",
+			"resources/Languages/*.json"
 		],
 		"sprites": [
 			"resources/ECLIPSE-android.png"

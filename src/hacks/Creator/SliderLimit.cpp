@@ -10,11 +10,11 @@ namespace eclipse::hacks::Creator {
     // TODO: bypass certain sliders in editor
     class SliderLimit : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
+            auto tab = gui::MenuTab::find("tab.creator");
 
-            tab->addToggle("Slider Limit", "creator.sliderlimit")
+            tab->addToggle("creator.sliderlimit")
                     ->handleKeybinds()
-                    ->setDescription("Removes the min/max limit on sliders.");
+                    ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Slider Limit"; }

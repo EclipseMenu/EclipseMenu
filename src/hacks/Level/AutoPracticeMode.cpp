@@ -8,11 +8,11 @@ namespace eclipse::hacks::Level {
 
     class AutoPracticeMode : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Auto Practice Mode", "level.autopracticemode")
+            tab->addToggle("level.autopracticemode")
                 ->handleKeybinds()
-                ->setDescription("Automatically enables practice mode when entering a level. (Created by Uproxide)");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Auto Practice Mode"; }

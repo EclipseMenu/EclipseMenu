@@ -29,11 +29,14 @@ namespace eclipse::hacks::Shortcuts {
                 level = lil->m_level;
             }
 
-            if (!level) return Popup::create("Error", "You have to open the level first!");
+            if (!level) return Popup::create(
+                i18n::get_("common.error"),
+                i18n::get_("shortcuts.uncomplete-level.error")
+            );
 
             Popup::create(
-                "Uncomplete level?",
-                fmt::format("Are you sure you want to uncomplete \"{}\"?\nYou can't undo this process.", level->m_levelName),
+                i18n::get_("shortcuts.uncomplete-level.title"),
+                i18n::format("shortcuts.uncomplete-level.msg", level->m_levelName),
                 "Yes", "No",[level](bool yes) {
                     if (!yes) return;
                     auto gsm = GameStatsManager::sharedState();
@@ -159,19 +162,19 @@ namespace eclipse::hacks::Shortcuts {
             config::setIfEmpty("shortcut.p1jump", keybinds::Keys::None);
             config::setIfEmpty("shortcut.p2jump", keybinds::Keys::None);
 
-            auto tab = gui::MenuTab::find("Shortcuts");
-            tab->addKeybind("P1 Jump", "shortcut.p1jump", true)->setInternal();
-            tab->addKeybind("P2 Jump", "shortcut.p2jump", true)->setInternal();
-            tab->addButton("Show Options")->setDescription("Open game settings menu")->callback(openSettings)->handleKeybinds();
-            tab->addButton("Uncomplete Level")->setDescription("Clear progress from a level")->callback(uncompleteLevel)->handleKeybinds();
-            tab->addButton("Restart Level")->setDescription("Restart the current level")->callback(restartLevel)->handleKeybinds();
-            tab->addButton("Toggle Practice Mode")->callback(togglePracticeMode)->handleKeybinds();
-            tab->addButton("Place Checkpoint")->callback(placeCheckpoint)->handleKeybinds();
-            tab->addButton("Remove Checkpoint")->callback(removeCheckpoint)->handleKeybinds();
+            auto tab = gui::MenuTab::find("tab.shortcuts");
+            tab->addKeybind("shortcuts.p1jump", "shortcut.p1jump", true)->setInternal();
+            tab->addKeybind("shortcuts.p2jump", "shortcut.p2jump", true)->setInternal();
+            tab->addButton("shortcuts.options")->setDescription()->callback(openSettings)->handleKeybinds();
+            tab->addButton("shortcuts.uncomplete-level")->setDescription()->callback(uncompleteLevel)->handleKeybinds();
+            tab->addButton("shortcuts.restart-level")->setDescription()->callback(restartLevel)->handleKeybinds();
+            tab->addButton("shortcuts.toggle-practice")->setDescription()->callback(togglePracticeMode)->handleKeybinds();
+            tab->addButton("shortcuts.place-checkpoint")->setDescription()->callback(placeCheckpoint)->handleKeybinds();
+            tab->addButton("shortcuts.remove-checkpoint")->setDescription()->callback(removeCheckpoint)->handleKeybinds();
             GEODE_WINDOWS(
-                tab->addButton("Inject DLL")->setDescription("Pick a DLL file to inject")->callback(injectDll)->handleKeybinds();
+                tab->addButton("shortcuts.inject-dll")->setDescription()->callback(injectDll)->handleKeybinds();
             )
-            tab->addButton("Save folder")->setDescription("Open the game's save folder")->callback(openSaveFolder)->handleKeybinds();
+            tab->addButton("shortcuts.save-folder")->setDescription()->callback(openSaveFolder)->handleKeybinds();
 
             auto manager = keybinds::Manager::get();
             manager->addListener("shortcut.p1jump", [](bool down) {

@@ -31,14 +31,15 @@ namespace eclipse::hacks::Global {
 
     class PitchShift : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Global");
+            auto tab = gui::MenuTab::find("tab.global");
 
             config::setIfEmpty("global.pitchshift.toggle", false);
             config::setIfEmpty("global.pitchshift", 1.f);
 
-            tab->addFloatToggle("Pitch Shift", "global.pitchshift", 0.5f, 2.f, "%.2f")
+            tab->addFloatToggle("global.pitchshift", "global.pitchshift", 0.5f, 2.f, "%.2f")
                 ->valueCallback(setPitch)
                 ->handleKeybinds()
+                ->setDescription()
                 ->toggleCallback([] {
                     if (config::get<bool>("global.pitchshift.toggle", false))
                         setPitch(config::get<float>("global.pitchshift", 1.f));

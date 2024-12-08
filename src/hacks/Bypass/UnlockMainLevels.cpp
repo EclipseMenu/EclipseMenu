@@ -8,9 +8,9 @@ namespace eclipse::hacks::Bypass {
 
     class UnlockMainLevels : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Bypass");
+            auto tab = gui::MenuTab::find("tab.bypass");
 
-            tab->addToggle("Unlock Main Levels", "bypass.unlockmainlevels")->setDescription("Unlocks any locked main levels.")->handleKeybinds();
+            tab->addToggle("bypass.unlockmainlevels")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Unlock Main Levels"; }

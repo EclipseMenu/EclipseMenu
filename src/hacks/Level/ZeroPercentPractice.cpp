@@ -8,11 +8,11 @@ namespace eclipse::hacks::Level {
 
     class ZeroPercentPractice : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("0% Practice Completion", "level.zeropercentpractice")
+            tab->addToggle("level.zeropercentpractice")
                 ->handleKeybinds()
-                ->setDescription("Treats completions from 0% in Practice Mode as Normal Mode completions");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "0% Practice Completion"; }

@@ -8,9 +8,9 @@ namespace eclipse::hacks::Level {
 
     class PlatGamemodes : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("All Modes in Platformer", "level.platgamemodes")->handleKeybinds();
+            tab->addToggle("level.platgamemodes")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "All Modes in Platformer"; }

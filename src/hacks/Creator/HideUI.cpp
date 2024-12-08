@@ -8,11 +8,11 @@ namespace eclipse::hacks::Creator {
 
     class HideUI : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
+            auto tab = gui::MenuTab::find("tab.creator");
 
-            tab->addToggle("Hide UI", "creator.hideui")
+            tab->addToggle("creator.hideui")
                 ->handleKeybinds()
-                ->setDescription("Hides the UI in the editor.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Hide UI"; }

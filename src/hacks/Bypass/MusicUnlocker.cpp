@@ -8,13 +8,13 @@ namespace eclipse::hacks::Cosmetic {
 
     class PracticeMusic : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Bypass");
+            auto tab = gui::MenuTab::find("tab.bypass");
 
-            tab->addToggle("Practice Music Sync", "bypass.practicemusic")
+            tab->addToggle("bypass.practicemusic")
                 ->callback([](bool v){
                     GameStatsManager::get()->toggleEnableItem(UnlockType::GJItem, 17, v);
                 })
-                ->handleKeybinds();
+                ->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Practice Music Sync"; }
@@ -22,10 +22,11 @@ namespace eclipse::hacks::Cosmetic {
 
     class MusicCustomizer : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Bypass");
+            auto tab = gui::MenuTab::find("tab.bypass");
 
-            tab->addToggle("Music Customizer", "bypass.musiccustomizer")
-                ->handleKeybinds();
+            tab->addToggle("bypass.musiccustomizer")
+                ->handleKeybinds()
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Music Customizer"; }

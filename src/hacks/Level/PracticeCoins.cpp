@@ -8,10 +8,10 @@ namespace eclipse::hacks::Level {
 
     class PracticeCoins : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Practice Coins", "level.practicecoins")
-                ->setDescription("Allows you to collect coins in practice mode.")
+            tab->addToggle("level.practicecoins")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

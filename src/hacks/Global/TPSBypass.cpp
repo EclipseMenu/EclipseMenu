@@ -17,9 +17,12 @@ namespace eclipse::hacks::Global {
         void init() override {
             config::setIfEmpty("global.tpsbypass", 240.f);
 
-            auto tab = gui::MenuTab::find("Global");
-            tab->addFloatToggle("Physics Bypass", "global.tpsbypass", MIN_TPS, MAX_TPS, "%.0f TPS")
+            auto tab = gui::MenuTab::find("tab.global");
+            tab->addFloatToggle("global.tpsbypass", "global.tpsbypass", MIN_TPS, MAX_TPS, "%.2f TPS")
+               ->setDescription()
                ->handleKeybinds();
+            tab->addToggle("Physics Bypass Real Time", "global.tpsbypass.unlag")
+               ->setDescription("Slows down the game to keep up with real time. Useful for replaying macros.");
         }
 
         [[nodiscard]] const char* getId() const override { return "Physics Bypass"; }
@@ -72,15 +75,20 @@ namespace eclipse::hacks::Global {
         }
 
         void update(float dt) override {
+            auto unlag = config::get("global.tpsbypass.unlag", false);
+            auto newTPS = config::get("global.tpsbypass", 240.f);
+            auto newDelta = 1.0 / newTPS;
+
+            if (unlag) {
+                dt = newDelta;
+            }
+
             auto fields = m_fields.self();
             fields->m_extraDelta += dt;
             fields->m_shouldBreak = false;
 
             // store current frame delta for later use in updateVisibility
             fields->m_realDelta = getCustomDelta(dt, 240.f, false);
-
-            auto newTPS = config::get("global.tpsbypass", 240.f);
-            auto newDelta = 1.0 / newTPS;
 
             if (fields->m_extraDelta >= newDelta) {
                 // call original update several times, until the extra delta is less than the new delta
@@ -94,7 +102,7 @@ namespace eclipse::hacks::Global {
                     GJBaseGameLayer::update(newDelta);
                     auto end = utils::getTimestamp();
                     // if the update took too long, break out of the loop
-                    if (end - start > ms) break;
+                    if (unlag && end - start > ms) break;
                     --steps;
                 }
                 fields->m_shouldHide = false;

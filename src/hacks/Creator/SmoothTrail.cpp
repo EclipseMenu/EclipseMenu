@@ -8,11 +8,11 @@ namespace eclipse::hacks::Creator {
 
     class SmoothTrail : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
+            auto tab = gui::MenuTab::find("tab.creator");
 
-            tab->addToggle("Smooth Editor Trail", "creator.smoothtrail")
+            tab->addToggle("creator.smoothtrail")
                 ->handleKeybinds()
-                ->setDescription("Makes the trail in editor playback smoother.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Smooth Editor Trail"; }

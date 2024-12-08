@@ -8,12 +8,13 @@ namespace eclipse::hacks::Global {
 
     class TransitionSpeed : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Global");
+            auto tab = gui::MenuTab::find("tab.global");
 
             config::setIfEmpty("global.transitionspeed.toggle", false);
             config::setIfEmpty("global.transitionspeed", 0.5f);
 
-            tab->addFloatToggle("Transition Speed", "global.transitionspeed", 0.f, 1.f, "%.2f")
+            tab->addFloatToggle("global.transitionspeed", "global.transitionspeed", 0.f, 1.f, "%.2f")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

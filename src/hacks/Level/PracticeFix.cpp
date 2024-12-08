@@ -20,10 +20,9 @@ namespace eclipse::Hacks::Level {
         
     private:
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Practice Fix", "bot.practicefix")
-                ->setDescription("Properly saves and restores the player's data when respawning from a checkpoint.");
+            tab->addToggle("bot.practicefix")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] bool isCheating() override { return false; }

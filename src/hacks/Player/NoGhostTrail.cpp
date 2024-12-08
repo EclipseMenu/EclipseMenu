@@ -8,10 +8,10 @@ namespace eclipse::hacks::Player {
 
     class NoGhostTrail : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            tab->addToggle("No Ghost Trail", "player.noghosttrail")
-                ->setDescription("Disables player ghost trail triggers.")
+            tab->addToggle("player.noghosttrail")
+                ->setDescription()
                 ->handleKeybinds();
         }
 
