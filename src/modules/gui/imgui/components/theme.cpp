@@ -168,7 +168,7 @@ namespace eclipse::gui::imgui {
         auto tm = ThemeManager::get();
         ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getTitleForegroundColor()));
         ImGui::PushFont(ImGuiRenderer::get()->getFontManager().getFont().get());
-        bool open = ImGui::Begin(title.c_str(), nullptr, flags);
+        bool open = ImGui::Begin(i18n::get(title).data(), nullptr, flags);
         ImGui::PopStyleColor();
 
         return open;
@@ -635,10 +635,10 @@ namespace eclipse::gui::imgui {
                 ImGui::CloseCurrentPopup();
             }
 
-            if (this->button(i18n::get_("labels.events.move-up"), false)) {
+            if (this->button(i18n::get_("labels.move-up"), false)) {
                 labelSettings->triggerMoveCallback(true);
             }
-            if (this->button(i18n::get_("labels.events.move-down"), false)) {
+            if (this->button(i18n::get_("labels.move-down"), false)) {
                 labelSettings->triggerMoveCallback(false);
             }
 
