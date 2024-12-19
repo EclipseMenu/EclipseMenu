@@ -5,6 +5,7 @@
 #include <modules/gui/cocos/components/ToggleComponent.hpp>
 #include <modules/gui/cocos/components/ButtonComponent.hpp>
 #include <modules/gui/cocos/components/ColorComponent.hpp>
+#include <modules/gui/cocos/components/FloatToggleComponent.hpp>
 
 namespace eclipse::gui::cocos {
 
@@ -101,6 +102,9 @@ namespace eclipse::gui::cocos {
                 } break;
                 case ComponentType::Color: {
                     layer->addChild(ColorComponentNode::create(component, size.width));
+                } break;
+                case ComponentType::FloatToggle: {
+                    layer->addChild(FloatToggleComponentNode::create(component, size.width));
                 } break;
                 default: break;
             }
