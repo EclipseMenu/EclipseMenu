@@ -6,6 +6,9 @@
 #include <modules/gui/cocos/components/ButtonComponent.hpp>
 #include <modules/gui/cocos/components/ColorComponent.hpp>
 #include <modules/gui/cocos/components/FloatToggleComponent.hpp>
+#include <modules/gui/cocos/components/InputFloatComponent.hpp>
+#include <modules/gui/cocos/components/InputIntComponent.hpp>
+#include <modules/gui/cocos/components/InputTextComponent.hpp>
 
 namespace eclipse::gui::cocos {
 
@@ -105,6 +108,15 @@ namespace eclipse::gui::cocos {
                 } break;
                 case ComponentType::FloatToggle: {
                     layer->addChild(FloatToggleComponentNode::create(component, size.width));
+                } break;
+                case ComponentType::InputFloat: {
+                    layer->addChild(InputFloatComponentNode::create(component, size.width));
+                } break;
+                case ComponentType::InputInt: {
+                    layer->addChild(InputIntComponentNode::create(component, size.width));
+                } break;
+                case ComponentType::InputText: {
+                    layer->addChild(InputTextComponentNode::create(component, size.width));
                 } break;
                 default: break;
             }
