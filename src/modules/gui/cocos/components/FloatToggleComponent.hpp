@@ -26,7 +26,7 @@ namespace eclipse::gui::cocos {
             m_toggler->toggle(m_component->getState());
             this->addChildAtPosition(m_toggler, geode::Anchor::Left, { 15.f, 0.f });
 
-            auto labelSize = width - 35.f;
+            auto labelSize = (width * 0.6f) - 35.f;
 
             if (!m_component->getDescription().empty()) {
                 m_infoButton = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 0.5f, [this](auto) {
@@ -56,9 +56,14 @@ namespace eclipse::gui::cocos {
         }
 
         virtual void textChanged(CCTextInputNode* input) override {
-            float val = std::stof(input->getString());
-            m_component->setValue(val);
-            m_component->triggerCallback(val);
+            geode::Result<float> valueOpt = geode::utils::numFromString<float>(input->getString());
+            if(!valueOpt)
+                return;
+
+            float value = std::clamp(*valueOpt, m_component->getMin(), m_component->getMax());
+            
+            m_component->setValue(value);
+            m_component->triggerCallback(value);
         }
     };
 }
