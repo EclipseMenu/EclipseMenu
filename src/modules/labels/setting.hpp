@@ -1,5 +1,7 @@
 #pragma once
 #include <hacks/Labels/LabelContainer.hpp>
+#include <modules/gui/color.hpp>
+#include <nlohmann/json.hpp>
 
 namespace eclipse::labels {
     using LabelsContainer = hacks::Labels::LabelsContainer;
