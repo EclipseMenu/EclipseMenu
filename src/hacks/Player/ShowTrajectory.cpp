@@ -162,13 +162,14 @@ namespace eclipse::hacks::Player {
             buttonForPlayer(player2, playerBase, false);
         }
 
-        PlayerObject* createTrajectoryPlayer() {
+        PlayerObject* createTrajectoryPlayer() const {
             PlayLayer* pl = PlayLayer::get();
 
             PlayerObject* player = PlayerObject::create(1, 1, pl, pl, true);
             player->retain();
             player->setPosition({0, 105});
             player->setVisible(false);
+            player->setID("show-trajectory-player"_spr);
             pl->m_objectLayer->addChild(player);
 
             return player;

@@ -56,6 +56,9 @@ namespace eclipse::i18n {
     /// @brief Get the required glyph ranges for the current language.
     GlyphRange getRequiredGlyphRanges();
 
+    /// @brief Get the required glyph ranges for the current language as a string.
+    std::string_view getRequiredGlyphRangesString();
+
     /// @brief Get a list of names of all available languages.
     std::vector<std::string> getAvailableLanguages();
 

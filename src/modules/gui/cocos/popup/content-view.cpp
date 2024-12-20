@@ -9,6 +9,9 @@
 #include <modules/gui/cocos/components/InputFloatComponent.hpp>
 #include <modules/gui/cocos/components/InputIntComponent.hpp>
 #include <modules/gui/cocos/components/InputTextComponent.hpp>
+#include <modules/i18n/translations.hpp>
+
+#include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 
 namespace eclipse::gui::cocos {
 
@@ -60,7 +63,7 @@ namespace eclipse::gui::cocos {
             switch (component->getType()) {
                 case ComponentType::Label: {
                     // replace
-                    auto label = cocos2d::CCLabelBMFont::create(component->getTitle().c_str(), "bigFont.fnt");
+                    auto label = TranslatedLabel::create(component->getTitle());
                     label->setAnchorPoint({ 0, 1 });
                     label->limitLabelWidth(size.width * 0.75f, 0.75f, 0.1f);
                     layer->addChild(label);
@@ -124,6 +127,7 @@ namespace eclipse::gui::cocos {
 
         layer->setLayout(
             geode::ColumnLayout::create()
+                ->setAutoScale(false)
                 ->setAxisReverse(true)
                 ->setAutoGrowAxis(this->getContentHeight())
                 ->setAxisAlignment(geode::AxisAlignment::End)

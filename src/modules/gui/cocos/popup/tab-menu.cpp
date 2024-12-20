@@ -1,4 +1,5 @@
 #include "tab-menu.hpp"
+
 #include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::cocos {
@@ -84,8 +85,8 @@ namespace eclipse::gui::cocos {
         size.width += 15.F; // 135
         this->setContentSize(size);
 
-        m_label = cocos2d::CCLabelBMFont::create(name.c_str(), "bigFont.fnt");
-        m_label->limitLabelWidth(100, 0.5F, .2F);
+        m_label = TranslatedLabel::create(name);
+        m_label->limitLabelWidth(100, 1.f, .2f);
         m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", { 0.0f, 0.0f, 80.0f, 80.0f });
         m_bgSprite->setContentSize({size.width, size.height + 8.F}); // minimum 36
         m_bgSprite->setScaleY(.75F);

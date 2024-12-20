@@ -6,7 +6,7 @@ namespace eclipse::gui::cocos {
     class FloatToggleComponentNode : public BaseComponentNode<FloatToggleComponentNode, cocos2d::CCMenu, FloatToggleComponent, float>, public TextInputDelegate {
     protected:
         CCMenuItemToggler* m_toggler = nullptr;
-        cocos2d::CCLabelBMFont* m_label = nullptr;
+        TranslatedLabel* m_label = nullptr;
         CCMenuItemSpriteExtra* m_infoButton = nullptr;
         geode::TextInput* m_textInput = nullptr;
 
@@ -39,7 +39,7 @@ namespace eclipse::gui::cocos {
                 labelSize -= 15.f;
             }
 
-            m_label = cocos2d::CCLabelBMFont::create(m_component->getTitle().c_str(), "bigFont.fnt");
+            m_label = TranslatedLabel::create(m_component->getTitle());
             m_label->setAnchorPoint({0, 0.5f});
             m_label->setScale(0.6f);
             m_label->limitLabelWidth(labelSize, 0.6f, 0.25f);

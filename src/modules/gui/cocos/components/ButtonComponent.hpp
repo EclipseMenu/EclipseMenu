@@ -1,4 +1,5 @@
 #pragma once
+
 #include "BaseComponentNode.hpp"
 #include <modules/gui/theming/manager.hpp>
 
@@ -12,7 +13,7 @@ namespace eclipse::gui::cocos {
         bool init(float width) override {
             const auto tm = ThemeManager::get();
 
-            auto label = cocos2d::CCLabelBMFont::create(m_component->getTitle().c_str(), "bigFont.fnt");
+            auto label = TranslatedLabel::create(m_component->getTitle());
             auto bg = cocos2d::extension::CCScale9Sprite::create("square.png", { 0.0f, 0.0f, 80.0f, 80.0f });
 
             bg->setContentSize({width * 0.9F, 28.F});

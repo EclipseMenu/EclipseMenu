@@ -163,6 +163,11 @@ namespace eclipse::i18n {
         return GlyphRange::Default;
     }
 
+    std::string_view getRequiredGlyphRangesString() {
+        if (!g_translations.contains("language-charset")) { return "default"; }
+        return g_translations["language-charset"].get<std::string_view>();
+    }
+
     std::vector<std::string> getAvailableLanguages() {
         auto langNames = fetchAvailableLanguages();
         auto currentLang = getCurrentLanguage();

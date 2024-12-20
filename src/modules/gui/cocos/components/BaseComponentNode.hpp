@@ -1,4 +1,5 @@
 #pragma once
+#include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 
 namespace eclipse::gui::cocos {
 

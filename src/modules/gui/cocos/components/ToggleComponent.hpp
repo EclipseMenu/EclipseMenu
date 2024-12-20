@@ -6,7 +6,7 @@ namespace eclipse::gui::cocos {
     class ToggleComponentNode : public BaseComponentNode<ToggleComponentNode, cocos2d::CCMenu, ToggleComponent, float> {
     protected:
         CCMenuItemToggler* m_toggler = nullptr;
-        cocos2d::CCLabelBMFont* m_label = nullptr;
+        TranslatedLabel* m_label = nullptr;
         CCMenuItemSpriteExtra* m_extraButton = nullptr;
         CCMenuItemSpriteExtra* m_infoButton = nullptr;
 
@@ -49,9 +49,9 @@ namespace eclipse::gui::cocos {
                 labelSize -= 15.f;
             }
 
-            m_label = cocos2d::CCLabelBMFont::create(m_component->getTitle().c_str(), "bigFont.fnt");
+            m_label = TranslatedLabel::create(m_component->getTitle());
             m_label->setAnchorPoint({0, 0.5f});
-            m_label->limitLabelWidth(labelSize, 0.6f, 0.25f);
+            m_label->limitLabelWidth(labelSize, 1.f, 0.25f);
             this->addChildAtPosition(m_label, geode::Anchor::Left, { 30.f, 0.f });
 
             return true;

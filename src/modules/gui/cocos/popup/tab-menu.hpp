@@ -1,5 +1,6 @@
 #pragma once
 #include <modules/gui/gui.hpp>
+#include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 
 namespace eclipse::gui::cocos {
 
@@ -21,7 +22,7 @@ namespace eclipse::gui::cocos {
     class TabButton : public cocos2d::CCNode {
     protected:
         cocos2d::extension::CCScale9Sprite* m_bgSprite;
-        cocos2d::CCLabelBMFont* m_label;
+        TranslatedLabel* m_label;
 
     public:
         void setState(bool active);
