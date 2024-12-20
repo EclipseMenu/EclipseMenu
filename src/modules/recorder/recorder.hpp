@@ -1,6 +1,6 @@
 #pragma once
 #include <Geode/platform/platform.hpp>
-#include <eclipse.ffmpeg-api/include/render_settings.hpp>
+#include "ffmpeg-api/events.hpp"
 
 #include "rendertexture.hpp"
 
