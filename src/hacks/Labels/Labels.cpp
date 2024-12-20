@@ -9,6 +9,8 @@
 #include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 
+#include "Label.hpp"
+
 namespace eclipse::hacks::Labels {
 
     static std::vector<labels::LabelSettings> s_labels;
