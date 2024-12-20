@@ -8,11 +8,11 @@ namespace eclipse::hacks::Bypass {
 
     class VerifyHack : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
+            auto tab = gui::MenuTab::find("tab.creator");
 
-            tab->addToggle("Verify Bypass", "bypass.verifyhack")
+            tab->addToggle("bypass.verifyhack")
                 ->handleKeybinds()
-                ->setDescription("Automatically verifies levels for you.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Verify Bypass"; }

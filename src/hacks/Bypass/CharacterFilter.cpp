@@ -9,11 +9,11 @@ namespace eclipse::hacks::Bypass {
 
     class CharFilter : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Bypass");
+            auto tab = gui::MenuTab::find("tab.bypass");
 
-            tab->addToggle("Character Filter Bypass", "bypass.charfilter")
+            tab->addToggle("bypass.charfilter")
                 ->handleKeybinds()
-                ->setDescription("Allows you to bypass the character filter on any text field.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Character Filter Bypass"; }

@@ -9,11 +9,11 @@ namespace eclipse::hacks::Level {
 
     class AutoLDM : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Auto LDM", "level.autoldm")
+            tab->addToggle("level.autoldm")
                 ->handleKeybinds()
-                ->setDescription("Automatically enables LDM upon entering a level");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Auto LDM"; }

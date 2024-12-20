@@ -10,10 +10,8 @@ namespace eclipse::hacks::Level {
 
     class ShowTriggers : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
-            tab->addToggle("Show Triggers", "level.showtriggers")
-                ->handleKeybinds()
-                ->setDescription("Renders triggers during gameplay");
+            auto tab = gui::MenuTab::find("tab.level");
+            tab->addToggle("level.showtriggers")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("level.showtriggers", false); }

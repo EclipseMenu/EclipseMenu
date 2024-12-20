@@ -8,9 +8,9 @@ namespace eclipse::hacks::Bypass {
 
     class UnlockIcons : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Bypass");
+            auto tab = gui::MenuTab::find("tab.bypass");
 
-            tab->addToggle("Unlock Icons", "bypass.unlockicons")->handleKeybinds();
+            tab->addToggle("bypass.unlockicons")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Unlock Icons"; }

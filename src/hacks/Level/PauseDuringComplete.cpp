@@ -8,10 +8,10 @@ namespace eclipse::hacks::Level {
 
     class PauseDuringComplete : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Pause During Complete", "level.pauseduringcomplete")
-                ->setDescription("Allows you to pause during the level complete cutscene.")
+            tab->addToggle("level.pauseduringcomplete")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

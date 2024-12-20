@@ -8,7 +8,7 @@ namespace eclipse::hacks::Player {
 
     class CustomWaveTrail : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
             config::setIfEmpty("player.customwavetrail.scale", 2.f);
             config::setIfEmpty("player.customwavetrail.speed", 0.5f);
@@ -16,18 +16,18 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.customwavetrail.value", 100.f);
             config::setIfEmpty("player.customwavetrail.color", gui::Color::WHITE);
 
-            tab->addToggle("Custom Wave Trail", "player.customwavetrail")
+            tab->addToggle("player.customwavetrail")
                 ->handleKeybinds()
-                ->setDescription("Customize the wave trail color and size")
+                ->setDescription()
                 ->addOptions([](auto options) {
-                    options->addInputFloat("Scale", "player.customwavetrail.scale", 0.f, 10.f, "%.2f");
-                    options->addToggle("Rainbow", "player.customwavetrail.rainbow")->addOptions([](auto opt) {
-                        opt->addInputFloat("Speed", "player.customwavetrail.speed", 0.f, FLT_MAX, "%.2f");
-                        opt->addInputFloat("Saturation", "player.customwavetrail.saturation", 0.f, 100.f, "%.2f");
-                        opt->addInputFloat("Value", "player.customwavetrail.value", 0.f, 100.f, "%.2f");
+                    options->addInputFloat("player.customwavetrail.scale", "player.customwavetrail.scale", 0.f, 10.f, "%.2f");
+                    options->addToggle("player.customwavetrail.rainbow")->addOptions([](auto opt) {
+                        opt->addInputFloat("player.customwavetrail.speed", "player.customwavetrail.speed", 0.f, FLT_MAX, "%.2f");
+                        opt->addInputFloat("player.customwavetrail.saturation", "player.customwavetrail.saturation", 0.f, 100.f, "%.2f");
+                        opt->addInputFloat("player.customwavetrail.value", "player.customwavetrail.value", 0.f, 100.f, "%.2f");
                     });
-                    options->addToggle("Custom color", "player.customwavetrail.customcolor")->addOptions([](auto opt) {
-                        opt->addColorComponent("Color", "player.customwavetrail.color");
+                    options->addToggle("player.customwavetrail.customcolor")->addOptions([](auto opt) {
+                        opt->addColorComponent("player.customwavetrail.color", "player.customwavetrail.color");
                     });
                 });
         }

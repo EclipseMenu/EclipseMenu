@@ -8,11 +8,11 @@ namespace eclipse::hacks::Creator {
 
     class FreeScroll : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
+            auto tab = gui::MenuTab::find("tab.creator");
 
-            tab->addToggle("Free Scroll", "creator.freescroll")
+            tab->addToggle("creator.freescroll")
                 ->handleKeybinds()
-                ->setDescription("Removes camera constraints in the level editor");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Free Scroll"; }

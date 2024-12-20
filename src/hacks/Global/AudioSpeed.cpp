@@ -38,19 +38,19 @@ namespace eclipse::hacks::Global {
     class AudioSpeed : public hack::Hack {
 
         void init() override {
-            auto tab = gui::MenuTab::find("Global");
+            auto tab = gui::MenuTab::find("tab.global");
 
             config::setIfEmpty("global.audiospeed.toggle", false);
             config::setIfEmpty("global.audiospeed", 1.f);
 
-            tab->addFloatToggle("Audio Speed", "global.audiospeed", 0.0001f, 1000.f, "%.4f")
+            tab->addFloatToggle("global.audiospeed", "global.audiospeed", 0.0001f, 1000.f, "%.4f")
                 ->handleKeybinds()
                 ->toggleCallback(updateChannels);
 
-            tab->addToggle("Sync with Speedhack", "global.audiospeed.sync")
+            tab->addToggle("global.audiospeed.sync")
                 ->handleKeybinds()
                 ->callback([](bool){ updateChannels(); })
-                ->setDescription("Sync audio speed with speedhack, if it's enabled.");
+                ->setDescription();
         }
 
         void update() override {

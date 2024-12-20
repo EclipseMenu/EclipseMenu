@@ -9,10 +9,10 @@ namespace eclipse::hacks::Player {
 
     class JumpHack : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            tab->addToggle("Jump Hack", "player.jumphack")
-                ->setDescription("Allows the player to infinitely jump in the air.")
+            tab->addToggle("player.jumphack")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

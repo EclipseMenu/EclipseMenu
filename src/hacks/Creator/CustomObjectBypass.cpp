@@ -8,11 +8,11 @@ namespace eclipse::hacks::Creator {
 
     class CustomObjectBypass : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
+            auto tab = gui::MenuTab::find("tab.creator");
 
-            tab->addToggle("Custom Object Bypass", "creator.customobjectbypass")
+            tab->addToggle("creator.customobjectbypass")
                 ->handleKeybinds()
-                ->setDescription("Allows you to go beyond the 1000 object limit for custom objects.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Custom Object Bypass"; }

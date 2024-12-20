@@ -8,10 +8,10 @@ namespace eclipse::hacks::Player {
 
     class NoRobotFire : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            tab->addToggle("No Robot Fire", "player.norobotfire")
-                ->setDescription("Disables the robot's fire when jumping.")
+            tab->addToggle("player.norobotfire")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

@@ -9,10 +9,10 @@ namespace eclipse::hacks::Player {
 
     class MuteLevelAudioOnDeath : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            tab->addToggle("Mute Level Audio On Death", "player.mutelevelaudioondeath")
-                ->setDescription("Mutes all level audio (Music + SFX) on player death. (Created by RayDeeUx)")
+            tab->addToggle("player.mutelevelaudioondeath")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

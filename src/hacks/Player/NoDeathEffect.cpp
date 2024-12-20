@@ -8,9 +8,9 @@ namespace eclipse::hacks::Player {
 
     class NoDeathEffect : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
-            tab->addToggle("No Death Effect", "player.nodeatheffect")
-                ->setDescription("Disables the player's death effect.")
+            auto tab = gui::MenuTab::find("tab.player");
+            tab->addToggle("player.nodeatheffect")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

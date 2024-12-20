@@ -8,9 +8,9 @@ namespace eclipse::hacks::Level {
 
     class StopTriggersOnDeath : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Stop Triggers On Death", "level.stoptrigondeath")->handleKeybinds();
+            tab->addToggle("level.stoptrigondeath")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Stop Triggers On Death"; }

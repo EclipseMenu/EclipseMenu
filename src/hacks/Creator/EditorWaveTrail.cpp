@@ -9,11 +9,11 @@ namespace eclipse::hacks::Creator { // i didnt do this properly :P
 
     /*class EditorWaveTrail : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
+            auto tab = gui::MenuTab::find("tab.creator");
 
-            tab->addToggle("Editor Wave Trail", "creator.editorwave")
+            tab->addToggle("creator.editorwave")
                 ->handleKeybinds()
-                ->setDescription("Enables the wave trail in the Editor");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Editor Wave Trail"; }

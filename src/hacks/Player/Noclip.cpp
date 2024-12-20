@@ -10,7 +10,7 @@ namespace eclipse::hacks::Player {
 
     class Noclip : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
             config::setIfEmpty("player.noclip.p1", true);
             config::setIfEmpty("player.noclip.p2", true);
@@ -20,18 +20,18 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.noclip.acclimit", 95.f);
             config::setIfEmpty("player.noclip.deathlimit", 2);
 
-            tab->addToggle("Noclip", "player.noclip")
-                ->setDescription("Disables player death.")
+            tab->addToggle("player.noclip")
+                ->setDescription()
                 ->handleKeybinds()
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addToggle("Player 1", "player.noclip.p1");
-                    options->addToggle("Player 2", "player.noclip.p2");
-                    options->addFloatToggle("Accuracy Limit", "player.noclip.acclimit", 0.01f, 100.f, "%.2f")->handleKeybinds();
-                    options->addIntToggle("Death Limit", "player.noclip.deathlimit", 1, 100)->handleKeybinds();
-                    options->addToggle("Noclip Tint", "player.noclip.tint");
-                    options->addColorComponent("Tint Color", "player.noclip.color");
-                    options->addInputFloat("Tint Opacity", "player.noclip.opacity", 0.f, 100.f, "%.0f%");
-                    options->addInputFloat("Tint Time", "player.noclip.time", 0.f, 5.f, "%.2fs")->setDescription("0 for instant");
+                    options->addToggle("player.noclip.p1");
+                    options->addToggle("player.noclip.p2");
+                    options->addFloatToggle("player.noclip.acclimit", "player.noclip.acclimit", 0.01f, 100.f, "%.2f")->handleKeybinds();
+                    options->addIntToggle("player.noclip.deathlimit", "player.noclip.deathlimit", 1, 100)->handleKeybinds();
+                    options->addToggle("player.noclip.tint");
+                    options->addColorComponent("player.noclip.color", "player.noclip.color");
+                    options->addInputFloat("player.noclip.opacity", "player.noclip.opacity", 0.f, 100.f, "%.0f%");
+                    options->addInputFloat("player.noclip.time", "player.noclip.time", 0.f, 5.f, "%.2fs")->setDescription();
                 });
         }
 
@@ -103,6 +103,8 @@ namespace eclipse::hacks::Player {
 
         void postUpdate(float dt) override {
             auto fields = m_fields.self();
+            config::setTemp<bool>("noclipDying", fields->m_wouldDieFrame || fields->m_deadLastFrame);
+
             if (config::get<bool>("player.noclip.tint", false) && fields->m_noclipTint && !m_hasCompletedLevel && !m_player1->m_isDead) {
                 float time = config::get<float>("player.noclip.time", 0.f);
                 if (time == 0.f) { // this doesnt really work but ok ninx

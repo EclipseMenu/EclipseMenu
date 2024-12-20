@@ -5,6 +5,7 @@
 #include <modules/gui/theming/manager.hpp>
 #include <modules/gui/gui.hpp>
 #include <misc/cpp/imgui_stdlib.h>
+#include <modules/i18n/translations.hpp>
 
 #include "components/megahack/megahack.hpp"
 #include "components/megaoverlay/megaoverlay.hpp"
@@ -28,9 +29,26 @@ namespace eclipse::gui::imgui {
         return m_font;
     }
 
+    const ImWchar* getGlyphRange(i18n::GlyphRange range) {
+        switch (range) {
+            case i18n::GlyphRange::Greek: return ImGui::GetIO().Fonts->GetGlyphRangesGreek();
+            case i18n::GlyphRange::Korean: return ImGui::GetIO().Fonts->GetGlyphRangesKorean();
+            case i18n::GlyphRange::Japanese: return ImGui::GetIO().Fonts->GetGlyphRangesJapanese();
+            case i18n::GlyphRange::ChineseFull: return ImGui::GetIO().Fonts->GetGlyphRangesChineseFull();
+            case i18n::GlyphRange::ChineseSimplified: return ImGui::GetIO().Fonts->GetGlyphRangesChineseSimplifiedCommon();
+            case i18n::GlyphRange::Cyrillic: return ImGui::GetIO().Fonts->GetGlyphRangesCyrillic();
+            case i18n::GlyphRange::Thai: return ImGui::GetIO().Fonts->GetGlyphRangesThai();
+            case i18n::GlyphRange::Vietnamese: return ImGui::GetIO().Fonts->GetGlyphRangesVietnamese();
+            default: return ImGui::GetIO().Fonts->GetGlyphRangesDefault();
+        }
+    }
+
     void FontManager::FontMetadata::load() {
         auto fontSize = ThemeManager::get()->getFontSize() * DEFAULT_SCALE;
-        m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(m_path.string().c_str(), fontSize);
+        m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(
+            m_path.string().c_str(), fontSize,
+            nullptr, getGlyphRange(i18n::getRequiredGlyphRanges())
+        );
     }
 
     std::vector<FontManager::FontMetadata> FontManager::fetchAvailableFonts() {

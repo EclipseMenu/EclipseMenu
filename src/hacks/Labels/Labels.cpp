@@ -238,11 +238,20 @@ namespace eclipse::hacks::Labels {
                     auto* container = m_fields->m_containers[static_cast<int>(setting.alignment)];
                     container->addLabel(label, [&setting](SmartLabel* label) {
                         label->setScript(setting.text);
-                        label->setFntFile(setting.font.c_str());
-                        label->setScale(setting.scale);
-                        label->setColor(setting.color.toCCColor3B());
-                        label->setOpacity(static_cast<GLubyte>(setting.color.a * 255));
-                        label->setVisible(setting.visible);
+                        /*if (setting.hasEvents()) {
+                            auto [visible, scale, color, font] = setting.processEvents();
+                            label->setFntFile(font.c_str());
+                            label->setScale(scale);
+                            label->setColor(color.toCCColor3B());
+                            label->setOpacity(static_cast<GLubyte>(color.a * 255));
+                            label->setVisible(visible);
+                        } else {*/
+                            label->setFntFile(setting.font.c_str());
+                            label->setScale(setting.scale);
+                            label->setColor(setting.color.toCCColor3B());
+                            label->setOpacity(static_cast<GLubyte>(setting.color.a * 255));
+                            label->setVisible(setting.visible);
+                        //}
                     });
                 }
             }
@@ -305,7 +314,7 @@ namespace eclipse::hacks::Labels {
         }
 
         void init() override {
-            auto tab = gui::MenuTab::find("Labels");
+            auto tab = gui::MenuTab::find("tab.labels");
             config::setIfEmpty("labels.visible", true);
             config::setIfEmpty("labels.cheat-indicator.endscreen", true);
             config::setIfEmpty("labels.cheat-indicator.scale", 0.5f);
@@ -324,32 +333,39 @@ namespace eclipse::hacks::Labels {
                 {"Noclip Deaths", "{ noclip ?? 'Deaths: ' + noclipDeaths}", false},
             });
 
-            tab->addToggle("Show Labels", "labels.visible")
-                ->setDescription("Toggles the visibility of the labels.")
-                ->handleKeybinds();
-            tab->addToggle("Cheat Indicator", "labels.cheat-indicator.visible")
+            tab->addToggle("labels.visible")
                 ->callback([](bool) { updateLabels(); })
-                ->setDescription("Shows a red indicator if you have any cheats enabled.")
+                ->setDescription()
+                ->handleKeybinds();
+            tab->addToggle("labels.cheat-indicator.visible")
+                ->callback([](bool) { updateLabels(); })
+                ->setDescription()
                 ->handleKeybinds()
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addToggle("Show on Endscreen", "labels.cheat-indicator.endscreen")
-                        ->setDescription("Shows the cheat indicator on the level end screen.");
+                    options->addToggle("labels.cheat-indicator.endscreen")
+                        ->setDescription();
                     // options->addToggle("Show only Cheating", "labels.cheat-indicator.only-cheating")
                     //     ->setDescription("Hides the cheat indicator if you're not cheating.");
-                    options->addInputFloat("Scale", "labels.cheat-indicator.scale", 0.1f, 2.f, "%.1f")
-                        ->setDescription("The scale of the cheat indicator.")
+                    options->addInputFloat("labels.cheat-indicator.scale", "labels.cheat-indicator.scale", 0.1f, 2.f, "%.1f")
+                        ->setDescription()
                         ->callback([](float) { updateLabels(); });
-                    options->addInputFloat("Opacity", "labels.cheat-indicator.opacity", 0.f, 1.f, "%.2f")
-                        ->setDescription("The opacity of the cheat indicator.");
-                    options->addCombo("Alignment", "labels.cheat-indicator.alignment", {
-                        "Top Left", "Top Center", "Top Right",
-                        "Center Left", "Center", "Center Right",
-                        "Bottom Left", "Bottom Center", "Bottom Right"
+                    options->addInputFloat("labels.cheat-indicator.opacity", "labels.cheat-indicator.opacity", 0.f, 1.f, "%.2f")
+                        ->setDescription();
+                    options->addCombo("labels.cheat-indicator.alignment", "labels.cheat-indicator.alignment", {
+                        i18n::get_("labels.alignment.top-left"),
+                        i18n::get_("labels.alignment.top-center"),
+                        i18n::get_("labels.alignment.top-right"),
+                        i18n::get_("labels.alignment.center-left"),
+                        i18n::get_("labels.alignment.center"),
+                        i18n::get_("labels.alignment.center-right"),
+                        i18n::get_("labels.alignment.bottom-left"),
+                        i18n::get_("labels.alignment.bottom-center"),
+                        i18n::get_("labels.alignment.bottom-right"),
                     }, 2)->callback([](int) { updateLabels(true); })
-                         ->setDescription("The alignment of the cheat indicator.");
+                         ->setDescription();
                 });
 
-            tab->addButton("Add New")->callback([this]{
+            tab->addButton("labels.add-new")->callback([this]{
                 gui::Engine::queueAfterDrawing([&](){
                     labels::LabelSettings newSetting;
                     if (!s_labels.empty()) {
@@ -432,7 +448,7 @@ namespace eclipse::hacks::Labels {
         [[nodiscard]] const char* getId() const override { return "Labels"; }
 
         void createLabelComponent() {
-            auto tab = gui::MenuTab::find("Labels");
+            auto tab = gui::MenuTab::find("tab.labels");
             for (const auto& toggle : m_labelToggles) {
                 tab->removeComponent(toggle);
             }

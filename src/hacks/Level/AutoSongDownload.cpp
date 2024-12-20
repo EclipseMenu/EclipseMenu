@@ -8,11 +8,11 @@ namespace eclipse::hacks::Level {
 
     class AutoSongDownload : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Auto Song Download", "level.autosongdownload")
+            tab->addToggle("level.autosongdownload")
                 ->handleKeybinds()
-                ->setDescription("Auto-download song and SFX files when viewing an online level. (Created by Uproxide)");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Auto Song Download"; }

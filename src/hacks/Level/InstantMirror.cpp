@@ -8,11 +8,11 @@ namespace eclipse::hacks::Level {
 
     class InstantMirror : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Instant Mirror", "level.instantmirror")
+            tab->addToggle("level.instantmirror")
                 ->handleKeybinds()
-                ->setDescription("Removes the mirror portal transition.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Instant Mirror"; }

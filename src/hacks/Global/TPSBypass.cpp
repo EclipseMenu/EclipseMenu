@@ -17,8 +17,9 @@ namespace eclipse::hacks::Global {
         void init() override {
             config::setIfEmpty("global.tpsbypass", 240.f);
 
-            auto tab = gui::MenuTab::find("Global");
-            tab->addFloatToggle("Physics Bypass", "global.tpsbypass", MIN_TPS, MAX_TPS, "%.0f TPS")
+            auto tab = gui::MenuTab::find("tab.global");
+            tab->addFloatToggle("global.tpsbypass", "global.tpsbypass", MIN_TPS, MAX_TPS, "%.2f TPS")
+               ->setDescription()
                ->handleKeybinds();
         }
 

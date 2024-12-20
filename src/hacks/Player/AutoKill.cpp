@@ -9,22 +9,20 @@ namespace eclipse::hacks::Player {
 
     class AutoKill : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
             config::setIfEmpty("player.autokill.percentage.toggle", true);
             config::setIfEmpty("player.autokill.percentage", 50.0f);
             config::setIfEmpty("player.autokill.time", 90.0f);
 
-            tab->addToggle("Auto Kill", "player.autokill")
+            tab->addToggle("player.autokill")
                 ->handleKeybinds()
-                ->setDescription("Kills the player at a certain time or percentage.")
+                ->setDescription()
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addFloatToggle("Kill at Percentage", "player.autokill.percentage", 0.f, 100.f, "%.2f%%")
-                        ->handleKeybinds()
-                        ->setDescription("Kills the player at a certain percentage.");
-                    options->addFloatToggle("Kill at Time", "player.autokill.time", 0.f, FLT_MAX, "%.2f s.")
-                        ->handleKeybinds()
-                        ->setDescription("Kills the player at a certain time.");
+                    options->addFloatToggle("player.autokill.percentage","player.autokill.percentage", 0.f, 100.f, "%.2f%%")
+                        ->handleKeybinds()->setDescription();
+                    options->addFloatToggle("player.autokill.time", "player.autokill.time", 0.f, FLT_MAX, "%.2f s.")
+                        ->handleKeybinds()->setDescription();
                 });
         }
 

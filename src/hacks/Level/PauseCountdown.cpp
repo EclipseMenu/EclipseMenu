@@ -12,14 +12,15 @@ namespace eclipse::hacks::Level {
 
     class PauseCount : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
             config::setIfEmpty("level.pausecount.time", 3.f);
 
-            tab->addToggle("Pause Countdown", "level.pausecount")
+            tab->addToggle("level.pausecount")
                 ->handleKeybinds()
+                ->setDescription()
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addInputFloat("Countdown Time", "level.pausecount.time", 0.1f, 15.f, "%.2fs");
+                    options->addInputFloat("level.pausecount.time", "level.pausecount.time", 0.1f, 15.f, "%.2fs");
                 });
         }
 

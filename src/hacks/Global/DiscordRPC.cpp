@@ -170,7 +170,7 @@ namespace eclipse::hacks::Global {
         }
 
         void init() override {
-            auto tab = gui::MenuTab::find("Global");
+            auto tab = gui::MenuTab::find("tab.global");
 
             config::setIfEmpty<std::string>("global.discordrpc.clientid", DEFAULT_CLIENT_ID);
             config::setIfEmpty("global.discordrpc.interval", 250.0f);
@@ -225,69 +225,68 @@ namespace eclipse::hacks::Global {
             initializeDiscord();
             recompileScripts();
 
-            tab->addToggle("Discord RPC", "global.discordrpc")
+            tab->addToggle("global.discordrpc")
                 ->handleKeybinds()
                 ->callback([this](bool enabled) { toggleRPC(enabled); })
-                ->setDescription("Display your current status in Discord.")
+                ->setDescription()
                 ->addOptions([this](auto opt) {
-                    opt->addInputText("Client ID", "global.discordrpc.clientid");
-                    opt->addInputFloat("Update interval (ms)", "global.discordrpc.interval", 100, FLT_MAX, "%.0f")
-                        ->setDescription("How often the RPC should update. Lower values may cause lag.");
-                    opt->addCombo("Time mode", "global.discordrpc.timemode",
-                        {"Disabled", "Total playtime", "Level playtime", "Total+Level playtime"},
+                    opt->addInputText("global.discordrpc.client-id", "global.discordrpc.clientid");
+                    opt->addInputFloat("global.discordrpc.update-rate", "global.discordrpc.interval", 100, FLT_MAX, "%.0f")
+                        ->setDescription();
+                    opt->addCombo("global.discordrpc.time-mode", "global.discordrpc.timemode",
+                        {
+                            i18n::get_("global.discordrpc.time-mode.0"),
+                            i18n::get_("global.discordrpc.time-mode.1"),
+                            i18n::get_("global.discordrpc.time-mode.2"),
+                            i18n::get_("global.discordrpc.time-mode.3")
+                        },
                         config::get<int>("global.discordrpc.timemode", 1)
-                    )->setDescription(
-                        "Defines how the time is displayed in the RPC.\n"
-                        "Disabled: Time is not displayed.\n"
-                        "Total playtime: Displays total time you've been in the game.\n"
-                        "Level playtime: Only displays the time you've been in the current level.\n"
-                        "Total+Level playtime: Displays total time in menus and level time in levels."
-                    );
+                    )->setDescription();
 
 #define ADD_SCRIPT(name, id) opt->addInputText(name, "global.discordrpc." id)->callback([this](auto){ recompileScripts(); })
 
-                    opt->addLabel("Menus");
-                    ADD_SCRIPT("Menu Details", "menu.details");
-                    ADD_SCRIPT("Menu State", "menu.state");
-                    ADD_SCRIPT("Menu Large Image", "menu.largeimage");
-                    ADD_SCRIPT("Menu Large Image Text", "menu.largeimage.text");
-                    ADD_SCRIPT("Menu Small Image", "menu.smallimage");
-                    ADD_SCRIPT("Menu Small Image Text", "menu.smallimage.text");
+                    opt->addLabel("global.discordrpc.menus");
+                    ADD_SCRIPT("global.discordrpc.menu.details", "menu.details");
+                    ADD_SCRIPT("global.discordrpc.menu.state", "menu.state");
+                    ADD_SCRIPT("global.discordrpc.menu.large-image", "menu.largeimage");
+                    ADD_SCRIPT("global.discordrpc.menu.large-text", "menu.largeimage.text");
+                    ADD_SCRIPT("global.discordrpc.menu.small-image", "menu.smallimage");
+                    ADD_SCRIPT("global.discordrpc.menu.small-text", "menu.smallimage.text");
 
-                    opt->addLabel("Editor");
-                    ADD_SCRIPT("Editor Details", "editor.details");
-                    ADD_SCRIPT("Editor State", "editor.state");
-                    ADD_SCRIPT("Editor Large Image", "editor.largeimage");
-                    ADD_SCRIPT("Editor Large Image Text", "editor.largeimage.text");
-                    ADD_SCRIPT("Editor Small Image", "editor.smallimage");
-                    ADD_SCRIPT("Editor Small Image Text", "editor.smallimage.text");
+                    opt->addLabel("global.discordrpc.editor");
+                    ADD_SCRIPT("global.discordrpc.editor.details", "editor.details");
+                    ADD_SCRIPT("global.discordrpc.editor.state", "editor.state");
+                    ADD_SCRIPT("global.discordrpc.editor.large-image", "editor.largeimage");
+                    ADD_SCRIPT("global.discordrpc.editor.large-text", "editor.largeimage.text");
+                    ADD_SCRIPT("global.discordrpc.editor.small-image", "editor.smallimage");
+                    ADD_SCRIPT("global.discordrpc.editor.small-text", "editor.smallimage.text");
 
-                    opt->addLabel("Levels");
-                    ADD_SCRIPT("Level Details", "level.details");
-                    ADD_SCRIPT("Level State", "level.state");
-                    ADD_SCRIPT("Level Large Image", "level.largeimage");
-                    ADD_SCRIPT("Level Large Image Text", "level.largeimage.text");
-                    ADD_SCRIPT("Level Small Image", "level.smallimage");
-                    ADD_SCRIPT("Level Small Image Text", "level.smallimage.text");
+                    opt->addLabel("global.discordrpc.levels");
+                    ADD_SCRIPT("global.discordrpc.level.details", "level.details");
+                    ADD_SCRIPT("global.discordrpc.level.state", "level.state");
+                    ADD_SCRIPT("global.discordrpc.level.large-image", "level.largeimage");
+                    ADD_SCRIPT("global.discordrpc.level.large-text", "level.largeimage.text");
+                    ADD_SCRIPT("global.discordrpc.level.small-image", "level.smallimage");
+                    ADD_SCRIPT("global.discordrpc.level.small-text", "level.smallimage.text");
 
-                    opt->addLabel("Platformer");
-                    ADD_SCRIPT("Platformer Details", "plat.details");
-                    ADD_SCRIPT("Platformer State", "plat.state");
-                    ADD_SCRIPT("Platformer Large Image", "plat.largeimage");
-                    ADD_SCRIPT("Platformer Large Image Text", "plat.largeimage.text");
-                    ADD_SCRIPT("Platformer Small Image", "plat.smallimage");
-                    ADD_SCRIPT("Platformer Small Image Text", "plat.smallimage.text");
+                    opt->addLabel("global.discordrpc.platformer");
+                    ADD_SCRIPT("global.discordrpc.platformer.details", "plat.details");
+                    ADD_SCRIPT("global.discordrpc.platformer.state", "plat.state");
+                    ADD_SCRIPT("global.discordrpc.platformer.large-image", "plat.largeimage");
+                    ADD_SCRIPT("global.discordrpc.platformer.large-text", "plat.largeimage.text");
+                    ADD_SCRIPT("global.discordrpc.platformer.small-image", "plat.smallimage");
+                    ADD_SCRIPT("global.discordrpc.platformer.small-text", "plat.smallimage.text");
 
-                    opt->addLabel("Buttons");
-                    opt->addToggle("Button 1", "global.discordrpc.button1.enabled")
+                    opt->addLabel("global.discordrpc.buttons");
+                    opt->addToggle("global.discordrpc.buttons.1", "global.discordrpc.button1.enabled")
                         ->addOptions([this](auto opt){
-                            ADD_SCRIPT("Text", "button1.text");
-                            ADD_SCRIPT("URL", "button1.url");
+                            ADD_SCRIPT("global.discordrpc.buttons.text", "button1.text");
+                            ADD_SCRIPT("global.discordrpc.buttons.url", "button1.url");
                         });
-                    opt->addToggle("Button 2", "global.discordrpc.button2.enabled")
+                    opt->addToggle("global.discordrpc.buttons.2", "global.discordrpc.button2.enabled")
                         ->addOptions([this](auto opt){
-                            ADD_SCRIPT("Text", "button2.text");
-                            ADD_SCRIPT("URL", "button2.url");
+                            ADD_SCRIPT("global.discordrpc.buttons.text", "button2.text");
+                            ADD_SCRIPT("global.discordrpc.buttons.url", "button2.url");
                         });
                 });
         }
