@@ -40,9 +40,7 @@ namespace eclipse::gui::cocos {
 
             if (!m_component->getDescription().empty()) {
                 m_infoButton = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 0.5f, [this](auto) {
-                    FLAlertLayer::create(
-                        m_component->getTitle().c_str(), m_component->getDescription().c_str(), "OK"
-                    )->show();
+                    this->openDescriptionPopup();
                 });
                 m_infoButton->setAnchorPoint({ 0.5, 0.5f });
                 this->addChildAtPosition(m_infoButton, geode::Anchor::Right, { offset - 10.f, 0.f });

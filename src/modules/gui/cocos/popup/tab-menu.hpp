@@ -26,7 +26,7 @@ namespace eclipse::gui::cocos {
 
     public:
         void setState(bool active);
-        static TabButton* create(std::string name, cocos2d::CCSize size);
+        static TabButton* create(const std::string &name, const cocos2d::CCSize &size);
 
     protected:
         bool init(std::string name, cocos2d::CCSize size);

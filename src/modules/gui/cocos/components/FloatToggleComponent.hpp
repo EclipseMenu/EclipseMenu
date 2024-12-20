@@ -30,9 +30,7 @@ namespace eclipse::gui::cocos {
 
             if (!m_component->getDescription().empty()) {
                 m_infoButton = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 0.5f, [this](auto) {
-                    FLAlertLayer::create(
-                        m_component->getTitle().c_str(), m_component->getDescription().c_str(), "OK"
-                    )->show();
+                    this->openDescriptionPopup();
                 });
                 m_infoButton->setAnchorPoint({ 0.5, 0.5f });
                 this->addChildAtPosition(m_infoButton, geode::Anchor::Right, { -10.f, 0.f });
@@ -41,8 +39,7 @@ namespace eclipse::gui::cocos {
 
             m_label = TranslatedLabel::create(m_component->getTitle());
             m_label->setAnchorPoint({0, 0.5f});
-            m_label->setScale(0.6f);
-            m_label->limitLabelWidth(labelSize, 0.6f, 0.25f);
+            m_label->limitLabelWidth(labelSize, 1.f, 0.25f);
             this->addChildAtPosition(m_label, geode::Anchor::Left, { 30.f, 0.f });
 
             m_textInput = geode::TextInput::create(120, m_component->getTitle().c_str());
@@ -50,6 +47,7 @@ namespace eclipse::gui::cocos {
             m_textInput->getInputNode()->setAllowedChars(".0123456789");
             m_textInput->setDelegate(this);
             m_textInput->setString(std::to_string(m_component->getValue()));
+            m_textInput->setScale(0.85f);
             this->addChildAtPosition(m_textInput, geode::Anchor::Right, { -70.f, 0.f });
 
             return true;

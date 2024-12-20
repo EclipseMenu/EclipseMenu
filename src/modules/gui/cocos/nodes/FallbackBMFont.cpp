@@ -14,7 +14,7 @@ namespace eclipse::gui::cocos {
         uint32_t totalHeight = 0;
 
         uint32_t quantityOfLines = 1;
-        uint32_t stringLen = m_sString ? std::char_traits<uint16_t>::length(m_sString) : 0;
+        uint32_t stringLen = m_sString ? std::char_traits<char16_t>::length(reinterpret_cast<char16_t*>(m_sString)) : 0;
         if (stringLen == 0) {
             return this->setContentSize({0, 0});
         }
@@ -232,7 +232,7 @@ namespace eclipse::gui::cocos {
         uint32_t totalHeight = 0;
 
         uint32_t quantityOfLines = 1;
-        uint32_t stringLen = m_sString ? std::char_traits<uint16_t>::length(m_sString) : 0;
+        uint32_t stringLen = m_sString ? std::char_traits<char16_t>::length(reinterpret_cast<char16_t*>(m_sString)) : 0;
         if (stringLen == 0) {
             return this->setContentSize({0, 0});
         }

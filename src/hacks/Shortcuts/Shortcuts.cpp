@@ -37,7 +37,8 @@ namespace eclipse::hacks::Shortcuts {
             Popup::create(
                 i18n::get_("shortcuts.uncomplete-level.title"),
                 i18n::format("shortcuts.uncomplete-level.msg", level->m_levelName),
-                "Yes", "No",[level](bool yes) {
+                i18n::get_("common.yes"), i18n::get_("common.no"),
+                [level](bool yes) {
                     if (!yes) return;
                     auto gsm = GameStatsManager::sharedState();
                     auto glm = GameLevelManager::sharedState();

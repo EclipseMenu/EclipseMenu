@@ -2,6 +2,7 @@
 #include <utils.hpp>
 
 #include "popup/options-popup.hpp"
+#include "nodes/ModalPopup.hpp"
 
 namespace eclipse::gui::cocos {
 
@@ -28,6 +29,10 @@ namespace eclipse::gui::cocos {
             popup->removeFromParentAndCleanup(true);
         m_optionsPopups.clear();
 
+        for (auto modal : m_modals)
+            modal->removeFromParentAndCleanup(true);
+        m_modals.clear();
+
         if (!m_popup) return;
 
         if (!noCleanup)
@@ -48,13 +53,8 @@ namespace eclipse::gui::cocos {
     }
 
     void CocosRenderer::showPopup(const eclipse::Popup &popup) {
-        if (popup.isPrompt()) return; // TODO: Implement prompt
-
-        geode::createQuickPopup(
-            popup.getTitle().c_str(), popup.getMessage().c_str(),
-            popup.getButton1().c_str(),
-            popup.getButton2().empty() ? nullptr : popup.getButton2().c_str(),
-            [callback = popup.getCallback()](auto, bool result) { callback(result); }
-        )->show();
+        auto modal = ModalPopup::create(popup);
+        modal->show();
+        m_modals.push_back(modal);
     }
 }

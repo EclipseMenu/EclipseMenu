@@ -6,11 +6,12 @@
 namespace eclipse::gui::cocos {
 
     inline static uint16_t* copyUTF16StringN(const uint16_t* str) {
-        auto len = str ? std::char_traits<uint16_t>::length(str) : 0;
-        auto copy = new uint16_t[len + 1];
-        std::char_traits<uint16_t>::copy(copy, str, len);
+        auto ptr = reinterpret_cast<const char16_t*>(str);
+        auto len = str ? std::char_traits<char16_t>::length(ptr) : 0;
+        auto copy = new char16_t[len + 1];
+        std::char_traits<char16_t>::copy(copy, ptr, len);
         copy[len] = 0;
-        return copy;
+        return reinterpret_cast<uint16_t*>(copy);
     }
 
     inline static std::u16string UTF8ToUTF16(const std::string& utf8) {
@@ -187,6 +188,15 @@ namespace eclipse::gui::cocos {
 
     public:
         static FallbackBMFont* create(const std::string& text, const std::string& font, const std::string& fallbackFont);
+
+        /// @brief Create a FallbackBMFont with the default font and fallback font.
+        static FallbackBMFont* create(const std::string& text) {
+            return FallbackBMFont::create(
+                text,
+                fmt::format("font_{}.fnt"_spr, i18n::getRequiredGlyphRangesString()),
+                "font_default.fnt"_spr
+            );
+        }
 
         ~FallbackBMFont() override {
             m_fallbackConfiguration->release();

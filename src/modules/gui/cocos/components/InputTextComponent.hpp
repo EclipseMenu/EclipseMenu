@@ -5,7 +5,7 @@
 namespace eclipse::gui::cocos {
     class InputTextComponentNode : public BaseComponentNode<InputTextComponentNode, cocos2d::CCMenu, InputTextComponent, float>, public TextInputDelegate {
     protected:
-        cocos2d::CCLabelBMFont* m_label = nullptr;
+        TranslatedLabel* m_label = nullptr;
         CCMenuItemSpriteExtra* m_infoButton = nullptr;
         geode::TextInput* m_textInput = nullptr;
 
@@ -29,16 +29,16 @@ namespace eclipse::gui::cocos {
                 labelSize -= 15.f;
             }
 
-            m_label = cocos2d::CCLabelBMFont::create(m_component->getTitle().c_str(), "bigFont.fnt");
+            m_label = TranslatedLabel::create(m_component->getTitle());
             m_label->setAnchorPoint({0, 0.5f});
-            m_label->setScale(0.6f);
-            m_label->limitLabelWidth(labelSize, 0.6f, 0.25f);
+            m_label->limitLabelWidth(labelSize, 1.f, 0.25f);
             this->addChildAtPosition(m_label, geode::Anchor::Left, { 15.f, 0.f });
 
             m_textInput = geode::TextInput::create(120, m_component->getTitle().c_str());
             m_textInput->setAnchorPoint({ 0.5f, 0.5f });
             m_textInput->setDelegate(this);
             m_textInput->setString(m_component->getValue());
+            m_textInput->setScale(0.85f);
             this->addChildAtPosition(m_textInput, geode::Anchor::Right, { -70.f, 0.f });
 
             return true;
