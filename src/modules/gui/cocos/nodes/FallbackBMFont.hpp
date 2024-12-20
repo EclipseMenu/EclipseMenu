@@ -1,6 +1,7 @@
 #pragma once
 #include <modules/config/config.hpp>
 #include <modules/i18n/translations.hpp>
+#include <codecvt>
 
 namespace eclipse::gui::cocos {
 
@@ -18,7 +19,7 @@ namespace eclipse::gui::cocos {
         std::vector<uint16_t> utf16(len);
         MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, reinterpret_cast<wchar_t*>(utf16.data()), len);
         return std::u16string(reinterpret_cast<char16_t*>(utf16.data()));
-#elif GEODE_IS_ANDROID
+#elif defined(GEODE_IS_ANDROID)
         auto str = cocos2d::cc_utf8_to_utf16(utf8.c_str());
         auto ret = std::u16string(reinterpret_cast<char16_t*>(str));
         delete[] str;
