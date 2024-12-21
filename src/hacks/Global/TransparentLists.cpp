@@ -7,11 +7,11 @@
 namespace eclipse::hacks::Global {
     class TransparentLists : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Global");
+            auto tab = gui::MenuTab::find("tab.global");
 
-            tab->addToggle("Transparent Lists", "global.transparentlists")
+            tab->addToggle("global.transparentlists")
                 ->handleKeybinds()
-                ->setDescription("Makes list backgrounds transparent.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Transparent Lists"; }

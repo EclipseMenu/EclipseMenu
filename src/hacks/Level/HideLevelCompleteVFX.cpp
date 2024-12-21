@@ -10,10 +10,10 @@
 namespace eclipse::hacks::Level {
     class HideLevelCompleteVFX : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Hide Level Complete VFX", "level.hidelevelcomplete")
-                ->setDescription("Hides the explosion, fireworks, and particles seen when completing a level. (Created by RayDeeUx)")
+            tab->addToggle("level.hidelevelcomplete")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

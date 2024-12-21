@@ -1,10 +1,12 @@
 #pragma once
 #include <hacks/Labels/LabelContainer.hpp>
+#include <modules/gui/color.hpp>
+#include <nlohmann/json.hpp>
 
 namespace eclipse::labels {
     using LabelsContainer = hacks::Labels::LabelsContainer;
 
-    const std::array<const char*, 9> alignmentNames = {
+    inline static std::array alignmentNames = {
         "Top Left", "Top Center", "Top Right",
         "Center Left", "Center", "Center Right",
         "Bottom Left", "Bottom Center", "Bottom Right"

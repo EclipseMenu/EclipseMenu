@@ -12,9 +12,9 @@ namespace eclipse::hacks::Player {
 
     class SolidWaveTrail : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
-            tab->addToggle("Solid Wave Trail", "player.solidwavetrail")
-                ->setDescription("Makes the player wave trail a solid color")
+            auto tab = gui::MenuTab::find("tab.player");
+            tab->addToggle("player.solidwavetrail")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

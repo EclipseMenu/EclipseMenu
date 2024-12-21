@@ -5,6 +5,7 @@
 namespace eclipse::gui::cocos {
 
     class OptionsPopup;
+    class ModalPopup;
 
     class CocosRenderer : public Renderer {
     public:
@@ -27,10 +28,13 @@ namespace eclipse::gui::cocos {
 
         void registerOptionsPopup(OptionsPopup* popup) { m_optionsPopups.push_back(popup); }
         void unregisterOptionsPopup(OptionsPopup* popup) { std::erase(m_optionsPopups, popup); }
+        void registerModal(ModalPopup* modal) { m_modals.push_back(modal); }
+        void unregisterModal(ModalPopup* modal) { std::erase(m_modals, modal); }
 
     private:
         Popup* m_popup = nullptr;
         std::vector<OptionsPopup*> m_optionsPopups;
+        std::vector<ModalPopup*> m_modals;
     };
 
 }

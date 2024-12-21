@@ -8,10 +8,10 @@ namespace eclipse::hacks::Player {
 
     class NoRespawnFlash : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            tab->addToggle("No Respawn Flash", "player.norespawnflash")
-                ->setDescription("Removes the blinking effect on respawn.")
+            tab->addToggle("player.norespawnflash")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

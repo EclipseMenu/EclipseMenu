@@ -1,5 +1,5 @@
 {
-	"geode": "4.0.1",
+	"geode": "4.1.1",
 	"gd": {
 		"win": "2.2074",
 		"mac": "2.2074",
@@ -40,7 +40,10 @@
 			"resources/Blur/*.glsl",
 			"resources/Fonts/*.ttf",
 			"resources/Licenses/*.txt",
-			"resources/Themes/*.json"
+			"resources/Themes/*.json",
+			"resources/Languages/*.json",
+			"resources/BitmapFonts/*.png",
+			"resources/BitmapFonts/*.fnt"
 		],
 		"sprites": [
 			"resources/ECLIPSE-android.png"

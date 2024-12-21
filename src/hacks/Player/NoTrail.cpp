@@ -13,11 +13,11 @@ namespace eclipse::hacks::Player {
 
     class NoTrail : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            tab->addToggle("No Trail", "player.notrail")
+            tab->addToggle("player.notrail")
                 ->handleKeybinds()
-                ->setDescription("Force the player trail off.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "No Trail"; }
@@ -27,11 +27,11 @@ namespace eclipse::hacks::Player {
 
     class AlwaysTrail : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            tab->addToggle("Always Show Trail", "player.alwaystrail")
+            tab->addToggle("player.alwaystrail")
                 ->handleKeybinds()
-                ->setDescription("Always shows the trail.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Always Show Trail"; }

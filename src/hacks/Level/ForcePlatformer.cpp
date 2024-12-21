@@ -9,11 +9,11 @@ namespace eclipse::hacks::Level {
 
     class ForcePlatformer : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Force Platformer", "level.forceplatformer")
+            tab->addToggle("level.forceplatformer")
                 ->handleKeybinds()
-                ->setDescription("Forces platformer mode when playing a level");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Force Platformer"; }

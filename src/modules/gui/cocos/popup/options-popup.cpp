@@ -9,8 +9,11 @@
 namespace eclipse::gui::cocos {
     bool OptionsPopup::setup(std::shared_ptr<MenuTab> const& tab) {
         const auto tm = ThemeManager::get();
-        this->setTitle(tab->getTitle());
-        m_title->setPositionY(225.f);
+
+        auto title = TranslatedLabel::create(tab->getTitle());
+        title->setPosition(200, 225);
+        title->setID("title"_spr);
+        m_mainLayer->addChild(title, 2);
 
         // The behind background for the entire popup to get the outline
         auto bgBehind = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");

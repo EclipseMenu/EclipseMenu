@@ -13,10 +13,10 @@ namespace eclipse::hacks::Bypass {
 
     class UnlockVaults : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Bypass");
-            tab->addToggle("Unlock Vaults", "bypass.unlockvaults")
+            auto tab = gui::MenuTab::find("tab.bypass");
+            tab->addToggle("bypass.unlockvaults")
                 ->handleKeybinds()
-                ->setDescription("Unlock all vaults and secrets in the game.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Unlock Vaults"; }

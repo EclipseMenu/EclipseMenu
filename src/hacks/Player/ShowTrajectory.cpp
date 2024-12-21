@@ -14,16 +14,16 @@
 namespace eclipse::hacks::Player {
     class ShowTrajectory : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            gui::ToggleComponent* toggle = tab->addToggle("Show Trajectory", "player.showtrajectory")
-                ->setDescription("Shows where the player will be if they click/don't click.")
+            gui::ToggleComponent* toggle = tab->addToggle("player.showtrajectory")
+                ->setDescription()
                 ->handleKeybinds();
 
             config::setIfEmpty("player.showtrajectory.iterations", 300);
 
             toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                options->addInputInt("Iterations", "player.showtrajectory.iterations", 1, 1000);
+                options->addInputInt("player.showtrajectory.iterations", "player.showtrajectory.iterations", 1, 1000);
             });
         }
 
@@ -162,13 +162,14 @@ namespace eclipse::hacks::Player {
             buttonForPlayer(player2, playerBase, false);
         }
 
-        PlayerObject* createTrajectoryPlayer() {
+        PlayerObject* createTrajectoryPlayer() const {
             PlayLayer* pl = PlayLayer::get();
 
             PlayerObject* player = PlayerObject::create(1, 1, pl, pl, true);
             player->retain();
             player->setPosition({0, 105});
             player->setVisible(false);
+            player->setID("show-trajectory-player"_spr);
             pl->m_objectLayer->addChild(player);
 
             return player;

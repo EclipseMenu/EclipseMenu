@@ -9,11 +9,11 @@ namespace eclipse::hacks::Bypass {
 
     class AllowLowVolume : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Bypass");
+            auto tab = gui::MenuTab::find("tab.bypass");
 
-            tab->addToggle("Allow Low Volume", "bypass.allowlowvolume")
+            tab->addToggle("bypass.allowlowvolume")
                 ->handleKeybinds()
-                ->setDescription("Allows setting the volume lower than 3%.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Allow Low Volume"; }

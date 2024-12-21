@@ -44,21 +44,19 @@ namespace eclipse::hacks::Level {
 
     class NoParticles : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
             config::setIfEmpty("level.noparticles", false);
             config::setIfEmpty("level.noparticles.nomiscparticles", true);
             config::setIfEmpty("level.noparticles.nocustomparticles", false);
 
-            tab->addToggle("No Particles", "level.noparticles")
+            tab->addToggle("level.noparticles")
                 ->handleKeybinds()
-                ->setDescription("Hides portal, coin, custom, etc particles in levels.")
+                ->setDescription()
                 ->callback(onHideParticles)
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addToggle("No Misc. Particles", "level.noparticles.nomiscparticles")
-                        ->setDescription("Includes portal, dash orb, coin, end wall particles, etc...");
-                    options->addToggle("No Custom Particles", "level.noparticles.nocustomparticles")
-                        ->setDescription("Includes particles created by the level author.");
+                    options->addToggle("level.noparticles.nomiscparticles")->setDescription();
+                    options->addToggle("level.noparticles.nocustomparticles")->setDescription();
                 });
         }
 

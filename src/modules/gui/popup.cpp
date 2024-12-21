@@ -1,4 +1,7 @@
 #include "popup.hpp"
+
+#include <modules/i18n/translations.hpp>
+
 #include "gui.hpp"
 
 namespace eclipse {
@@ -34,7 +37,7 @@ namespace eclipse {
         popup.m_id = s_instanceCounter++;
         popup.m_title = title;
         popup.m_message = message;
-        popup.m_button1 = "OK";
+        popup.m_button1 = i18n::get_("common.ok");
         gui::Engine::get()->showPopup(popup);
     }
 
@@ -45,7 +48,7 @@ namespace eclipse {
         popup.m_prompt = true;
         popup.m_title = title;
         popup.m_message = message;
-        popup.m_button1 = "OK";
+        popup.m_button1 = i18n::get_("common.ok");
         popup.m_promptValue = defaultValue;
         popup.m_promptCallback = callback;
         gui::Engine::get()->showPopup(popup);

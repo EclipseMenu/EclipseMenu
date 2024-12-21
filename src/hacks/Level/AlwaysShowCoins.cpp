@@ -40,11 +40,11 @@ namespace eclipse::hacks::Level {
 
     class AlwaysShowCoins : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Always Show Coins", "level.alwaysshowcoins")
+            tab->addToggle("level.alwaysshowcoins")
                 ->handleKeybinds()
-                ->setDescription("Always shows the uncollected variant of the coins.")
+                ->setDescription()
                 ->callback(onChangeShowCoins);
         }
 

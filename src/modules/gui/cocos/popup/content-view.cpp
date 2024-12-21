@@ -9,6 +9,10 @@
 #include <modules/gui/cocos/components/InputFloatComponent.hpp>
 #include <modules/gui/cocos/components/InputIntComponent.hpp>
 #include <modules/gui/cocos/components/InputTextComponent.hpp>
+#include <modules/gui/cocos/components/RadioButtonMenuComponent.hpp>
+#include <modules/i18n/translations.hpp>
+
+#include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 
 namespace eclipse::gui::cocos {
 
@@ -60,7 +64,7 @@ namespace eclipse::gui::cocos {
             switch (component->getType()) {
                 case ComponentType::Label: {
                     // replace
-                    auto label = cocos2d::CCLabelBMFont::create(component->getTitle().c_str(), "bigFont.fnt");
+                    auto label = TranslatedLabel::create(component->getTitle());
                     label->setAnchorPoint({ 0, 1 });
                     label->limitLabelWidth(size.width * 0.75f, 0.75f, 0.1f);
                     layer->addChild(label);
@@ -103,6 +107,16 @@ namespace eclipse::gui::cocos {
                     );
                     layer->addChild(menu);
                 } break;
+                case ComponentType::RadioButton: {
+                    std::vector<std::shared_ptr<RadioButtonComponent>> radioComponents;
+                    radioComponents.push_back(std::static_pointer_cast<RadioButtonComponent>(component));
+                    auto radioComponent = peekComponent<ComponentType::RadioButton>(tab->getComponents(), i + 1);
+                    while (radioComponent) {
+                        radioComponents.push_back(std::static_pointer_cast<RadioButtonComponent>(*radioComponent));
+                        radioComponent = peekComponent<ComponentType::RadioButton>(tab->getComponents(), ++i + 1);
+                    }
+                    layer->addChild(RadioButtonsMenuNode::create(radioComponents, size.width));
+                } break;
                 case ComponentType::Color: {
                     layer->addChild(ColorComponentNode::create(component, size.width));
                 } break;
@@ -124,6 +138,7 @@ namespace eclipse::gui::cocos {
 
         layer->setLayout(
             geode::ColumnLayout::create()
+                ->setAutoScale(false)
                 ->setAxisReverse(true)
                 ->setAutoGrowAxis(this->getContentHeight())
                 ->setAxisAlignment(geode::AxisAlignment::End)

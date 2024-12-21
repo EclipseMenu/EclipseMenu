@@ -20,7 +20,8 @@ namespace eclipse::gui::cocos {
         // The behind background for the entire popup to get the outline
         auto bgBehind = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
         bgBehind->setContentSize(m_mainLayer->getContentSize() * tm->getBorderSize());
-        m_bgSprite->setColor(tm->getBorderColor().toCCColor3B());
+        bgBehind->setColor(tm->getBorderColor().toCCColor3B());
+        bgBehind->setOpacity(tm->getBorderColor().getAlphaByte());
         bgBehind->setID("bg-behind"_spr);
         m_mainLayer->addChildAtPosition(bgBehind, geode::Anchor::Center);
 
@@ -28,6 +29,7 @@ namespace eclipse::gui::cocos {
         m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
         m_bgSprite->setContentSize(m_mainLayer->getContentSize() - 3);
         m_bgSprite->setColor(tm->getTitleBackgroundColor().toCCColor3B());
+        m_bgSprite->setOpacity(tm->getTitleBackgroundColor().getAlphaByte());
         m_bgSprite->setID("main-bg"_spr);
         m_mainLayer->addChildAtPosition(m_bgSprite, geode::Anchor::Center);
 

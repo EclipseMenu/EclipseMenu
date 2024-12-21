@@ -67,20 +67,21 @@ namespace eclipse::hacks::Level {
 
     class HitboxMultiplier : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
             config::setIfEmpty("level.hitbox_multiplier", false);
             config::setIfEmpty("level.hitbox_multiplier.player", 1.f);
             config::setIfEmpty("level.hitbox_multiplier.solid", 1.f);
             config::setIfEmpty("level.hitbox_multiplier.hazard", 1.f);
 
-            tab->addToggle("Hitbox Multiplier", "level.hitbox_multiplier")
+            tab->addToggle("level.hitbox_multiplier")
                 ->handleKeybinds()
+                ->setDescription()
                 ->callback([](bool){forceHitboxRecalculation();})
                 ->addOptions([] (std::shared_ptr<gui::MenuTab> options) {
-                    options->addInputFloat("Player Multiplier", "level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx");
-                    options->addInputFloat("Solid Multiplier", "level.hitbox_multiplier.solid", 0.01f, 10.f, "%.2fx");
-                    options->addInputFloat("Hazard Multiplier", "level.hitbox_multiplier.hazard", 0.01f, 10.f, "%.2fx");
+                    options->addInputFloat("level.hitbox_multiplier.player", "level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx");
+                    options->addInputFloat("level.hitbox_multiplier.solid", "level.hitbox_multiplier.solid", 0.01f, 10.f, "%.2fx");
+                    options->addInputFloat("level.hitbox_multiplier.hazard", "level.hitbox_multiplier.hazard", 0.01f, 10.f, "%.2fx");
                 });
         }
 

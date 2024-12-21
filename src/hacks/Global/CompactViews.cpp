@@ -9,11 +9,11 @@ namespace eclipse::hacks::Global {
 
     class CompactEditorLevels : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Global");
+            auto tab = gui::MenuTab::find("tab.global");
 
-            tab->addToggle("Compact Editor Levels", "global.compacteditorlevels")
+            tab->addToggle("global.compacteditorlevels")
                 ->handleKeybinds()
-                ->setDescription("Enables the compact view when browsing custom editor levels. (Adapted from code by Cvolton, created by RayDeeUx)");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Compact Editor Levels"; }
@@ -21,10 +21,10 @@ namespace eclipse::hacks::Global {
 
     class CompactProfileComments : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Global");
-            tab->addToggle("Compact Profile Comments", "global.compactprofilecomments")
+            auto tab = gui::MenuTab::find("tab.global");
+            tab->addToggle("global.compactprofilecomments")
                 ->handleKeybinds()
-                ->setDescription("Enables the compact view when viewing profile comments. (Adapted from code by Cvolton, created by RayDeeUx)");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Compact Profile Comments"; }

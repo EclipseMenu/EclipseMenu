@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <modules/config/config.hpp>
+#include "Label.hpp"
 
 namespace eclipse::hacks::Labels {
 
@@ -161,9 +162,9 @@ namespace eclipse::hacks::Labels {
     void LabelsContainer::update() {
         if (!isVisible()) return;
 
-        for (auto& label : m_labels) {
-            label.second(label.first);
-            label.first->update();
+        for (auto& [label, updater] : m_labels) {
+            updater(label);
+            label->update();
         }
     }
 

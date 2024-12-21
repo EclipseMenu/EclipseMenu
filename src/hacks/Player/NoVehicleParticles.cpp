@@ -31,11 +31,11 @@ namespace eclipse::hacks::Player {
 
     class NoParticles : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            tab->addToggle("No Vehicle Particles", "player.novehicleparticles")
+            tab->addToggle("player.novehicleparticles")
                 ->handleKeybinds()
-                ->setDescription("Hides vehicle particles.")
+                ->setDescription()
                 ->callback(onHideParticles);
         }
 

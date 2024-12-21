@@ -7,10 +7,10 @@
 namespace eclipse::hacks::Creator {
     class ResetPercentOnSave : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
-            tab->addToggle("Reset Percent on Save", "creator.resetpercentonsave")
+            auto tab = gui::MenuTab::find("tab.creator");
+            tab->addToggle("creator.resetpercentonsave")
                 ->handleKeybinds()
-                ->setDescription("Resets a level's percent to 0% when saved/unverified.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Reset Percent on Save"; }

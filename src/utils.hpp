@@ -4,6 +4,7 @@
 #include <modules/gui/color.hpp>
 #include <Geode/binding/GJBaseGameLayer.hpp>
 #include <modules/debug/trace.hpp>
+#include <modules/i18n/translations.hpp>
 
 enum class PlayerMode {
     Cube, Ship, Ball,
@@ -114,5 +115,5 @@ namespace eclipse::utils {
     cocos2d::CCMenu* getEclipseUILayer();
 
     /// @brief Checks if a string matches another one (case-insensitive)
-    bool matchesStringFuzzy(const std::string& strHaystack, const std::string& strNeedle);
+    bool matchesStringFuzzy(std::string_view haystack, std::string_view needle);
 }

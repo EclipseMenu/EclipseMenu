@@ -51,6 +51,15 @@ namespace eclipse::gui {
         return {r, g, b, a};
     }
 
+    Color::operator cocos2d::_ccColor4B() const {
+        return {
+            static_cast<uint8_t>(r * 255),
+            static_cast<uint8_t>(g * 255),
+            static_cast<uint8_t>(b * 255),
+            static_cast<uint8_t>(a * 255)
+        };
+    }
+
     Color Color::fromHSV(float h, float s, float v, float a) {
         float c = v * s;
         float x = c * (1 - std::abs(fmod(h / 60.0f, 2) - 1));

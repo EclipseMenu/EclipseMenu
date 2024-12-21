@@ -1,4 +1,5 @@
 #include "tab-menu.hpp"
+
 #include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::cocos {
@@ -12,7 +13,7 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    TabButton* TabButton::create(std::string name, cocos2d::CCSize size) {
+    TabButton* TabButton::create(const std::string &name, const cocos2d::CCSize &size) {
         auto ret = new TabButton();
         if (ret->init(name, size)) {
             ret->autorelease();
@@ -60,15 +61,15 @@ namespace eclipse::gui::cocos {
         }
 
         // setup layout
-        auto layout = geode::AxisLayout::create(geode::Axis::Column);
-        layout->setAxisReverse(true);
-        layout->setAutoScale(true);
-        layout->setGrowCrossAxis(false);
-        layout->setCrossAxisOverflow(true);
-        layout->setGap(0.5f);
-        layout->setAxisAlignment(geode::AxisAlignment::End);
-        layout->setCrossAxisAlignment(geode::AxisAlignment::Start);
-        layout->setCrossAxisLineAlignment(geode::AxisAlignment::Start);
+        auto layout = geode::AxisLayout::create(geode::Axis::Column)
+                        ->setAxisReverse(true)
+                        ->setAutoScale(true)
+                        ->setGrowCrossAxis(false)
+                        ->setCrossAxisOverflow(true)
+                        ->setGap(0.5f)
+                        ->setAxisAlignment(geode::AxisAlignment::End)
+                        ->setCrossAxisAlignment(geode::AxisAlignment::Start)
+                        ->setCrossAxisLineAlignment(geode::AxisAlignment::Start);
         this->setAnchorPoint({0.f, 1.f});
         this->setContentHeight(260.f);
         this->setLayout(layout, true);
@@ -84,8 +85,8 @@ namespace eclipse::gui::cocos {
         size.width += 15.F; // 135
         this->setContentSize(size);
 
-        m_label = cocos2d::CCLabelBMFont::create(name.c_str(), "bigFont.fnt");
-        m_label->limitLabelWidth(100, 0.5F, .2F);
+        m_label = TranslatedLabel::create(name);
+        m_label->limitLabelWidth(100, 1.f, .2f);
         m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", { 0.0f, 0.0f, 80.0f, 80.0f });
         m_bgSprite->setContentSize({size.width, size.height + 8.F}); // minimum 36
         m_bgSprite->setScaleY(.75F);

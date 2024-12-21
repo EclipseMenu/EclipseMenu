@@ -8,11 +8,11 @@ namespace eclipse::hacks::Bypass {
 
     class CopyBypass : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
+            auto tab = gui::MenuTab::find("tab.creator");
 
-            tab->addToggle("Level Copy Bypass", "bypass.copybypass")
+            tab->addToggle("bypass.copybypass")
                 ->handleKeybinds()
-                ->setDescription("Allows you to copy any level.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Level Copy Bypass"; }

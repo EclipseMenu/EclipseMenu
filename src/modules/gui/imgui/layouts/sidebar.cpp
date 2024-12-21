@@ -2,6 +2,7 @@
 #include <modules/gui/imgui/imgui.hpp>
 #include <modules/gui/gui.hpp>
 #include <modules/gui/theming/manager.hpp>
+#include <modules/i18n/translations.hpp>
 
 namespace eclipse::gui::imgui {
 
@@ -75,7 +76,7 @@ namespace eclipse::gui::imgui {
         Tabs currentTabs = Engine::get()->getTabs();
 
         for (int i = 0; i < currentTabs.size(); i++) {
-            std::string it = currentTabs[i]->getTitle().c_str();
+            std::string it = i18n::get_(currentTabs[i]->getTitle());
             ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5, 0.5));
             ImGui::PushStyleColor(ImGuiCol_Button, m_selectedTab == i ? style->Colors[ImGuiCol_Button] : ImVec4(0, 0, 0, 0));
             ImGui::PushStyleColor(ImGuiCol_Text, currentTabs[i]->isSearchedFor() ? static_cast<ImVec4>(tm->getSearchedColor()) : style->Colors[ImGuiCol_Text]);

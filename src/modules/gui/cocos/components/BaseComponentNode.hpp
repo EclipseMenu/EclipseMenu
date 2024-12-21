@@ -1,4 +1,6 @@
 #pragma once
+#include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
+#include <modules/gui/popup.hpp>
 
 namespace eclipse::gui::cocos {
 
@@ -23,6 +25,13 @@ namespace eclipse::gui::cocos {
             }
             delete ret;
             return nullptr;
+        }
+
+        void openDescriptionPopup() {
+            Popup::create(
+                i18n::get_(m_component->getTitle()),
+                i18n::get_(m_component->getDescription())
+            );
         }
     };
 

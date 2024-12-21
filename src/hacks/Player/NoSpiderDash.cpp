@@ -8,10 +8,10 @@ namespace eclipse::hacks::Player {
 
     class NoSpiderDash : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            tab->addToggle("No Spider Dash", "player.nospiderdash")
-                ->setDescription("Disables the spider dash trail.")
+            tab->addToggle("player.nospiderdash")
+                ->setDescription()
                 ->handleKeybinds();
         }
 
