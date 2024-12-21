@@ -12,55 +12,31 @@
 #include <Geode/modify/HardStreak.hpp>
 
 namespace eclipse::hacks::Player {
-    class ShowTrajectory : public hack::Hack {
-        void init() override {
-            auto tab = gui::MenuTab::find("tab.player");
-
-            gui::ToggleComponent* toggle = tab->addToggle("player.showtrajectory")
-                ->setDescription()
-                ->handleKeybinds();
-
-            config::setIfEmpty("player.showtrajectory.iterations", 300);
-
-            toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                options->addInputInt("player.showtrajectory.iterations", "player.showtrajectory.iterations", 1, 1000);
-            });
-        }
-
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("player.showtrajectory", false); }
-        [[nodiscard]] const char* getId() const override { return "Show Trajectory"; }
-    };
-
-    REGISTER_HACK(ShowTrajectory)
-
     class TrajectorySimulation {
     private:
-        PlayerObject* m_player1;
-        PlayerObject* m_player2;
+        PlayerObject* m_player1{};
+        PlayerObject* m_player2{};
 
         bool m_simulating = false;
-        bool m_simuationDead = false;
+        bool m_simulationDead = false;
         bool m_player1Pressed = false;
         bool m_player2Pressed = false;
 
         float m_frameDt = 0.f;
 
-    private:
-        cocos2d::CCDrawNode* getDrawNode() {
-
+    public:
+        cocos2d::CCDrawNode* getDrawNode() const {
             class TrajectoryDrawNode : public cocos2d::CCDrawNode {
             public:
                 static TrajectoryDrawNode* create() {
-                    TrajectoryDrawNode* ret = new TrajectoryDrawNode();
-
-                    if (ret && ret->init()) {
+                    auto ret = new TrajectoryDrawNode();
+                    if (ret->init()) {
                         ret->autorelease();
                         ret->m_bUseArea = false;
+                        return ret;
                     }
-                    else
-                        CC_SAFE_DELETE(ret);
-
-                    return ret;
+                    delete ret;
+                    return nullptr;
                 }
             };
 
@@ -69,34 +45,40 @@ namespace eclipse::hacks::Player {
             if (!instance) {
                 instance = TrajectoryDrawNode::create();
                 instance->retain();
+                instance->setID("show-trajectory-draw-node"_spr);
             }
 
             return instance;
         }
 
-        void drawRectangleHitbox(const cocos2d::CCRect& rect, cocos2d::ccColor4B colBase, cocos2d::ccColor4B colBorder) {
-            const size_t N = 4;
-            std::vector<cocos2d::CCPoint> points(N);
+    private:
+        void drawRectangleHitbox(const cocos2d::CCRect& rect, const gui::Color& color, const gui::Color& borderColor) const {
+            std::array vertices = {
+                cocos2d::CCPoint { rect.getMinX(), rect.getMinY() },
+                cocos2d::CCPoint { rect.getMinX(), rect.getMaxY() },
+                cocos2d::CCPoint { rect.getMaxX(), rect.getMaxY() },
+                cocos2d::CCPoint { rect.getMaxX(), rect.getMinY() }
+            };
 
-            points[0] = cocos2d::CCPointMake(rect.getMinX(), rect.getMinY());
-            points[1] = cocos2d::CCPointMake(rect.getMinX(), rect.getMaxY());
-            points[2] = cocos2d::CCPointMake(rect.getMaxX(), rect.getMaxY());
-            points[3] = cocos2d::CCPointMake(rect.getMaxX(), rect.getMinY());
-
-            getDrawNode()->drawPolygon(const_cast<cocos2d::CCPoint*>(points.data()), points.size(), ccc4FFromccc4B(colBase),
-                                0.25, ccc4FFromccc4B(colBorder));
+            getDrawNode()->drawPolygon(
+                vertices.data(), vertices.size(),
+                { color.r, color.g, color.b, 0 },
+                0.25f, borderColor
+            );
         }
 
-        void drawForPlayer(PlayerObject* player) {
-            if (!player) return;
-
+        void drawForPlayer(PlayerObject* player) const {
             cocos2d::CCRect rect1 = player->getObjectRect();
             cocos2d::CCRect rect2 = player->getObjectRect(0.25f, 0.25f);
-            drawRectangleHitbox(rect1, { 255, 0, 0, 0 }, { 255, 0, 0, 255 });
-            drawRectangleHitbox(rect2, { 0, 255, 0, 0 }, { 0, 255, 0, 255 });
+
+            auto color = config::get<gui::Color>("level.showhitboxes.player_color", { 1.f, 0, 0, 1.f });
+            auto colorInner = config::get<gui::Color>("level.showhitboxes.player_color_inner", { 0, 1.f, 0, 1.f });
+
+            drawRectangleHitbox(rect1, color, color);
+            drawRectangleHitbox(rect2, colorInner, colorInner);
         }
 
-        void resetCollisionLog(PlayerObject* self) {
+        void resetCollisionLog(PlayerObject* self) const {
             self->m_collisionLogTop->removeAllObjects();
             self->m_collisionLogBottom->removeAllObjects();
             self->m_collisionLogLeft->removeAllObjects();
@@ -105,20 +87,21 @@ namespace eclipse::hacks::Player {
 
         void iterateForPlayer(PlayerObject* player, bool down, bool isPlayer2) {
             player->setVisible(false);
-            m_simuationDead = false;
+            m_simulationDead = false;
 
             bool iterationActionDone = false;
 
             const size_t iterations = config::get<int>("player.showtrajectory.iterations", 300);
-;
+            auto pl = PlayLayer::get();
 
             for (size_t i = 0; i < iterations; i++) {
                 cocos2d::CCPoint initialPlayerPosition = player->getPosition();
                 resetCollisionLog(player);
 
-                PlayLayer::get()->checkCollisions(player, m_frameDt, false);
+                pl->checkCollisions(player, m_frameDt, false);
 
-                if (m_simuationDead)
+                // ReSharper disable once CppDFAConstantConditions
+                if (m_simulationDead)
                     break;
 
                 if (!iterationActionDone && (!isPlayer2 && !m_player1Pressed || isPlayer2 && !m_player2Pressed)) {
@@ -166,7 +149,7 @@ namespace eclipse::hacks::Player {
             PlayLayer* pl = PlayLayer::get();
 
             PlayerObject* player = PlayerObject::create(1, 1, pl, pl, true);
-            player->retain();
+            // player->retain();
             player->setPosition({0, 105});
             player->setVisible(false);
             player->setID("show-trajectory-player"_spr);
@@ -191,13 +174,13 @@ namespace eclipse::hacks::Player {
             m_player2 = nullptr;
         }
 
-        bool isSimulating() {
+        bool isSimulating() const {
             return m_simulating;
         }
 
         bool isSimulationDead(PlayerObject* player) {
             if (m_simulating && (player == m_player1 || player == m_player2)) {
-                m_simuationDead = true;
+                m_simulationDead = true;
                 return true;
             }
 
@@ -218,7 +201,6 @@ namespace eclipse::hacks::Player {
 
             m_simulating = true;
 
-            getDrawNode()->setVisible(true);
             getDrawNode()->clear();
 
             simulateForPlayer(m_player1, m_player2, pl->m_player1);
@@ -229,7 +211,7 @@ namespace eclipse::hacks::Player {
             m_simulating = false;
         }
 
-        void hide() {
+        void hide() const {
             getDrawNode()->setVisible(false);
         }
 
@@ -241,7 +223,41 @@ namespace eclipse::hacks::Player {
 
     static TrajectorySimulation s_simulation;
 
+    class ShowTrajectory : public hack::Hack {
+        void init() override {
+            auto tab = gui::MenuTab::find("tab.player");
+
+            gui::ToggleComponent* toggle = tab->addToggle("player.showtrajectory")
+                ->setDescription()
+                ->handleKeybinds();
+
+            config::setIfEmpty("player.showtrajectory.iterations", 300);
+
+            toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                options->addInputInt("player.showtrajectory.iterations", "player.showtrajectory.iterations", 1, 1000);
+            });
+
+            config::addDelegate("player.showtrajectory", []() {
+                auto value = config::get<bool>("player.showtrajectory", false);
+                s_simulation.getDrawNode()->setVisible(value);
+            });
+        }
+
+        [[nodiscard]] bool isCheating() override { return config::get<bool>("player.showtrajectory", false); }
+        [[nodiscard]] const char* getId() const override { return "Show Trajectory"; }
+    };
+
+    REGISTER_HACK(ShowTrajectory)
+
     class $modify(ShowTrajectoryPLHook, PlayLayer) {
+        static void onModify(auto& self) {
+            HOOKS_TOGGLE(
+                "player.showtrajectory", PlayLayer,
+                "destroyPlayer",
+                "playEndAnimationToPos"
+            );
+        }
+
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
             if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
@@ -250,8 +266,8 @@ namespace eclipse::hacks::Player {
             return true;
         }
 
-        void destroyPlayer(PlayerObject* player, GameObject* gameObject) {
-            if (s_simulation.isSimulationDead(player)) return;
+        void destroyPlayer(PlayerObject* player, GameObject* gameObject) override {
+            if (gameObject != m_anticheatSpike && s_simulation.isSimulationDead(player)) return;
 
             PlayLayer::destroyPlayer(player, gameObject);
         }
@@ -260,12 +276,6 @@ namespace eclipse::hacks::Player {
             if (s_simulation.isSimulating()) return;
             
             PlayLayer::playEndAnimationToPos(p0);
-        }
-
-        void flipGravity(PlayerObject* p0, bool p1, bool p2) {
-            if (s_simulation.isSimulating()) return;
-            
-            PlayLayer::flipGravity(p0, p1, p2);
         }
 
         void onQuit() {
@@ -283,6 +293,8 @@ namespace eclipse::hacks::Player {
     };
 
     class $modify(ShowTrajectoryHSHook, HardStreak) {
+        ADD_HOOKS_DELEGATE("player.showtrajectory")
+
         void addPoint(cocos2d::CCPoint p0) {
             if (s_simulation.isSimulating()) return;
 
@@ -291,7 +303,9 @@ namespace eclipse::hacks::Player {
     };
 
     class $modify(ShowTrajectoryEGOHook, EffectGameObject) {
-        void triggerObject(GJBaseGameLayer* p0, int p1, const gd::vector<int>* p2) {
+        ADD_HOOKS_DELEGATE("player.showtrajectory")
+
+        void triggerObject(GJBaseGameLayer* p0, int p1, const gd::vector<int>* p2) override {
             if (s_simulation.isSimulating()) return;
             
             return EffectGameObject::triggerObject(p0, p1, p2);
@@ -299,6 +313,8 @@ namespace eclipse::hacks::Player {
     };
 
     class $modify(ShowTrajectoryGOHook, GameObject) {
+        ADD_HOOKS_DELEGATE("player.showtrajectory")
+
         void playShineEffect() {
             if (s_simulation.isSimulating()) return;
             
@@ -307,6 +323,8 @@ namespace eclipse::hacks::Player {
     };
 
     class $modify(ShowTrajectoryPOHook, PlayerObject) {
+        ADD_HOOKS_DELEGATE("player.showtrajectory")
+
         void playSpiderDashEffect(cocos2d::CCPoint from, cocos2d::CCPoint to) {
             if (s_simulation.isSimulating()) return;
 
@@ -319,7 +337,7 @@ namespace eclipse::hacks::Player {
             PlayerObject::incrementJumps();
         }
 
-        void update(float dt){
+        void update(float dt) override {
             PlayerObject::update(dt);
 
             if (PlayLayer::get() && !s_simulation.isSimulating())
@@ -334,6 +352,8 @@ namespace eclipse::hacks::Player {
     };
 
     class $modify(ShowTrajectoryBGLHook, GJBaseGameLayer) {
+        ADD_HOOKS_DELEGATE("player.showtrajectory")
+
         bool canBeActivatedByPlayer(PlayerObject* p0, EffectGameObject* p1) {
             if (s_simulation.isSimulating())
                 return false;
@@ -346,6 +366,12 @@ namespace eclipse::hacks::Player {
                 s_simulation.handleButton(down, isPlayer1);
 
             GJBaseGameLayer::handleButton(down, button, isPlayer1);
+        }
+
+        void flipGravity(PlayerObject* p0, bool p1, bool p2) {
+            if (s_simulation.isSimulating()) return;
+
+            GJBaseGameLayer::flipGravity(p0, p1, p2);
         }
 
         //don't trigger objects early
@@ -379,10 +405,7 @@ namespace eclipse::hacks::Player {
         }
 
         void updateCamera(float dt) {
-            if (config::get<bool>("player.showtrajectory", false))
-                s_simulation.simulate();
-            else
-                s_simulation.hide();
+            s_simulation.simulate();
 
             GJBaseGameLayer::updateCamera(dt);
         }
