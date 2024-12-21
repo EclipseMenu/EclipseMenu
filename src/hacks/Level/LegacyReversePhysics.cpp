@@ -27,11 +27,11 @@ namespace eclipse::hacks::Level {
     
     class LegacyReversePhysics : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Legacy Reverse Physics", "level.legacyreversephysics")
+            tab->addToggle("level.legacyreversephysics")
                 ->handleKeybinds()
-                ->setDescription("Forces old upside down physics among other old physics changes.")
+                ->setDescription()
                 ->callback([](bool newState){
                     if (auto pl = PlayLayer::get()) {
                         static_cast<LegacyPhysicsPlayLayer*>(pl)->toggleFixGravityBugState(newState);

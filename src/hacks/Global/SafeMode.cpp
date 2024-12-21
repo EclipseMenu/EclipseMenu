@@ -75,12 +75,12 @@ namespace eclipse::hacks::Global {
 
     private:
         void init() override {
-            auto tab = gui::MenuTab::find("Global");
+            auto tab = gui::MenuTab::find("tab.global");
 
             config::setIfEmpty("global.autosafemode", true);
-            tab->addToggle("Auto Safe Mode", "global.autosafemode")
+            tab->addToggle("global.autosafemode")
                 ->handleKeybinds()
-                ->setDescription("Automatically enables safe mode if cheats are enabled");
+                ->setDescription();
         }
 
         void update() override {
@@ -96,17 +96,18 @@ namespace eclipse::hacks::Global {
 
     class SafeMode : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Global");
+            auto tab = gui::MenuTab::find("tab.global");
 
             config::setIfEmpty("global.safemode", false);
             config::setIfEmpty("global.safemode.freeze_attempts", true);
             config::setIfEmpty("global.safemode.freeze_jumps", true);
 
-            tab->addToggle("Safe Mode", "global.safemode")
+            tab->addToggle("global.safemode")
                 ->handleKeybinds()
+                ->setDescription()
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addToggle("Freeze Attempt Count", "global.safemode.freeze_attempts");
-                    options->addToggle("Freeze Jump Count", "global.safemode.freeze_jumps");
+                    options->addToggle("global.safemode.freeze_attempts");
+                    options->addToggle("global.safemode.freeze_jumps");
                 });
         }
 

@@ -8,9 +8,9 @@ namespace eclipse::hacks::Level {
 
     class FreezeAttempts : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            tab->addToggle("Freeze Attempts", "level.freeze_attempts")->handleKeybinds();
+            tab->addToggle("level.freeze_attempts")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Freeze Attempts"; }

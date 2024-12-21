@@ -8,11 +8,11 @@ namespace eclipse::hacks::Bypass {
 
     class PauseBuffering : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Bypass");
+            auto tab = gui::MenuTab::find("tab.bypass");
 
-            tab->addToggle("Pause Buffering", "bypass.pausebuffering")
+            tab->addToggle("bypass.pausebuffering")
                 ->handleKeybinds()
-                ->setDescription("Prevents the game from blocking pause buffering.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Pause Buffering"; }

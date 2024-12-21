@@ -91,7 +91,7 @@ namespace eclipse::gui::imgui::themes {
             ImGui::OpenPopup(popupName.c_str());
 
         ImGui::SetNextWindowSizeConstraints(ImVec2(240 * tm->getGlobalScale(), 0), ImVec2(FLT_MAX, FLT_MAX));
-        if (ImGui::BeginPopup(popupName.c_str(), ImGuiWindowFlags_NoMove)) {
+        if (ImGui::BeginPopup(popupName.c_str()/*, ImGuiWindowFlags_NoMove*/)) {
             callback();
             ImGui::EndPopup();
         }

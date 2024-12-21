@@ -38,12 +38,18 @@ namespace eclipse::hacks::Recorder {
     cocos2d::CCSize newScreenScale;
 
     void endPopup() {
-        Popup::create("Info", "Recording finished!", "OK", "Open folder", [](bool result) {
-            if(result)
-                return;
+        Popup::create(
+            i18n::get_("common.info"),
+            i18n::get_("recorder.finished"),
+            i18n::get_("common.ok"),
+            i18n::get_("recorder.open-folder"),
+            [](bool result) {
+                if(result)
+                    return;
 
-            geode::utils::file::openFolder(geode::Mod::get()->getSaveDir() / "renders");
-        });
+                geode::utils::file::openFolder(geode::Mod::get()->getSaveDir() / "renders");
+            }
+        );
     }
 
     void applyWinSize() {
@@ -125,8 +131,8 @@ namespace eclipse::hacks::Recorder {
 
         auto lvl = PlayLayer::get()->m_level;
         std::string trimmedLevelName = lvl->m_levelName;
-        trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '/'), trimmedLevelName.end());
-        trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '\\'), trimmedLevelName.end());
+        std::erase(trimmedLevelName, '/');
+        std::erase(trimmedLevelName, '\\');
         trimmedLevelName = std::regex_replace(trimmedLevelName, std::regex("\\s+"), " ");
         auto renderPath = geode::Mod::get()->getSaveDir() / "renders" / STR(trimmedLevelName) / (fmt::format("{} - {}.mp4", trimmedLevelName, lvl->m_levelID.value()));
 
@@ -155,17 +161,17 @@ namespace eclipse::hacks::Recorder {
 
     class InternalRecorder : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Internal Recorder");
+            auto tab = gui::MenuTab::find("tab.recorder");
         }
 
         void lateInit() override {
             auto ffmpeg = geode::Loader::get()->getLoadedMod("eclipse.ffmpeg-api");
             if (!ffmpeg) return;
             
-            auto tab = gui::MenuTab::find("Internal Recorder");
+            auto tab = gui::MenuTab::find("tab.recorder");
 
-            tab->addButton("Start Recording")->callback(start);
-            tab->addButton("Stop Recording")->callback([] {
+            tab->addButton("recorder.start")->callback(start);
+            tab->addButton("recorder.stop")->callback([] {
                 if (s_recorder.isRecording())
                     stop();
                 if (s_recorder.isRecordingAudio())
@@ -187,15 +193,15 @@ namespace eclipse::hacks::Recorder {
 
             int codecIdx = static_cast<int>(std::distance(m_codecs.begin(), std::ranges::find(m_codecs, "h264")));
 
-            tab->addInputFloat("Framerate", "recorder.fps", 1.f, 360.f, "%.0f FPS");
-            tab->addInputFloat("Endscreen Duration", "recorder.endscreen", 0.f, 30.f, "%.2fs.");
-            tab->addInputFloat("Bitrate", "recorder.bitrate", 1.f, 1000.f, "%.0fmbps");
-            tab->addInputInt("Resolution X", "recorder.resolution.x", 1, 15360);
-            tab->addInputInt("Resolution Y", "recorder.resolution.y", 1, 8640);
+            tab->addInputFloat("recorder.framerate", "recorder.fps", 1.f, 360.f, "%.0f FPS");
+            tab->addInputFloat("recorder.endscreen-duration", "recorder.endscreen", 0.f, 30.f, "%.2fs.");
+            tab->addInputFloat("recorder.bitrate", "recorder.bitrate", 1.f, 1000.f, "%.0fmbps");
+            tab->addInputInt("recorder.res-x", "recorder.resolution.x", 1, 15360);
+            tab->addInputInt("recorder.res-y", "recorder.resolution.y", 1, 8640);
 
             config::setIfEmpty("recorder.codecIdx", codecIdx);
 
-            tab->addCombo("Codec", "recorder.codecIdx", m_codecs, codecIdx)->callback([&](int index) {
+            tab->addCombo("recorder.codec", "recorder.codecIdx", m_codecs, codecIdx)->callback([&](int index) {
                 config::set("recorder.codecString", m_codecs[index]);
             });
 
@@ -215,21 +221,25 @@ namespace eclipse::hacks::Recorder {
             //     }
             // });
 
-            tab->addCombo("Audio mode", "recorder.audio", {"Don't record", "Ask first", "Always record"}, 0);
+            tab->addCombo("recorder.audio-mode", "recorder.audio", {
+                i18n::get_("recorder.audio-mode.disable"),
+                i18n::get_("recorder.audio-mode.ask"),
+                i18n::get_("recorder.audio-mode.always")
+            }, 0);
 
-            tab->addInputText("Colorspace Args", "recorder.colorspace");
+            tab->addInputText("recorder.colorspace-args", "recorder.colorspace");
             
-            tab->addLabel("Presets");
-            tab->addButton("CPU")->callback([] {
+            tab->addLabel("recorder.presets");
+            tab->addButton("recorder.preset.cpu")->callback([] {
                 config::set<std::string>("recorder.codecString", "h264");
             });
 
-            tab->addButton("NVIDIA")->callback([] {
+            tab->addButton("recorder.preset.nvidia")->callback([] {
                 config::set<std::string>("recorder.codecString", "h264_nvenc");
                 config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::CUDA));
             });
 
-            tab->addButton("AMD")->callback([] {
+            tab->addButton("recorder.preset.amd")->callback([] {
                 config::set<std::string>("recorder.codecString", "h264_amf");
                 config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::D3D11VA));
             });
@@ -309,14 +319,20 @@ namespace eclipse::hacks::Recorder {
                         switch(config::get<int>("recorder.audio", 2)) {
                             case 1:
                                 popupShown = true;
-                                Popup::create("Audio", "Record audio?", "Yes", "No", [&](bool result) {
-                                    if(result) {
-                                        startAudio();
-                                        return;
+                                Popup::create(
+                                    i18n::get_("recorder.audio"),
+                                    i18n::get_("recorder.audio.msg"),
+                                    i18n::get_("common.yes"),
+                                    i18n::get_("common.no"),
+                                    [&](bool result) {
+                                        if(result) {
+                                            startAudio();
+                                            return;
+                                        }
+                                        stop();
+                                        endPopup();
                                     }
-                                    stop();
-                                    endPopup();
-                                });
+                                );
                                 break;
                             case 2:
                                 startAudio();

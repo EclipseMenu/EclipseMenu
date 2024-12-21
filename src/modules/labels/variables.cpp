@@ -364,6 +364,29 @@ namespace eclipse::labels {
         m_variables["noclipDeaths"] = rift::Value::integer(config::getTemp("noclipDeaths", 0));
         m_variables["noclipAccuracy"] = rift::Value::floating(config::getTemp("noclipAccuracy", 100.f));
         m_variables["progress"] = rift::Value::floating(utils::getActualProgress(gameLayer));
+        m_variables["timeWarp"] = rift::Value::floating(gameLayer->m_gameState.m_timeWarp);
+        m_variables["gravity"] = rift::Value::floating(gameLayer->m_player1->m_gravityMod);
+        m_variables["activeObjects"] = rift::Value::integer(gameLayer->m_activeObjects);
+        m_variables["gradients"] = rift::Value::integer(gameLayer->m_activeGradients);
+        m_variables["particleCount"] = rift::Value::integer(gameLayer->m_particleCount);
+
+        auto fmod = FMODAudioEngine::get();
+        m_variables["songsCount"] = rift::Value::integer(fmod->countActiveMusic());
+        m_variables["sfxCount"] = rift::Value::integer(fmod->countActiveEffects());
+
+        m_variables["moveTriggerCount"] = rift::Value::integer(gameLayer->m_movedCountDisplay);
+        m_variables["rotateTriggerCount"] = rift::Value::integer(gameLayer->m_rotatedCountDisplay);
+        m_variables["scaleTriggerCount"] = rift::Value::integer(gameLayer->m_scaledCountDisplay);
+        m_variables["followTriggerCount"] = rift::Value::integer(gameLayer->m_followedCountDisplay);
+
+        m_variables["areaMoveTrigger"] = rift::Value::integer(gameLayer->m_areaMovedCountTotalDisplay);
+        m_variables["areaMoveTriggerTotal"] = rift::Value::integer(gameLayer->m_areaMovedCountDisplay);
+        m_variables["areaRotateTrigger"] = rift::Value::integer(gameLayer->m_areaRotatedCountTotalDisplay);
+        m_variables["areaRotateTriggerTotal"] = rift::Value::integer(gameLayer->m_areaRotatedCountDisplay);
+        m_variables["areaScaleTrigger"] = rift::Value::integer(gameLayer->m_areaScaledCountTotalDisplay);
+        m_variables["areaScaleTriggerTotal"] = rift::Value::integer(gameLayer->m_areaScaledCountDisplay);
+        m_variables["areaColOpTrigger"] = rift::Value::integer(gameLayer->m_areaColorCountTotalDisplay);
+        m_variables["areaColOpTriggerTotal"] = rift::Value::integer(gameLayer->m_areaColorCountDisplay);
 
         if (auto* pl = PlayLayer::get()) {
             m_variables["editorMode"] = rift::Value::boolean(false);

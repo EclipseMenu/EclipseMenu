@@ -17,14 +17,20 @@ namespace eclipse::hacks::Bot {
     static bot::Bot s_bot;
 
     void newReplay() {
-        Popup::prompt("New replay", "Enter a name for the new replay:", [&](bool result, std::string name) {
-            if(!result)
-                return;
-            
-            s_bot.save(Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
-            config::set("bot.selectedreplay", Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
+        Popup::prompt(
+            i18n::get_("bot.new-replay"),
+            i18n::get_("bot.new-replay.msg"),
+            [&](bool result, std::string name) {
+                if(!result)
+                    return;
 
-        }, "Create", "Cancel", "");
+                s_bot.save(Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
+                config::set("bot.selectedreplay", Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
+            },
+            i18n::get_("common.create"),
+            i18n::get_("common.cancel"),
+            ""
+        );
     }
 
     void saveReplay() {
@@ -36,47 +42,68 @@ namespace eclipse::hacks::Bot {
         std::filesystem::path replayPath = config::get<std::filesystem::path>("bot.selectedreplay", "temp");
 
         if(std::filesystem::exists(replayPath)) {
-            Popup::create("Warning", fmt::format("Are you sure you want to overwrite {}?", replayPath.filename().stem().string()), "Yes", "No", [&](bool result) {
-                if(!result)
-                    return;
+            return Popup::create(
+                i18n::get_("common.warning"),
+                i18n::format("bot.overwrite", replayPath.filename().stem().string()),
+                i18n::get_("common.yes"),
+                i18n::get_("common.no"),
+                [&](bool result) {
+                    if(!result)
+                        return;
 
-                std::filesystem::path confirmReplayDirectory = config::get<std::filesystem::path>("bot.selectedreplay", "temp");
+                    auto confirmReplayDirectory = config::get<std::filesystem::path>("bot.selectedreplay", "temp");
 
-                s_bot.save(confirmReplayDirectory);
-                Popup::create("Replay saved", fmt::format("Replay {} saved with {} inputs", confirmReplayDirectory.filename().stem().string(), s_bot.getInputCount()));
-                
-                config::set("bot.selectedreplay", confirmReplayDirectory);
-            });
-            return;
+                    s_bot.save(confirmReplayDirectory);
+                    Popup::create(
+                        i18n::get_("bot.saved"),
+                        i18n::format("bot.saved.msg", confirmReplayDirectory.filename().stem().string(), s_bot.getInputCount())
+                    );
+
+                    config::set("bot.selectedreplay", confirmReplayDirectory);
+                }
+            );
         }
 
         s_bot.save(replayPath);
-        Popup::create("Replay saved", fmt::format("Replay {} saved with {} inputs", replayPath.filename().stem().string(), s_bot.getInputCount()));
+        Popup::create(
+            i18n::get_("bot.saved"),
+            i18n::format("bot.saved.msg", replayPath.filename().stem().string(), s_bot.getInputCount())
+        );
         config::set("bot.selectedreplay", replayPath);
     }
 
     void confirmLoad(std::filesystem::path const& replayPath) {
         auto res = s_bot.load(replayPath);
         if (res.isErr()) {
-            Popup::create("Error", fmt::format("Failed to load replay: {}", res.unwrapErr()));
-            return;
+            return Popup::create(
+                i18n::get_("common.error"),
+                i18n::format("bot.load-fail", res.unwrapErr())
+            );
         }
-        Popup::create("Replay loaded", fmt::format("Replay {} loaded with {} inputs", replayPath.filename().stem(), s_bot.getInputCount()));
+        Popup::create(
+            i18n::get_("bot.loaded"),
+            i18n::format("bot.loaded.msg", replayPath.filename().stem(), s_bot.getInputCount())
+        );
     }
 
     void loadReplay() {
         std::filesystem::path replayPath = config::get<std::string>("bot.selectedreplay", "");
 
         if(s_bot.getInputCount() > 0) {
-            Popup::create("Warning", "Your current replay will be overwritten. Are you sure?", "Yes", "No", [&](bool result) {
-                if(!result)
-                    return;
+            return Popup::create(
+                i18n::get_("common.warning"),
+                i18n::get_("bot.overwrite-current"),
+                i18n::get_("common.yes"),
+                i18n::get_("common.no"),
+                [&](bool result) {
+                    if(!result)
+                        return;
 
-                std::filesystem::path confirmReplayPath = config::get<std::string>("bot.selectedreplay", "");
+                    std::filesystem::path confirmReplayPath = config::get<std::string>("bot.selectedreplay", "");
 
-                confirmLoad(confirmReplayPath);
-            });
-            return;
+                    confirmLoad(confirmReplayPath);
+                }
+            );
         }
 
         confirmLoad(replayPath);
@@ -85,19 +112,30 @@ namespace eclipse::hacks::Bot {
     void deleteReplay() {
         std::filesystem::path replayPath = config::get<std::string>("bot.selectedreplay", "");
         if(!std::filesystem::exists(replayPath)) {
-            Popup::create("Invalid Replay", "Please select a replay you would like to delete.");
-            return;
+            return Popup::create(
+                i18n::get_("bot.delete-invalid"),
+                i18n::get_("bot.delete-invalid.msg")
+            );
         }
         std::string replayName = replayPath.filename().stem().string();
-        Popup::create("Warning", fmt::format("Are you sure you want to delete {}?", replayName), "Yes", "No", [replayPath, replayName](bool result) {
-            if (!result) return;
-            if (std::filesystem::exists(replayPath)) {
-                Popup::create("Replay deleted", fmt::format("{} has been deleted.", replayName));
-                std::filesystem::remove(replayPath);
-                // apparently i cannot put the Popup below here otherwise some memory corruption happens, WHY? its not even a pointer!!
-                config::set("bot.selectedreplay", "");
+        Popup::create(
+            i18n::get_("common.warning"),
+            i18n::format("bot.confirm-delete", replayName),
+            i18n::get_("common.yes"),
+            i18n::get_("common.no"),
+            [replayPath, replayName](bool result) {
+                if (!result) return;
+                if (std::filesystem::exists(replayPath)) {
+                    Popup::create(
+                        i18n::get_("bot.deleted"),
+                        i18n::format("bot.deleted.msg", replayName)
+                    );
+                    std::filesystem::remove(replayPath);
+                    // apparently i cannot put the Popup below here otherwise some memory corruption happens, WHY? its not even a pointer!!
+                    config::set("bot.selectedreplay", "");
+                }
             }
-        });
+        );
     }
 
     class Bot : public hack::Hack {
@@ -107,17 +145,17 @@ namespace eclipse::hacks::Bot {
             config::setIfEmpty("bot.state", 0);
             updateBotState(config::get<int>("bot.state", 0));
 
-            auto tab = gui::MenuTab::find("Bot");
+            auto tab = gui::MenuTab::find("tab.bot");
 
-            tab->addRadioButton("Disabled", "bot.state", 0)->callback(updateBotState)->handleKeybinds();
-            tab->addRadioButton("Record", "bot.state", 1)->callback(updateBotState)->handleKeybinds();
-            tab->addRadioButton("Playback", "bot.state", 2)->callback(updateBotState)->handleKeybinds();
+            tab->addRadioButton("bot.disabled", "bot.state", 0)->callback(updateBotState)->handleKeybinds();
+            tab->addRadioButton("bot.record", "bot.state", 1)->callback(updateBotState)->handleKeybinds();
+            tab->addRadioButton("bot.playback", "bot.state", 2)->callback(updateBotState)->handleKeybinds();
 
-            tab->addFilesystemCombo("Replays", "bot.selectedreplay", Mod::get()->getSaveDir() / "replays");
-            tab->addButton("New")->callback(newReplay);
-            tab->addButton("Save")->callback(saveReplay);
-            tab->addButton("Load")->callback(loadReplay);
-            tab->addButton("Delete")->callback(deleteReplay);
+            tab->addFilesystemCombo("bot.replays", "bot.selectedreplay", Mod::get()->getSaveDir() / "replays");
+            tab->addButton("common.new")->callback(newReplay);
+            tab->addButton("common.save")->callback(saveReplay);
+            tab->addButton("common.load")->callback(loadReplay);
+            tab->addButton("common.delete")->callback(deleteReplay);
         }
 
         [[nodiscard]] bool isCheating() override {

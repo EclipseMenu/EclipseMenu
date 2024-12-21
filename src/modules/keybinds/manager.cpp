@@ -373,10 +373,10 @@ namespace eclipse::keybinds {
 
     void updateHintLabel() {
         if (!s_hintLabel) return;
-        auto components = gui::MenuTab::find("Keybinds")->getComponents();
+        auto components = gui::MenuTab::find("tab.keybinds")->getComponents();
         s_hintLabel->setText(
             components.size() <= 3 ?
-            "Right-Click on any button or toggle to bind it to a key!" : ""
+            i18n::get_("keybinds.hint") : ""
         );
     }
 
@@ -467,7 +467,7 @@ namespace eclipse::keybinds {
 
                 auto idStr = std::string(id);
                 gui::Engine::queueAfterDrawing([idStr, state, keybind] {
-                    auto tab = gui::MenuTab::find("Keybinds");
+                    auto tab = gui::MenuTab::find("tab.keybinds");
                     if (state) {
                         // Add the keybind to the GUI
                         auto keybindComponent = tab->addKeybind(keybind.getTitle(), fmt::format("keybind.{}.key", idStr), true);
@@ -602,9 +602,9 @@ namespace eclipse::keybinds {
     }
 
     void Manager::setupTab() {
-        auto tab = gui::MenuTab::find("Keybinds");
+        auto tab = gui::MenuTab::find("tab.keybinds");
 
-        tab->addKeybind("Open Menu", "menu.toggleKey")->callback([](Keys key) {
+        tab->addKeybind("keybinds.open-menu", "menu.toggleKey")->callback([](Keys key) {
             if (key == Keys::MouseLeft) {
                 // Reset it back to the default keybind (LMB softlocks the menu)
                 key = Keys::Tab;
@@ -615,8 +615,8 @@ namespace eclipse::keybinds {
                 keybind->get().setKey(key);
         });
 
-        tab->addToggle("In-game only", "keybind.in-game-only")
-           ->setDescription("Makes keybinds only usable while in a level");
+        tab->addToggle("keybinds.in-game-only")
+           ->setDescription();
 
         s_hintLabel = tab->addLabel("");
         updateHintLabel();

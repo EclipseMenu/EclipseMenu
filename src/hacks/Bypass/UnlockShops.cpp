@@ -8,11 +8,11 @@ namespace eclipse::hacks::Bypass {
 
     class UnlockShops : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Bypass");
+            auto tab = gui::MenuTab::find("tab.bypass");
 
-            tab->addToggle("Unlock Shops", "bypass.unlockshops")
+            tab->addToggle("bypass.unlockshops")
                 ->handleKeybinds()
-                ->setDescription("Unlock all shops in the game");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Unlock Shops"; }

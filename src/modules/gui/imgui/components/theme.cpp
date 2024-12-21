@@ -6,11 +6,11 @@
 #include <modules/gui/gui.hpp>
 #include <modules/gui/theming/manager.hpp>
 #include <misc/cpp/imgui_stdlib.h>
+#include <modules/i18n/translations.hpp>
 
-std::pair<std::string, float> truncateString(std::string str, float availWidth, bool canDelete = false)
-{
+std::pair<std::string, float> truncateString(std::string_view str, float availWidth, bool canDelete = false) {
     auto labelMaxWidth = availWidth * (canDelete ? 0.5f : 0.6f);
-    auto labelSize = ImGui::CalcTextSize(str.c_str());
+    auto labelSize = ImGui::CalcTextSize(str.data());
 
     if (labelSize.x > labelMaxWidth) {
         auto labelEnd = 0;
@@ -29,9 +29,9 @@ std::pair<std::string, float> truncateString(std::string str, float availWidth, 
             fmt::format("{}...", str.substr(0, labelEnd)),
             labelMaxWidth
         };    
-    } else {
-        return { str, labelMaxWidth };
     }
+
+    return { std::string(str), labelMaxWidth };
 }
 
 namespace eclipse::gui::imgui {
@@ -83,7 +83,7 @@ namespace eclipse::gui::imgui {
 
             ImGui::SetNextWindowPos(pos);
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getForegroundColor()));
-            ImGui::SetTooltip("%s", text.c_str());
+            ImGui::SetTooltip("%s", i18n::get(text).data());
             ImGui::PopStyleColor();
         }
     }
@@ -103,9 +103,9 @@ namespace eclipse::gui::imgui {
             if (keybind.has_value()) {
                 auto& keybindRef = keybind->get();
 
-                if (!keybindRef.isInitialized() && ImGui::MenuItem("Add keybind")) {
+                if (!keybindRef.isInitialized() && ImGui::MenuItem(i18n::get("keybinds.add").data())) {
                     keybinds->setKeybindState(id, true);
-                } else if (keybindRef.isInitialized() && ImGui::MenuItem("Remove keybind")) {
+                } else if (keybindRef.isInitialized() && ImGui::MenuItem(i18n::get("keybinds.remove").data())) {
                     keybinds->setKeybindState(id, false);
                 }
             }
@@ -168,7 +168,7 @@ namespace eclipse::gui::imgui {
         auto tm = ThemeManager::get();
         ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getTitleForegroundColor()));
         ImGui::PushFont(ImGuiRenderer::get()->getFontManager().getFont().get());
-        bool open = ImGui::Begin(title.c_str(), nullptr, flags);
+        bool open = ImGui::Begin(i18n::get(title).data(), nullptr, flags);
         ImGui::PopStyleColor();
 
         return open;
@@ -185,7 +185,7 @@ namespace eclipse::gui::imgui {
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
         else
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getForegroundColor()));
-        ImGui::TextWrapped("%s", label->getTitle().c_str());
+        ImGui::TextWrapped("%s", i18n::get(label->getTitle()).data());
         ImGui::PopStyleColor();
     }
 
@@ -194,9 +194,10 @@ namespace eclipse::gui::imgui {
 
         bool toggled = false;
         bool value = toggle->getValue();
+        auto title = i18n::get_(toggle->getTitle());
 
         if (auto options = toggle->getOptions().lock()) {
-            toggled = this->checkboxWithSettings(toggle->getTitle(), value, toggle->isSearchedFor(), [this, options] {
+            toggled = this->checkboxWithSettings(title, value, toggle->isSearchedFor(), [this, options] {
                 for (auto& comp : options->getComponents())
                     this->visit(comp);
             }, [toggle] {
@@ -205,7 +206,7 @@ namespace eclipse::gui::imgui {
                     handleKeybindMenu(toggle->getId());
             });
         } else {
-            toggled = this->checkbox(toggle->getTitle(), value, toggle->isSearchedFor(), [toggle] {
+            toggled = this->checkbox(title, value, toggle->isSearchedFor(), [toggle] {
                 handleTooltip(toggle->getDescription());
                 if (toggle->hasKeybind())
                     handleKeybindMenu(toggle->getId());
@@ -225,7 +226,7 @@ namespace eclipse::gui::imgui {
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         ImGui::PushStyleColor(ImGuiCol_CheckMark, static_cast<ImVec4>(ThemeManager::get()->getCheckboxCheckmarkColor()));
-        if (ImGui::RadioButton(radio->getTitle().c_str(), &value, radio->getChoice())) {
+        if (ImGui::RadioButton(i18n::get(radio->getTitle()).data(), &value, radio->getChoice())) {
             radio->setValue(value);
             radio->triggerCallback(value);
         }
@@ -242,11 +243,12 @@ namespace eclipse::gui::imgui {
     void Theme::visitCombo(const std::shared_ptr<ComboComponent>& combo) const {
         auto& items = combo->getItems();
         int value = combo->getValue();
-        auto& title = combo->getTitle();
+        auto title = i18n::get(combo->getTitle());
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * (title.empty() ? .9f : .5f));
-        if (value >= items.size()) value = 0;
-        if (ImGui::BeginCombo(fmt::format("##{}", title).c_str(), items[value].c_str())) {
+        if (value >= items.size()) value = std::clamp(value, 0, static_cast<int>(items.size() - 1));
+        auto preview = value < items.size() ? items[value] : "";
+        if (ImGui::BeginCombo(fmt::format("##{}", title).c_str(), preview.c_str())) {
             for (int n = 0; n < items.size(); n++) {
                 const bool is_selected = (value == n);
                 if (ImGui::Selectable(items[n].c_str(), is_selected)) {
@@ -266,7 +268,7 @@ namespace eclipse::gui::imgui {
         if (combo->isSearchedFor())
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
-        ImGui::TextWrapped("%s", title.c_str());
+        ImGui::TextWrapped("%s", title.data());
 
         if (combo->isSearchedFor())
             ImGui::PopStyleColor();
@@ -275,10 +277,10 @@ namespace eclipse::gui::imgui {
     void Theme::visitFilesystemCombo(const std::shared_ptr<FilesystemComboComponent>& combo) const {
         auto& items = combo->getItems();
         std::filesystem::path value = combo->getValue();
-        auto title = combo->getTitle();
+        auto title = i18n::get(combo->getTitle());
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * (title.empty() ? .9f : .5f));
-        if (ImGui::BeginCombo(fmt::format("##{}", title.c_str()).c_str(), value.empty() ? "None" : value.filename().stem().string().c_str())) {
+        if (ImGui::BeginCombo(fmt::format("##{}", title).c_str(), value.empty() ? "None" : value.filename().stem().string().c_str())) {
             ImGui::InputText("##search", combo->getSearchBuffer());
             for (int n = 0; n < items.size(); n++) {
                 std::string option = items[n].filename().stem().string();
@@ -302,7 +304,7 @@ namespace eclipse::gui::imgui {
         if (combo->isSearchedFor())
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
-        ImGui::TextWrapped("%s", title.c_str());
+        ImGui::TextWrapped("%s", title.data());
 
         if (combo->isSearchedFor())
             ImGui::PopStyleColor();
@@ -315,7 +317,7 @@ namespace eclipse::gui::imgui {
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
-        if (ImGui::SliderFloat(slider->getTitle().c_str(), &value, slider->getMin(), slider->getMax(), slider->getFormat().c_str())) {
+        if (ImGui::SliderFloat(i18n::get(slider->getTitle()).data(), &value, slider->getMin(), slider->getMax(), slider->getFormat().c_str())) {
             slider->setValue(value);
             slider->triggerCallback(value);
         }
@@ -329,9 +331,10 @@ namespace eclipse::gui::imgui {
 
     void Theme::visitInputFloat(const std::shared_ptr<InputFloatComponent> &inputFloat) const {
         auto value = inputFloat->getValue();
+        auto title = i18n::get(inputFloat->getTitle());
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
-        if (ImGui::InputFloat(fmt::format("##{}", inputFloat->getTitle()).c_str(), &value, 0, 0, inputFloat->getFormat().c_str())) {
+        if (ImGui::InputFloat(fmt::format("##{}", title).c_str(), &value, 0, 0, inputFloat->getFormat().c_str())) {
             value = std::clamp(value, inputFloat->getMin(), inputFloat->getMax());
             inputFloat->setValue(value);
             inputFloat->triggerCallback(value);
@@ -342,7 +345,7 @@ namespace eclipse::gui::imgui {
         if (inputFloat->isSearchedFor())
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
-        ImGui::TextWrapped("%s", inputFloat->getTitle().c_str());
+        ImGui::TextWrapped("%s", title.data());
 
         if (inputFloat->isSearchedFor())
             ImGui::PopStyleColor();
@@ -353,9 +356,10 @@ namespace eclipse::gui::imgui {
 
     void Theme::visitInputInt(const std::shared_ptr<InputIntComponent> &inputInt) const {
         auto value = inputInt->getValue();
+        auto title = i18n::get(inputInt->getTitle());
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
-        if (ImGui::InputInt(fmt::format("##{}", inputInt->getTitle()).c_str(), &value, 0, 0)) {
+        if (ImGui::InputInt(fmt::format("##{}", title).c_str(), &value, 0, 0)) {
             value = std::clamp(value, inputInt->getMin(), inputInt->getMax());
             inputInt->setValue(value);
             inputInt->triggerCallback(value);
@@ -366,7 +370,7 @@ namespace eclipse::gui::imgui {
         if (inputInt->isSearchedFor())
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
-        ImGui::TextWrapped("%s", inputInt->getTitle().c_str());
+        ImGui::TextWrapped("%s", title.data());
 
         if (inputInt->isSearchedFor())
             ImGui::PopStyleColor();
@@ -379,9 +383,10 @@ namespace eclipse::gui::imgui {
         auto value = intToggle->getValue();
         auto state = intToggle->getState();
         auto tm = ThemeManager::get();
+        auto title = i18n::get_(intToggle->getTitle());
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
-        if (ImGui::InputInt(fmt::format("##{}", intToggle->getTitle()).c_str(), &value, 0, 0)) {
+        if (ImGui::InputInt(fmt::format("##{}", title).c_str(), &value, 0, 0)) {
             value = std::clamp(value, intToggle->getMin(), intToggle->getMax());
             intToggle->setValue(value);
             intToggle->triggerCallback(value);
@@ -390,7 +395,7 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine(0, 1);
 
-        if (this->checkbox(intToggle->getTitle(), state, intToggle->isSearchedFor(), [intToggle] {
+        if (this->checkbox(title, state, intToggle->isSearchedFor(), [intToggle] {
             handleTooltip(intToggle->getDescription());
             if (intToggle->hasKeybind())
                 handleKeybindMenu(intToggle->getId());
@@ -404,9 +409,10 @@ namespace eclipse::gui::imgui {
         auto value = floatToggle->getValue();
         auto state = floatToggle->getState();
         auto tm = ThemeManager::get();
+        auto title = i18n::get_(floatToggle->getTitle());
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
-        if (ImGui::InputFloat(fmt::format("##{}", floatToggle->getTitle()).c_str(), &value, 0, 0, floatToggle->getFormat().c_str())) {
+        if (ImGui::InputFloat(fmt::format("##{}", title).c_str(), &value, 0, 0, floatToggle->getFormat().c_str())) {
             value = std::clamp(value, floatToggle->getMin(), floatToggle->getMax());
             floatToggle->setValue(value);
             floatToggle->triggerCallback(value);
@@ -415,7 +421,7 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine(0, 1);
 
-        if (this->checkbox(floatToggle->getTitle(), state, floatToggle->isSearchedFor(), [floatToggle] {
+        if (this->checkbox(title, state, floatToggle->isSearchedFor(), [floatToggle] {
             handleTooltip(floatToggle->getDescription());
             if (floatToggle->hasKeybind())
                 handleKeybindMenu(floatToggle->getId());
@@ -427,9 +433,10 @@ namespace eclipse::gui::imgui {
 
     void Theme::visitInputText(const std::shared_ptr<InputTextComponent>& inputText) const {
         auto value = inputText->getValue();
+        auto title = i18n::get(inputText->getTitle());
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
-        if (ImGui::InputText(fmt::format("##{}", inputText->getTitle()).c_str(), &value)) {
+        if (ImGui::InputText(fmt::format("##{}", title).c_str(), &value)) {
             inputText->setValue(value);
             inputText->triggerCallback(value);
         }
@@ -441,7 +448,7 @@ namespace eclipse::gui::imgui {
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         // ImGui::PushTextWrapPos(0.0f);
-        ImGui::Text("%s", inputText->getTitle().c_str());
+        ImGui::Text("%s", title.data());
         // ImGui::PopTextWrapPos();
 
         if (inputText->isSearchedFor())
@@ -453,11 +460,12 @@ namespace eclipse::gui::imgui {
     void Theme::visitColor(const std::shared_ptr<ColorComponent>& color) const {
         auto value = color->getValue();
         bool changed = false;
+        auto title = i18n::get(color->getTitle());
 
         if (color->hasOpacity()) {
-            changed = ImGui::ColorEdit4(fmt::format("##{}", color->getTitle()).c_str(), value.data(), ImGuiColorEditFlags_NoInputs);
+            changed = ImGui::ColorEdit4(fmt::format("##{}", title).c_str(), value.data(), ImGuiColorEditFlags_NoInputs);
         } else {
-            changed = ImGui::ColorEdit3(fmt::format("##{}", color->getTitle()).c_str(), value.data(), ImGuiColorEditFlags_NoInputs);
+            changed = ImGui::ColorEdit3(fmt::format("##{}", title).c_str(), value.data(), ImGuiColorEditFlags_NoInputs);
         }
 
         ImGui::SameLine();
@@ -465,7 +473,7 @@ namespace eclipse::gui::imgui {
         if (color->isSearchedFor())
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
-        ImGui::TextWrapped("%s", color->getTitle().c_str());
+        ImGui::TextWrapped("%s", title.data());
 
         if (color->isSearchedFor())
             ImGui::PopStyleColor();
@@ -478,7 +486,7 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitButton(const std::shared_ptr<ButtonComponent>& button) const {
-        if (this->button(button->getTitle(), button->isSearchedFor())) {
+        if (this->button(i18n::get_(button->getTitle()), button->isSearchedFor())) {
             button->triggerCallback();
         }
 
@@ -488,10 +496,10 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitKeybind(const std::shared_ptr<KeybindComponent>& keybind) const {
-        auto& title = keybind->getTitle();
+        auto title = i18n::get(keybind->getTitle());
         auto canDelete = keybind->canDelete();
 
-        ImGui::PushID(title.c_str());
+        ImGui::PushID(title.data());
         ImGui::PushItemWidth(-1);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
@@ -507,10 +515,10 @@ namespace eclipse::gui::imgui {
         // truncate title if it's too long
         const auto& [truncatedLabel, maxWidth] = truncateString(title, availWidth, canDelete);
         if (truncatedLabel == title) {
-            ImGui::Button(title.c_str(), ImVec2(maxWidth, 0));
+            ImGui::Button(title.data(), ImVec2(maxWidth, 0));
         } else {
             ImGui::Button(truncatedLabel.c_str(), ImVec2(maxWidth, 0));
-            handleTooltip(title);
+            handleTooltip(std::string(title));
         }
 
         ImGui::SameLine(0, 2);
@@ -533,17 +541,17 @@ namespace eclipse::gui::imgui {
 
         if (ImGui::BeginPopup(popupName.c_str())) {
             ImGuiCocos::get().setInputMode(ImGuiCocos::InputMode::Blocking);
-            ImGui::Text("%s", "Press any key to change the keybind...");
+            ImGui::Text("%s", i18n::get("keybinds.press-key").data());
             ImGui::Separator();
 
-            ImGui::Text("%s", "Press ESC to cancel.");
+            ImGui::Text("%s", i18n::get("keybinds.press-esc").data());
 
             if (keybinds::isKeyDown(keybinds::Keys::Escape)) {
                 ImGui::CloseCurrentPopup();
             } else {
                 auto from = keybinds::Keys::A;
                 auto to = keybinds::Keys::LastKey;
-                for (auto i = from; i < to; i++) {
+                for (auto i = from; i < to; ++i) {
                     if (keybinds::isKeyDown(i)) {
                         config::set(keybind->getId(), i);
                         keybind->triggerCallback(i);
@@ -581,56 +589,56 @@ namespace eclipse::gui::imgui {
 
         if (this->checkboxWithSettings(settings->name, settings->visible, labelSettings->isSearchedFor(), [this, settings, labelSettings] {
             auto& name = settings->name;
-            if (ImGui::InputText("Name", &name)) {
+            if (ImGui::InputText(i18n::get("labels.name").data(), &name)) {
                 settings->name = name;
                 labelSettings->triggerEditCallback();
             }
 
             auto& text = settings->text;
-            if (ImGui::InputText("Text", &text)) {
+            if (ImGui::InputText(i18n::get("labels.text").data(), &text)) {
                 settings->text = text;
                 labelSettings->triggerEditCallback();
             }
 
             int32_t currentFont = labels::getFontIndex(settings->font);
-            if (ImGui::Combo("Font", &currentFont, labels::fontNames.data(), labels::fontNames.size())) {
+            if (ImGui::Combo(i18n::get("labels.font").data(), &currentFont, labels::fontNames.data(), labels::fontNames.size())) {
                 settings->font = labels::fontFiles[currentFont];
                 labelSettings->triggerEditCallback();
             }
 
             auto labelScale = settings->scale;
-            if (ImGui::InputFloat("Scale", &labelScale, 0.f, 0.f, "%.2f")) {
+            if (ImGui::InputFloat(i18n::get("labels.scale").data(), &labelScale, 0.f, 0.f, "%.2f")) {
                 settings->scale = std::clamp(labelScale, 0.0f, 10.0f);
                 labelSettings->triggerEditCallback();
             }
 
             auto& color = settings->color;
-            if (ImGui::ColorEdit3("Color", color.data(), ImGuiColorEditFlags_NoInputs)) {
+            if (ImGui::ColorEdit3(i18n::get("labels.color").data(), color.data(), ImGuiColorEditFlags_NoInputs)) {
                 settings->color = color;
                 labelSettings->triggerEditCallback();
             }
 
             auto opacity = settings->color.a;
-            if (ImGui::SliderFloat("Opacity", &opacity, 0.0f, 1.0f)) {
+            if (ImGui::InputFloat(i18n::get("labels.opacity").data(), &opacity, 0.0f, 1.0f)) {
                 settings->color.a = opacity;
                 labelSettings->triggerEditCallback();
             }
 
             auto alignment = settings->alignment;
-            if (ImGui::Combo("Alignment", reinterpret_cast<int*>(&alignment), labels::alignmentNames.data(), labels::alignmentNames.size())) {
+            if (ImGui::Combo(i18n::get("labels.alignment").data(), reinterpret_cast<int*>(&alignment), labels::alignmentNames.data(), labels::alignmentNames.size())) {
                 settings->alignment = alignment;
                 labelSettings->triggerEditCallback();
             }
 
-            if (this->button("Delete", false)) {
+            if (this->button(i18n::get_("labels.delete"), false)) {
                 labelSettings->triggerDeleteCallback();
                 ImGui::CloseCurrentPopup();
             }
 
-            if (this->button("Move Up", false)) {
+            if (this->button(i18n::get_("labels.move-up"), false)) {
                 labelSettings->triggerMoveCallback(true);
             }
-            if (this->button("Move Down", false)) {
+            if (this->button(i18n::get_("labels.move-down"), false)) {
                 labelSettings->triggerMoveCallback(false);
             }
 
@@ -677,7 +685,7 @@ namespace eclipse::gui::imgui {
             ImGui::OpenPopup(popupName.c_str());
 
         ImGui::SetNextWindowSizeConstraints(ImVec2(240 * tm->getGlobalScale(), 0), ImVec2(FLT_MAX, FLT_MAX));
-        if (ImGui::BeginPopup(popupName.c_str(), ImGuiWindowFlags_NoMove)) {
+        if (ImGui::BeginPopup(popupName.c_str()/*, ImGuiWindowFlags_NoMove */)) {
             callback();
             ImGui::EndPopup();
         }

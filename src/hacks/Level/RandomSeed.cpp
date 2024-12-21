@@ -9,15 +9,15 @@ namespace eclipse::hacks::Level {
 
     class RandomSeed : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
             config::setIfEmpty("level.randomseed.seed", 1);
 
-            tab->addToggle("Random Seed", "level.randomseed")
+            tab->addToggle("level.randomseed")
                 ->handleKeybinds()
-                ->setDescription("Sets a seed of choice for all random triggers.")
+                ->setDescription()
                 ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addInputInt("Seed", "level.randomseed.seed");
+                    options->addInputInt("level.randomseed.seed", "level.randomseed.seed");
                 });
         }
 

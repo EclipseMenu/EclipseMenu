@@ -8,11 +8,11 @@ namespace eclipse::hacks::Creator {
 
     class NoCopyMark : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
+            auto tab = gui::MenuTab::find("tab.creator");
 
-            tab->addToggle("No (C) Mark", "creator.nocopymark")
+            tab->addToggle("creator.nocopymark")
                 ->handleKeybinds()
-                ->setDescription("Removes the copy mark from your levels when uploading.");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "No (C) Mark"; }

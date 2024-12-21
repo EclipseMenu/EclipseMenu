@@ -9,11 +9,11 @@ namespace eclipse::hacks::Creator {
 
     class DefaultSongBypass : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Creator");
+            auto tab = gui::MenuTab::find("tab.creator");
 
-            tab->addToggle("Default Song Bypass", "creator.defaultsongbypass")
+            tab->addToggle("creator.defaultsongbypass")
                 ->handleKeybinds()
-                ->setDescription("Unlocks hidden songs in the level editor");
+                ->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Default Song Bypass"; }

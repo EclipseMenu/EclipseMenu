@@ -1,4 +1,5 @@
 #pragma once
+
 #include "BaseComponentNode.hpp"
 #include <modules/gui/theming/manager.hpp>
 
@@ -12,13 +13,13 @@ namespace eclipse::gui::cocos {
         bool init(float width) override {
             const auto tm = ThemeManager::get();
 
-            auto label = cocos2d::CCLabelBMFont::create(m_component->getTitle().c_str(), "bigFont.fnt");
+            auto label = TranslatedLabel::create(m_component->getTitle());
             auto bg = cocos2d::extension::CCScale9Sprite::create("square.png", { 0.0f, 0.0f, 80.0f, 80.0f });
 
             bg->setContentSize({width * 0.9F, 28.F});
             bg->setColor(tm->getButtonBackgroundColor().toCCColor3B());
             label->setColor(tm->getButtonActivatedForeground().toCCColor3B());
-            label->setScale(0.5F);
+            // label->setScale(0.5F);
             bg->addChildAtPosition(label, geode::Anchor::Center);
             if (!bg || !label) return false;
             if (!CCMenuItemSpriteExtra::init(

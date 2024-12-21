@@ -11,6 +11,7 @@
 #include <modules/gui/theming/manager.hpp>
 #include <modules/debug/trace.hpp>
 #include <imgui-cocos.hpp>
+#include <modules/i18n/translations.hpp>
 
 using namespace eclipse;
 
@@ -107,6 +108,9 @@ $on_mod(Loaded) {
     // Load the configuration file.
     config::load();
 
+    // Load language files
+    i18n::setLanguage(config::get<std::string>("language", "en"));
+
     // Initialize the hacks.
     hack::Hack::initializeHacks();
 
@@ -118,75 +122,84 @@ $on_mod(Loaded) {
     // Add "Interface" tab to edit theme settings
     {
         using namespace gui;
-        auto tab = MenuTab::find("Interface");
+        auto tab = MenuTab::find("tab.interface");
         std::vector<std::string> themeNames = {};
         for (ThemeMeta theme : ThemeManager::get()->listAvailableThemes()) {
             themeNames.push_back(theme.name);
         }
         if (!themeNames.empty()) {
-            auto themeCombo = tab->addCombo("Theme", "themeIndex", themeNames, 0);
+            auto themeCombo = tab->addCombo("interface.theme", "themeIndex", themeNames, 0);
             themeCombo->callback([](int value) {
                 ThemeManager::get()->loadTheme(ThemeManager::get()->listAvailableThemes()[value].path);
                 ThemeManager::get()->setUIScale(config::getTemp<float>("uiScale", 1.f));
             });
         }
-        tab->addInputFloat("UI Scale", "uiScale", 0.75f, 2.f, "x%.3f")
+        tab->addInputFloat("interface.ui-scale", "uiScale", 0.75f, 2.f, "x%.3f")
             ->callback([](float value) {
                 ThemeManager::get()->setUIScale(value);
             })->disableSaving();
 
-        auto fontCombo = tab->addCombo("Font", "fontIndex", ThemeManager::getFontNames(), 0);
+        auto fontCombo = tab->addCombo("interface.font", "fontIndex", ThemeManager::getFontNames(), 0);
         fontCombo->callback([](int value) {
             ThemeManager::get()->setSelectedFont(value);
         })->disableSaving();
-        tab->addInputFloat("Font Size", "fontSize", 10.f, 64.f)
+        tab->addInputFloat("interface.font-size", "fontSize", 10.f, 64.f)
             ->callback([](float value) {
                 if (value >= 10.f) ThemeManager::get()->setFontSize(value);
             })->disableSaving();
-        tab->addButton("Reload Fonts")->callback([fontCombo] {
+        tab->addButton("interface.reload-fonts")->callback([fontCombo] {
             ImGuiCocos::get().reload();
             fontCombo->setItems(ThemeManager::getFontNames());
         });
 
-        tab->addCombo("Layout Type", "layout", {"Tabbed", "Panel", "Sidebar"}, 0)
+        tab->addCombo("interface.layout-type", "layout", {"Tabbed", "Panel", "Sidebar"}, 0)
             ->callback([](int value) {
                 ThemeManager::get()->setLayoutMode(static_cast<imgui::LayoutMode>(value));
             })->disableSaving();
 
-        tab->addCombo("Style", "style", imgui::THEME_NAMES, 0)
+        tab->addCombo("interface.style", "style", imgui::THEME_NAMES, 0)
             ->callback([](int value) {
                 ThemeManager::get()->setComponentTheme(static_cast<imgui::ComponentTheme>(value));
             })->disableSaving();
 
-        auto blurToggle = tab->addToggle("Enable blur", "blurEnabled")
+        auto blurToggle = tab->addToggle("interface.enable-blur", "blurEnabled")
             ->callback([](bool value) { ThemeManager::get()->setBlurEnabled(value); });
         blurToggle->addOptions([](auto opt) {
-            opt->addInputFloat("Blur speed", "blurSpeed", 0.f, 10.f, "%.3f s")
+            opt->addInputFloat("interface.blur-speed", "blurSpeed", 0.f, 10.f, "%.3f s")
                 ->callback([](float value){ ThemeManager::get()->setBlurSpeed(value); })
                 ->disableSaving();
         });
         blurToggle->disableSaving();
 
-        auto accentColor = tab->addColorComponent("Accent Color", "accent", true);
+        auto accentColor = tab->addColorComponent("interface.accent-color", "accent", true);
         accentColor->callback([](const Color& color) {
             ThemeManager::get()->applyAccentColor(color);
         })->disableSaving();
 
-        auto backgroundColor = tab->addColorComponent("Background Color", "background", true);
+        auto backgroundColor = tab->addColorComponent("interface.background-color", "background", true);
         backgroundColor->callback([](const Color& color) {
             ThemeManager::get()->applyBackgroundColor(color);
         })->disableSaving();
 
-        auto searchInput = tab->addInputText("Search", "search");
+        auto languageCombo = tab->addCombo("interface.language", "language.index", i18n::getAvailableLanguages(), i18n::getLanguageIndex());
+        languageCombo->callback([languageCombo](int value) {
+            i18n::setLanguage(i18n::fetchAvailableLanguages()[value].code);
+            config::set("language", i18n::getCurrentLanguage());
+
+            languageCombo->setItems(i18n::getAvailableLanguages());
+
+            // Reload fonts if in ImGui mode
+            if (Engine::getRendererType() == RendererType::ImGui)
+                ImGuiCocos::get().reload();
+        })->disableSaving();
+
+        auto searchInput = tab->addInputText("interface.search", "search");
         searchInput->callback([](std::string input) {
             static bool hasSearched = false;
 
-            if (input.empty())
-            {
-                if (hasSearched)
-                {
-                    for (auto& tab : Engine::get()->getTabs())
-                    {
+            if (input.empty())  {
+                if (hasSearched) {
+                    for (auto& tab : Engine::get()->getTabs()) {
                         tab->setSearchedFor(false);
 
                         for (auto& component : tab->getComponents())
@@ -195,19 +208,14 @@ $on_mod(Loaded) {
 
                     hasSearched = false;
                 }
-            }
-            else
-            {
+            } else {
                 hasSearched = true;
 
-                for (auto& tab : Engine::get()->getTabs())
-                {
+                for (auto& tab : Engine::get()->getTabs()) {
                     bool hasFoundComponent = false;
 
-                    for (auto& component : tab->getComponents())
-                    {
-                        if (utils::matchesStringFuzzy(component->getTitle(), input))
-                        {
+                    for (auto& component : tab->getComponents()) {
+                        if (utils::matchesStringFuzzy(i18n::get(component->getTitle()), input)) {
                             component->setSearchedFor(true);
                             hasFoundComponent = true;
                         }

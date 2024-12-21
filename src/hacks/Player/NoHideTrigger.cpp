@@ -9,10 +9,10 @@ namespace eclipse::hacks::Player {
 
     class NoHideTrigger : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Player");
+            auto tab = gui::MenuTab::find("tab.player");
 
-            tab->addToggle("No Hide Trigger", "player.nohidetrigger")
-                ->setDescription("Keeps the player visible.")
+            tab->addToggle("player.nohidetrigger")
+                ->setDescription()
                 ->handleKeybinds();
         }
 

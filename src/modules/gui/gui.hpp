@@ -140,6 +140,11 @@ namespace eclipse::gui {
             return this;
         }
 
+        ToggleComponent* setDescription() {
+            m_description = fmt::format("{}.desc", m_title);
+            return this;
+        }
+
         [[nodiscard]] const std::string& getId() const override { return m_id; }
         [[nodiscard]] const std::string& getTitle() const override { return m_title; }
         [[nodiscard]] std::weak_ptr<MenuTab> getOptions() const { return m_options; }
@@ -242,6 +247,11 @@ namespace eclipse::gui {
 
         ComboComponent* setDescription(std::string description) override {
             m_description = std::move(description);
+            return this;
+        }
+
+        ComboComponent* setDescription() {
+            m_description = fmt::format("{}.desc", m_title);
             return this;
         }
 
@@ -397,6 +407,11 @@ namespace eclipse::gui {
             return this;
         }
 
+        InputFloatComponent* setDescription() {
+            m_description = fmt::format("{}.desc", m_title);
+            return this;
+        }
+
         void triggerCallback(float value) const {
             if (m_callback) m_callback(value);
         }
@@ -540,6 +555,11 @@ namespace eclipse::gui {
             return this;
         }
 
+        FloatToggleComponent* setDescription() {
+            m_description = fmt::format("{}.desc", m_title);
+            return this;
+        }
+
         /// @brief Allows to set keybinds for the toggle.
         FloatToggleComponent* handleKeybinds();
 
@@ -678,6 +698,11 @@ namespace eclipse::gui {
             return this;
         }
 
+        ButtonComponent* setDescription() {
+            m_description = fmt::format("{}.desc", m_title);
+            return this;
+        }
+
         /// @brief Allows to set keybinds for the button.
         ButtonComponent* handleKeybinds();
 
@@ -812,6 +837,13 @@ namespace eclipse::gui {
             auto label = std::make_shared<LabelComponent>(title);
             addComponent(label);
             return label;
+        }
+
+        /// @brief Add a checkbox to the tab. (id is the same as title)
+        std::shared_ptr<ToggleComponent> addToggle(const std::string& id) {
+            auto toggle = std::make_shared<ToggleComponent>(id, id);
+            addComponent(toggle);
+            return toggle;
         }
 
         /// @brief Add a checkbox to the tab.

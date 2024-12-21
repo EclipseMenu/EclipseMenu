@@ -8,13 +8,13 @@ namespace eclipse::hacks::Global {
 
     class NoShortNumbers : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Global");
+            auto tab = gui::MenuTab::find("tab.global");
 
-            tab->addToggle("No Short Numbers", "global.noshortnumbers")
-                ->setDescription("Removes any number abbreviations. (Example: 23.4K -> 23400)")
+            tab->addToggle("global.noshortnumbers")
+                ->setDescription()
                 ->handleKeybinds()
                 ->addOptions([](auto options) {
-                    options->addToggle("Thousands Separator", "global.noshortnumbers.thousands");
+                    options->addToggle("global.noshortnumbers.thousands");
                 });
         }
 

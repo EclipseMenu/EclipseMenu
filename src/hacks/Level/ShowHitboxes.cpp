@@ -36,9 +36,9 @@ namespace eclipse::hacks::Level {
 
     class ShowHitboxes : public hack::Hack {
         void init() override {
-            auto tab = gui::MenuTab::find("Level");
+            auto tab = gui::MenuTab::find("tab.level");
 
-            gui::ToggleComponent* toggle = tab->addToggle("Show Hitboxes", "level.showhitboxes")->handleKeybinds();
+            auto toggle = tab->addToggle("level.showhitboxes")->handleKeybinds()->setDescription();
 
             toggle->callback([](bool value) {
                 if (auto pl = PlayLayer::get()) {
@@ -67,20 +67,20 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.showhitboxes.other_color", gui::Color::GREEN);
 
             toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                options->addToggle("Show In Editor", "level.showhitboxes.editor");
-                options->addToggle("Hide Player", "level.showhitboxes.hideplayer");
-                options->addToggle("Hitboxes On Death", "level.showhitboxes.ondeath")->handleKeybinds();
-                options->addToggle("Custom Colors", "level.showhitboxes.customcolors")->addOptions([](std::shared_ptr<gui::MenuTab> optionsColor) {
-                    optionsColor->addColorComponent("Solid Color", "level.showhitboxes.solid_color");
-                    optionsColor->addColorComponent("Danger Color", "level.showhitboxes.danger_color");
-                    optionsColor->addColorComponent("Other Color", "level.showhitboxes.other_color");
-                    optionsColor->addColorComponent("Player Color", "level.showhitboxes.player_color");
-                    optionsColor->addColorComponent("Player Color Inner", "level.showhitboxes.player_color_inner");
-                    optionsColor->addColorComponent("Player Color Rotated", "level.showhitboxes.player_color_rotated");
+                options->addToggle("level.showhitboxes.editor");
+                options->addToggle("level.showhitboxes.hideplayer");
+                options->addToggle("level.showhitboxes.ondeath")->handleKeybinds();
+                options->addToggle("level.showhitboxes.customcolors")->addOptions([](std::shared_ptr<gui::MenuTab> optionsColor) {
+                    optionsColor->addColorComponent("level.showhitboxes.solid_color", "level.showhitboxes.solid_color");
+                    optionsColor->addColorComponent("level.showhitboxes.danger_color", "level.showhitboxes.danger_color");
+                    optionsColor->addColorComponent("level.showhitboxes.other_color", "level.showhitboxes.other_color");
+                    optionsColor->addColorComponent("level.showhitboxes.player_color", "level.showhitboxes.player_color");
+                    optionsColor->addColorComponent("level.showhitboxes.player_color_inner", "level.showhitboxes.player_color_inner");
+                    optionsColor->addColorComponent("level.showhitboxes.player_color_rotated", "level.showhitboxes.player_color_rotated");
                 });
-                options->addInputFloat("Border Size", "level.showhitboxes.bordersize", 0.01f, 10.f, "%.2f");
-                options->addFloatToggle("Fill Alpha", "level.showhitboxes.fillalpha", 0.f, 1.f);
-                options->addFloatToggle("Trail Length", "level.showhitboxes.traillength", 1.f, 2000.f, "%.0f");
+                options->addInputFloat("level.showhitboxes.bordersize", "level.showhitboxes.bordersize", 0.01f, 10.f, "%.2f");
+                options->addFloatToggle("level.showhitboxes.fillalpha", "level.showhitboxes.fillalpha", 0.f, 1.f);
+                options->addFloatToggle("level.showhitboxes.traillength", "level.showhitboxes.traillength", 1.f, 2000.f, "%.0f");
             });
         }
 

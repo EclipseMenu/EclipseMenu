@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Label.hpp"
-
 namespace eclipse::hacks::Labels {
+
+    class SmartLabel;
 
     /// @brief Class that contains multiple labels and can manage them.
     class LabelsContainer : public cocos2d::CCNode {
