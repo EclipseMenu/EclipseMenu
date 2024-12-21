@@ -1,7 +1,5 @@
 #include "recorder.hpp"
 
-#include <eclipse.ffmpeg-api/include/recorder.hpp>
-#include <eclipse.ffmpeg-api/include/audio_mixer.hpp>
 #include <Geode/binding/FMODAudioEngine.hpp>
 #include <Geode/loader/Log.hpp>
 #include <Geode/utils/general.hpp>
@@ -38,7 +36,7 @@ namespace eclipse::recorder {
     }
 
     void Recorder::recordThread() {
-        ffmpeg::Recorder ffmpegRecorder;
+        ffmpeg::events::Recorder ffmpegRecorder;
 
         ffmpegRecorder.init(m_renderSettings);
 
@@ -69,7 +67,7 @@ namespace eclipse::recorder {
 
         std::filesystem::path tempPath = m_renderSettings.m_outputFile.parent_path() / "music.mp4";
 
-        ffmpeg::AudioMixer audioMixer;
+        ffmpeg::events::AudioMixer audioMixer;
         audioMixer.mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath);
 
         std::filesystem::remove(m_renderSettings.m_outputFile);
@@ -77,7 +75,7 @@ namespace eclipse::recorder {
     }
 
     std::vector<std::string> Recorder::getAvailableCodecs() {
-        ffmpeg::Recorder ffmpegRecorder;
+        ffmpeg::events::Recorder ffmpegRecorder;
         return ffmpegRecorder.getAvailableCodecs();
     }
 }
