@@ -996,6 +996,9 @@ namespace eclipse::gui {
 
         /// @brief Get the renderer type.
         [[nodiscard]] virtual RendererType getType() const = 0;
+
+        /// @brief Triggered whenever a new tab is added.
+        virtual void updateTabs() {}
     };
 
     using Tabs = std::vector<std::shared_ptr<MenuTab>>;

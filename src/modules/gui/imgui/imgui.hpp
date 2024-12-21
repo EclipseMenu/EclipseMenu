@@ -57,6 +57,7 @@ namespace eclipse::gui::imgui {
         void queueAfterDrawing(const std::function<void()>& func) override;
         void showPopup(const Popup &popup) override;
         [[nodiscard]] RendererType getType() const override { return RendererType::ImGui; }
+        void updateTabs() override;
 
     public:
         void draw();

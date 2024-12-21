@@ -132,6 +132,11 @@ namespace eclipse::gui::imgui {
         s_initialized = true;
     }
 
+    void ImGuiRenderer::updateTabs() {
+        // init will recreate all tabs
+        if (m_layout) m_layout->init();
+    }
+
     void ImGuiRenderer::draw() {
         auto scale = ImGui::GetIO().DisplaySize.x / 1920.f;
         config::setTemp("ui.scale", scale);

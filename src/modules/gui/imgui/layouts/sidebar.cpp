@@ -7,6 +7,8 @@
 namespace eclipse::gui::imgui {
 
     void SidebarLayout::init() {
+        m_tabs.clear();
+
         auto& tabs = Engine::get()->getTabs();
         for (auto& tab : tabs) {
             m_tabs.emplace_back(tab->getTitle(), [tab] {

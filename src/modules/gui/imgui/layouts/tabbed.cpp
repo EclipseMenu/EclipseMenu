@@ -12,6 +12,8 @@ namespace eclipse::gui::imgui {
     };
 
     void TabbedLayout::init() {
+        m_windows.clear();
+
         // Load tabs
         auto& tabs = Engine::get()->getTabs();
         for (auto& tab : tabs) {

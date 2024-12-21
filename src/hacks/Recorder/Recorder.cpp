@@ -160,9 +160,7 @@ namespace eclipse::hacks::Recorder {
     }
 
     class InternalRecorder : public hack::Hack {
-        void init() override {
-            auto tab = gui::MenuTab::find("tab.recorder");
-        }
+        void init() override {}
 
         void lateInit() override {
             auto ffmpeg = geode::Loader::get()->getLoadedMod("eclipse.ffmpeg-api");
