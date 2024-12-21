@@ -334,6 +334,9 @@ namespace eclipse::gui {
         auto tab = std::make_shared<MenuTab>(std::string(name), false);
         m_tabs.push_back(tab);
 
+        // tell the renderer to update the tabs if we're past the initialization stage
+        if (m_initialized && m_renderer) m_renderer->updateTabs();
+
         return tab;
     }
 

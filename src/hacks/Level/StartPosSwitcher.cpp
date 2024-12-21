@@ -5,6 +5,7 @@
 
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/UILayer.hpp>
+#include <modules/labels/variables.hpp>
 
 namespace eclipse::hacks::Level {
 
@@ -76,8 +77,9 @@ namespace eclipse::hacks::Level {
 
             if (playLayer->m_isPracticeMode)
                 playLayer->resetLevelFromStart();
+            else
+                playLayer->resetLevel();
 
-            playLayer->resetLevel();
             playLayer->startMusic();
             playLayer->updateTestModeLabel();
         }
