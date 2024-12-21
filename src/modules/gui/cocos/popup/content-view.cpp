@@ -9,6 +9,7 @@
 #include <modules/gui/cocos/components/InputFloatComponent.hpp>
 #include <modules/gui/cocos/components/InputIntComponent.hpp>
 #include <modules/gui/cocos/components/InputTextComponent.hpp>
+#include <modules/gui/cocos/components/RadioButtonMenuComponent.hpp>
 #include <modules/i18n/translations.hpp>
 
 #include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
@@ -105,6 +106,16 @@ namespace eclipse::gui::cocos {
                             ->setGap(2.5f)
                     );
                     layer->addChild(menu);
+                } break;
+                case ComponentType::RadioButton: {
+                    std::vector<std::shared_ptr<RadioButtonComponent>> radioComponents;
+                    radioComponents.push_back(std::static_pointer_cast<RadioButtonComponent>(component));
+                    auto radioComponent = peekComponent<ComponentType::RadioButton>(tab->getComponents(), i + 1);
+                    while (radioComponent) {
+                        radioComponents.push_back(std::static_pointer_cast<RadioButtonComponent>(*radioComponent));
+                        radioComponent = peekComponent<ComponentType::RadioButton>(tab->getComponents(), ++i + 1);
+                    }
+                    layer->addChild(RadioButtonsMenuNode::create(radioComponents, size.width));
                 } break;
                 case ComponentType::Color: {
                     layer->addChild(ColorComponentNode::create(component, size.width));
