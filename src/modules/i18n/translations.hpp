@@ -7,6 +7,7 @@ namespace eclipse::i18n {
         std::string name;
         std::string code;
         std::string fallback;
+        std::string charset;
         std::filesystem::path path;
     };
 
@@ -31,6 +32,15 @@ namespace eclipse::i18n {
 
     /// @brief Fetch all currently available languages.
     std::vector<LanguageMetadata> fetchAvailableLanguages();
+
+    constexpr std::array<std::string_view, 6> BitmapFontsExtensions = {
+        ".fnt", ".png",
+        "-hd.fnt", "-hd.png",
+        "-uhd.fnt", "-uhd.png"
+    };
+
+    /// @brief Check if bitmap fonts are installed for the specified font.
+    bool hasBitmapFont(std::string_view font);
 
     /// @brief Redownload all language files from the server.
     /// Makes sure translations are up-to-date. (does a check once per day)

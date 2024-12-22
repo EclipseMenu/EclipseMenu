@@ -95,11 +95,14 @@ namespace eclipse::i18n {
         if (!json.contains("language-name") || !json.contains("language-code")) return std::nullopt;
 
         auto fallback = json.contains("language-fallback") ? json["language-fallback"].get<std::string>() : "en";
+        auto charset = json.contains("language-charset") ? json["language-charset"].get<std::string>() : "default";
 
         return LanguageMetadata {
             json["language-name"].get<std::string>(),
             json["language-code"].get<std::string>(),
-            fallback, path
+            fallback,
+            charset,
+            path
         };
     }
 
@@ -124,6 +127,19 @@ namespace eclipse::i18n {
         globLangs(fallbackPath);
 
         return result;
+    }
+
+    bool hasBitmapFont(std::string_view font) {
+        if (font == "default") return true;
+
+        static auto fontsPath = geode::Mod::get()->getConfigDir() / "bmfonts" / GEODE_MOD_ID;
+        if (!std::filesystem::exists(fontsPath))
+            return false;
+
+        if (!std::filesystem::exists(fontsPath / fmt::format("font_{}.fnt", font)))
+            return false;
+
+        return true;
     }
 
     void downloadLanguages() {

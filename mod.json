@@ -42,8 +42,7 @@
 			"resources/Licenses/*.txt",
 			"resources/Themes/*.json",
 			"resources/Languages/*.json",
-			"resources/BitmapFonts/*.png",
-			"resources/BitmapFonts/*.fnt"
+			"resources/BitmapFonts/font_default*"
 		],
 		"sprites": [
 			"resources/ECLIPSE-android.png"

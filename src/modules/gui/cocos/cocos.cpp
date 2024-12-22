@@ -6,7 +6,14 @@
 
 namespace eclipse::gui::cocos {
 
-    void CocosRenderer::init() {}
+    void CocosRenderer::init() {
+        // check if bitmap font exists
+        if (!i18n::hasBitmapFont(i18n::getRequiredGlyphRangesString())) {
+            geode::log::warn("Bitmap font not found for selected language, setting to English");
+            config::set("language", "en");
+            i18n::setLanguage("en");
+        }
+    }
 
     void CocosRenderer::toggle() {
         if (m_popup) return shutdown();

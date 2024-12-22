@@ -90,11 +90,9 @@ namespace eclipse::gui::cocos {
             cocos2d::CCSprite* fontChar;
 
             if (usingFallback) {
-                fontChar = static_cast<cocos2d::CCSprite*>(m_spriteBatch->getChildByTag(i));
-                fallbackIndex++;
+                fontChar = static_cast<cocos2d::CCSprite*>(m_spriteBatch->getChildByTag(fallbackIndex));
             } else {
                 fontChar = static_cast<cocos2d::CCSprite*>(this->getChildByTag(normalIndex));
-                normalIndex++;
             }
 
             if (fontChar) {
@@ -126,10 +124,10 @@ namespace eclipse::gui::cocos {
                 // Color MUST be set before opacity, since opacity might change color if OpacityModifyRGB is on
                 fontChar->updateDisplayedColor(m_tDisplayedColor);
                 fontChar->updateDisplayedOpacity(m_cDisplayedOpacity);
-
-                if (usingFallback) fallbackIndex++;
-                else normalIndex++;
             }
+
+            if (usingFallback) fallbackIndex++;
+            else normalIndex++;
 
             int yOffset = m_pConfiguration->m_nCommonHeight - fontDef.yOffset;
             cocos2d::CCPoint fontPos {

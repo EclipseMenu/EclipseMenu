@@ -11,7 +11,9 @@
 #include <modules/gui/theming/manager.hpp>
 #include <modules/debug/trace.hpp>
 #include <imgui-cocos.hpp>
+#include <modules/gui/cocos/cocos.hpp>
 #include <modules/i18n/translations.hpp>
+#include <modules/i18n/DownloadPopup.hpp>
 
 using namespace eclipse;
 
@@ -119,6 +121,12 @@ $on_mod(Loaded) {
 
     gui::ThemeManager::get();
 
+    // Add bitmap fonts to texture search path
+    auto bmfontPath = geode::Mod::get()->getConfigDir() / "bmfonts";
+    std::filesystem::create_directories(bmfontPath / GEODE_MOD_ID);
+    cocos2d::CCFileUtils::sharedFileUtils()->addSearchPath(bmfontPath.string().c_str());
+    geode::log::info("Added bitmap fonts to search path: {}", bmfontPath.string());
+
     // Add "Interface" tab to edit theme settings
     {
         using namespace gui;
@@ -183,14 +191,35 @@ $on_mod(Loaded) {
 
         auto languageCombo = tab->addCombo("interface.language", "language.index", i18n::getAvailableLanguages(), i18n::getLanguageIndex());
         languageCombo->callback([languageCombo](int value) {
-            i18n::setLanguage(i18n::fetchAvailableLanguages()[value].code);
-            config::set("language", i18n::getCurrentLanguage());
+            if (Engine::getRendererType() == RendererType::Cocos2d) {
+                auto meta = i18n::fetchAvailableLanguages()[value];
+                if (i18n::hasBitmapFont(meta.charset)) {
+                    i18n::setLanguage(i18n::fetchAvailableLanguages()[value].code);
+                    config::set("language", i18n::getCurrentLanguage());
+                    languageCombo->setItems(i18n::getAvailableLanguages());
+                } else {
+                    auto oldIndex = i18n::getLanguageIndex();
+                    config::setTemp("language.index", oldIndex);
+                    Popup::create(
+                        i18n::get_("common.warning"),
+                        i18n::get_("interface.font-not-found"),
+                        i18n::get_("common.yes"),
+                        i18n::get_("common.no"),
+                        [charset = std::move(meta.charset)](bool yes) {
+                            if (!yes) return;
+                            i18n::DownloadPopup::create(charset)->show();
+                        }
+                    );
+                }
+            } else {
+                i18n::setLanguage(i18n::fetchAvailableLanguages()[value].code);
+                config::set("language", i18n::getCurrentLanguage());
 
-            languageCombo->setItems(i18n::getAvailableLanguages());
+                languageCombo->setItems(i18n::getAvailableLanguages());
 
-            // Reload fonts if in ImGui mode
-            if (Engine::getRendererType() == RendererType::ImGui)
+                // Reload fonts if in ImGui mode
                 ImGuiCocos::get().reload();
+            }
         })->disableSaving();
 
         auto searchInput = tab->addInputText("interface.search", "search");

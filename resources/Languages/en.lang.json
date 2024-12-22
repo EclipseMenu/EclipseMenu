@@ -195,6 +195,9 @@
     "interface.background-color": "Background Color",
     "interface.language": "Language",
     "interface.search": "Search",
+    "interface.font-not-found": "This language pack requires an additional font to be installed.\nWould you like to download it?",
+    "interface.font-download": "Downloading font...",
+    "interface.font-download-fail": "Failed to download font. Error code: {}",
 
     "keybinds.open-menu": "Open Menu",
     "keybinds.in-game-only": "In-game only",
