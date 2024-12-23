@@ -64,4 +64,16 @@ namespace eclipse::gui::cocos {
         modal->show();
         m_modals.push_back(modal);
     }
+
+    void CocosRenderer::refreshPage() const {
+        if (m_popup) m_popup->refreshPage();
+    }
+
+    std::string_view CocosRenderer::getSelectedTab() const {
+        if (!m_popup) return "";
+        auto tabs = Engine::get()->getTabs();
+        auto idx = config::get<int>("menu.current_tab", 0);
+        if (idx < 0 || idx >= tabs.size()) return "";
+        return tabs[idx]->getTitle();
+    }
 }

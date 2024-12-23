@@ -9,6 +9,7 @@
 #include <modules/gui/cocos/components/InputFloatComponent.hpp>
 #include <modules/gui/cocos/components/InputIntComponent.hpp>
 #include <modules/gui/cocos/components/InputTextComponent.hpp>
+#include <modules/gui/cocos/components/KeybindComponent.hpp>
 #include <modules/gui/cocos/components/RadioButtonMenuComponent.hpp>
 #include <modules/i18n/translations.hpp>
 
@@ -26,9 +27,9 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    void ContentView::setContent(const std::shared_ptr<MenuTab>& tab) {
+    void ContentView::setContent(const std::shared_ptr<MenuTab>& tab, bool resetScroll) const {
         this->loadContent(tab);
-        m_contentLayer->scrollToTop();
+        if (resetScroll) m_contentLayer->scrollToTop();
     }
 
     bool ContentView::init(cocos2d::CCSize const &size, const std::shared_ptr<MenuTab> &tab) {
@@ -131,6 +132,9 @@ namespace eclipse::gui::cocos {
                 } break;
                 case ComponentType::InputText: {
                     layer->addChild(InputTextComponentNode::create(component, size.width));
+                } break;
+                case ComponentType::Keybind: {
+                    layer->addChild(KeybindComponentNode::create(component, size.width));
                 } break;
                 default: break;
             }

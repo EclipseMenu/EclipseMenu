@@ -15,7 +15,7 @@ namespace eclipse::gui::cocos {
         static Popup* create(Tabs const& tabs);
 
         void setActiveTab(int idx) const;
-        void loadTab(const std::shared_ptr<MenuTab>& tab) const;
+        void refreshPage() const;
 
         bool isAncestorOf(CCNode* node) const;
 
@@ -24,8 +24,6 @@ namespace eclipse::gui::cocos {
 
         cocos2d::extension::CCScale9Sprite* m_contentBG = nullptr;
         ContentView* m_contentMenu = nullptr;
-
-        int m_activeTab = 0;
     };
 
 }

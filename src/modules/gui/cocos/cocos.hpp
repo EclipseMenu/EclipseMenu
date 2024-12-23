@@ -26,6 +26,12 @@ namespace eclipse::gui::cocos {
         void queueAfterDrawing(const std::function<void()>& func) override;
         void showPopup(const eclipse::Popup& popup) override;
 
+        /// @brief Used to refresh the selected page contents in the popup. Use this when you edit components within the page.
+        void refreshPage() const;
+
+        /// @brief Get the selected tab in the popup. If popup is not open, returns an empty string.
+        [[nodiscard]] std::string_view getSelectedTab() const;
+
         void registerOptionsPopup(OptionsPopup* popup) { m_optionsPopups.push_back(popup); }
         void unregisterOptionsPopup(OptionsPopup* popup) { std::erase(m_optionsPopups, popup); }
         void registerModal(ModalPopup* modal) { m_modals.push_back(modal); }

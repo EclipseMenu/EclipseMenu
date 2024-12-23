@@ -38,7 +38,7 @@ namespace eclipse::gui::cocos {
         m_contentBG->setAnchorPoint({ 0, 1 });
         m_contentBG->setPosition(125.f, 270.f);
         m_contentBG->setColor(tm->getBackgroundColor().toCCColor3B());
-        //m_contentBG->setOpacity(128);
+        m_contentBG->setOpacity(tm->getBackgroundColor().getAlphaByte());
         m_contentBG->setContentSize({ 345.f, 260.f });
         m_contentBG->setID("content-bg"_spr);
         m_mainLayer->addChild(m_contentBG);
@@ -77,6 +77,13 @@ namespace eclipse::gui::cocos {
         if (idx < 0 || idx >= tabs.size()) return;
         config::set("menu.current_tab", idx);
         m_contentMenu->setContent(tabs[idx]);
+    }
+
+    void Popup::refreshPage() const {
+        auto tabs = Engine::get()->getTabs();
+        auto idx = config::get<int>("menu.current_tab", 0);
+        if (idx < 0 || idx >= tabs.size()) return;
+        m_contentMenu->setContent(tabs[idx], false);
     }
 
     bool Popup::isAncestorOf(CCNode* node) const {

@@ -3,6 +3,7 @@
 #include <modules/config/config.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/gui/gui.hpp>
+#include <modules/gui/cocos/cocos.hpp>
 #include <modules/gui/imgui/imgui.hpp>
 
 #ifdef GEODE_IS_WINDOWS
@@ -378,6 +379,13 @@ namespace eclipse::keybinds {
             components.size() <= 3 ?
             i18n::get_("keybinds.hint") : ""
         );
+
+        // if in cocos ui, refresh the page
+        if (auto cocos = gui::cocos::CocosRenderer::get()) {
+            if (cocos->getSelectedTab() == "tab.keybinds") {
+                cocos->refreshPage();
+            }
+        }
     }
 
     std::shared_ptr<Manager> Manager::get() {

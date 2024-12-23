@@ -6,7 +6,6 @@ namespace eclipse::i18n {
 
     bool DownloadPopup::setup(std::string const& charset) {
         this->setID("download-popup"_spr);
-        this->setTitle("");
         m_closeBtn->setVisible(false);
 
         m_charset = charset;

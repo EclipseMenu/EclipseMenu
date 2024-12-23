@@ -17,7 +17,6 @@ namespace eclipse::gui::cocos {
     }
 
     bool ModalPopup::setup(eclipse::Popup const &settings) {
-        this->setTitle("");
         m_closeBtn->setVisible(false);
 
         m_settings = settings;
