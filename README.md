@@ -26,10 +26,13 @@
 <br>
 
 ## Tabbed Style
-<img src="screenshots/image1.png" alt="Tabbed Style">
+<img src="screenshots/tabbed.png" alt="Tabbed Style">
 
 ## Panel Style 
-<img src="screenshots/image2.png" alt="Panel Style">
+<img src="screenshots/panel.png" alt="Panel Style">
+
+## Sidebar Style
+<img src="screenshots/sidebar.png" alt="Sidebar Style">
 
 ## How to install
 1. Install [Geode](https://geode-sdk.org) if you haven't already!
@@ -52,6 +55,7 @@
 - Internal Recorder
 - Replay Bot
 - Keybinds
+- Betterinfo integration
 - Theme Customizability (you can theme Eclipse Menu however you want!)
 
 ## Build Instructions
