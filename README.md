@@ -55,7 +55,6 @@
 - Internal Recorder
 - Replay Bot
 - Keybinds
-- Betterinfo integration
 - Theme Customizability (you can theme Eclipse Menu however you want!)
 
 ## Build Instructions
