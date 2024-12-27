@@ -11,6 +11,8 @@
 #include <modules/gui/cocos/components/InputTextComponent.hpp>
 #include <modules/gui/cocos/components/KeybindComponent.hpp>
 #include <modules/gui/cocos/components/RadioButtonMenuComponent.hpp>
+#include <modules/gui/cocos/components/ComboComponent.hpp>
+#include <modules/gui/cocos/components/DirectoryComboComponent.hpp>
 #include <modules/i18n/translations.hpp>
 
 #include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
@@ -103,7 +105,7 @@ namespace eclipse::gui::cocos {
                     menu->setLayout(
                         geode::ColumnLayout::create()
                             ->setAxisReverse(true)
-                            ->setAxisAlignment(geode::AxisAlignment::End)
+                            ->setAxisAlignment(geode::AxisAlignment::Center)
                             ->setGap(2.5f)
                     );
                     layer->addChild(menu);
@@ -135,6 +137,12 @@ namespace eclipse::gui::cocos {
                 } break;
                 case ComponentType::Keybind: {
                     layer->addChild(KeybindComponentNode::create(component, size.width));
+                } break;
+                case ComponentType::Combo: {
+                    layer->addChild(ComboComponentNode::create(component, size.width));
+                } break;
+                case ComponentType::FilesystemCombo: {
+                    layer->addChild(FilesystemComboComponentNode::create(component, size.width));
                 } break;
                 default: break;
             }
