@@ -29,6 +29,15 @@ namespace eclipse::gui::imgui {
         return m_font;
     }
 
+    const ImWchar* getDefaultRange() {
+        static constexpr ImWchar ranges[] = {
+            0x0020, 0x00FF, // Basic Latin + Latin Supplement
+            0x0100, 0x017F, // Latin Extended-A
+            0,
+        };
+        return &ranges[0];
+    }
+
     const ImWchar* getGlyphRange(i18n::GlyphRange range) {
         switch (range) {
             case i18n::GlyphRange::Greek: return ImGui::GetIO().Fonts->GetGlyphRangesGreek();
@@ -39,7 +48,7 @@ namespace eclipse::gui::imgui {
             case i18n::GlyphRange::Cyrillic: return ImGui::GetIO().Fonts->GetGlyphRangesCyrillic();
             case i18n::GlyphRange::Thai: return ImGui::GetIO().Fonts->GetGlyphRangesThai();
             case i18n::GlyphRange::Vietnamese: return ImGui::GetIO().Fonts->GetGlyphRangesVietnamese();
-            default: return ImGui::GetIO().Fonts->GetGlyphRangesDefault();
+            default: return getDefaultRange();
         }
     }
 
