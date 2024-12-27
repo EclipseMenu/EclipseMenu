@@ -57,7 +57,7 @@ namespace eclipse::gui::cocos {
             m_background->setAnchorPoint({ 0.5f, 0.5f });
             m_background->setScale(0.3f);
             m_background->setContentSize({365.f, 80.f});
-            m_background->setColor(cocos2d::ccColor3B(50, 50, 50));
+            m_background->setColor(cocos2d::ccColor3B{50, 50, 50});
             m_background->setZOrder(-1);
             this->addChildAtPosition(m_background, geode::Anchor::Right, { -70.f, 0.f });
 
