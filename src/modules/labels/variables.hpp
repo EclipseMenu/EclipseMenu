@@ -11,7 +11,6 @@ namespace eclipse::labels {
     /// @brief Class that represents a variable manager, used to store and retrieve variables.
     class VariableManager {
     public:
-        using VarMap = std::unordered_map<std::string, rift::Value>;
 
         static VariableManager& get();
 
@@ -31,7 +30,7 @@ namespace eclipse::labels {
         void removeVariable(const std::string& name);
 
         /// @brief Get all variables.
-        [[nodiscard]] const VarMap& getVariables() const { return m_variables; }
+        [[nodiscard]] const rift::Object& getVariables() const { return m_variables; }
 
         /// @brief Re-fetch all variables from the game
         void refetch();
@@ -47,7 +46,7 @@ namespace eclipse::labels {
         void fetchPlayerData(PlayerObject* player, bool isPlayer2);
         void fetchGameplayData(GJBaseGameLayer* gameLayer);
 
-        VarMap m_variables;
+        rift::Object m_variables;
     };
 
 }

@@ -35,6 +35,14 @@ namespace eclipse::i18n {
         labels::alignmentNames[6] = get("labels.alignment.bottom-left").data();
         labels::alignmentNames[7] = get("labels.alignment.bottom-center").data();
         labels::alignmentNames[8] = get("labels.alignment.bottom-right").data();
+
+        for (size_t i = 0; i < labels::eventNames.size(); ++i) {
+            labels::eventNames[i] = get(fmt::format("labels.events.types.{}", i)).data();
+        }
+
+        for (size_t i = 0; i < labels::visibleNames.size(); ++i) {
+            labels::visibleNames[i] = get(fmt::format("labels.events.visible.{}", i)).data();
+        }
     }
 
     void loadFallback(std::string_view code) {

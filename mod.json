@@ -46,7 +46,10 @@
 		],
 		"sprites": [
 			"resources/ECLIPSE-android.png"
-		]
+		],
+		"spritesheets": {
+			"emojis": [ "resources/Emojis/*.png" ]
+		}
 	},
 	"dependencies": [
         {

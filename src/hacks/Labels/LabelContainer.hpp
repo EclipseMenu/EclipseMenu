@@ -38,6 +38,9 @@ namespace eclipse::hacks::Labels {
         /// @brief Update all labels in the container.
         void update();
 
+        /// @brief Invalidate the container. This will mark it as dirty and update it after update is finished.
+        void invalidate() { m_dirty = true; }
+
         /// @brief Set the alignment of the container.
         /// @param alignment The alignment to set.
         void setAlignment(Alignment alignment) {
@@ -54,8 +57,12 @@ namespace eclipse::hacks::Labels {
         void updatePosition();
 
     private:
+        /// @brief Performs a layout update.
+        void recalculateLayout();
+
         std::vector<std::pair<SmartLabel*, std::function<void(SmartLabel*)>>> m_labels;
         Alignment m_alignment = Alignment::TopLeft;
+        bool m_dirty = false;
     };
 
 }

@@ -798,12 +798,21 @@ namespace eclipse::gui {
             return this;
         }
 
+        LabelSettingsComponent* exportCallback(const std::function<void()>& func) {
+            m_exportCallback = func;
+            return this;
+        }
+
         void triggerDeleteCallback() const;
 
         void triggerEditCallback() const;
 
         void triggerMoveCallback(bool up) const {
             if (m_moveCallback) m_moveCallback(up);
+        }
+
+        void triggerExportCallback() const {
+            if (m_exportCallback) m_exportCallback();
         }
 
         /// @brief Allows to set keybinds for the label.
@@ -817,6 +826,8 @@ namespace eclipse::gui {
         std::function<void()> m_deleteCallback;
         std::function<void()> m_editCallback;
         std::function<void(bool)> m_moveCallback;
+        std::function<void()> m_exportCallback;
+
         bool m_hasKeybind = false;
     };
 

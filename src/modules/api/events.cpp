@@ -123,7 +123,12 @@ $execute {
 
     /* RIFT */
     new EventListener<EventFilter<events::FormatRiftStringEvent>>(+[](events::FormatRiftStringEvent* e) {
-        e->setResult(rift::format(e->getSource(), labels::VariableManager::get().getVariables()));
+        auto res = rift::format(e->getSource(), labels::VariableManager::get().getVariables());
+        if (res.isErr()) {
+            e->setResult(res.unwrapErr().message());
+        } else {
+            e->setResult(res.unwrap());
+        }
         return ListenerResult::Stop;
     });
     createGetRiftVariableListener<std::string>();

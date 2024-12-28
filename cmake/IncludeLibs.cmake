@@ -21,7 +21,7 @@ if (NOT ANDROID)
 endif()
 CPMAddPackage("gh:matcool/gd-imgui-cocos#fbd4103")
 CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
-CPMAddPackage("gh:EclipseMenu/rift#e065e9a")
+CPMAddPackage("gh:EclipseMenu/rift#4c9155b")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
 CPMAddPackage(
     NAME nlohmann_json

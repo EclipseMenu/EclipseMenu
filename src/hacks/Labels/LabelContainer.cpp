@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <modules/config/config.hpp>
+#include <modules/utils/SingletonCache.hpp>
 #include "Label.hpp"
 
 namespace eclipse::hacks::Labels {
@@ -12,12 +13,13 @@ namespace eclipse::hacks::Labels {
         m_alignment = alignment;
         updatePosition();
 
-        auto* layout = geode::AxisLayout::create(geode::Axis::Column);
-        layout->setAxisReverse(true);
-        layout->setAutoScale(false);
-        layout->setGrowCrossAxis(false);
-        layout->setCrossAxisOverflow(true);
-        layout->setGap(0.f);
+        auto* layout = geode::AxisLayout::create(geode::Axis::Column)
+                           ->setAxisReverse(true)
+                           ->setAutoScale(false)
+                           ->setGrowCrossAxis(false)
+                           ->setCrossAxisOverflow(true)
+                           ->setGap(0.f);
+        layout->ignoreInvisibleChildren(true);
 
 #define SET_ALIGNMENT(axis, crossAxis, crossAxisLine) \
         layout->setAxisAlignment(geode::AxisAlignment:: axis);               \
@@ -59,11 +61,13 @@ namespace eclipse::hacks::Labels {
 
         this->setLayout(layout, false);
 
+        this->recalculateLayout();
+
         return true;
     }
 
     void LabelsContainer::updatePosition() {
-        auto winSize = cocos2d::CCDirector::sharedDirector()->getWinSize();
+        auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
         auto padding = config::get<float>("labels.padding", 3.f);
 
         setContentSize({ winSize.width - padding * 2, winSize.height - padding * 2 });
@@ -107,6 +111,10 @@ namespace eclipse::hacks::Labels {
                 break;
         }
 
+        this->recalculateLayout();
+    }
+
+    void LabelsContainer::recalculateLayout() {
         this->updateLayout(false);
     }
 
@@ -165,6 +173,11 @@ namespace eclipse::hacks::Labels {
         for (auto& [label, updater] : m_labels) {
             updater(label);
             label->update();
+        }
+
+        if (m_dirty) {
+            this->recalculateLayout();
+            m_dirty = false;
         }
     }
 

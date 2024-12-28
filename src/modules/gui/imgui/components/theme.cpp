@@ -630,6 +630,127 @@ namespace eclipse::gui::imgui {
                 labelSettings->triggerEditCallback();
             }
 
+            auto absolute = settings->absolutePosition;
+            if (this->checkbox(i18n::get("labels.absolute").data(), absolute, false)) {
+                settings->absolutePosition = absolute;
+                labelSettings->triggerEditCallback();
+            }
+
+            if (absolute) {
+                auto offset = settings->offset;
+                if (ImGui::InputFloat2(i18n::get("labels.offset").data(), reinterpret_cast<float*>(&offset), "%.2f")) {
+                    settings->offset = offset;
+                    labelSettings->triggerEditCallback();
+                }
+            }
+
+            auto& events = settings->events;
+            if (ImGui::CollapsingHeader(i18n::get("labels.events").data())) {
+                std::vector<int> toDeleteIndices;
+
+                for (auto& event : events) {
+                    ImGui::PushID(&event);
+                    {
+                        bool changed = false;
+
+                        changed |= this->checkbox(i18n::get_("labels.events.enabled"), event.enabled, false);
+                        changed |= ImGui::Combo(i18n::get("labels.events.type").data(), reinterpret_cast<int*>(&event.type), labels::eventNames.data(), labels::eventNames.size());
+
+                        if (event.type == labels::LabelEvent::Type::Custom) {
+                            changed |= ImGui::InputText(i18n::get("labels.events.condition").data(), &event.condition);
+                        }
+
+                        {
+                            int currentVisibleState = event.visible.has_value() ? (event.visible.value() ? 1 : 2) : 0;
+                            changed |= ImGui::Combo(i18n::get("labels.events.visible").data(), &currentVisibleState, labels::visibleNames.data(), labels::visibleNames.size());
+                            if (currentVisibleState == 0) event.visible.reset();
+                            else event.visible = currentVisibleState == 1;
+                        }
+
+                        {
+                            bool hasScale = event.scale.has_value();
+                            if (this->checkbox(i18n::get_("labels.events.scale"), hasScale, false)) {
+                                if (hasScale) event.scale = 1.0f;
+                                else event.scale.reset();
+                                changed = true;
+                            }
+                            if (hasScale) {
+                                changed |= ImGui::InputFloat(i18n::get("labels.scale").data(), &event.scale.value(), 0.f, 0.f, "%.2f");
+                            }
+                        }
+
+                        {
+                            bool hasColor = event.color.has_value();
+                            if (this->checkbox(i18n::get_("labels.events.color"), hasColor, false)) {
+                                if (hasColor) event.color = {1.f, 1.f, 1.f};
+                                else event.color.reset();
+                                changed = true;
+                            }
+                            if (hasColor) {
+                                changed |= ImGui::ColorEdit3(i18n::get("labels.color").data(), event.color->data(), ImGuiColorEditFlags_NoInputs);
+                            }
+                        }
+
+                        {
+                            bool hasOpacity = event.opacity.has_value();
+                            if (this->checkbox(i18n::get_("labels.events.opacity"), hasOpacity, false)) {
+                                if (hasOpacity) event.opacity = 1.0f;
+                                else event.opacity.reset();
+                                changed = true;
+                            }
+                            if (hasOpacity) {
+                                changed |= ImGui::InputFloat(i18n::get("labels.opacity").data(), &event.opacity.value(), 0.f, 1.f);
+                            }
+                        }
+
+                        {
+                            bool hasFont = event.font.has_value();
+                            if (this->checkbox(i18n::get_("labels.events.font"), hasFont, false)) {
+                                if (hasFont) event.font = "bigFont.fnt";
+                                else event.font.reset();
+                                changed = true;
+                            }
+                            if (hasFont) {
+                                int currentFont2 = labels::getFontIndex(event.font.value());
+                                if (ImGui::Combo(i18n::get("labels.font").data(), &currentFont2, labels::fontNames.data(), labels::fontNames.size())) {
+                                    event.font = labels::fontFiles[currentFont2];
+                                    changed = true;
+                                }
+                            }
+                        }
+
+                        changed |= ImGui::InputFloat(i18n::get("labels.events.delay").data(), &event.delay, 0.f, 0.f, "%.2f");
+                        changed |= ImGui::InputFloat(i18n::get("labels.events.duration").data(), &event.duration, 0.f, 0.f, "%.2f");
+                        changed |= ImGui::InputFloat(i18n::get("labels.events.easing").data(), &event.easing, 0.f, 0.f, "%.2f");
+
+                        if (this->button(i18n::get_("labels.events.delete"), false)) {
+                            toDeleteIndices.push_back(&event - &events[0]);
+                        }
+
+                        if (changed) {
+                            labelSettings->triggerEditCallback();
+                        }
+                    }
+                    ImGui::Separator();
+                    ImGui::PopID();
+                }
+
+                for (auto& index : toDeleteIndices) {
+                    events.erase(events.begin() + index);
+                }
+
+                if (toDeleteIndices.size() > 0) {
+                    labelSettings->triggerEditCallback();
+                }
+
+                if (this->button(i18n::get_("labels.events.add"), false)) {
+                    events.emplace_back();
+                    labelSettings->triggerEditCallback();
+                }
+
+                ImGui::Separator();
+            }
+
             if (this->button(i18n::get_("labels.delete"), false)) {
                 labelSettings->triggerDeleteCallback();
                 ImGui::CloseCurrentPopup();
@@ -640,6 +761,9 @@ namespace eclipse::gui::imgui {
             }
             if (this->button(i18n::get_("labels.move-down"), false)) {
                 labelSettings->triggerMoveCallback(false);
+            }
+            if (this->button(i18n::get_("labels.export"), false)) {
+                labelSettings->triggerExportCallback();
             }
 
         }, [labelSettings, settings] {

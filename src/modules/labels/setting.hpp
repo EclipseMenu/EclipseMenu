@@ -2,6 +2,7 @@
 #include <hacks/Labels/LabelContainer.hpp>
 #include <modules/gui/color.hpp>
 #include <nlohmann/json.hpp>
+#include "events.hpp"
 
 namespace eclipse::labels {
     using LabelsContainer = hacks::Labels::LabelsContainer;
@@ -60,16 +61,31 @@ namespace eclipse::labels {
     struct LabelSettings {
         static size_t instanceCount; // used to generate unique IDs
 
+        ~LabelSettings() {
+            // release all current related events
+            EventManager::get().removeEvents(this);
+        }
+
         std::string name;
         std::string text;
         bool visible = true;
+        bool absolutePosition = false;
         float scale = 0.35f;
         gui::Color color = gui::Color(1.f, 1.f, 1.f, 0.3f);
         std::string font = "bigFont.fnt";
         LabelsContainer::Alignment alignment = LabelsContainer::Alignment::TopLeft;
+        cocos2d::CCPoint offset = { 0, 0 };
+        std::vector<LabelEvent> events;
         size_t id = instanceCount++;
+
+        Event::EventState processEvents() const;
+        bool hasEvents() const { return !events.empty(); }
+
+        void promptSave() const;
     };
 
     void from_json(const nlohmann::json& json, LabelSettings& settings);
     void to_json(nlohmann::json& json, const LabelSettings& settings);
+    void from_json(const nlohmann::json& json, LabelEvent& event);
+    void to_json(nlohmann::json& json, const LabelEvent& event);
 }

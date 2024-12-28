@@ -38,7 +38,7 @@ namespace eclipse::hacks::Global {
         void refreshPresence() {
             auto gameState = getGameState();
             auto getScript = [this, gameState](const std::string& key, bool addPrefix = true) -> rift::Script* {
-                static rift::Script* nullScript = rift::compile("").getValue(); // Script that returns empty string
+                static auto nullScript = rift::compile("").unwrap(); // Script that returns empty string
                 std::string keyStr;
                 if (addPrefix) {
                     switch (gameState) {
@@ -50,7 +50,7 @@ namespace eclipse::hacks::Global {
                 }
                 keyStr += key;
                 auto it = m_scripts.find(keyStr);
-                return it != m_scripts.end() ? it->second.get() : nullScript;
+                return it != m_scripts.end() ? it->second.get() : nullScript.get();
             };
 
             DiscordRichPresence presence = {};
@@ -59,16 +59,16 @@ namespace eclipse::hacks::Global {
             auto& varManager = labels::VariableManager::get();
             varManager.refetch(); // collect all variables
             const auto& vars = varManager.getVariables();
-            state = getScript("state")->run(vars);
-            details = getScript("details")->run(vars);
-            largeImage = getScript("largeimage")->run(vars);
-            largeImageText = getScript("largeimage.text")->run(vars);
-            smallImage = getScript("smallimage")->run(vars);
-            smallImageText = getScript("smallimage.text")->run(vars);
-            button1Text = getScript("button1.text", false)->run(vars);
-            button2Text = getScript("button2.text", false)->run(vars);
-            button1URL = getScript("button1.url", false)->run(vars);
-            button2URL = getScript("button2.url", false)->run(vars);
+            state = getScript("state")->run(vars).unwrapOrDefault();
+            details = getScript("details")->run(vars).unwrapOrDefault();
+            largeImage = getScript("largeimage")->run(vars).unwrapOrDefault();
+            largeImageText = getScript("largeimage.text")->run(vars).unwrapOrDefault();
+            smallImage = getScript("smallimage")->run(vars).unwrapOrDefault();
+            smallImageText = getScript("smallimage.text")->run(vars).unwrapOrDefault();
+            button1Text = getScript("button1.text", false)->run(vars).unwrapOrDefault();
+            button2Text = getScript("button2.text", false)->run(vars).unwrapOrDefault();
+            button1URL = getScript("button1.url", false)->run(vars).unwrapOrDefault();
+            button2URL = getScript("button2.url", false)->run(vars).unwrapOrDefault();
 
             presence.state = state.c_str();
             presence.details = details.c_str();
@@ -121,8 +121,9 @@ namespace eclipse::hacks::Global {
 
         void compileScript(const std::string& name) {
             auto res = rift::compile(config::get<std::string>("global.discordrpc." + name, ""));
-            if (res)
-                m_scripts[name] = std::unique_ptr<rift::Script>(res.getValue());
+            if (res.isOk()) {
+                m_scripts[name] = std::move(res.unwrap());
+            }
         }
 
         void recompileScripts() {
@@ -243,7 +244,7 @@ namespace eclipse::hacks::Global {
                         config::get<int>("global.discordrpc.timemode", 1)
                     )->setDescription();
 
-#define ADD_SCRIPT(name, id) opt->addInputText(name, "global.discordrpc." id)->callback([this](auto){ recompileScripts(); })
+#define ADD_SCRIPT(name, id) opt->addInputText(name, "global.discordrpc." id)->callback([this](auto){ compileScript(id); })
 
                     opt->addLabel("global.discordrpc.menus");
                     ADD_SCRIPT("global.discordrpc.menu.details", "menu.details");

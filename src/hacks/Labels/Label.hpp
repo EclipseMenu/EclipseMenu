@@ -1,14 +1,15 @@
 #pragma once
 #include <Geode/Geode.hpp>
 #include <modules/gui/color.hpp>
+#include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 #include <rift.hpp>
 
 namespace eclipse::hacks::Labels {
 
     class LabelsContainer;
 
-    /// @brief Class that represents a CCLabelBMFont object with additional functionality.
-    class SmartLabel : public cocos2d::CCLabelBMFont {
+    /// @brief Label with RIFT scripting support.
+    class SmartLabel : public gui::cocos::EmojiLabel {
     public:
         static SmartLabel* create(const std::string& text, const std::string& font) {
             auto ret = new SmartLabel();
@@ -21,7 +22,7 @@ namespace eclipse::hacks::Labels {
         }
 
         /// @brief Initialize the label with the specified text and font.
-        bool init(const std::string& text, const std::string& font);
+        bool init(const std::string& text, const std::string& font) override;
 
         /// @brief Set the parent container of the label.
         void setParentContainer(LabelsContainer* container) { m_parentContainer = container; }
@@ -44,12 +45,13 @@ namespace eclipse::hacks::Labels {
     private:
         cocos2d::CCPoint m_customPosition = {0, 0};
         float m_heightMultiplier = 1.0f;
-        rift::Script* m_script = nullptr;
+        std::unique_ptr<rift::Script> m_script = nullptr;
         std::string m_text;
         std::string m_error;
 
         // Used to check if the label should call updateLayout on the parent container
-        bool m_wasEmpty = false;
+        float m_lastHeight = 0.f;
+        bool m_wasVisible = false;
         LabelsContainer* m_parentContainer = nullptr;
     };
 
