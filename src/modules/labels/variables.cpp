@@ -65,7 +65,7 @@ namespace eclipse::labels {
         m_variables["gameVersion"] = loader->getGameVersion();
         auto allMods = loader->getAllMods();
         m_variables["totalMods"] = static_cast<int64_t>(allMods.size());
-        m_variables["enabledMods"] = std::ranges::count_if(allMods, [](auto* mod) { return mod->shouldLoad(); });
+        m_variables["enabledMods"] = rift::Value::integer(std::ranges::count_if(allMods, [](auto* mod) { return mod->shouldLoad(); }));
 
         // Emojis :D
         m_variables["starEmoji"] = "⭐";
