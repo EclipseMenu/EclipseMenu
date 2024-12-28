@@ -14,17 +14,17 @@ namespace eclipse::hacks::Level {
 
     /// @brief Check whether hitboxes made by RobTop should be drawn. (e.g. in practice mode)
     inline bool robtopHitboxCheck() {
-        if (auto* pl = PlayLayer::get())
-            return pl->m_isPracticeMode && GameManager::get()->getGameVariable("0166");
-        if (LevelEditorLayer::get())
-            return GameManager::get()->getGameVariable("0045");
+        if (auto* pl = utils::get<PlayLayer>())
+            return pl->m_isPracticeMode && utils::get<GameManager>()->getGameVariable("0166");
+        if (utils::get<LevelEditorLayer>())
+            return utils::get<GameManager>()->getGameVariable("0045");
         return false;
     }
 
     /// @brief Gracefully disable hitboxes to return to the original state
     inline void toggleOffHitboxes() {
         if (config::get<bool>("level.showhitboxes", false)) return;
-        if (auto* gjbgl = GJBaseGameLayer::get())
+        if (auto* gjbgl = utils::get<GJBaseGameLayer>())
             gjbgl->m_debugDrawNode->setVisible(robtopHitboxCheck());
     }
 
@@ -41,15 +41,15 @@ namespace eclipse::hacks::Level {
             auto toggle = tab->addToggle("level.showhitboxes")->handleKeybinds()->setDescription();
 
             toggle->callback([](bool value) {
-                if (auto pl = PlayLayer::get()) {
+                if (auto pl = utils::get<PlayLayer>()) {
                     // since progress bar isn't added immediately, we need to check if it exists
                     if (pl->m_progressBar == nullptr) return;
                     pl->updateProgressbar();
                 }
 
-                if (LevelEditorLayer::get()) {
-                    LevelEditorLayer::get()->updateEditor(0);
-                    LevelEditorLayer::get()->updateOptions();
+                if (utils::get<LevelEditorLayer>()) {
+                    utils::get<LevelEditorLayer>()->updateEditor(0);
+                    utils::get<LevelEditorLayer>()->updateOptions();
                 }
                 toggleOffHitboxes();
             });
@@ -89,7 +89,7 @@ namespace eclipse::hacks::Level {
             if (config::get<bool>("level.showhitboxes.ondeath", false))
                 return false; // on-death hitboxes are fine
 
-            if (auto* pl = PlayLayer::get())
+            if (auto* pl = utils::get<PlayLayer>())
                 // if not in practice with enabled hitboxes
                 return enabled && !pl->m_isPracticeMode;
             
@@ -148,7 +148,7 @@ namespace eclipse::hacks::Level {
             return;
         }
 
-        GJBaseGameLayer* bgl = GJBaseGameLayer::get();
+        GJBaseGameLayer* bgl = utils::get<GJBaseGameLayer>();
 
         if (!bgl || drawNode != bgl->m_debugDrawNode) return;
         if (!config::get<bool>("level.showhitboxes", false)) return;
@@ -282,7 +282,7 @@ namespace eclipse::hacks::Level {
         ENABLE_FIRST_HOOKS_ALL()
 
         void playerDestroyed(bool p0) {
-            if (auto* pl = PlayLayer::get())
+            if (auto* pl = utils::get<PlayLayer>())
                 s_isDead = this == pl->m_player1 || this == pl->m_player2;
             PlayerObject::playerDestroyed(p0);
         }
@@ -318,7 +318,7 @@ namespace eclipse::hacks::Level {
 
         void updateDebugDraw() override {
             auto ptr1 = reinterpret_cast<uintptr_t>(this);
-            auto ptr2 = reinterpret_cast<uintptr_t>(LevelEditorLayer::get());
+            auto ptr2 = reinterpret_cast<uintptr_t>(utils::get<LevelEditorLayer>());
             // unlock hitboxes in editor even if they are disabled
             if (ptr1 == ptr2 && config::get<bool>("level.showhitboxes.editor", false))
                 this->m_isDebugDrawEnabled |= config::get<bool>("level.showhitboxes", false);

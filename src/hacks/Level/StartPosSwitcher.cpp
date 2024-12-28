@@ -45,14 +45,14 @@ namespace eclipse::hacks::Level {
             auto manager = keybinds::Manager::get();
             manager->addListener("level.startpos_switcher.previous", [](bool down) {
                 if (!down) return;
-                auto* playLayer = PlayLayer::get();
+                auto* playLayer = utils::get<PlayLayer>();
                 if (!playLayer) return;
                 if (!config::get<bool>("level.startpos_switcher", false)) return;
                 pickStartPos(playLayer, currentStartPosIndex - 1);
             });
             manager->addListener("level.startpos_switcher.next", [](bool down) {
                 if (!down) return;
-                auto* playLayer = PlayLayer::get();
+                auto* playLayer = utils::get<PlayLayer>();
                 if (!playLayer) return;
                 if (!config::get<bool>("level.startpos_switcher", false)) return;
                 pickStartPos(playLayer, currentStartPosIndex + 1);
@@ -125,7 +125,7 @@ namespace eclipse::hacks::Level {
             m_label->setPosition(0.0f, 0.0f);
 
             auto scale = config::get<float>("label.startpos_switcher.scale", 0.7f);
-            auto winSize = cocos2d::CCDirector::sharedDirector()->getWinSize();
+            auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
             this->setPosition(winSize.width / 2.f, 30.f * scale);
             this->setAnchorPoint({0.f, 0.f});
 
@@ -191,7 +191,7 @@ namespace eclipse::hacks::Level {
             }
 
             // Center the node on the screen (center bottom)
-            auto winSize = cocos2d::CCDirector::sharedDirector()->getWinSize();
+            auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
             this->setPosition(winSize.width / 2.f, 30.f * scale);
  
             auto label = fmt::format("{}/{}", currentStartPosIndex + 1, startPosObjects.size());

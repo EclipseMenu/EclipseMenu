@@ -9,7 +9,7 @@ namespace eclipse::hacks::Shortcuts {
 
         static void openSettings() {
             if (auto* options = OptionsLayer::create()) {
-                auto scene = cocos2d::CCScene::get();
+                auto scene = utils::get<cocos2d::CCScene>();
                 if (!scene) return;
                 auto zOrder = scene->getHighestChildZ();
                 scene->addChild(options, zOrder + 1);
@@ -18,12 +18,12 @@ namespace eclipse::hacks::Shortcuts {
         }
 
         static void uncompleteLevel() {
-            auto scene = cocos2d::CCScene::get();
+            auto scene = utils::get<cocos2d::CCScene>();
             if (!scene) return; // sometimes people frget CCScene can sometimes be nullptr for no reason
             GJGameLevel* level = nullptr;
 
             // try to find it from either PlayLayer or LevelInfoLayer
-            if (auto* pl = PlayLayer::get()) {
+            if (auto* pl = utils::get<PlayLayer>()) {
                 level = pl->m_level;
             } else if (auto* lil = scene->getChildByType<LevelInfoLayer>(0)) {
                 level = lil->m_level;
@@ -40,8 +40,8 @@ namespace eclipse::hacks::Shortcuts {
                 i18n::get_("common.yes"), i18n::get_("common.no"),
                 [level](bool yes) {
                     if (!yes) return;
-                    auto gsm = GameStatsManager::sharedState();
-                    auto glm = GameLevelManager::sharedState();
+                    auto gsm = utils::get<GameStatsManager>();
+                    auto glm = utils::get<GameLevelManager>();
                     // if level had been completed, ensure that their stars are also removed if the said level was rated
                     if (level->m_normalPercent >= 100 && gsm->hasCompletedLevel(level)) {
                         int levelid = level->m_levelID.value();
@@ -94,24 +94,24 @@ namespace eclipse::hacks::Shortcuts {
         }
 
         static void restartLevel() {
-            if (auto* pl = PlayLayer::get())
+            if (auto* pl = utils::get<PlayLayer>())
                 pl->resetLevel();
         }
 
         static void togglePracticeMode() {
-            if (auto* pl = PlayLayer::get())
+            if (auto* pl = utils::get<PlayLayer>())
                 pl->togglePracticeMode(!pl->m_isPracticeMode);
         }
 
         static void placeCheckpoint() {
-            if (auto* pl = PlayLayer::get()) {
+            if (auto* pl = utils::get<PlayLayer>()) {
                 if (pl->m_isPracticeMode)
                     pl->markCheckpoint();
             }
         }
 
         static void removeCheckpoint() {
-            if (auto* pl = PlayLayer::get()) {
+            if (auto* pl = utils::get<PlayLayer>()) {
                 if (pl->m_isPracticeMode)
                     pl->removeCheckpoint(false);
             }
@@ -179,12 +179,12 @@ namespace eclipse::hacks::Shortcuts {
 
             auto manager = keybinds::Manager::get();
             manager->addListener("shortcut.p1jump", [](bool down) {
-                auto gameLayer = GJBaseGameLayer::get();
+                auto gameLayer = utils::get<GJBaseGameLayer>();
                 if (!gameLayer) return;
                 gameLayer->handleButton(down, 1, true);
             });
             manager->addListener("shortcut.p2jump", [](bool down) {
-                auto gameLayer = GJBaseGameLayer::get();
+                auto gameLayer = utils::get<GJBaseGameLayer>();
                 if (!gameLayer) return;
                 gameLayer->handleButton(down, 1, false);
             });

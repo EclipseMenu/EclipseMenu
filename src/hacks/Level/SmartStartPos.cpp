@@ -45,7 +45,7 @@ namespace eclipse::hacks::Level {
 
         void setupStartPos(StartPosObject* startPos) {
             LevelSettingsObject* startPosSettings = startPos->m_startSettings;
-            LevelSettingsObject* levelSettings = PlayLayer::get()->m_levelSettings;
+            LevelSettingsObject* levelSettings = utils::get<PlayLayer>()->m_levelSettings;
 
             startPosSettings->m_startDual = levelSettings->m_startDual;
             startPosSettings->m_startMode = levelSettings->m_startMode;

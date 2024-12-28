@@ -55,7 +55,7 @@ namespace eclipse::config {
     /// @param path Path to save the config file
     void saveFile(const std::filesystem::path& path) {
         std::ofstream file(path);
-        file << getStorage().dump(4);
+        file << getStorage().dump(4, ' ', false, nlohmann::detail::error_handler_t::ignore);
         file.close();
     }
 

@@ -38,7 +38,7 @@ namespace eclipse::hacks::Player {
     }
 
     cocos2d::CCPoint screenToFrame(const ImVec2& pos) {
-        auto* director = cocos2d::CCDirector::sharedDirector();
+        auto* director = utils::get<cocos2d::CCDirector>();
         const auto frameSize = director->getOpenGLView()->getFrameSize();
         const auto winSize = director->getWinSize();
 
@@ -62,7 +62,7 @@ namespace eclipse::hacks::Player {
             PlatformToolbox::showCursor();
 
             if (keybinds::isKeyPressed(keybinds::Keys::MouseRight)) {
-                auto playLayer = PlayLayer::get();
+                auto playLayer = utils::get<PlayLayer>();
                 if (!playLayer) return;
                 auto gamePos = screenToGame(geode::cocos::getMousePos(), playLayer);
 

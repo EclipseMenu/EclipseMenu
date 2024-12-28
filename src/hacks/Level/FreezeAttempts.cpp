@@ -30,7 +30,7 @@ namespace eclipse::hacks::Level {
         }
 
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
-            auto* GSM = GameStatsManager::sharedState();
+            auto* GSM = utils::get<GameStatsManager>();
 
             m_fields->totalAttempts = GSM->getStat("2");
 
@@ -45,7 +45,7 @@ namespace eclipse::hacks::Level {
         }
 
         void onQuit() {
-            GameStatsManager::sharedState()->setStat("2", m_fields->totalAttempts);
+            utils::get<GameStatsManager>()->setStat("2", m_fields->totalAttempts);
             PlayLayer::onQuit();
         }
     };

@@ -54,9 +54,9 @@ namespace eclipse::hacks::Recorder {
 
     void applyWinSize() {
         if(newDesignResolution.width != 0 && newDesignResolution.height != 0) {
-            auto view = cocos2d::CCEGLView::get();
+            auto view = utils::get<cocos2d::CCEGLView>();
             
-            cocos2d::CCDirector::get()->m_obWinSizeInPoints = newDesignResolution;
+            utils::get<cocos2d::CCDirector>()->m_obWinSizeInPoints = newDesignResolution;
             view->setDesignResolutionSize(newDesignResolution.width, newDesignResolution.height, ResolutionPolicy::kResolutionExactFit);
             view->m_fScaleX = newScreenScale.width;
             view->m_fScaleY = newScreenScale.height;
@@ -65,9 +65,9 @@ namespace eclipse::hacks::Recorder {
 
     void restoreWinSize() {
         if(oldDesignResolution.width != 0 && oldDesignResolution.height != 0) {
-            auto view = cocos2d::CCEGLView::get();
+            auto view = utils::get<cocos2d::CCEGLView>();
 
-            cocos2d::CCDirector::get()->m_obWinSizeInPoints = oldDesignResolution;
+            utils::get<cocos2d::CCDirector>()->m_obWinSizeInPoints = oldDesignResolution;
             view->setDesignResolutionSize(oldDesignResolution.width, oldDesignResolution.height, ResolutionPolicy::kResolutionExactFit);
             view->m_fScaleX = originalScreenScale.width;
             view->m_fScaleY = originalScreenScale.height;
@@ -75,7 +75,7 @@ namespace eclipse::hacks::Recorder {
     }
 
     void start() {
-        if (!PlayLayer::get()) return;
+        if (!utils::get<PlayLayer>()) return;
 
         visiting = false;
         levelDone = false;
@@ -85,7 +85,7 @@ namespace eclipse::hacks::Recorder {
         lastFrameTime = 0.;
         afterEndTimer = 0.f;
 
-        GJGameLevel* lvl = PlayLayer::get()->m_level;
+        GJGameLevel* lvl = utils::get<PlayLayer>()->m_level;
 
         std::string trimmedLevelName = lvl->m_levelName;
         trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '/'), trimmedLevelName.end());
@@ -105,7 +105,7 @@ namespace eclipse::hacks::Recorder {
         s_recorder.m_renderSettings.m_hardwareAccelerationType = static_cast<ffmpeg::HardwareAccelerationType>(config::get<int>("recorder.hwType", 0));
         s_recorder.m_renderSettings.m_colorspaceFilters = config::get<std::string>("recorder.colorspace", "");
 
-        auto view = cocos2d::CCEGLView::get();
+        auto view = utils::get<cocos2d::CCEGLView>();
 
         oldDesignResolution = view->getDesignResolutionSize();
         float aspectRatio = static_cast<float>(s_recorder.m_renderSettings.m_width) / static_cast<float>(s_recorder.m_renderSettings.m_height);
@@ -127,9 +127,9 @@ namespace eclipse::hacks::Recorder {
     void startAudio() {
         stop();
 
-        FMODAudioEngine::get()->stopAllEffects();
+        utils::get<FMODAudioEngine>()->stopAllEffects();
 
-        auto lvl = PlayLayer::get()->m_level;
+        auto lvl = utils::get<PlayLayer>()->m_level;
         std::string trimmedLevelName = lvl->m_levelName;
         std::erase(trimmedLevelName, '/');
         std::erase(trimmedLevelName, '\\');
@@ -145,12 +145,12 @@ namespace eclipse::hacks::Recorder {
         popupShown = false;
         afterEndTimer = 0.f;
 
-        if (auto ell = PlayLayer::get()->getChildByType<EndLevelLayer>(0))
+        if (auto ell = utils::get<PlayLayer>()->getChildByType<EndLevelLayer>(0))
             ell->removeFromParent();
 
-        PlayLayer::get()->stopAllActions();
-        PlayLayer::get()->startGame();
-        PlayLayer::get()->resetLevelFromStart();
+        utils::get<PlayLayer>()->stopAllActions();
+        utils::get<PlayLayer>()->startGame();
+        utils::get<PlayLayer>()->resetLevelFromStart();
 
         s_recorder.startAudio(renderPath);
     }
@@ -292,7 +292,7 @@ namespace eclipse::hacks::Recorder {
             FMOD::Channel* audioChannel;
 
             for (int i = 0; i < 2; i++) {
-                FMODAudioEngine::sharedEngine()->m_system->getChannel(126 + i, &audioChannel);
+                utils::get<FMODAudioEngine>()->m_system->getChannel(126 + i, &audioChannel);
                 if (audioChannel) {
                     uint32_t channelTime = 0;
                     audioChannel->getPosition(&channelTime, FMOD_TIMEUNIT_MS);

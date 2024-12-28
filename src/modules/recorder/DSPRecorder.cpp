@@ -1,4 +1,5 @@
 #include "DSPRecorder.hpp"
+#include <modules/utils/SingletonCache.hpp>
 
 DSPRecorder* DSPRecorder::get() {
     static DSPRecorder instance;
@@ -61,7 +62,7 @@ void DSPRecorder::init() {
         return FMOD_OK;
     };
 
-    auto system = FMODAudioEngine::sharedEngine()->m_system;
+    auto system = eclipse::utils::get<FMODAudioEngine>()->m_system;
     system->createDSP(&desc, &m_dsp);
     system->getMasterChannelGroup(&m_masterGroup);
 }

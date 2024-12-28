@@ -12,7 +12,7 @@ namespace eclipse::hacks::Level {
         static cocos2d::CCObject* uncollectedSecretCoin = nullptr;
         static cocos2d::CCObject* uncollectedUserCoin = nullptr;
 
-        auto* GM = GameManager::sharedState();
+        auto* GM = utils::get<GameManager>();
 
         if (!uncollectedSecretCoin)
             uncollectedSecretCoin = GM->m_unkAnimationDict->objectForKey(-142)->copy();

@@ -126,7 +126,7 @@ namespace eclipse::hacks::Global {
         ENABLE_SAFE_HOOKS_ALL()
 
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
-            auto* GSM = GameStatsManager::sharedState();
+            auto* GSM = utils::get<GameStatsManager>();
 
             m_fields->totalJumps = GSM->getStat("1");
             m_fields->totalAttempts = GSM->getStat("2");
@@ -143,7 +143,7 @@ namespace eclipse::hacks::Global {
             if (safeMode || AutoSafeMode::shouldEnable()) {
                 this->m_isTestMode = true;
 
-                auto* GSM = GameStatsManager::sharedState();
+                auto* GSM = utils::get<GameStatsManager>();
 
                 if (config::get<bool>("global.safemode.freeze_jumps", true))
                     GSM->setStat("1", m_fields->totalJumps);

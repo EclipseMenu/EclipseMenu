@@ -70,7 +70,7 @@ namespace eclipse::Hacks::Level {
         }
 
         void loadFromCheckpoint(CheckpointObject* checkpoint) {
-            auto* playLayer = static_cast<FixPlayLayer*>(FixPlayLayer::get());
+            auto* playLayer = static_cast<FixPlayLayer*>(utils::get<PlayLayer>());
 
             if (PracticeFix::shouldEnable() && playLayer->m_fields->m_checkpoints.contains(checkpoint)) {
                 PlayLayer::loadFromCheckpoint(checkpoint);
@@ -90,7 +90,7 @@ namespace eclipse::Hacks::Level {
         bool init(GJGameLevel* level, bool unk) {
             bool result = LevelEditorLayer::init(level, unk);
 
-            if (auto* playLayer = static_cast<FixPlayLayer*>(FixPlayLayer::get()))
+            if (auto* playLayer = static_cast<FixPlayLayer*>(utils::get<PlayLayer>()))
                 playLayer->m_fields->m_checkpoints.clear();
             
             return result;
@@ -109,7 +109,7 @@ namespace eclipse::Hacks::Level {
             if (!PracticeFix::shouldEnable())
                 return result;
 
-            auto* playLayer = static_cast<FixPlayLayer*>(FixPlayLayer::get());
+            auto* playLayer = static_cast<FixPlayLayer*>(utils::get<PlayLayer>());
 
             if (playLayer->m_gameState.m_currentProgress > 0) {
                 CheckpointData data(playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr);

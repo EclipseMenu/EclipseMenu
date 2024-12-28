@@ -526,7 +526,7 @@ namespace eclipse::keybinds {
             return true;
 
         // Ignore if the keyboard is being used
-        if (CCIMEDispatcher::sharedDispatcher()->hasDelegate())
+        if (utils::get<CCIMEDispatcher>()->hasDelegate())
             return true;
 
         return false;
@@ -544,7 +544,7 @@ namespace eclipse::keybinds {
         if (shouldIgnoreInputs())
             return;
 
-        bool ignoreInPlayLayer = !PlayLayer::get() && config::get<bool>("keybind.in-game-only", false);
+        bool ignoreInPlayLayer = !utils::get<PlayLayer>() && config::get<bool>("keybind.in-game-only", false);
 
         for (auto& keybind : m_keybinds) {
             if (keybind.getKey() == key && (keybind.isInitialized() || keybind.isInternal())) {
@@ -575,7 +575,7 @@ namespace eclipse::keybinds {
         if (shouldIgnoreInputs())
             return;
 
-        bool ignoreInPlayLayer = !PlayLayer::get() && config::get<bool>("keybind.in-game-only", false);
+        bool ignoreInPlayLayer = !utils::get<PlayLayer>() && config::get<bool>("keybind.in-game-only", false);
 
         for (auto& keybind : m_keybinds) {
             if (keybind.getKey() == key && (keybind.isInitialized() || keybind.isInternal())) {

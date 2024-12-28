@@ -40,7 +40,7 @@ namespace eclipse::hacks::Global {
             double m_extraDelta = 0.0;
             float m_realDelta = 0.0;
             bool m_shouldHide = false;
-            bool m_isEditor = LevelEditorLayer::get() != nullptr;
+            bool m_isEditor = utils::get<LevelEditorLayer>() != nullptr;
             bool m_shouldBreak = false;
         };
 

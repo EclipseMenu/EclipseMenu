@@ -1,5 +1,6 @@
 #pragma once
 
+#include <modules/utils/SingletonCache.hpp>
 #include <Geode/platform/platform.hpp>
 #include <utils.hpp>
 #include <memory>

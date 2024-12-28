@@ -1,5 +1,6 @@
 #include "float-button.hpp"
 #include <modules/config/config.hpp>
+#include <modules/utils/SingletonCache.hpp>
 
 #include <Geode/Geode.hpp>
 #include <Geode/modify/CCScene.hpp>
@@ -88,10 +89,10 @@ namespace eclipse::gui {
     }
 
     bool FloatingButton::shouldHide() const {
-        if (auto pl = PlayLayer::get(); !m_showInLevel && pl)
+        if (auto pl = utils::get<PlayLayer>(); !m_showInLevel && pl)
             return !pl->m_isPaused && !pl->m_hasCompletedLevel;
 
-        if (auto le = LevelEditorLayer::get(); !m_showInLevel && le)
+        if (auto le = utils::get<LevelEditorLayer>(); !m_showInLevel && le)
             return le->m_playbackMode == PlaybackMode::Playing;
 
         return false;

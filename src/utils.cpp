@@ -8,6 +8,7 @@
 #include <Geode/loader/Mod.hpp>
 
 #include <modules/config/config.hpp>
+#include <modules/utils/SingletonCache.hpp>
 
 namespace eclipse::utils {
 
@@ -70,10 +71,10 @@ namespace eclipse::utils {
 
     void updateCursorState(bool visible) {
         bool canShowInLevel = true;
-        if (auto* playLayer = PlayLayer::get()) {
+        if (auto* playLayer = utils::get<PlayLayer>()) {
             canShowInLevel = playLayer->m_hasCompletedLevel ||
                              playLayer->m_isPaused ||
-                             GameManager::sharedState()->getGameVariable("0024");
+                             utils::get<GameManager>()->getGameVariable("0024");
         }
         if (visible || canShowInLevel)
             PlatformToolbox::showCursor();
@@ -103,7 +104,7 @@ namespace eclipse::utils {
 
     PlayerMode getGameMode(PlayerObject* player) {
         if (!player) {
-            auto gm = GameManager::get();
+            auto gm = utils::get<GameManager>();
             switch (gm->m_playerIconType) {
                 case IconType::Cube: default:
                     return PlayerMode::Cube;
@@ -150,7 +151,7 @@ namespace eclipse::utils {
     }
 
     int getPlayerIcon(PlayerMode mode) {
-        auto gm = GameManager::get();
+        auto gm = utils::get<GameManager>();
         switch (mode) {
             case PlayerMode::Cube: return gm->m_playerFrame;
             case PlayerMode::Ship: return gm->m_playerShip;
@@ -170,7 +171,7 @@ namespace eclipse::utils {
     }
 
     cocos2d::CCMenu* getEclipseUILayer() {
-        auto uiLayer = UILayer::get();
+        auto uiLayer = utils::get<UILayer>();
         if (!uiLayer) return nullptr;
 
         if (auto menu = uiLayer->getChildByID("eclipse-ui"_spr))

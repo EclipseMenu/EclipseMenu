@@ -28,7 +28,7 @@ namespace eclipse::hacks::Creator {
             // auto* objLayer = m_editorLayer->m_objectLayer;
             // auto pos = objLayer->getPosition();
             // objLayer->setPosition({0, 0});
-            // auto* director = cocos2d::CCDirector::sharedDirector();
+            // auto* director = utils::get<cocos2d::CCDirector>();
             // auto screenLeft = director->getScreenLeft();
             // auto screenTop = director->getScreenTop();
             // auto screenRight = director->getScreenRight();

@@ -34,7 +34,7 @@ namespace eclipse::hacks::Creator {
         void onPlaytest(cocos2d::CCObject* sender) {
             EditorUI::onPlaytest(sender);
 
-            auto* editorLayer = LevelEditorLayer::get();
+            auto* editorLayer = utils::get<LevelEditorLayer>();
             if (!editorLayer) return;
 
             // Store all triggers

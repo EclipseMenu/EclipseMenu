@@ -92,7 +92,7 @@ namespace eclipse::hacks::Player {
             bool iterationActionDone = false;
 
             const size_t iterations = config::get<int>("player.showtrajectory.iterations", 300);
-            auto pl = PlayLayer::get();
+            auto pl = utils::get<PlayLayer>();
 
             for (size_t i = 0; i < iterations; i++) {
                 cocos2d::CCPoint initialPlayerPosition = player->getPosition();
@@ -126,7 +126,7 @@ namespace eclipse::hacks::Player {
         void buttonForPlayer(PlayerObject* player, PlayerObject* playerBase, bool down) {
             if (!player || !playerBase) return;
 
-            bool isPlayer2 = playerBase == PlayLayer::get()->m_player2;
+            bool isPlayer2 = playerBase == utils::get<PlayLayer>()->m_player2;
 
             player->copyAttributes(playerBase);
             player->m_gravityMod = playerBase->m_gravityMod;
@@ -146,7 +146,7 @@ namespace eclipse::hacks::Player {
         }
 
         PlayerObject* createTrajectoryPlayer() const {
-            PlayLayer* pl = PlayLayer::get();
+            PlayLayer* pl = utils::get<PlayLayer>();
 
             PlayerObject* player = PlayerObject::create(1, 1, pl, pl, true);
             // player->retain();
@@ -160,7 +160,7 @@ namespace eclipse::hacks::Player {
 
     public:
         void init() {
-            PlayLayer* pl = PlayLayer::get();
+            PlayLayer* pl = utils::get<PlayLayer>();
 
             m_player1 = createTrajectoryPlayer();
             m_player2 = createTrajectoryPlayer();
@@ -195,7 +195,7 @@ namespace eclipse::hacks::Player {
         }
 
         void simulate() {
-            PlayLayer* pl = PlayLayer::get();
+            PlayLayer* pl = utils::get<PlayLayer>();
 
             if (!pl) return;
 
@@ -216,7 +216,7 @@ namespace eclipse::hacks::Player {
         }
 
         void setFrameDelta(float dt) {
-            PlayLayer* pl = PlayLayer::get();
+            PlayLayer* pl = utils::get<PlayLayer>();
             m_frameDt = dt / pl->m_gameState.m_timeWarp;
         }
     };
@@ -340,7 +340,7 @@ namespace eclipse::hacks::Player {
         void update(float dt) override {
             PlayerObject::update(dt);
 
-            if (PlayLayer::get() && !s_simulation.isSimulating())
+            if (utils::get<PlayLayer>() && !s_simulation.isSimulating())
                 s_simulation.setFrameDelta(dt);
         }
 

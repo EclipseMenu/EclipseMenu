@@ -56,7 +56,7 @@ namespace eclipse::hacks::Player {
 
         void activateStreak() {
             if (this->levelFlipping()) return;
-            if (GameManager::get()->m_editorEnabled) return;
+            if (utils::get<GameManager>()->m_editorEnabled) return;
             if (this->m_isHidden) return;
 
             this->m_streakRelated4 = true;

@@ -29,17 +29,17 @@ namespace eclipse::hacks::Bypass {
         void musicSliderChanged(cocos2d::CCObject* sender) {
             auto slider = GET_SLIDER(sender);
             auto value = slider->getValue();
-            auto* audioEngine = FMODAudioEngine::get();
+            auto* audioEngine = utils::get<FMODAudioEngine>();
             float originalVolume = audioEngine->getBackgroundMusicVolume();
             audioEngine->setBackgroundMusicVolume(value);
             if (originalVolume <= 0.f && value > 0.f)
-                GameManager::get()->playMenuMusic();
+                utils::get<GameManager>()->playMenuMusic();
         }
 
         void sfxSliderChanged(cocos2d::CCObject* sender) {
             auto slider = GET_SLIDER(sender);
             auto value = slider->getValue();
-            FMODAudioEngine::get()->setEffectsVolume(value);
+            utils::get<FMODAudioEngine>()->setEffectsVolume(value);
         }
     };
 
@@ -49,7 +49,7 @@ namespace eclipse::hacks::Bypass {
         void musicSliderChanged(cocos2d::CCObject* sender) {
             auto slider = GET_SLIDER(sender);
             auto value = slider->getValue();
-            FMODAudioEngine::get()->setBackgroundMusicVolume(value);
+            utils::get<FMODAudioEngine>()->setBackgroundMusicVolume(value);
         }
 
 // Function is merged with the one in OptionsLayer on Windows
@@ -57,7 +57,7 @@ namespace eclipse::hacks::Bypass {
         void sfxSliderChanged(cocos2d::CCObject* sender) {
             auto slider = GET_SLIDER(sender);
             auto value = slider->getValue();
-            FMODAudioEngine::get()->setEffectsVolume(value);
+            utils::get<FMODAudioEngine>()->setEffectsVolume(value);
         }
 #endif
     };

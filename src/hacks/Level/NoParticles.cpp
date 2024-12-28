@@ -15,7 +15,7 @@ namespace eclipse::hacks::Level {
         if (customParticlesEnabled && miscParticlesEnabled)
             config::set("level.noparticles", false);
 
-        auto* gjbgl = GJBaseGameLayer::get();
+        auto* gjbgl = utils::get<GJBaseGameLayer>();
 
         if (!gjbgl) return;
 

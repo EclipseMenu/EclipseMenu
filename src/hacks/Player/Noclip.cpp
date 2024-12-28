@@ -162,7 +162,7 @@ namespace eclipse::hacks::Player {
         void processCommands(float dt) {
             GJBaseGameLayer::processCommands(dt);
 
-            if (!PlayLayer::get()) {
+            if (!utils::get<PlayLayer>()) {
                 config::setTemp<int>("noclipDeaths", 0);
                 config::setTemp<float>("noclipAccuracy", 100.f);
                 return;
@@ -178,7 +178,7 @@ namespace eclipse::hacks::Player {
                     auto deaths = config::getTemp<int>("noclipDeaths", 0);
                     config::setTemp<int>("noclipDeaths", deaths + 1);
                     if (config::get<bool>("player.noclip.deathlimit.toggle", false) && deaths + 1 >= config::get<int>("player.noclip.deathlimit", 0))
-                        PlayLayer::get()->destroyPlayer(m_player1, nullptr);
+                        utils::get<PlayLayer>()->destroyPlayer(m_player1, nullptr);
                 }
             }
 
@@ -191,7 +191,7 @@ namespace eclipse::hacks::Player {
                 config::setTemp("noclipAccuracy", acc);
                 bool dead = (m_player1 && m_player1->m_isDead) || (m_player2 && m_player2->m_isDead);
                 //if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc <= config::get<float>("player.noclip.acclimit", 95.f) && !dead)
-                    //PlayLayer::get()->destroyPlayer(m_player1, (GameObject*)((int*)1));
+                    //utils::get<PlayLayer>()->destroyPlayer(m_player1, (GameObject*)((int*)1));
             }
         }
     };
@@ -199,6 +199,6 @@ namespace eclipse::hacks::Player {
 }
 /*
 if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc < config::get<float>("player.noclip.acclimit", 95.f)) {
-                    PlayLayer::get()->destroyPlayer(m_player1, nullptr);
+                    utils::get<PlayLayer>()->destroyPlayer(m_player1, nullptr);
                     config::setTemp("noclipAccuracy", config::get<float>("player.noclip.acclimit", 95.f));
                 }*/

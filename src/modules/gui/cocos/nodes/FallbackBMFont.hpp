@@ -1,6 +1,7 @@
 #pragma once
 #include <modules/config/config.hpp>
 #include <modules/i18n/translations.hpp>
+#include <modules/utils/SingletonCache.hpp>
 #include <codecvt>
 
 namespace eclipse::gui::cocos {
@@ -57,7 +58,7 @@ namespace eclipse::gui::cocos {
         }
     }
 
-    inline static std::unordered_map<uint64_t, std::string_view> g_emojis = {
+    inline static const std::unordered_map<uint64_t, std::string_view> g_emojis = {
         { 0xD83D'DC7D, "alien.png"_spr },
         { 0xD83D'DC76, "baby.png"_spr },
         { 0xD83D'DC94, "brokenHeart.png"_spr },
@@ -67,12 +68,15 @@ namespace eclipse::gui::cocos {
         { 0x274C,      "cross.png"_spr },
         { 0xD83D'DC4E, "dislike.png"_spr },
         { 0xD83D'DC36, "dog.png"_spr },
+        { 0xD83C'DF17, "eclipse.png"_spr },
         { 0x2757,      "exclamation.png"_spr },
+        { 0xD83E'DD2F, "explodingHead.png"_spr },
         { 0xD83D'DD25, "fire.png"_spr },
         { 0xD83D'DC7B, "ghost.png"_spr },
         { 0x2764'FE0F, "heart.png"_spr },
         { 0xD83D'DC4D, "like.png"_spr },
         { 0xD83C'DF19, "moon.png"_spr },
+        { 0xD83E'DD13, "nerd.png"_spr },
         { 0xD83E'DDD6, "personInSteamyRoom.png"_spr },
         { 0x2753,      "question.png"_spr },
         { 0xD83E'DD16, "robot.png"_spr },
@@ -80,6 +84,7 @@ namespace eclipse::gui::cocos {
         { 0xD83D'DFE1, "secretCoin-filled.png"_spr },
         { 0xD83D'DC80, "skull.png"_spr },
         { 0x2744'FE0F, "snowflake.png"_spr },
+        { 0xD83D'DE2D, "sob.png"_spr },
         { 0xD83D'DDE3'FE0F, "speakingHead.png"_spr },
         { 0x2B50,      "star.png"_spr },
         { 0xD83E'DDFF, "startpos.png"_spr },
@@ -114,15 +119,6 @@ namespace eclipse::gui::cocos {
         P* getParent() const { return m_parent; }
 
         void setString(unsigned short* newString, bool needUpdateLabel) override {
-            auto copy = copyUTF16StringN(newString);
-            if (needUpdateLabel) {
-                delete[] m_sInitialString;
-                m_sInitialString = copy;
-            } else {
-                delete[] m_sString;
-                m_sString = copy;
-            }
-
             if (m_pChildren) {
                 for (int i = 0; i < m_pChildren->count(); i++) {
                     if (auto child = static_cast<CCNode*>(m_pChildren->objectAtIndex(i))) {
@@ -140,15 +136,31 @@ namespace eclipse::gui::cocos {
 
             // i love c++ so much
             static_cast<T*>(this)->T::createFontChars();
-            if (needUpdateLabel) {
-                this->updateLabel();
-            }
         }
 
         void setString(const char* newString, bool needUpdateLabel) override {
             if (!newString) newString = "";
-            if (needUpdateLabel) m_sInitialStringUTF8 = newString;
-            this->BaseLabel::setString(reinterpret_cast<uint16_t*>(UTF8ToUTF16(newString).data()), needUpdateLabel);
+            if (needUpdateLabel) {
+                if (m_sInitialStringUTF8 == newString) return;
+                m_sInitialStringUTF8 = newString;
+            }
+            m_string = std::move(UTF8ToUTF16(newString));
+            this->BaseLabel::setString(reinterpret_cast<uint16_t*>(m_string.data()), needUpdateLabel);
+        }
+
+        void setFntFile(std::string_view fntFile) {
+            if (m_sFntFile == fntFile) return;
+
+            auto* newConf = cocos2d::FNTConfigLoadFile(fntFile.data());
+            if (!newConf) return;
+
+            m_sFntFile = fntFile;
+            CC_SAFE_RELEASE(m_pConfiguration);
+            m_pConfiguration = newConf;
+            m_pConfiguration->retain();
+
+            this->setTexture(utils::get<cocos2d::CCTextureCache>()->addImage(m_pConfiguration->getAtlasName(), false));
+            static_cast<T*>(this)->T::createFontChars();
         }
 
         int kerningAmountForFirst(uint16_t first, uint16_t second, const cocos2d::tCCKerningHashElement* dictionary) const {
@@ -172,6 +184,7 @@ namespace eclipse::gui::cocos {
         }
 
     protected:
+        std::u16string m_string;
         P* m_parent = nullptr;
         CCSpriteBatchNode* m_spriteBatch = nullptr;
     };
@@ -209,7 +222,7 @@ namespace eclipse::gui::cocos {
         }
 
         void setFntFile(std::string_view fntFile) const {
-            m_label->setFntFile(fntFile.data());
+            m_label->setFntFile(fntFile);
         }
 
         void setColor(const cocos2d::ccColor3B& color) const {
@@ -262,7 +275,7 @@ namespace eclipse::gui::cocos {
         }
 
         void setFntFile(std::string_view fntFile) const {
-            m_label->setFntFile(fntFile.data());
+            m_label->setFntFile(fntFile);
         }
 
         void setColor(const cocos2d::ccColor3B& color) const {

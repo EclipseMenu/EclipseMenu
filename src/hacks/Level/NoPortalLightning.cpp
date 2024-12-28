@@ -23,7 +23,7 @@ namespace eclipse::hacks::Level {
         ALL_DELEGATES_AND_SAFE_PRIO("level.noportallightning")
 
         void lightningFlash(cocos2d::CCPoint from, cocos2d::CCPoint to, cocos2d::ccColor3B color, float lineWidth, float duration, int displacement, bool flash, float opacity) {
-            auto* gm = GameManager::get();
+            auto* gm = utils::get<GameManager>();
             auto perfMode = gm->m_performanceMode;
             gm->m_performanceMode = true;
             flash = false;

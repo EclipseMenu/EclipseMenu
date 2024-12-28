@@ -51,7 +51,7 @@ namespace eclipse::hacks::Creator {
     class $modify (SliderLimitGJSHook, GJScaleControl) {
         ADD_HOOKS_DELEGATE("creator.sliderlimit")
 
-        void ccTouchMoved(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) {
+        void ccTouchMoved(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) override {
             GJScaleControl::ccTouchMoved(touch, event);
 
             if (m_sliderXY && m_sliderXY->m_touchLogic->m_activateThumb) {
@@ -63,7 +63,8 @@ namespace eclipse::hacks::Creator {
                 updateLabelXY(value);
                 this->sliderChanged(m_sliderXY->getThumb());
 
-                if (EditorUI::get()) EditorUI::get()->scaleXYChanged(value, value, m_scaleLocked);
+                if (auto editorUI = utils::get<EditorUI>())
+                    editorUI->scaleXYChanged(value, value, m_scaleLocked);
             }
         }
     };

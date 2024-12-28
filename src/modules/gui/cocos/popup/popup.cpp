@@ -2,6 +2,7 @@
 #include <modules/gui/cocos/cocos.hpp>
 #include <modules/config/config.hpp>
 #include <modules/gui/theming/manager.hpp>
+#include <modules/utils/SingletonCache.hpp>
 
 #include <utility>
 
@@ -11,7 +12,7 @@ namespace eclipse::gui::cocos {
 
     bool Popup::setup(Tabs const& tabs) {
         const auto tm = ThemeManager::get();
-        auto winSize = cocos2d::CCDirector::get()->getWinSize();
+        auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
         this->setTitle("");
         m_buttonMenu->setContentSize(winSize);
         m_closeBtn->setPosition(20.f, winSize.height - 20.f);

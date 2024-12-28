@@ -13,10 +13,10 @@ namespace eclipse::hacks::Level {
     static std::deque<GameObject*> s_affectedGameObjects;
 
     float getMultiplier(GameObject* gameObject) {
-        if (!GJBaseGameLayer::get())
+        if (!utils::get<GJBaseGameLayer>())
             return 1.f;
 
-        if ((gameObject == GJBaseGameLayer::get()->m_player1 || gameObject == GJBaseGameLayer::get()->m_player2))
+        if ((gameObject == utils::get<GJBaseGameLayer>()->m_player1 || gameObject == utils::get<GJBaseGameLayer>()->m_player2))
             return config::get<float>("level.hitbox_multiplier.player", 1.f);
         else if (gameObject->m_objectType == GameObjectType::Hazard || gameObject->m_objectType == GameObjectType::AnimatedHazard)
             return config::get<float>("level.hitbox_multiplier.hazard", 1.f);
@@ -124,7 +124,7 @@ namespace eclipse::hacks::Level {
 
     class $modify(HitboxMultiplierOBB2DHook, OBB2D) {
         void calculateWithCenter(cocos2d::CCPoint center, float width, float heigth, float rotation) {
-            if (!GJBaseGameLayer::get() || !config::get<bool>("level.hitbox_multiplier", false) || !s_rotatedGameObject) {
+            if (!utils::get<GJBaseGameLayer>() || !config::get<bool>("level.hitbox_multiplier", false) || !s_rotatedGameObject) {
                 s_rotatedGameObject = nullptr;
                 return OBB2D::calculateWithCenter(center, width, heigth, rotation);
             }

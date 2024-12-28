@@ -33,7 +33,7 @@ namespace eclipse::hacks::Level {
                 ->handleKeybinds()
                 ->setDescription()
                 ->callback([](bool newState){
-                    if (auto pl = PlayLayer::get()) {
+                    if (auto pl = utils::get<PlayLayer>()) {
                         static_cast<LegacyPhysicsPlayLayer*>(pl)->toggleFixGravityBugState(newState);
                     }
                 });
@@ -43,7 +43,7 @@ namespace eclipse::hacks::Level {
         //otherwise the hack being on doesn't matter
         [[nodiscard]] bool isCheating() override {
             if (!config::get<bool>("level.legacyreversephysics", false)) return false;
-            auto pl = PlayLayer::get();
+            auto pl = utils::get<PlayLayer>();
             if (!pl) return false;
 
             return static_cast<LegacyPhysicsPlayLayer*>(pl)->m_fields->originalFixGravityVal;

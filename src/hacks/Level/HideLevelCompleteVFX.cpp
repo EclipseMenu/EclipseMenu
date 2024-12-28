@@ -28,7 +28,7 @@ namespace eclipse::hacks::Level {
         void setPosition(cocos2d::CCPoint const& p0) {
             CCCircleWave::setPosition(p0);
 
-            PlayLayer* pl = PlayLayer::get();
+            PlayLayer* pl = utils::get<PlayLayer>();
 
             if (!pl) return;
 
@@ -55,7 +55,7 @@ namespace eclipse::hacks::Level {
                 p11, p12, p13, p14, p15, p16, p17, p18, p19
             );
 
-            PlayLayer* pl = PlayLayer::get();
+            PlayLayer* pl = utils::get<PlayLayer>();
 
             if (!pl) return;
 
@@ -72,7 +72,7 @@ namespace eclipse::hacks::Level {
             CCParticleSystemQuad::initTexCoordsWithRect(p0);
             geode::log::info("help");
             if (!config::get<bool>("level.hidelevelcomplete", false)) return;
-            PlayLayer* pl = PlayLayer::get();
+            PlayLayer* pl = utils::get<PlayLayer>();
             if (!pl) return;
             if (this->getParent() != pl) return;
 
@@ -90,7 +90,7 @@ namespace eclipse::hacks::Level {
         void initParticle(cocos2d::sCCParticle* p0) {
             CCParticleSystem::initParticle(p0);
 
-            PlayLayer* pl = PlayLayer::get();
+            PlayLayer* pl = utils::get<PlayLayer>();
 
             if (!pl) return;
             if (this->getParent() != pl) return;

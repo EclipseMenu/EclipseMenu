@@ -26,7 +26,7 @@ namespace eclipse::hacks::Global {
 
     void updateChannels() {
         FMOD::Channel* audioChannel;
-        FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
+        FMOD::System* system = utils::get<FMODAudioEngine>()->m_system;
 
         for (auto i = 0; i < 4; i++) {
             system->getChannel(126 + i, &audioChannel);

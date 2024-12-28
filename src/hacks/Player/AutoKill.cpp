@@ -35,7 +35,7 @@ namespace eclipse::hacks::Player {
         ADD_HOOKS_DELEGATE("player.autokill")
 
         void killPlayer() {
-            auto* playLayer = PlayLayer::get();
+            auto* playLayer = utils::get<PlayLayer>();
             if (!playLayer) return;
 
             bool noclipEnabled = config::get<bool>("player.noclip", false);
@@ -48,7 +48,7 @@ namespace eclipse::hacks::Player {
         void update(float p0) override {
             GJBaseGameLayer::update(p0);
 
-            auto* playLayer = PlayLayer::get();
+            auto* playLayer = utils::get<PlayLayer>();
             if (!playLayer) return;
 
             auto percentageEnabled = config::get<bool>("player.autokill.percentage.toggle", true);

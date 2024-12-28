@@ -22,7 +22,7 @@ namespace eclipse::hacks::Level {
         ALL_DELEGATES_AND_SAFE_PRIO("level.stoptrigondeath")
 
         void update(float dt) {
-            if (!PlayLayer::get()) return GJBaseGameLayer::update(dt);
+            if (!utils::get<PlayLayer>()) return GJBaseGameLayer::update(dt);
 
             if ((m_player1 && m_player1->m_isDead) || (m_player2 && m_player2->m_isDead)) return;
 

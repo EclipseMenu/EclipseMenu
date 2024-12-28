@@ -212,7 +212,7 @@ namespace eclipse::hacks::Bot {
         }
 
         void loadFromCheckpoint(CheckpointObject* checkpoint) {
-            PlayLayer* playLayer = PlayLayer::get();
+            PlayLayer* playLayer = utils::get<PlayLayer>();
 
             if (s_bot.getState() != bot::State::RECORD || !playLayer)
                 return PlayLayer::loadFromCheckpoint(checkpoint);

@@ -62,11 +62,11 @@ namespace eclipse::hacks::Player {
         void update(float dt) override {
             // for playlayer, check if the level is not paused/finished (maybe add loading check later?)
             bool usable = false;
-            if (auto playLayer = PlayLayer::get())
+            if (auto playLayer = utils::get<PlayLayer>())
                 usable = !playLayer->m_isPaused && !playLayer->m_hasCompletedLevel && playLayer->m_started && !playLayer->m_player1->m_isDead;
 
             // for level editor, check if it's in playback mode
-            else if (auto editor = LevelEditorLayer::get())
+            else if (auto editor = utils::get<LevelEditorLayer>())
                 usable = editor->m_playbackMode == PlaybackMode::Playing;
 
             if (!usable)
@@ -150,7 +150,7 @@ namespace eclipse::hacks::Player {
 
             this->setPosition(0, 0);
 
-            auto winSize = cocos2d::CCDirector::get()->getWinSize();
+            auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
             auto sprite = cocos2d::CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
             sprite->setFlipX(true);
             m_stepForward = HoldingMenuItem::create(sprite,

@@ -146,7 +146,7 @@ namespace eclipse::hacks::Labels {
         bool pushButton(PlayerButton btn) {
             bool result = PlayerObject::pushButton(btn);
 
-            const auto* gjbgl = GJBaseGameLayer::get();
+            const auto* gjbgl = utils::get<GJBaseGameLayer>();
             if (!gjbgl) return result;
 
             const bool isP1 = this == gjbgl->m_player1;

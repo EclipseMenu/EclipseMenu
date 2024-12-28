@@ -21,7 +21,7 @@ namespace eclipse::hacks::Player {
             player->m_swingBurstParticles2->setVisible(toggle);
         };
 
-        auto* bgl = GJBaseGameLayer::get();
+        auto* bgl = utils::get<GJBaseGameLayer>();
 
         if (!bgl) return;
 

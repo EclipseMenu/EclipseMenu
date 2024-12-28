@@ -12,7 +12,7 @@ namespace eclipse::hacks::Cosmetic {
 
             tab->addToggle("bypass.practicemusic")
                 ->callback([](bool v){
-                    GameStatsManager::get()->toggleEnableItem(UnlockType::GJItem, 17, v);
+                    utils::get<GameStatsManager>()->toggleEnableItem(UnlockType::GJItem, 17, v);
                 })
                 ->handleKeybinds()->setDescription();
         }

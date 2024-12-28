@@ -54,7 +54,7 @@ namespace eclipse::hacks::Global {
         void onClick(CCObject* sender) {
             // get the "view" button to work with compact mode in "my levels"
             if (this->m_level->m_levelType == GJLevelType::Editor && config::get<bool>("global.compacteditorlevels", false))
-                cocos2d::CCDirector::sharedDirector()->replaceScene(
+                utils::get<cocos2d::CCDirector>()->replaceScene(
                     cocos2d::CCTransitionFade::create(0.5f, EditLevelLayer::scene(m_level))
                 );
             else

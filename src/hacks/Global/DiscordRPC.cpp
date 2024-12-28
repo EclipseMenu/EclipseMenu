@@ -28,9 +28,9 @@ namespace eclipse::hacks::Global {
         };
 
         static GameState getGameState() {
-            if (auto* pl = PlayLayer::get())
+            if (auto* pl = utils::get<PlayLayer>())
                 return pl->m_isPlatformer ? GameState::Platformer : GameState::Level;
-            if (auto* ed = LevelEditorLayer::get())
+            if (auto* ed = utils::get<LevelEditorLayer>())
                 return GameState::Editor;
             return GameState::Menu;
         }

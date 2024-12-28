@@ -30,7 +30,7 @@ namespace eclipse::hacks::Player {
         -- raydeeux
         */
         void playerDestroyed(bool p0) {
-            PlayLayer* pl = PlayLayer::get();
+            PlayLayer* pl = utils::get<PlayLayer>();
 
             // do nothing if playlayer is nullptr
             if (!pl) return PlayerObject::playerDestroyed(p0);
@@ -43,7 +43,7 @@ namespace eclipse::hacks::Player {
             if (pl->m_isPracticeMode && !pl->m_practiceMusicSync)
                 return PlayerObject::playerDestroyed(p0);
 
-            const auto fmod = FMODAudioEngine::sharedEngine();
+            const auto fmod = utils::get<FMODAudioEngine>();
 
             /*
             stopAllMusic(), while not inlined, does not represent
@@ -93,7 +93,7 @@ namespace eclipse::hacks::Player {
         from spawn triggers.
         */
         void triggerObject(GJBaseGameLayer* p0, int p1, gd::vector<int> const* p2) {
-            PlayLayer* pl = PlayLayer::get();
+            PlayLayer* pl = utils::get<PlayLayer>();
 
             // do nothing if playlayer is nullptr
             if (!pl) return EffectGameObject::triggerObject(p0, p1, p2);

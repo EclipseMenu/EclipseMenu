@@ -124,7 +124,7 @@ $on_mod(Loaded) {
     // Add bitmap fonts to texture search path
     auto bmfontPath = geode::Mod::get()->getConfigDir() / "bmfonts";
     std::filesystem::create_directories(bmfontPath / GEODE_MOD_ID);
-    cocos2d::CCFileUtils::sharedFileUtils()->addSearchPath(bmfontPath.string().c_str());
+    utils::get<cocos2d::CCFileUtils>()->addSearchPath(bmfontPath.string().c_str());
     geode::log::info("Added bitmap fonts to search path: {}", bmfontPath.string());
 
     // Add "Interface" tab to edit theme settings

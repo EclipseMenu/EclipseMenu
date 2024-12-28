@@ -11,10 +11,10 @@ namespace eclipse::hacks::Global {
         
         pitch = config::get<bool>("global.pitchshift.toggle", false) ? pitch : 1.f;
 
-        FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
+        FMOD::System* system = utils::get<FMODAudioEngine>()->m_system;
 
         if (pitchShifter) {
-            FMODAudioEngine::sharedEngine()->m_backgroundMusicChannel->removeDSP(pitchShifter);
+            utils::get<FMODAudioEngine>()->m_backgroundMusicChannel->removeDSP(pitchShifter);
             pitchShifter->release();
             pitchShifter = nullptr;
         }
@@ -26,7 +26,7 @@ namespace eclipse::hacks::Global {
         //pitchShifter->setParameterFloat(FMOD_DSP_PITCHSHIFT_FFTSIZE, 4096);
         pitchShifter->setParameterFloat(FMOD_DSP_PITCHSHIFT_FFTSIZE, 0x800); // or 0x457 
         pitchShifter->setParameterFloat(FMOD_DSP_PITCHSHIFT_PITCH, pitch);
-        FMODAudioEngine::sharedEngine()->m_backgroundMusicChannel->addDSP(0, pitchShifter);
+        utils::get<FMODAudioEngine>()->m_backgroundMusicChannel->addDSP(0, pitchShifter);
     }
 
     class PitchShift : public hack::Hack {

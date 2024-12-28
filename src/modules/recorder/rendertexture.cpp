@@ -2,6 +2,7 @@
 
 #include <Geode/cocos/platform/win32/CCGL.h>
 #include <Geode/binding/PlayLayer.hpp>
+#include <modules/utils/SingletonCache.hpp>
 
 namespace eclipse::recorder {
 
@@ -40,16 +41,16 @@ namespace eclipse::recorder {
     }
 
     void RenderTexture::capture(std::mutex& lock, std::vector<uint8_t>& data, volatile bool& hasDataFlag) {
-        auto director = cocos2d::CCDirector::sharedDirector();
+        auto director = utils::get<cocos2d::CCDirector>();
 
         glViewport(0, 0, m_width, m_height);
 
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_old_fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-        PlayLayer::get()->setScaleY(-1);
-        PlayLayer::get()->visit();
-        PlayLayer::get()->setScaleY(1);
+        utils::get<PlayLayer>()->setScaleY(-1);
+        utils::get<PlayLayer>()->visit();
+        utils::get<PlayLayer>()->setScaleY(1);
 
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
         lock.lock();

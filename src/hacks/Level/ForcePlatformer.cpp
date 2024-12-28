@@ -25,7 +25,7 @@ namespace eclipse::hacks::Level {
         ADD_HOOKS_DELEGATE("level.forceplatformer")
 
         void loadLevelSettings() {
-            if(!PlayLayer::get() || m_levelSettings->m_platformerMode) return GJBaseGameLayer::loadLevelSettings(); 
+            if(!utils::get<PlayLayer>() || m_levelSettings->m_platformerMode) return GJBaseGameLayer::loadLevelSettings();
 
             //length is changed by loadLevelSettings
             m_levelSettings->m_platformerMode = true;

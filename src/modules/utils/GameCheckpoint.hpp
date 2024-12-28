@@ -268,7 +268,7 @@ namespace eclipse::utils {
         }
 
         void apply(PlayerObject* player) {
-            if (!PlayLayer::get()->m_isPracticeMode) return;
+            if (!utils::get<PlayLayer>()->m_isPracticeMode) return;
 
             player->m_wasTeleported = m_wasTeleported;
             player->m_fixGravityBug = m_fixGravityBug;

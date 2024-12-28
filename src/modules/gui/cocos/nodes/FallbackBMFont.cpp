@@ -1,4 +1,5 @@
 #include "FallbackBMFont.hpp"
+#include <modules/utils/SingletonCache.hpp>
 
 namespace eclipse::gui::cocos {
 
@@ -14,7 +15,7 @@ namespace eclipse::gui::cocos {
         uint32_t totalHeight = 0;
 
         uint32_t quantityOfLines = 1;
-        uint32_t stringLen = m_sString ? std::char_traits<char16_t>::length(reinterpret_cast<char16_t*>(m_sString)) : 0;
+        uint32_t stringLen = m_string.length();
         if (stringLen == 0) {
             return this->setContentSize({0, 0});
         }
@@ -23,7 +24,7 @@ namespace eclipse::gui::cocos {
         auto fallbackCharset = m_parent->m_fallbackConfiguration->getCharacterSet();
 
         for (uint32_t i = 0; i < stringLen - 1; ++i) {
-            if (m_sString[i] == '\n') {
+            if (m_string[i] == '\n') {
                 quantityOfLines++;
             }
         }
@@ -34,13 +35,13 @@ namespace eclipse::gui::cocos {
         cocos2d::CCRect rect;
         cocos2d::ccBMFontDef fontDef;
 
-        auto scaleFactor = cocos2d::CCDirector::sharedDirector()->getContentScaleFactor();
+        auto scaleFactor = utils::get<cocos2d::CCDirector>()->getContentScaleFactor();
 
         uint32_t normalIndex = 0;
         uint32_t fallbackIndex = 0;
 
         for (uint32_t i = 0; i < stringLen; ++i) {
-            auto c = m_sString[i];
+            auto c = m_string[i];
             if (c == '\n') {
                 nextFontPositionX = 0;
                 nextFontPositionY -= m_pConfiguration->m_nCommonHeight;
@@ -192,7 +193,7 @@ namespace eclipse::gui::cocos {
     constexpr bool isEmoji(uint16_t c) { return c >= 0x2600 && c <= 0x2BFF; }
     constexpr bool isEmojiModifier(uint16_t c) { return c == 0xFE0F; }
 
-    static uint64_t getEmoji(const uint16_t* str, uint32_t& index, uint32_t len) {
+    static uint64_t getEmoji(const std::u16string& str, uint32_t& index, uint32_t len) {
         uint64_t emoji = str[index];
         if (isEmojiHeader(str[index])) {
             if (index + 1 >= len) return 0;
@@ -230,7 +231,7 @@ namespace eclipse::gui::cocos {
         uint32_t totalHeight = 0;
 
         uint32_t quantityOfLines = 1;
-        uint32_t stringLen = m_sString ? std::char_traits<char16_t>::length(reinterpret_cast<char16_t*>(m_sString)) : 0;
+        uint32_t stringLen = m_string.length();
         if (stringLen == 0) {
             return this->setContentSize({0, 0});
         }
@@ -238,7 +239,7 @@ namespace eclipse::gui::cocos {
         auto charset = m_pConfiguration->getCharacterSet();
 
         for (uint32_t i = 0; i < stringLen - 1; ++i) {
-            if (m_sString[i] == '\n') {
+            if (m_string[i] == '\n') {
                 quantityOfLines++;
             }
         }
@@ -249,11 +250,11 @@ namespace eclipse::gui::cocos {
         cocos2d::CCRect rect;
         cocos2d::ccBMFontDef fontDef;
 
-        auto scaleFactor = cocos2d::CCDirector::sharedDirector()->getContentScaleFactor();
+        auto scaleFactor = utils::get<cocos2d::CCDirector>()->getContentScaleFactor();
 
         uint32_t emojiIndex = 0;
         for (uint32_t i = 0; i < stringLen; ++i) {
-            auto c = m_sString[i];
+            auto c = m_string[i];
             if (c == '\n') {
                 nextFontPositionX = 0;
                 nextFontPositionY -= m_pConfiguration->m_nCommonHeight;
@@ -262,7 +263,7 @@ namespace eclipse::gui::cocos {
 
             // check if charset has the character
             if (!charset->contains(c)) {
-                auto emoji = getEmoji(m_sString, i, stringLen);
+                auto emoji = getEmoji(m_string, i, stringLen);
                 if (emoji != 0) {
                     auto it = g_emojis.find(emoji);
                     if (it != g_emojis.end()) {
@@ -306,8 +307,6 @@ namespace eclipse::gui::cocos {
                         }
 
                         emojiIndex++;
-                    } else {
-                        geode::log::debug("EmojiLabel({}): emoji not found: {}", m_sInitialStringUTF8, emoji);
                     }
 
                     continue;

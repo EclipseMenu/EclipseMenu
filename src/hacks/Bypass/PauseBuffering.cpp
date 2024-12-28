@@ -24,7 +24,7 @@ namespace eclipse::hacks::Bypass {
         ADD_HOOKS_DELEGATE("bypass.pausebuffering")
 
         void onPause(cocos2d::CCObject* sender) {
-            auto* playLayer = PlayLayer::get();
+            auto* playLayer = utils::get<PlayLayer>();
             if (!playLayer) return UILayer::onPause(sender);
 
             uint32_t original = playLayer->m_gameState.m_pauseCounter;

@@ -25,20 +25,20 @@ namespace eclipse::hacks::Creator { // i didnt do this properly :P
         ALL_DELEGATES_AND_SAFE_PRIO("creator.editorwave")
 
         void placeStreakPoint() {
-            if (LevelEditorLayer::get() && m_isDart) m_waveTrail->addPoint(this->getPosition());
+            if (utils::get<LevelEditorLayer>() && m_isDart) m_waveTrail->addPoint(this->getPosition());
             else PlayerObject::placeStreakPoint();
         }
 
         void fadeOutStreak2(float dt) {
             PlayerObject::fadeOutStreak2(dt);
 
-            if (LevelEditorLayer::get()) m_waveTrail->runAction(cocos2d::CCFadeTo::create(dt, 0));
+            if (utils::get<LevelEditorLayer>()) m_waveTrail->runAction(cocos2d::CCFadeTo::create(dt, 0));
         }
 
         virtual void update(float dt) {
             PlayerObject::update(dt);
 
-            if (LevelEditorLayer::get() && m_isDart) m_waveTrail->m_currentPoint = this->getPosition();
+            if (utils::get<LevelEditorLayer>() && m_isDart) m_waveTrail->m_currentPoint = this->getPosition();
         }
     };
 
@@ -46,7 +46,7 @@ namespace eclipse::hacks::Creator { // i didnt do this properly :P
         ADD_HOOKS_DELEGATE("creator.editorwave")
 
         void updateStroke(float dt) {
-            if (LevelEditorLayer::get()) m_drawStreak = true;
+            if (utils::get<LevelEditorLayer>()) m_drawStreak = true;
             HardStreak::updateStroke(dt);
         }
     };*/

@@ -1,4 +1,5 @@
 #include "scroll-layer.hpp"
+#include <modules/utils/SingletonCache.hpp>
 // all thanks to https://github.com/CallocGD/GD-2.205-Decompiled
 // and also from https://github.com/geode-sdk/geode
 
@@ -13,7 +14,7 @@ namespace eclipse::gui::cocos {
             bool value = CCScrollLayerExt::ccTouchBegan(touch, event);
             if (value) {
                 m_touchStart = touch;
-                auto touchPos = cocos2d::CCDirector::sharedDirector()->convertToGL(m_touchStart->getLocationInView());
+                auto touchPos = utils::get<cocos2d::CCDirector>()->convertToGL(m_touchStart->getLocationInView());
                 m_touchStartPosition2 = touchPos;
                 m_touchPosition2 = touchPos;
                 if (m_touchOutOfBoundary) {
@@ -48,7 +49,7 @@ namespace eclipse::gui::cocos {
     void ScrollLayer::ccTouchMoved(cocos2d::CCTouch *touch, cocos2d::CCEvent *event) {
         CCScrollLayerExt::ccTouchMoved(touch, event);
         m_touchMoved = true;
-        auto touchPoint = cocos2d::CCDirector::sharedDirector()->convertToGL(touch->getLocationInView());
+        auto touchPoint = utils::get<cocos2d::CCDirector>()->convertToGL(touch->getLocationInView());
         if (touch == m_touchStart) {
             m_touchPosition2 = m_touchPosition2 - touchPoint;
         }
@@ -58,8 +59,8 @@ namespace eclipse::gui::cocos {
         }
     }
     void ScrollLayer::claimTouch(cocos2d::CCTouch* touch) {
-        auto touchDispatcher = cocos2d::CCDirector::sharedDirector()->getTouchDispatcher();
-        auto handler = (cocos2d::CCTargetedTouchHandler *)touchDispatcher->findHandler(this);		
+        auto touchDispatcher = utils::get<cocos2d::CCDirector>()->getTouchDispatcher();
+        auto handler = static_cast<cocos2d::CCTargetedTouchHandler *>(touchDispatcher->findHandler(this));
         if (handler) {
             cocos2d::CCSet* claimedTouches = handler->getClaimedTouches();
             if (!claimedTouches->containsObject(touch)) {
@@ -73,7 +74,7 @@ namespace eclipse::gui::cocos {
         set->addObject(touch);
         set->autorelease();
         m_cancellingTouches = true;
-        auto touchDispather = cocos2d::CCDirector::sharedDirector()->getTouchDispatcher();
+        auto touchDispather = utils::get<cocos2d::CCDirector>()->getTouchDispatcher();
         touchDispather->touchesCancelled(set, event);
         m_cancellingTouches = false;
         claimTouch(touch);
@@ -119,7 +120,7 @@ namespace eclipse::gui::cocos {
                 auto const topRight = this->convertToWorldSpace(this->getContentSize());
                 cocos2d::CCSize const size = topRight - bottomLeft;
 
-                cocos2d::CCEGLView::get()->setScissorInPoints(bottomLeft.x, bottomLeft.y, size.width, size.height);
+                utils::get<cocos2d::CCEGLView>()->setScissorInPoints(bottomLeft.x, bottomLeft.y, size.width, size.height);
             }
         }
 
@@ -157,7 +158,7 @@ namespace eclipse::gui::cocos {
         }
     }
     void ScrollLayer::touchFinish(cocos2d::CCTouch* touch) {
-        auto touchPoint = cocos2d::CCDirector::sharedDirector()->convertToGL(touch->getLocationInView());
+        auto touchPoint = utils::get<cocos2d::CCDirector>()->convertToGL(touch->getLocationInView());
         if (touch == this->m_touchStart) {
             //auto pvVar1 = (CCMenuItemSpriteExtra *)itemForTouch((CCTouch *)this);
             auto pvVar1 = nullptr;

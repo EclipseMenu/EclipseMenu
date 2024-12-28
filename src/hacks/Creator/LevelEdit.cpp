@@ -30,7 +30,7 @@ namespace eclipse::hacks::Creator {
         ALL_DELEGATES_AND_SAFE_PRIO("creator.leveledit")
 
         void customSetup() override {
-            auto level = PlayLayer::get()->m_level;
+            auto level = utils::get<PlayLayer>()->m_level;
             auto levelType = level->m_levelType;
 
             level->m_levelType = GJLevelType::Editor;
@@ -39,7 +39,7 @@ namespace eclipse::hacks::Creator {
         }
 
         void onEdit(cocos2d::CCObject* sender) {
-            auto level = PlayLayer::get()->m_level;
+            auto level = utils::get<PlayLayer>()->m_level;
             auto levelType = level->m_levelType;
 
             level->m_levelType = GJLevelType::Editor;
