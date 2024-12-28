@@ -4,16 +4,13 @@
 #include <modules/utils/SingletonCache.hpp>
 #include <codecvt>
 
-namespace eclipse::gui::cocos {
+#ifdef GEODE_IS_ANDROID
+#define GD_STRING_SET_WITH_SW(str) std::string(str)
+#else
+#define GD_STRING_SET_WITH_SW(str) str
+#endif
 
-    inline static uint16_t* copyUTF16StringN(const uint16_t* str) {
-        auto ptr = reinterpret_cast<const char16_t*>(str);
-        auto len = str ? std::char_traits<char16_t>::length(ptr) : 0;
-        auto copy = new char16_t[len + 1];
-        std::char_traits<char16_t>::copy(copy, ptr, len);
-        copy[len] = 0;
-        return reinterpret_cast<uint16_t*>(copy);
-    }
+namespace eclipse::gui::cocos {
 
     inline static std::u16string UTF8ToUTF16(const std::string& utf8) {
 #ifdef GEODE_IS_WINDOWS
@@ -154,7 +151,7 @@ namespace eclipse::gui::cocos {
             auto* newConf = cocos2d::FNTConfigLoadFile(fntFile.data());
             if (!newConf) return;
 
-            m_sFntFile = fntFile;
+            m_sFntFile = GD_STRING_SET_WITH_SW(fntFile);
             CC_SAFE_RELEASE(m_pConfiguration);
             m_pConfiguration = newConf;
             m_pConfiguration->retain();
