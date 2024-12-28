@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseComponentNode.hpp"
 #include <modules/gui/cocos/popup/options-popup.hpp>
+#include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::cocos {
     class FloatToggleComponentNode : public BaseComponentNode<FloatToggleComponentNode, cocos2d::CCMenu, FloatToggleComponent, float>, public TextInputDelegate {
@@ -11,13 +12,30 @@ namespace eclipse::gui::cocos {
         geode::TextInput* m_textInput = nullptr;
 
     public:
+        cocos2d::extension::CCScale9Sprite* createButton(bool check) {
+            const auto tm = ThemeManager::get();
+            // prizm men 
+            auto box = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", { 0.0f, 0.0f, 0.0f, 0.0f });
+            box->setScale(0.285F);
+            if (check) {
+                auto checkmark = cocos2d::CCSprite::create("checkmark.png"_spr);
+                checkmark->setScale(0.3F);
+                checkmark->setAnchorPoint({0,0});
+                checkmark->setPosition({6,15});
+                box->addChild(checkmark);
+                checkmark->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
+            }
+            box->setColor(tm->getCheckboxBackgroundColor().toCCColor3B());
+            return box;
+        }
         bool init(float width) override {
             if (!CCMenu::init()) return false;
+            const auto tm = ThemeManager::get();
 
             this->setID(fmt::format("toggle-{}"_spr, m_component->getId()));
             this->setContentSize({ width, 28.f });
 
-            m_toggler = geode::cocos::CCMenuItemExt::createTogglerWithStandardSprites(0.7f, [this](auto) {
+            m_toggler = geode::cocos::CCMenuItemExt::createToggler(createButton(true), createButton(false), [this](auto) {
                 auto value = !this->m_component->getState();
                 m_component->setState(value);
                 m_component->triggerCallback();
@@ -40,6 +58,7 @@ namespace eclipse::gui::cocos {
             m_label = TranslatedLabel::create(m_component->getTitle());
             m_label->setAnchorPoint({0, 0.5f});
             m_label->limitLabelWidth(labelSize, 1.f, 0.25f);
+            m_label->setColor(tm->getCheckboxForegroundColor().toCCColor3B());
             this->addChildAtPosition(m_label, geode::Anchor::Left, { 30.f, 0.f });
 
             m_textInput = geode::TextInput::create(120, m_component->getTitle().c_str());

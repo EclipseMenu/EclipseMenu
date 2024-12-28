@@ -45,7 +45,9 @@
 			"resources/BitmapFonts/font_default*"
 		],
 		"sprites": [
-			"resources/ECLIPSE-android.png"
+			"resources/ECLIPSE-android.png",
+			"resources/checkmark.png",
+			"resources/circle.png"
 		],
 		"spritesheets": {
 			"emojis": [ "resources/Emojis/*.png" ]

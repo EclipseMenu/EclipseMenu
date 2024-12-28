@@ -170,7 +170,7 @@ namespace eclipse::gui::cocos {
     }
 
     bool FallbackBMFont::init(const std::string& text, const std::string& font, const std::string& fallbackFont) {
-        CCNode::init();
+        if (!CCNode::init()) return false;
 
         m_fallbackConfiguration = cocos2d::FNTConfigLoadFile(fallbackFont.c_str());
         m_fallbackConfiguration->retain();
