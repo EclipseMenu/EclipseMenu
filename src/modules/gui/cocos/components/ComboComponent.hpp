@@ -8,30 +8,34 @@ namespace eclipse::gui::cocos {
         TranslatedLabel* m_label = nullptr;
         CCMenuItemSpriteExtra* m_infoButton = nullptr;
         cocos2d::extension::CCScale9Sprite* m_background = nullptr;
-        cocos2d::CCLabelBMFont* m_valueLabel = nullptr;
+        FallbackBMFont* m_valueLabel = nullptr;
 
     public:
-        void updateLabel() {
-            m_valueLabel->setString(m_component->getItems()[m_component->getValue()].c_str());
-            m_valueLabel->limitLabelWidth(200.f, 1.f, 0.25f);
+        void updateLabel() const {
+            int index = m_component->getValue();
+            if (index < 0 || index >= m_component->getItems().size()) {
+                m_valueLabel->setString("");
+                return;
+            }
+            m_valueLabel->setString(m_component->getItems()[index]);
+            m_valueLabel->limitLabelWidth(200.f, 2.f, 0.25f);
         }
 
-        void right(CCObject* sender) {
-            int value = m_component->getValue() == m_component->getItems().size() - 1 ? 0 : m_component->getValue() + 1;
+        void scroll(CCObject* sender) {
+            int tag = sender->getTag();
+            int currentIndex = m_component->getValue();
+            int value = currentIndex + tag;
+            if (value < 0) value = std::max<int>(m_component->getItems().size() - 1, 0);
+            if (value >= m_component->getItems().size()) value = 0;
             m_component->setValue(value);
-            updateLabel();
-        }
-
-        void left(CCObject* sender) {
-            int value = m_component->getValue() == 0 ? m_component->getItems().size() - 1 : m_component->getValue() - 1;
-            m_component->setValue(value);
+            m_component->triggerCallback(value);
             updateLabel();
         }
 
         bool init(float width) override {
             if (!CCMenu::init()) return false;
 
-            this->setID(fmt::format("toggle-{}"_spr, m_component->getId()));
+            this->setID(fmt::format("combo-{}"_spr, m_component->getId()));
             this->setContentSize({ width, 28.f });
 
             auto labelSize = (width * 0.6f) - 35.f;
@@ -61,14 +65,21 @@ namespace eclipse::gui::cocos {
 
             auto spr = cocos2d::CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
             spr->setScale(0.6f);
-            auto arrowBtn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(ComboComponentNode::right));
+            auto arrowBtn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(ComboComponentNode::scroll));
+            arrowBtn->setTag(1);
             this->addChildAtPosition(arrowBtn, geode::Anchor::Right, { -25.f, 0.f });
 
-            auto arrowBtn2 = CCMenuItemSpriteExtra::create(spr, this, menu_selector(ComboComponentNode::left));
+            auto arrowBtn2 = CCMenuItemSpriteExtra::create(spr, this, menu_selector(ComboComponentNode::scroll));
             arrowBtn2->setRotation(180.f);
+            arrowBtn2->setTag(-1);
             this->addChildAtPosition(arrowBtn2, geode::Anchor::Right, { -115.f, 0.f });
 
-            m_valueLabel = cocos2d::CCLabelBMFont::create(m_component->getItems().at(m_component->getValue()).c_str(), "bigFont.fnt");
+            int index = m_component->getValue();
+            if (index < 0 || index >= m_component->getItems().size()) {
+                m_valueLabel = FallbackBMFont::create("");
+            } else {
+                m_valueLabel = FallbackBMFont::create(m_component->getItems().at(m_component->getValue()));
+            }
             m_background->addChildAtPosition(m_valueLabel, geode::Anchor::Center, { 0.f, 0.f });
             updateLabel();
 
