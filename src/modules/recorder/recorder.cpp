@@ -6,10 +6,23 @@
 #include <thread>
 #include <memory>
 #include <utility>
-
+#include <modules/utils/SingletonCache.hpp>
 #include <modules/recorder/DSPRecorder.hpp>
 
 namespace eclipse::recorder {
+
+    class ProjectionDelegate : public cocos2d::CCDirectorDelegate {
+        virtual void updateProjection() override {
+            kmGLMatrixMode(KM_GL_PROJECTION);
+            kmGLLoadIdentity();
+            kmMat4 orthoMatrix;
+            auto size = utils::get<cocos2d::CCDirector>()->m_obWinSizeInPoints;
+            kmMat4OrthographicProjection(&orthoMatrix, 0, size.width, size.height, 0, -1024, 1024 );
+            kmGLMultMatrix(&orthoMatrix);
+            kmGLMatrixMode(KM_GL_MODELVIEW);
+            kmGLLoadIdentity();
+        }
+    };
 
     void Recorder::start() {
         m_currentFrame.resize(m_renderSettings.m_width * m_renderSettings.m_height * 4, 0);
@@ -20,6 +33,8 @@ namespace eclipse::recorder {
         m_recording = true;
         m_frameHasData = false;
 
+        utils::get<cocos2d::CCDirector>()->setDelegate(new ProjectionDelegate());
+
         std::thread(&Recorder::recordThread, this).detach();
     }
 
@@ -27,6 +42,9 @@ namespace eclipse::recorder {
         m_recording = false;
 
         m_renderTexture.end();
+
+        delete utils::get<cocos2d::CCDirector>()->m_pProjectionDelegate;
+        utils::get<cocos2d::CCDirector>()->setProjection(cocos2d::ccDirectorProjection::kCCDirectorProjection2D);
     }
 
     void Recorder::captureFrame() {

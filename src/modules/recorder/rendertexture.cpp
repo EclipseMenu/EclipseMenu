@@ -48,7 +48,9 @@ namespace eclipse::recorder {
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_old_fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
+        director->setProjection(cocos2d::kCCDirectorProjectionCustom);
         utils::get<PlayLayer>()->visit();
+        director->setProjection(cocos2d::kCCDirectorProjection2D);
 
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
         lock.lock();

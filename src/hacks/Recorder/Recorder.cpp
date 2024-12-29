@@ -106,6 +106,7 @@ namespace eclipse::hacks::Recorder {
         s_recorder.m_renderSettings.m_outputFile = renderDirectory / (fmt::format("{} - {}.mp4", trimmedLevelName, lvl->m_levelID.value()));
         s_recorder.m_renderSettings.m_hardwareAccelerationType = static_cast<ffmpeg::HardwareAccelerationType>(config::get<int>("recorder.hwType", 0));
         s_recorder.m_renderSettings.m_colorspaceFilters = config::get<std::string>("recorder.colorspace", "");
+        s_recorder.m_renderSettings.m_doVerticalFlip = false;
 
         auto view = utils::get<cocos2d::CCEGLView>();
 
@@ -253,6 +254,20 @@ namespace eclipse::hacks::Recorder {
     };
 
     REGISTER_HACK(InternalRecorder)
+
+    bool inShaderLayer = false;
+
+    class $modify(InternalRecorderSLHook, ShaderLayer) {
+        void visit() {
+            if(s_recorder.isRecording()) {
+                setScaleY(-1);
+                ShaderLayer::visit();
+                return setScaleY(1);
+            }
+
+            ShaderLayer::visit();
+        }
+    };
 
     class $modify(InternalRecorderSchedulerHook, cocos2d::CCScheduler) {
         ENABLE_SAFE_HOOKS_ALL()
