@@ -56,7 +56,7 @@ namespace eclipse::recorder {
     void Recorder::recordThread() {
         ffmpeg::events::Recorder ffmpegRecorder;
 
-        geode::Result<void> res = ffmpegRecorder.init(m_renderSettings);
+        geode::Result<> res = ffmpegRecorder.init(m_renderSettings);
 
         if(m_callback)
             m_callback(res);
@@ -97,8 +97,7 @@ namespace eclipse::recorder {
 
         std::filesystem::path tempPath = m_renderSettings.m_outputFile.parent_path() / "music.mp4";
 
-        ffmpeg::events::AudioMixer audioMixer;
-        audioMixer.mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath);
+        ffmpeg::events::AudioMixer::mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath);
 
         std::filesystem::remove(m_renderSettings.m_outputFile);
         std::filesystem::rename(tempPath,m_renderSettings.m_outputFile);

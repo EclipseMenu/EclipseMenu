@@ -35,7 +35,7 @@ namespace eclipse::hacks::Recorder {
     cocos2d::CCSize originalScreenScale;
     cocos2d::CCSize newScreenScale;
 
-    void callback(geode::Result<void> res) {
+    void callback(geode::Result<> res) {
         if(res.isOk()) return;
         Popup::create("Error", res.unwrapErr());
     }

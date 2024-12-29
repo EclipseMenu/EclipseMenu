@@ -22,7 +22,7 @@ namespace eclipse::recorder {
         bool isRecording() const { return m_recording; }
         bool isRecordingAudio() const { return m_recordingAudio; }
 
-        void setCallback(const std::function<void(geode::Result<void>)>& callback) { m_callback = callback; }
+        void setCallback(const std::function<void(geode::Result<>)>& callback) { m_callback = callback; }
 
         std::vector<std::string> getAvailableCodecs();
     
@@ -40,6 +40,6 @@ namespace eclipse::recorder {
         std::mutex m_lock;
         RenderTexture m_renderTexture;
 
-        std::function<void(geode::Result<void>)> m_callback;
+        std::function<void(geode::Result<>)> m_callback;
     };
 };
