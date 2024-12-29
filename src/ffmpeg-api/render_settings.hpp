@@ -313,6 +313,7 @@ struct RenderSettings {
     PixelFormat m_pixelFormat = PixelFormat::RGB0;
     std::string m_codec = "h264";
     std::string m_colorspaceFilters = "";
+    bool m_doVerticalFlip = true;
     int64_t m_bitrate = 30000000;
     uint32_t m_width = 1920;
     uint32_t m_height = 1080;

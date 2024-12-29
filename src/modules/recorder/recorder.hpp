@@ -22,6 +22,8 @@ namespace eclipse::recorder {
         bool isRecording() const { return m_recording; }
         bool isRecordingAudio() const { return m_recordingAudio; }
 
+        void setCallback(const std::function<void(geode::Result<void>)>& callback) { m_callback = callback; }
+
         std::vector<std::string> getAvailableCodecs();
     
     public:
@@ -37,5 +39,7 @@ namespace eclipse::recorder {
         std::vector<uint8_t> m_currentFrame;
         std::mutex m_lock;
         RenderTexture m_renderTexture;
+
+        std::function<void(geode::Result<void>)> m_callback;
     };
 };

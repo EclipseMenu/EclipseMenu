@@ -48,9 +48,7 @@ namespace eclipse::recorder {
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_old_fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-        utils::get<PlayLayer>()->setScaleY(-1);
         utils::get<PlayLayer>()->visit();
-        utils::get<PlayLayer>()->setScaleY(1);
 
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
         lock.lock();

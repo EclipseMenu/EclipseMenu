@@ -21,8 +21,6 @@ namespace eclipse::hacks::Recorder {
 
     static recorder::Recorder s_recorder;
 
-    bool visiting = false;
-    bool inShaderLayer = false;
     bool levelDone = false;
     bool popupShown = false;
 
@@ -36,6 +34,11 @@ namespace eclipse::hacks::Recorder {
     cocos2d::CCSize newDesignResolution;
     cocos2d::CCSize originalScreenScale;
     cocos2d::CCSize newScreenScale;
+
+    void callback(geode::Result<void> res) {
+        if(res.isOk()) return;
+        Popup::create("Error", res.unwrapErr());
+    }
 
     void endPopup() {
         Popup::create(
@@ -77,7 +80,6 @@ namespace eclipse::hacks::Recorder {
     void start() {
         if (!utils::get<PlayLayer>()) return;
 
-        visiting = false;
         levelDone = false;
         popupShown = false;
         totalTime = 0.f;
@@ -116,6 +118,8 @@ namespace eclipse::hacks::Recorder {
 
         if(oldDesignResolution != newDesignResolution)
             applyWinSize();
+
+        s_recorder.setCallback(callback);
 
         s_recorder.start();
     }
@@ -250,14 +254,6 @@ namespace eclipse::hacks::Recorder {
 
     REGISTER_HACK(InternalRecorder)
 
-    class $modify(InternalRecorderSLHook, ShaderLayer) {
-        void visit() {
-            inShaderLayer = true;
-            ShaderLayer::visit();
-            inShaderLayer = false;
-        }
-    };
-
     class $modify(InternalRecorderSchedulerHook, cocos2d::CCScheduler) {
         ENABLE_SAFE_HOOKS_ALL()
 
@@ -369,9 +365,7 @@ namespace eclipse::hacks::Recorder {
 
                 syncMusic();
 
-                visiting = true;
                 s_recorder.captureFrame();
-                visiting = false;
             }
 
             GJBaseGameLayer::update(dt);

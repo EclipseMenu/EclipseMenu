@@ -38,17 +38,29 @@ namespace eclipse::recorder {
     void Recorder::recordThread() {
         ffmpeg::events::Recorder ffmpegRecorder;
 
-        ffmpegRecorder.init(m_renderSettings);
+        geode::Result<void> res = ffmpegRecorder.init(m_renderSettings);
+
+        if(m_callback)
+            m_callback(res);
+
+        if(res.isErr()) {
+            stop();
+            ffmpegRecorder.stop();
+            return;
+        }
 
         while (m_recording || m_frameHasData) {
-            m_lock.lock();
-
             if (m_frameHasData) {
+                m_lock.lock();
                 m_frameHasData = false;
-                ffmpegRecorder.writeFrame(m_currentFrame);
+
+                res = ffmpegRecorder.writeFrame(m_currentFrame);
+
+                if(m_callback)
+                    m_callback(res);
+                    
                 m_lock.unlock();
             }
-            else m_lock.unlock();
         }
 
         ffmpegRecorder.stop();
