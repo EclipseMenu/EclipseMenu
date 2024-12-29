@@ -311,7 +311,7 @@ enum class HardwareAccelerationType : int {
 struct RenderSettings {
     HardwareAccelerationType m_hardwareAccelerationType = HardwareAccelerationType::NONE;
     PixelFormat m_pixelFormat = PixelFormat::RGB0;
-    std::string m_codec = "h264";
+    std::string m_codec;
     std::string m_colorspaceFilters = "";
     bool m_doVerticalFlip = true;
     int64_t m_bitrate = 30000000;

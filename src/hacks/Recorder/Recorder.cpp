@@ -102,7 +102,7 @@ namespace eclipse::hacks::Recorder {
         s_recorder.m_renderSettings.m_fps = static_cast<int>(config::get<float>("recorder.fps", 60.f));
         s_recorder.m_renderSettings.m_width = config::get<int>("recorder.resolution.x", 1920);
         s_recorder.m_renderSettings.m_height = config::get<int>("recorder.resolution.y", 1080);
-        s_recorder.m_renderSettings.m_codec = config::get<std::string>("recorder.codecString", "h264");
+        s_recorder.m_renderSettings.m_codec = config::get<std::string>("recorder.codecString", "libx264");
         s_recorder.m_renderSettings.m_outputFile = renderDirectory / (fmt::format("{} - {}.mp4", trimmedLevelName, lvl->m_levelID.value()));
         s_recorder.m_renderSettings.m_hardwareAccelerationType = static_cast<ffmpeg::HardwareAccelerationType>(config::get<int>("recorder.hwType", 0));
         s_recorder.m_renderSettings.m_colorspaceFilters = config::get<std::string>("recorder.colorspace", "");
@@ -194,7 +194,7 @@ namespace eclipse::hacks::Recorder {
 
             std::ranges::sort(m_codecs);
 
-            int codecIdx = static_cast<int>(std::distance(m_codecs.begin(), std::ranges::find(m_codecs, "h264")));
+            int codecIdx = static_cast<int>(std::distance(m_codecs.begin(), std::ranges::find(m_codecs, "libx264")));
 
             tab->addInputFloat("recorder.framerate", "recorder.fps", 1.f, 360.f, "%.0f FPS");
             tab->addInputFloat("recorder.endscreen-duration", "recorder.endscreen", 0.f, 30.f, "%.2fs.");
@@ -234,7 +234,7 @@ namespace eclipse::hacks::Recorder {
             
             tab->addLabel("recorder.presets");
             tab->addButton("recorder.preset.cpu")->callback([] {
-                config::set<std::string>("recorder.codecString", "h264");
+                config::set<std::string>("recorder.codecString", "libx264");
             });
 
             tab->addButton("recorder.preset.nvidia")->callback([] {
@@ -254,8 +254,6 @@ namespace eclipse::hacks::Recorder {
     };
 
     REGISTER_HACK(InternalRecorder)
-
-    bool inShaderLayer = false;
 
     class $modify(InternalRecorderSLHook, ShaderLayer) {
         void visit() {
