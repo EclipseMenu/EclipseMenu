@@ -34,8 +34,7 @@ namespace eclipse::recorder {
         m_recording = true;
         m_frameHasData = false;
 
-        utils::get<cocos2d::CCDirector>()->setDelegate(new ProjectionDelegate());
-
+        utils::get<cocos2d::CCDirector>()->m_pProjectionDelegate = new ProjectionDelegate();
         std::thread(&Recorder::recordThread, this).detach();
     }
 
