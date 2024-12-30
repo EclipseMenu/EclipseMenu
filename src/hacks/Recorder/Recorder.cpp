@@ -9,6 +9,7 @@
 #include <Geode/modify/CCScheduler.hpp>
 
 #include <regex>
+#include <modules/recorder/DSPRecorder.hpp>
 
 // android uses custom gd::string class
 #ifdef GEODE_IS_ANDROID
@@ -129,41 +130,6 @@ namespace eclipse::hacks::Recorder {
         s_recorder.stop();
     }
 
-    void startAudio() {
-        stop();
-
-        utils::get<FMODAudioEngine>()->stopAllEffects();
-
-        auto lvl = utils::get<PlayLayer>()->m_level;
-        std::string trimmedLevelName = lvl->m_levelName;
-        std::erase(trimmedLevelName, '/');
-        std::erase(trimmedLevelName, '\\');
-        trimmedLevelName = std::regex_replace(trimmedLevelName, std::regex("\\s+"), " ");
-        auto renderPath = geode::Mod::get()->getSaveDir() / "renders" / STR(trimmedLevelName) / (fmt::format("{} - {}.mp4", trimmedLevelName, lvl->m_levelID.value()));
-
-        if (!std::filesystem::exists(renderPath)) {
-            geode::log::error("Render {} not found", renderPath);
-            return;
-        }
-
-        levelDone = false;
-        popupShown = false;
-        afterEndTimer = 0.f;
-
-        if (auto ell = utils::get<PlayLayer>()->getChildByType<EndLevelLayer>(0))
-            ell->removeFromParent();
-
-        utils::get<PlayLayer>()->stopAllActions();
-        utils::get<PlayLayer>()->startGame();
-        utils::get<PlayLayer>()->resetLevelFromStart();
-
-        s_recorder.startAudio(renderPath);
-    }
-
-    void stopAudio() {
-        s_recorder.stopAudio();
-    }
-
     class InternalRecorder : public hack::Hack {
         void init() override {}
 
@@ -179,8 +145,6 @@ namespace eclipse::hacks::Recorder {
             tab->addButton("recorder.stop")->callback([] {
                 if (s_recorder.isRecording())
                     stop();
-                if (s_recorder.isRecordingAudio())
-                    stopAudio();
             });
 
             config::setIfEmpty("recorder.fps", 60.f);
@@ -188,7 +152,6 @@ namespace eclipse::hacks::Recorder {
             config::setIfEmpty("recorder.bitrate", 30.f);
             config::setIfEmpty("recorder.resolution.x", 1920.f);
             config::setIfEmpty("recorder.resolution.y", 1080.f);
-            config::setIfEmpty("recorder.audio", 2);
             config::setIfEmpty("recorder.hwType", 0);
             config::setIfEmpty("recorder.colorspace", "");
 
@@ -225,12 +188,6 @@ namespace eclipse::hacks::Recorder {
             //             break;
             //     }
             // });
-
-            tab->addCombo("recorder.audio-mode", "recorder.audio", {
-                i18n::get_("recorder.audio-mode.disable"),
-                i18n::get_("recorder.audio-mode.ask"),
-                i18n::get_("recorder.audio-mode.always")
-            }, 0);
 
             tab->addInputText("recorder.colorspace-args", "recorder.colorspace");
             
@@ -293,71 +250,16 @@ namespace eclipse::hacks::Recorder {
     };
 
     class $modify(InternalRecorderBGLHook, GJBaseGameLayer) {
-        void syncMusic() {
-            //temp hardcoded
-            uint32_t tps = 240;
-
-            float songTime = (static_cast<float>(m_gameState.m_currentProgress) / tps) * 1000.f;
-            songTime += m_levelSettings->m_songOffset * 1000.f;
-
-            FMOD::Channel* audioChannel;
-
-            for (int i = 0; i < 2; i++) {
-                utils::get<FMODAudioEngine>()->m_system->getChannel(126 + i, &audioChannel);
-                if (audioChannel) {
-                    uint32_t channelTime = 0;
-                    audioChannel->getPosition(&channelTime, FMOD_TIMEUNIT_MS);
-
-                    if (channelTime <= 0)
-                        continue;
-
-                    if (channelTime - songTime > 0.25f || channelTime - songTime < -0.25f)
-                        audioChannel->setPosition(songTime, FMOD_TIMEUNIT_MS);
-                }
-            }
-        }
-
         void update(float dt) {
-            if ((!s_recorder.isRecording() && !s_recorder.isRecordingAudio()) || m_gameState.m_currentProgress <= 0) return GJBaseGameLayer::update(dt);
+            if (!s_recorder.isRecording() || m_gameState.m_currentProgress <= 0) return GJBaseGameLayer::update(dt);
 
             float endscreen = config::get<float>("recorder.endscreen", 5.f);
 
             if (levelDone) {
-                if (afterEndTimer > endscreen) {
-                    if (s_recorder.isRecording() && !popupShown) {
-                        switch(config::get<int>("recorder.audio", 2)) {
-                            case 1:
-                                popupShown = true;
-                                Popup::create(
-                                    i18n::get_("recorder.audio"),
-                                    i18n::get_("recorder.audio.msg"),
-                                    i18n::get_("common.yes"),
-                                    i18n::get_("common.no"),
-                                    [&](bool result) {
-                                        if(result) {
-                                            startAudio();
-                                            return;
-                                        }
-                                        stop();
-                                        endPopup();
-                                    }
-                                );
-                                break;
-                            case 2:
-                                startAudio();
-                                break;
-                            default:
-                            case 0:
-                                stop();
-                                endPopup();
-                                break;
-                        }
-                    }
-                    else if (s_recorder.isRecordingAudio()) {
-                        stopAudio();
-                        endPopup();
-                    }
-                    
+                if (afterEndTimer > endscreen && s_recorder.isRecording() && !popupShown) {
+                    popupShown = true;
+                    stop();
+                    endPopup();
                     return GJBaseGameLayer::update(dt);
                 }
                 afterEndTimer += dt;
@@ -374,11 +276,11 @@ namespace eclipse::hacks::Recorder {
             double frameDt = 1. / static_cast<double>(fps) * timewarp;
             double time = totalTime + extraTime - lastFrameTime;
 
+            DSPRecorder::get()->tryUnpause(totalTime);
+
             if (time >= frameDt) {
                 extraTime = time - frameDt;
                 lastFrameTime = totalTime;
-
-                syncMusic();
 
                 s_recorder.captureFrame();
             }
@@ -390,7 +292,6 @@ namespace eclipse::hacks::Recorder {
     class $modify(InternalRecorderPLHook, PlayLayer) {
         void onQuit() {
             if (s_recorder.isRecording()) stop();
-            if (s_recorder.isRecordingAudio()) stopAudio();
             PlayLayer::onQuit();
         }
 
@@ -403,13 +304,6 @@ namespace eclipse::hacks::Recorder {
             levelDone = false;
             popupShown = false;
             PlayLayer::resetLevel();
-        }
-
-        void pauseGame(bool paused) {
-            if (s_recorder.isRecordingAudio())
-                return;
-
-            PlayLayer::pauseGame(paused);
         }
     };
 

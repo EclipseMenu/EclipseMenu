@@ -14,13 +14,9 @@ namespace eclipse::recorder {
         void start();
         void stop();
 
-        void startAudio(const std::filesystem::path& renderPath);
-        void stopAudio();
-
         void captureFrame();
 
         bool isRecording() const { return m_recording; }
-        bool isRecordingAudio() const { return m_recordingAudio; }
 
         void setCallback(const std::function<void(std::string const&)>& callback) { m_callback = callback; }
 
@@ -34,7 +30,6 @@ namespace eclipse::recorder {
 
     private:
         bool m_recording = false;
-        bool m_recordingAudio = false;
         bool m_frameHasData = false;
         std::vector<uint8_t> m_currentFrame;
         std::mutex m_lock;

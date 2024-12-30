@@ -243,7 +243,7 @@ namespace eclipse::hacks::Bot {
             if (s_bot.getState() != bot::State::RECORD)
                 return;
 
-            bool realPlayer1 = !m_levelSettings->m_twoPlayerMode || player1 || !m_gameState.m_isDualMode;
+            bool realPlayer1 = m_levelSettings->m_twoPlayerMode ? player1 : player1 || !m_gameState.m_isDualMode;
 
             s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !realPlayer1, down);
         }

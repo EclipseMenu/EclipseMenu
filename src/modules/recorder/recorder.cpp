@@ -34,6 +34,8 @@ namespace eclipse::recorder {
         m_recording = true;
         m_frameHasData = false;
 
+        DSPRecorder::get()->start();
+
         utils::get<cocos2d::CCDirector>()->m_pProjectionDelegate = new ProjectionDelegate();
         std::thread(&Recorder::recordThread, this).detach();
     }
@@ -85,22 +87,15 @@ namespace eclipse::recorder {
         }
 
         ffmpegRecorder.stop();
-    }
 
-    void Recorder::startAudio(const std::filesystem::path& renderPath) {
-        DSPRecorder::get()->useLocking(false);
-        DSPRecorder::get()->start();
-        m_recordingAudio = true;
-    }
-
-    void Recorder::stopAudio() {
         DSPRecorder::get()->stop();
         auto data = DSPRecorder::get()->getData();
-        m_recordingAudio = false;
 
         std::filesystem::path tempPath = m_renderSettings.m_outputFile.parent_path() / "music.mp4";
 
-        (void) ffmpeg::AudioMixer::mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath);
+        res = ffmpeg::AudioMixer::mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath);
+        if(res.isErr())
+            m_callback(res.unwrapErr());
 
         std::filesystem::remove(m_renderSettings.m_outputFile);
         std::filesystem::rename(tempPath,m_renderSettings.m_outputFile);
