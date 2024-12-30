@@ -140,7 +140,16 @@ namespace eclipse::hacks::Bot {
 
     class Bot : public hack::Hack {
         void init() override {
-            const auto updateBotState = [](int state) { s_bot.setState(static_cast<bot::State>(state)); };
+            const auto updateBotState = [](int state) {
+                static bool wasTps = eclipse::config::get<bool>("global.tpsbypass.toggle", true);
+                if(s_bot.getState() == bot::State::DISABLED)
+                    wasTps = eclipse::config::get<bool>("global.tpsbypass.toggle", true);
+
+                s_bot.setState(static_cast<bot::State>(state));
+
+                if(state == 0)
+                    eclipse::config::set("global.tpsbypass.toggle", wasTps);
+            };
 
             config::setIfEmpty("bot.state", 0);
             updateBotState(config::get<int>("bot.state", 0));
@@ -182,8 +191,12 @@ namespace eclipse::hacks::Bot {
             PlayLayer::resetLevel();
 
             static Mod* cbfMod = geode::Loader::get()->getLoadedMod("syzzi.click_between_frames");
-            if (s_bot.getState() != bot::State::DISABLED && cbfMod)
-                cbfMod->setSettingValue<bool>("soft-toggle", true);
+            if (s_bot.getState() != bot::State::DISABLED) {
+                if(cbfMod)
+                    cbfMod->setSettingValue<bool>("soft-toggle", true);
+
+                eclipse::config::set<bool>("global.tpsbypass.toggle", true);
+            }
 
             if (s_bot.getState() == bot::State::RECORD) {
                 //gd does this automatically for holding but not releases so we do it manually

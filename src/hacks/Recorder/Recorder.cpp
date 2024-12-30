@@ -28,8 +28,8 @@ namespace eclipse::hacks::Recorder {
     float totalTime = 0.f;
     float afterEndTimer = 0.f;
 
-    double extraTime = 0.;
-    double lastFrameTime = 0.;
+    float extraTime = 0.f;
+    float lastFrameTime = 0.f;
 
     cocos2d::CCSize oldDesignResolution;
     cocos2d::CCSize newDesignResolution;
@@ -86,8 +86,8 @@ namespace eclipse::hacks::Recorder {
         levelDone = false;
         popupShown = false;
         totalTime = 0.f;
-        extraTime = 0.;
-        lastFrameTime = 0.;
+        extraTime = 0.f;
+        lastFrameTime = 0.f;
         afterEndTimer = 0.f;
 
         GJGameLevel* lvl = utils::get<PlayLayer>()->m_level;
@@ -250,10 +250,15 @@ namespace eclipse::hacks::Recorder {
     };
 
     class $modify(InternalRecorderBGLHook, GJBaseGameLayer) {
+        static void onModify(auto& self) {
+            SAFE_SET_PRIO("GJBaseGameLayer::update", SAFE_HOOK_PRIORITY + 1);
+        }
+
         void update(float dt) {
             if (!s_recorder.isRecording() || m_gameState.m_currentProgress <= 0) return GJBaseGameLayer::update(dt);
 
             float endscreen = config::get<float>("recorder.endscreen", 5.f);
+            eclipse::config::set<bool>("global.tpsbypass.toggle", true);
 
             if (levelDone) {
                 if (afterEndTimer > endscreen && s_recorder.isRecording() && !popupShown) {
@@ -273,8 +278,8 @@ namespace eclipse::hacks::Recorder {
 
             totalTime += dt;
 
-            double frameDt = 1. / static_cast<double>(fps) * timewarp;
-            double time = totalTime + extraTime - lastFrameTime;
+            float frameDt = 1. / fps * timewarp;
+            float time = totalTime + extraTime - lastFrameTime;
 
             DSPRecorder::get()->tryUnpause(totalTime);
 

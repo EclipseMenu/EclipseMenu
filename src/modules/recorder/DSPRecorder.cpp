@@ -8,6 +8,7 @@ FMOD_RESULT setSoftwareFormat(FMOD::System* system, int samplerate, FMOD_SPEAKER
     float tps = eclipse::config::get<bool>("global.tpsbypass.toggle", false) ? eclipse::config::get<float>("global.tpsbypass", 240.f) : 240.f;
     if(recreating)
         samplerate *= tps / eclipse::config::get<float>("recorder.fps", 60.f);
+
     return system->setSoftwareFormat(samplerate, speakermode, numrawspeakers);
 }
 
@@ -91,7 +92,7 @@ void DSPRecorder::init() {
 
     system->createDSP(&desc, &m_dsp);
     system->getMasterChannelGroup(&m_masterGroup);
-    m_masterGroup->setPitch(tps / eclipse::config::get<float>("recorder.fps", 60.f) * 1.5f);
+    m_masterGroup->setPitch(tps / eclipse::config::get<float>("recorder.fps", 60.f) * 2.f);
 }
 
 void DSPRecorder::tryUnpause(float time) {
@@ -102,7 +103,7 @@ void DSPRecorder::tryUnpause(float time) {
 
     float fps = eclipse::config::get<float>("recorder.fps", 60.f);
     float tps = eclipse::config::get<bool>("global.tpsbypass.toggle", false) ? eclipse::config::get<float>("global.tpsbypass", 240.f) : 240.f;
-    float mult = tps / fps * 1.5f;
+    float mult = tps / fps * 2.f;
 
     float songTime = (float)m_data.size() / ((float)sampleRate * (float)channels) * mult;
 
