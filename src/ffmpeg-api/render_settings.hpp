@@ -3,7 +3,17 @@
 #include <string>
 #include <filesystem>
 
-namespace ffmpeg {
+#define FFMPEG_API_VERSION 2
+
+#define BEGIN_FFMPEG_NAMESPACE namespace ffmpeg {
+#define FFMPEG_API_VERSION_NS GEODE_CONCAT(v, FFMPEG_API_VERSION)
+#define BEGIN_FFMPEG_NAMESPACE_V \
+BEGIN_FFMPEG_NAMESPACE \
+inline namespace FFMPEG_API_VERSION_NS {
+#define END_FFMPEG_NAMESPACE }
+#define END_FFMPEG_NAMESPACE_V }}
+
+BEGIN_FFMPEG_NAMESPACE_V
 
 enum class PixelFormat : int {
     NONE = -1,
@@ -55,7 +65,7 @@ enum class PixelFormat : int {
     BGR565LE,
     BGR555BE,
     BGR555LE,
-    
+
     VAAPI,
 
     YUV420P16LE,
@@ -77,7 +87,7 @@ enum class PixelFormat : int {
 
     BGR48BE,
     BGR48LE,
-    
+
     YUV420P9BE,
     YUV420P9LE,
     YUV420P10BE,
@@ -140,13 +150,13 @@ enum class PixelFormat : int {
     GBRAP,
     GBRAP16BE,
     GBRAP16LE,
-    
+
     QSV,
-    
+
     MMAL,
 
     D3D11VA_VLD,
-    
+
     CUDA,
 
     _0RGB,
@@ -212,7 +222,7 @@ enum class PixelFormat : int {
 
     P016LE,
     P016BE,
-    
+
     D3D11,
 
     GRAY9BE,
@@ -222,9 +232,9 @@ enum class PixelFormat : int {
     GBRPF32LE,
     GBRAPF32BE,
     GBRAPF32LE,
-    
+
     DRM_PRIME,
-    
+
     OPENCL,
 
     GRAY14BE,
@@ -240,7 +250,7 @@ enum class PixelFormat : int {
 
     NV24,
     NV42,
-    
+
     VULKAN,
 
     Y210BE,
@@ -291,12 +301,12 @@ enum class PixelFormat : int {
     P212BE,
     P212LE,
 
-    P412BE, 
+    P412BE,
     P412LE,
 
     GBRAP14BE,
     GBRAP14LE,
-    
+
     D3D12,
 
     NB
@@ -321,4 +331,4 @@ struct RenderSettings {
     std::filesystem::path m_outputFile;
 };
 
-}
+END_FFMPEG_NAMESPACE_V

@@ -35,9 +35,11 @@ namespace eclipse::hacks::Recorder {
     cocos2d::CCSize originalScreenScale;
     cocos2d::CCSize newScreenScale;
 
-    void callback(geode::Result<> res) {
-        if(res.isOk()) return;
-        Popup::create("Error", res.unwrapErr());
+    void callback(std::string const& error) {
+        Popup::create(
+            i18n::get_("common.error"),
+            error
+        );
     }
 
     void endPopup() {
@@ -90,8 +92,8 @@ namespace eclipse::hacks::Recorder {
         GJGameLevel* lvl = utils::get<PlayLayer>()->m_level;
 
         std::string trimmedLevelName = lvl->m_levelName;
-        trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '/'), trimmedLevelName.end());
-        trimmedLevelName.erase(std::remove(trimmedLevelName.begin(), trimmedLevelName.end(), '\\'), trimmedLevelName.end());
+        std::erase(trimmedLevelName, '/');
+        std::erase(trimmedLevelName, '\\');
         trimmedLevelName = std::regex_replace(trimmedLevelName, std::regex("\\s+"), " ");
         std::filesystem::path renderDirectory = geode::Mod::get()->getSaveDir() / "renders" / STR(trimmedLevelName);
 
@@ -119,8 +121,6 @@ namespace eclipse::hacks::Recorder {
 
         if(oldDesignResolution != newDesignResolution)
             applyWinSize();
-
-        s_recorder.setCallback(callback);
 
         s_recorder.start();
     }
@@ -170,7 +170,9 @@ namespace eclipse::hacks::Recorder {
         void lateInit() override {
             auto ffmpeg = geode::Loader::get()->getLoadedMod("eclipse.ffmpeg-api");
             if (!ffmpeg) return;
-            
+
+            s_recorder.setCallback(callback);
+
             auto tab = gui::MenuTab::find("tab.recorder");
 
             tab->addButton("recorder.start")->callback(start);
@@ -190,7 +192,7 @@ namespace eclipse::hacks::Recorder {
             config::setIfEmpty("recorder.hwType", 0);
             config::setIfEmpty("recorder.colorspace", "");
 
-            m_codecs = s_recorder.getAvailableCodecs();
+            m_codecs = recorder::Recorder::getAvailableCodecs();
 
             std::ranges::sort(m_codecs);
 

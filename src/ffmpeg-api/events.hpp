@@ -53,24 +53,17 @@ namespace impl {
         void* m_ptr;
     };
 
-    class WriteFrameRecorderEvent : public geode::Event {
+    struct Dummy {};
+
+    class GetWriteFrameFunctionEvent : public geode::Event {
     public:
-        WriteFrameRecorderEvent(void* ptr, const std::vector<uint8_t>& frameData) {
-            m_ptr = ptr;
-            m_frameData = &frameData;
-        }
+        using writeFrame_t = geode::Result<>(Dummy::*)(std::vector<uint8_t> const&);
+        GetWriteFrameFunctionEvent() = default;
 
-        void setResult(geode::Result<>&& result) {m_result = std::move(result);}
-        geode::Result<> getResult() {return m_result;}
-
-        void* getPtr() const {return m_ptr;}
-
-        const std::vector<uint8_t>& getFrameData() const {return *m_frameData;}
-
+        void setFunction(writeFrame_t function) {m_function = function;}
+        writeFrame_t getFunction() const {return m_function;}
     private:
-        const std::vector<uint8_t>* m_frameData;
-        void* m_ptr;
-        geode::Result<> m_result = DEFAULT_RESULT_ERROR;
+        writeFrame_t m_function;
     };
 
     class CodecRecorderEvent : public geode::Event {
@@ -134,7 +127,7 @@ public:
     Recorder() {
         impl::CreateRecorderEvent createEvent;
         createEvent.post();
-        m_ptr = createEvent.getPtr();
+        m_ptr = static_cast<impl::Dummy*>(createEvent.getPtr());
     }
 
     ~Recorder() {
@@ -150,9 +143,9 @@ public:
      * This function configures the recorder with the given render settings,
      * allocates necessary resources, and prepares for video encoding.
      *
-     * @param settings The rendering settings that define the output characteristics, 
+     * @param settings The rendering settings that define the output characteristics,
      *                 including codec, bitrate, resolution, and pixel format.
-     * 
+     *
      * @return true if initialization is successful, false otherwise.
      */
     geode::Result<> init(RenderSettings const& settings) {
@@ -173,28 +166,32 @@ public:
     /**
      * @brief Writes a single video frame to the output.
      *
-     * This function takes the frame data as a byte vector and encodes it 
-     * to the output file. The frame data must match the expected format and 
+     * This function takes the frame data as a byte vector and encodes it
+     * to the output file. The frame data must match the expected format and
      * dimensions defined during initialization.
      *
      * @param frameData A vector containing the raw frame data to be written.
-     * 
+     *
      * @return true if the frame is successfully written, false if there is an error.
-     * 
+     *
      * @warning Ensure that the frameData size matches the expected dimensions of the frame.
      */
     geode::Result<> writeFrame(const std::vector<uint8_t>& frameData) {
-        impl::WriteFrameRecorderEvent writeFrameEvent(m_ptr, frameData);
-        writeFrameEvent.post();
-        return writeFrameEvent.getResult();
+        static auto writeFrame = []{
+            impl::GetWriteFrameFunctionEvent event;
+            event.post();
+            return event.getFunction();
+        }();
+        if (!writeFrame) return geode::Err("Failed to call writeFrame function.");
+        return std::invoke(writeFrame, m_ptr, frameData);
     }
 
     /**
      * @brief Retrieves a list of available codecs for video encoding.
      *
-     * This function iterates through all available codecs in FFmpeg and 
+     * This function iterates through all available codecs in FFmpeg and
      * returns a sorted vector of codec names.
-     * 
+     *
      * @return A vector representing the names of available codecs.
      */
     static std::vector<std::string> getAvailableCodecs() {
@@ -203,7 +200,7 @@ public:
         return codecEvent.getCodecs();
     }
 private:
-    void* m_ptr = nullptr;
+    impl::Dummy* m_ptr = nullptr;
 };
 
 class AudioMixer {

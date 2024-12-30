@@ -10,6 +10,7 @@
 #include <modules/recorder/DSPRecorder.hpp>
 
 namespace eclipse::recorder {
+    namespace ffmpeg = ffmpeg::events;
 
     class ProjectionDelegate : public cocos2d::CCDirectorDelegate {
         virtual void updateProjection() override {
@@ -54,15 +55,18 @@ namespace eclipse::recorder {
     }
 
     void Recorder::recordThread() {
-        ffmpeg::events::Recorder ffmpegRecorder;
+        geode::utils::thread::setName("Eclipse Recorder Thread");
+        ffmpeg::Recorder ffmpegRecorder;
+        if (!ffmpegRecorder.isValid()) {
+            stop();
+            m_callback("Failed to initialize ffmpeg recorder.");
+            return;
+        }
 
-        geode::Result<> res = ffmpegRecorder.init(m_renderSettings);
-
-        if(m_callback)
-            m_callback(res);
-
+        auto res = ffmpegRecorder.init(m_renderSettings);
         if(res.isErr()) {
             stop();
+            m_callback(res.unwrapErr());
             ffmpegRecorder.stop();
             return;
         }
@@ -73,10 +77,10 @@ namespace eclipse::recorder {
                 m_frameHasData = false;
 
                 res = ffmpegRecorder.writeFrame(m_currentFrame);
+                if (res.isErr()) {
+                    m_callback(res.unwrapErr());
+                }
 
-                if(m_callback)
-                    m_callback(res);
-                    
                 m_lock.unlock();
             }
         }
@@ -97,14 +101,13 @@ namespace eclipse::recorder {
 
         std::filesystem::path tempPath = m_renderSettings.m_outputFile.parent_path() / "music.mp4";
 
-        ffmpeg::events::AudioMixer::mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath);
+        (void) ffmpeg::AudioMixer::mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath);
 
         std::filesystem::remove(m_renderSettings.m_outputFile);
         std::filesystem::rename(tempPath,m_renderSettings.m_outputFile);
     }
 
     std::vector<std::string> Recorder::getAvailableCodecs() {
-        ffmpeg::events::Recorder ffmpegRecorder;
-        return ffmpegRecorder.getAvailableCodecs();
+        return ffmpeg::Recorder::getAvailableCodecs();
     }
 }

@@ -22,9 +22,9 @@ namespace eclipse::recorder {
         bool isRecording() const { return m_recording; }
         bool isRecordingAudio() const { return m_recordingAudio; }
 
-        void setCallback(const std::function<void(geode::Result<>)>& callback) { m_callback = callback; }
+        void setCallback(const std::function<void(std::string const&)>& callback) { m_callback = callback; }
 
-        std::vector<std::string> getAvailableCodecs();
+        static std::vector<std::string> getAvailableCodecs();
     
     public:
         ffmpeg::RenderSettings m_renderSettings{};
@@ -33,13 +33,13 @@ namespace eclipse::recorder {
         void recordThread();
 
     private:
-        bool m_recording;
-        bool m_recordingAudio;
-        bool m_frameHasData;
+        bool m_recording = false;
+        bool m_recordingAudio = false;
+        bool m_frameHasData = false;
         std::vector<uint8_t> m_currentFrame;
         std::mutex m_lock;
-        RenderTexture m_renderTexture;
+        RenderTexture m_renderTexture{};
 
-        std::function<void(geode::Result<>)> m_callback;
+        std::function<void(std::string const&)> m_callback;
     };
 };
