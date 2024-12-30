@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseComponentNode.hpp"
-#include <modules/gui/cocos/popup/options-popup.hpp>
+
+#include <modules/gui/components/combo.hpp>
 
 namespace eclipse::gui::cocos {
     class ComboComponentNode : public BaseComponentNode<ComboComponentNode, cocos2d::CCMenu, ComboComponent, float> {

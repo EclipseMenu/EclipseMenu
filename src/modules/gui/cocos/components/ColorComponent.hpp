@@ -1,7 +1,8 @@
 #pragma once
 #include "BaseComponentNode.hpp"
-#include "Geode/ui/ColorPickPopup.hpp"
-#include <modules/gui/cocos/popup/options-popup.hpp>
+
+#include <Geode/ui/ColorPickPopup.hpp>
+#include <modules/gui/components/color.hpp>
 
 namespace eclipse::gui::cocos {
     class ColorComponentNode : public BaseComponentNode<ColorComponentNode, cocos2d::CCMenu, ColorComponent, float>, public geode::ColorPickPopupDelegate {

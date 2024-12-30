@@ -1,19 +1,16 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/CustomListView.hpp>
 #include <Geode/modify/LevelCell.hpp>
 
 namespace eclipse::hacks::Global {
-
     class CompactEditorLevels : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
-
-            tab->addToggle("global.compacteditorlevels")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("global.compacteditorlevels")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Compact Editor Levels"; }
@@ -22,9 +19,7 @@ namespace eclipse::hacks::Global {
     class CompactProfileComments : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
-            tab->addToggle("global.compactprofilecomments")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("global.compactprofilecomments")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Compact Profile Comments"; }
@@ -41,7 +36,9 @@ namespace eclipse::hacks::Global {
         and now it finds a new home in eclipsemenu
         -- raydeeux
         */
-        static CustomListView* create(cocos2d::CCArray* a, TableViewCellDelegate* b, float c, float d, int e, BoomListType f, float g) {
+        static CustomListView* create(
+            cocos2d::CCArray* a, TableViewCellDelegate* b, float c, float d, int e, BoomListType f, float g
+        ) {
             if (f == BoomListType::Level2 && config::get<bool>("global.compacteditorlevels", false))
                 f = BoomListType::Level4; // Level4 = compact level view
             else if (f == BoomListType::Comment4 && config::get<bool>("global.compactprofilecomments", false))

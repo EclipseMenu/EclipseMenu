@@ -1,19 +1,27 @@
 #include <Geode/loader/Setting.hpp>
-#include <Geode/modify/MenuLayer.hpp>
-#include <Geode/modify/UILayer.hpp>
 #include <Geode/modify/CCScheduler.hpp>
+#include <Geode/modify/MenuLayer.hpp>
 
+#include <imgui-cocos.hpp>
 #include <modules/config/config.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
-#include <modules/gui/blur/blur.hpp>
+
 #include <modules/gui/float-button.hpp>
-#include <modules/gui/theming/manager.hpp>
-#include <modules/debug/trace.hpp>
-#include <imgui-cocos.hpp>
+#include <modules/gui/blur/blur.hpp>
+
 #include <modules/gui/cocos/cocos.hpp>
-#include <modules/i18n/translations.hpp>
+#include <modules/gui/theming/manager.hpp>
+
 #include <modules/i18n/DownloadPopup.hpp>
+#include <modules/i18n/translations.hpp>
+
+#include <modules/gui/components/button.hpp>
+#include <modules/gui/components/color.hpp>
+#include <modules/gui/components/combo.hpp>
+#include <modules/gui/components/input-float.hpp>
+#include <modules/gui/components/input-text.hpp>
+#include <modules/gui/components/toggle.hpp>
 
 using namespace eclipse;
 
@@ -67,8 +75,8 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
 
     void onToggleRenderer(CCObject* sender) {
         auto type = gui::Engine::getRendererType() == gui::RendererType::ImGui
-            ? gui::RendererType::Cocos2d
-            : gui::RendererType::ImGui;
+                        ? gui::RendererType::Cocos2d
+                        : gui::RendererType::ImGui;
         gui::ThemeManager::get()->setRenderer(type);
     }
 };
@@ -143,39 +151,39 @@ $on_mod(Loaded) {
             });
         }
         tab->addInputFloat("interface.ui-scale", "uiScale", 0.75f, 2.f, "x%.3f")
-            ->callback([](float value) {
-                ThemeManager::get()->setUIScale(value);
-            })->disableSaving();
+           ->callback([](float value) {
+               ThemeManager::get()->setUIScale(value);
+           })->disableSaving();
 
         auto fontCombo = tab->addCombo("interface.font", "fontIndex", ThemeManager::getFontNames(), 0);
         fontCombo->callback([](int value) {
             ThemeManager::get()->setSelectedFont(value);
         })->disableSaving();
         tab->addInputFloat("interface.font-size", "fontSize", 10.f, 64.f)
-            ->callback([](float value) {
-                if (value >= 10.f) ThemeManager::get()->setFontSize(value);
-            })->disableSaving();
+           ->callback([](float value) {
+               if (value >= 10.f) ThemeManager::get()->setFontSize(value);
+           })->disableSaving();
         tab->addButton("interface.reload-fonts")->callback([fontCombo] {
             ImGuiCocos::get().reload();
             fontCombo->setItems(ThemeManager::getFontNames());
         });
 
         tab->addCombo("interface.layout-type", "layout", {"Tabbed", "Panel", "Sidebar"}, 0)
-            ->callback([](int value) {
-                ThemeManager::get()->setLayoutMode(static_cast<imgui::LayoutMode>(value));
-            })->disableSaving();
+           ->callback([](int value) {
+               ThemeManager::get()->setLayoutMode(static_cast<imgui::LayoutMode>(value));
+           })->disableSaving();
 
         tab->addCombo("interface.style", "style", imgui::THEME_NAMES, 0)
-            ->callback([](int value) {
-                ThemeManager::get()->setComponentTheme(static_cast<imgui::ComponentTheme>(value));
-            })->disableSaving();
+           ->callback([](int value) {
+               ThemeManager::get()->setComponentTheme(static_cast<imgui::ComponentTheme>(value));
+           })->disableSaving();
 
         auto blurToggle = tab->addToggle("interface.enable-blur", "blurEnabled")
-            ->callback([](bool value) { ThemeManager::get()->setBlurEnabled(value); });
+                             ->callback([](bool value) { ThemeManager::get()->setBlurEnabled(value); });
         blurToggle->addOptions([](auto opt) {
             opt->addInputFloat("interface.blur-speed", "blurSpeed", 0.f, 10.f, "%.3f s")
-                ->callback([](float value){ ThemeManager::get()->setBlurSpeed(value); })
-                ->disableSaving();
+               ->callback([](float value) { ThemeManager::get()->setBlurSpeed(value); })
+               ->disableSaving();
         });
         blurToggle->disableSaving();
 
@@ -189,7 +197,10 @@ $on_mod(Loaded) {
             ThemeManager::get()->applyBackgroundColor(color);
         })->disableSaving();
 
-        auto languageCombo = tab->addCombo("interface.language", "language.index", i18n::getAvailableLanguages(), i18n::getLanguageIndex());
+        auto languageCombo = tab->addCombo(
+            "interface.language", "language.index",
+            i18n::getAvailableLanguages(), i18n::getLanguageIndex()
+        );
         languageCombo->callback([languageCombo](int value) {
             if (Engine::getRendererType() == RendererType::Cocos2d) {
                 auto meta = i18n::fetchAvailableLanguages()[value];
@@ -226,7 +237,7 @@ $on_mod(Loaded) {
         searchInput->callback([](std::string input) {
             static bool hasSearched = false;
 
-            if (input.empty())  {
+            if (input.empty()) {
                 if (hasSearched) {
                     for (auto& tab : Engine::get()->getTabs()) {
                         tab->setSearchedFor(false);
@@ -247,9 +258,7 @@ $on_mod(Loaded) {
                         if (utils::matchesStringFuzzy(i18n::get(component->getTitle()), input)) {
                             component->setSearchedFor(true);
                             hasFoundComponent = true;
-                        }
-                        else
-                            component->setSearchedFor(false);
+                        } else component->setSearchedFor(false);
                     }
 
                     tab->setSearchedFor(hasFoundComponent);

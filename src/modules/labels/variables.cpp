@@ -1,23 +1,22 @@
 #include "variables.hpp"
+#include <utils.hpp>
 #include <modules/config/config.hpp>
 #include <modules/utils/SingletonCache.hpp>
-#include <utils.hpp>
 
-#include <Geode/binding/LevelEditorLayer.hpp>
+#include <Geode/Loader.hpp>
 #include <Geode/binding/GameManager.hpp>
 #include <Geode/binding/GJGameLevel.hpp>
+#include <Geode/binding/LevelEditorLayer.hpp>
 #include <Geode/binding/PlayerObject.hpp>
 #include <Geode/binding/PlayLayer.hpp>
 #include <Geode/loader/Mod.hpp>
-#include <Geode/Loader.hpp>
 
-#include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 #include <rift/config.hpp>
 
 namespace eclipse::labels {
-
     static std::vector<EffectGameObject*> s_coins;
 
     rift::Value getConfigValue(std::string key) {
@@ -25,16 +24,11 @@ namespace eclipse::labels {
             return {};
         }
         switch (config::getType(key)) {
-            case nlohmann::detail::value_t::string:
-                return config::get<std::string>(key).unwrap();
-            case nlohmann::detail::value_t::boolean:
-                return config::get<bool>(key).unwrap();
-            case nlohmann::detail::value_t::number_integer:
-                return config::get<int>(key).unwrap();
-            case nlohmann::detail::value_t::number_float:
-                return config::get<float>(key).unwrap();
-            default:
-                return {};
+            case nlohmann::detail::value_t::string: return config::get<std::string>(key).unwrap();
+            case nlohmann::detail::value_t::boolean: return config::get<bool>(key).unwrap();
+            case nlohmann::detail::value_t::number_integer: return config::get<int>(key).unwrap();
+            case nlohmann::detail::value_t::number_float: return config::get<float>(key).unwrap();
+            default: return {};
         }
     }
 
@@ -43,7 +37,7 @@ namespace eclipse::labels {
     }
 
     VariableManager& VariableManager::get() {
-        static VariableManager instance = []{
+        static VariableManager instance = [] {
             VariableManager manager;
             manager.init();
             return manager;
@@ -59,13 +53,15 @@ namespace eclipse::labels {
         m_variables["modVersion"] = mod->getVersion().toNonVString();
         m_variables["geodeVersion"] = geode::Loader::get()->getVersion().toNonVString();
         m_variables["platform"] = GEODE_WINDOWS("Windows")
-                                        GEODE_ANDROID("Android")
-                                        GEODE_MACOS("macOS")
-                                        GEODE_IOS("iOS");
+                GEODE_ANDROID("Android")
+                GEODE_MACOS("macOS")
+                GEODE_IOS("iOS");
         m_variables["gameVersion"] = loader->getGameVersion();
         auto allMods = loader->getAllMods();
         m_variables["totalMods"] = static_cast<int64_t>(allMods.size());
-        m_variables["enabledMods"] = rift::Value::integer(std::ranges::count_if(allMods, [](auto* mod) { return mod->shouldLoad(); }));
+        m_variables["enabledMods"] = rift::Value::integer(
+            std::ranges::count_if(allMods, [](auto* mod) { return mod->shouldLoad(); })
+        );
 
         // Emojis :D
         m_variables["starEmoji"] = "⭐";
@@ -95,11 +91,11 @@ namespace eclipse::labels {
         m_variables["explodingHeadEmoji"] = "🤯";
 
         // special emojis
-        m_variables["emojis"] = rift::Object {
-            { "userCoin", rift::Array { "🛞", "🔵" } },
-            { "secretCoin", rift::Array { "⭕", "🟡" } },
-            { "startPos", "🧿" },
-            { "practice", "♦️" },
+        m_variables["emojis"] = rift::Object{
+            {"userCoin", rift::Array{"🛞", "🔵"}},
+            {"secretCoin", rift::Array{"⭕", "🟡"}},
+            {"startPos", "🧿"},
+            {"practice", "♦️"},
         };
 
         // Fetch everything else
@@ -372,7 +368,7 @@ namespace eclipse::labels {
         m_variables["frame"] = gameLayer->m_gameState.m_currentProgress;
         m_variables["frameReal"] = gameLayer->m_gameState.m_levelTime * utils::getTPS();
         m_variables["isDead"] = gameLayer->m_player1->m_isDead;
-        m_variables["isDualMode"] = gameLayer->m_player2 != nullptr && gameLayer->m_player2->isRunning(); // can m_isDualMode be added already
+        m_variables["isDualMode"] = gameLayer->m_player2 != nullptr && gameLayer->m_player2->isRunning();
         m_variables["noclipDeaths"] = config::getTemp("noclipDeaths", 0);
         m_variables["noclipAccuracy"] = config::getTemp("noclipAccuracy", 100.f);
         m_variables["progress"] = utils::getActualProgress(gameLayer);
@@ -517,7 +513,7 @@ namespace eclipse::labels {
             PlayLayer::levelComplete();
             saveBestRun();
         }
-        
+
         void destroyPlayer(PlayerObject* player, GameObject* object) override {
             auto percentage = utils::getActualProgress(this);
             PlayLayer::destroyPlayer(player, object);

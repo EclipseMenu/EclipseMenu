@@ -19,7 +19,6 @@ void set##name(type const& value) { member = value; }
 #define COLOR_PROPERTY(member, name) CR_PROPERTY(Color, member, name)
 
 namespace eclipse::gui {
-
     constexpr auto THEME_SCHEMA_VERSION = 1;
 
     struct ThemeMeta {
@@ -35,9 +34,8 @@ namespace eclipse::gui {
         /// @brief Sets all values to default ones. Used to ensure nothing is left uninitialized when loading a theme.
         void setDefaults();
 
-    /// === Saving/loading
+        /// === Saving/loading
     public:
-
         /// @brief Get the theme manager instance
         static std::shared_ptr<ThemeManager> get();
 
@@ -64,7 +62,7 @@ namespace eclipse::gui {
         /// @brief Exports a ZIP file with theme settings and fonts
         void exportTheme(const std::filesystem::path& path);
 
-    /// === Utils
+        /// === Utils
 
         /// @brief [ImGui] Gets the actual UI scale (user setting * display ratio)
         float getGlobalScale() const;
@@ -74,7 +72,7 @@ namespace eclipse::gui {
         /// @brief Returns a vector of all available built-in and custom themes
         static std::vector<ThemeMeta> listAvailableThemes();
 
-    /// === Meta-colors
+        /// === Meta-colors
 
         /// @brief Calculates colors based on the accent color for:
         /// m_disabledColor, m_titleBackgroundColor,
@@ -89,7 +87,7 @@ namespace eclipse::gui {
         /// m_foregroundColor, m_checkboxForegroundColor, m_checkboxBackgroundColor
         void applyBackgroundColor(const Color& color);
 
-    /// === Properties
+        /// === Properties
 
         /// [Meta] Theme name
         CR_PROPERTY(std::string, m_themeName, ThemeName)
@@ -201,9 +199,7 @@ namespace eclipse::gui {
         COLOR_PROPERTY(m_buttonActivatedColor, ButtonActivatedBackground)
         /// Button pressed foreground
         COLOR_PROPERTY(m_buttonActiveForeground, ButtonActivatedForeground)
-
     };
-
 }
 
 #undef PROPERTY

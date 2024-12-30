@@ -1,11 +1,11 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Player {
-
     void onHideParticles(bool state) {
         auto change_particles_state = [](PlayerObject* player, bool toggle) {
             player->m_playerGroundParticles->setVisible(toggle);
@@ -34,9 +34,9 @@ namespace eclipse::hacks::Player {
             auto tab = gui::MenuTab::find("tab.player");
 
             tab->addToggle("player.novehicleparticles")
-                ->handleKeybinds()
-                ->setDescription()
-                ->callback(onHideParticles);
+               ->handleKeybinds()
+               ->setDescription()
+               ->callback(onHideParticles);
         }
 
         [[nodiscard]] const char* getId() const override { return "No Vehicle Particles"; }

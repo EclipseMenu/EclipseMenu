@@ -1,7 +1,78 @@
 #include "FallbackBMFont.hpp"
 #include <modules/utils/SingletonCache.hpp>
+#include <modules/i18n/translations.hpp>
 
 namespace eclipse::gui::cocos {
+    std::u16string utf8ToUtf16(std::string_view utf8) noexcept {
+        std::u16string utf16;
+        size_t length = utf8.size();
+        utf16.reserve(length); // Reserve approximate space for UTF-16 output.
+
+        for (size_t i = 0; i < length;) {
+            char32_t codePoint = 0;
+            unsigned char c = static_cast<unsigned char>(utf8[i]);
+
+            // Decode UTF-8 to code point.
+            if ((c & 0x80) == 0) { // Single-byte (ASCII)
+                codePoint = c;
+                i += 1;
+            } else if ((c & 0xE0) == 0xC0 && i + 1 < length) { // Two-byte sequence
+                codePoint = ((c & 0x1F) << 6) | (utf8[i + 1] & 0x3F);
+                if ((utf8[i + 1] & 0xC0) != 0x80) return {}; // Invalid continuation byte.
+                i += 2;
+            } else if ((c & 0xF0) == 0xE0 && i + 2 < length) { // Three-byte sequence
+                codePoint = ((c & 0x0F) << 12) | ((utf8[i + 1] & 0x3F) << 6) | (utf8[i + 2] & 0x3F);
+                if ((utf8[i + 1] & 0xC0) != 0x80 || (utf8[i + 2] & 0xC0) != 0x80) return {};
+                i += 3;
+            } else if ((c & 0xF8) == 0xF0 && i + 3 < length) { // Four-byte sequence
+                codePoint = ((c & 0x07) << 18) | ((utf8[i + 1] & 0x3F) << 12) | ((utf8[i + 2] & 0x3F) << 6) | (utf8[i + 3] & 0x3F);
+                if ((utf8[i + 1] & 0xC0) != 0x80 || (utf8[i + 2] & 0xC0) != 0x80 || (utf8[i + 3] & 0xC0) != 0x80) return {};
+                i += 4;
+            } else {
+                return {}; // Invalid UTF-8 sequence.
+            }
+
+            // Convert code point to UTF-16.
+            if (codePoint <= 0xFFFF) {
+                utf16.push_back(static_cast<char16_t>(codePoint));
+            } else if (codePoint <= 0x10FFFF) {
+                codePoint -= 0x10000;
+                utf16.push_back(static_cast<char16_t>((codePoint >> 10) + 0xD800)); // High surrogate.
+                utf16.push_back(static_cast<char16_t>((codePoint & 0x3FF) + 0xDC00)); // Low surrogate.
+            } else {
+                return {}; // Invalid code point.
+            }
+        }
+
+        return utf16;
+    }
+
+    void setBatchSpriteColor(cocos2d::CCSpriteBatchNode *batch, const cocos2d::ccColor3B &color) {
+        if (auto children = batch->getChildren()) {
+            for (int i = 0; i < children->count(); i++) {
+                static_cast<cocos2d::CCSprite*>(children->objectAtIndex(i))->setColor(color);
+            }
+        }
+    }
+
+    void setBatchSpriteOpacity(cocos2d::CCSpriteBatchNode *batch, GLubyte opacity) {
+        if (auto children = batch->getChildren()) {
+            for (int i = 0; i < children->count(); i++) {
+                static_cast<cocos2d::CCSprite*>(children->objectAtIndex(i))->setOpacity(opacity);
+            }
+        }
+    }
+
+    void setBatchSpriteColorAndOpacity(cocos2d::CCSpriteBatchNode *batch, const cocos2d::ccColor3B &color,
+                                       GLubyte opacity) {
+        if (auto children = batch->getChildren()) {
+            for (int i = 0; i < children->count(); i++) {
+                auto sprite = static_cast<cocos2d::CCSprite*>(children->objectAtIndex(i));
+                sprite->setColor(color);
+                sprite->setOpacity(opacity);
+            }
+        }
+    }
 
     void FallbackBMFont::Label::createFontChars() {
         int nextFontPositionX = 0;
@@ -169,6 +240,18 @@ namespace eclipse::gui::cocos {
         return ret;
     }
 
+    FallbackBMFont * FallbackBMFont::create(const std::string&text) {
+        return FallbackBMFont::create(
+            text,
+            fmt::format("font_{}.fnt"_spr, i18n::getRequiredGlyphRangesString()),
+            "font_default.fnt"_spr
+        );
+    }
+
+    FallbackBMFont::~FallbackBMFont() {
+        m_fallbackConfiguration->release();
+    }
+
     bool FallbackBMFont::init(const std::string& text, const std::string& font, const std::string& fallbackFont) {
         if (!CCNode::init()) return false;
 
@@ -187,6 +270,39 @@ namespace eclipse::gui::cocos {
         this->setAnchorPoint({ 0.5, 0.5 });
 
         return true;
+    }
+
+    void FallbackBMFont::setString(std::string_view text) const {
+        m_label->Label::setString(text.data(), true);
+    }
+
+    void FallbackBMFont::setFntFile(std::string_view fntFile) const {
+        m_label->setFntFile(fntFile);
+    }
+
+    void FallbackBMFont::setColor(const cocos2d::ccColor3B &color) const {
+        m_label->setColor(color);
+        setBatchSpriteColor(m_fallbackBatch, color);
+    }
+
+    void FallbackBMFont::setOpacity(GLubyte opacity) const {
+        m_label->setOpacity(opacity);
+        setBatchSpriteOpacity(m_fallbackBatch, opacity);
+    }
+
+    void FallbackBMFont::limitLabelWidth(float width, float defaultScale, float minScale) {
+        auto originalWidth = m_label->getContentSize().width;
+        auto scale = this->getScale();
+        if (originalWidth > width && width > 0.0f) {
+            scale = width / originalWidth;
+        }
+        if (defaultScale != 0.0f && defaultScale <= scale) {
+            scale = defaultScale;
+        }
+        if (minScale != 0.0f && minScale >= scale) {
+            scale = minScale;
+        }
+        this->setScale(scale);
     }
 
     constexpr bool isEmojiHeader(uint16_t c) { return c >= 0xD83C && c <= 0xD83E; }
@@ -418,5 +534,33 @@ namespace eclipse::gui::cocos {
         this->addChild(m_label);
 
         return true;
+    }
+
+    void EmojiLabel::setString(std::string_view text) const {
+        m_label->Label::setString(text.data(), true);
+    }
+
+    void EmojiLabel::setFntFile(std::string_view fntFile) const {
+        m_label->setFntFile(fntFile);
+    }
+
+    void EmojiLabel::setColor(const cocos2d::ccColor3B &color) const {
+        m_label->setColor(color);
+    }
+
+    void EmojiLabel::setOpacity(GLubyte opacity) const {
+        m_label->setOpacity(opacity);
+        setBatchSpriteOpacity(m_emojiBatch, opacity);
+    }
+
+    TranslatedLabel * TranslatedLabel::create(std::string_view key) {
+        auto ret = new TranslatedLabel();
+        ret->init(
+            i18n::get_(key),
+            fmt::format("font_{}.fnt"_spr, i18n::getRequiredGlyphRangesString()),
+            "font_default.fnt"_spr
+        );
+        ret->autorelease();
+        return ret;
     }
 }

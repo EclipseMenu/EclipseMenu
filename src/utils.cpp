@@ -1,32 +1,27 @@
 #include "utils.hpp"
 
 #include <fmt/format.h>
-#include <Geode/binding/PlayLayer.hpp>
-#include <Geode/binding/GJGameLevel.hpp>
 #include <Geode/binding/GameManager.hpp>
+#include <Geode/binding/GJGameLevel.hpp>
 #include <Geode/binding/PlatformToolbox.hpp>
+#include <Geode/binding/PlayLayer.hpp>
 #include <Geode/loader/Mod.hpp>
 
 #include <modules/config/config.hpp>
+#include <modules/gui/color.hpp>
 #include <modules/utils/SingletonCache.hpp>
 
 namespace eclipse::utils {
-
     std::random_device& getRng() {
         static std::random_device rng;
         return rng;
     }
 
     std::string getClock(bool useTwelveHours) {
-        const char* format = useTwelveHours ? "%I:%M:%S %p" : "%H:%M:%S";
-
         auto now = std::chrono::system_clock::now();
         auto time = std::chrono::system_clock::to_time_t(now);
-        auto tm = std::localtime(&time);
-
-        std::stringstream ss;
-        ss << std::put_time(tm, format);
-        return ss.str();
+        auto tm = fmt::localtime(time);
+        return useTwelveHours ? fmt::format("{:%I:%M:%S %p}", tm) : fmt::format("{:%H:%M:%S}", tm);
     }
 
     bool hasOpenGLExtension(std::string_view extension) {
@@ -37,11 +32,11 @@ namespace eclipse::utils {
     }
 
     bool shouldUseLegacyDraw() {
-#ifdef GEODE_IS_MACOS
+        #ifdef GEODE_IS_MACOS
         static bool hasVAO = hasOpenGLExtension("GL_APPLE_vertex_array_object");
-#else
+        #else
         static bool hasVAO = hasOpenGLExtension("GL_ARB_vertex_array_object");
-#endif
+        #endif
         auto useLegacy = geode::Mod::get()->getSettingValue<bool>("legacy-render");
         return !hasVAO || useLegacy;
     }
@@ -52,10 +47,8 @@ namespace eclipse::utils {
         auto seconds = static_cast<int>(time) % 60;
         auto millis = static_cast<int>(time * 1000) % 1000;
 
-        if (hours > 0)
-            return fmt::format("{}:{:02d}:{:02d}.{:03d}", hours, minutes, seconds, millis);
-        if (minutes > 0)
-            return fmt::format("{}:{:02d}.{:03d}", minutes, seconds, millis);
+        if (hours > 0) return fmt::format("{}:{:02d}:{:02d}.{:03d}", hours, minutes, seconds, millis);
+        if (minutes > 0) return fmt::format("{}:{:02d}.{:03d}", minutes, seconds, millis);
         return fmt::format("{}.{:03d}", seconds, millis);
     }
 
@@ -106,23 +99,15 @@ namespace eclipse::utils {
         if (!player) {
             auto gm = utils::get<GameManager>();
             switch (gm->m_playerIconType) {
-                case IconType::Cube: default:
-                    return PlayerMode::Cube;
+                case IconType::Cube: default: return PlayerMode::Cube;
                 case IconType::Ship:
-                case IconType::Jetpack:
-                    return PlayerMode::Ship;
-                case IconType::Ball:
-                    return PlayerMode::Ball;
-                case IconType::Ufo:
-                    return PlayerMode::UFO;
-                case IconType::Wave:
-                    return PlayerMode::Wave;
-                case IconType::Robot:
-                    return PlayerMode::Robot;
-                case IconType::Spider:
-                    return PlayerMode::Spider;
-                case IconType::Swing:
-                    return PlayerMode::Swing;
+                case IconType::Jetpack: return PlayerMode::Ship;
+                case IconType::Ball: return PlayerMode::Ball;
+                case IconType::Ufo: return PlayerMode::UFO;
+                case IconType::Wave: return PlayerMode::Wave;
+                case IconType::Robot: return PlayerMode::Robot;
+                case IconType::Spider: return PlayerMode::Spider;
+                case IconType::Swing: return PlayerMode::Swing;
             }
         }
 

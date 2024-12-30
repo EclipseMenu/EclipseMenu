@@ -1,13 +1,13 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
+#include <Geode/binding/GameManager.hpp>
 #include <Geode/modify/GameObject.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
-#include <Geode/binding/GameManager.hpp>
 
 namespace eclipse::hacks::Level {
-
     void onChangeShowCoins(bool state) {
         static cocos2d::CCObject* uncollectedSecretCoin = nullptr;
         static cocos2d::CCObject* uncollectedUserCoin = nullptr;
@@ -41,11 +41,8 @@ namespace eclipse::hacks::Level {
     class AlwaysShowCoins : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
-
-            tab->addToggle("level.alwaysshowcoins")
-                ->handleKeybinds()
-                ->setDescription()
-                ->callback(onChangeShowCoins);
+            tab->addToggle("level.alwaysshowcoins")->handleKeybinds()->setDescription()
+               ->callback(onChangeShowCoins);
         }
 
         void lateInit() override {

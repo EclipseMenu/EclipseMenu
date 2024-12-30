@@ -1,16 +1,18 @@
 #include "cocos.hpp"
 #include <utils.hpp>
 
-#include "popup/options-popup.hpp"
+#include <modules/config/config.hpp>
+#include <modules/i18n/translations.hpp>
+
 #include "nodes/ModalPopup.hpp"
+#include "popup/options-popup.hpp"
 
 namespace eclipse::gui::cocos {
-
     void CocosRenderer::init() {
         // check if bitmap font exists
         if (!i18n::hasBitmapFont(i18n::getRequiredGlyphRangesString())) {
             geode::log::warn("Bitmap font not found for selected language, setting to English");
-            config::set("language", "en");
+            config::set<std::string_view>("language", "en");
             i18n::setLanguage("en");
         }
     }
@@ -59,7 +61,7 @@ namespace eclipse::gui::cocos {
         func();
     }
 
-    void CocosRenderer::showPopup(const eclipse::Popup &popup) {
+    void CocosRenderer::showPopup(const eclipse::Popup& popup) {
         auto modal = ModalPopup::create(popup);
         modal->show();
         m_modals.push_back(modal);

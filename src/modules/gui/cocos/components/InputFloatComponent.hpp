@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseComponentNode.hpp"
-#include <modules/gui/cocos/popup/options-popup.hpp>
+
+#include <modules/gui/components/input-float.hpp>
 
 namespace eclipse::gui::cocos {
     class InputFloatComponentNode : public BaseComponentNode<InputFloatComponentNode, cocos2d::CCMenu, InputFloatComponent, float>, public TextInputDelegate {

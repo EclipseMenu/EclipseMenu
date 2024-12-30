@@ -1,19 +1,16 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
-#include <Geode/modify/SongSelectNode.hpp>
 #include <Geode/modify/MoreSearchLayer.hpp>
+#include <Geode/modify/SongSelectNode.hpp>
 
 namespace eclipse::hacks::Creator {
-
     class DefaultSongBypass : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
-
-            tab->addToggle("creator.defaultsongbypass")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("creator.defaultsongbypass")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Default Song Bypass"; }
@@ -54,5 +51,4 @@ namespace eclipse::hacks::Creator {
             this->updateAudioLabel();
         }
     };
-
 }

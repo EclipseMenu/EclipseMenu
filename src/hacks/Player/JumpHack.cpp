@@ -1,19 +1,16 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
-#include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Player {
-
     class JumpHack : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
-
-            tab->addToggle("player.jumphack")
-                ->setDescription()
-                ->handleKeybinds();
+            tab->addToggle("player.jumphack")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.jumphack", false); }

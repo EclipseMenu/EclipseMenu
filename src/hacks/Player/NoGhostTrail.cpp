@@ -1,18 +1,15 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Player {
-
     class NoGhostTrail : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
-
-            tab->addToggle("player.noghosttrail")
-                ->setDescription()
-                ->handleKeybinds();
+            tab->addToggle("player.noghosttrail")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "No Ghost Trail"; }
@@ -27,5 +24,4 @@ namespace eclipse::hacks::Player {
             PlayerObject::toggleGhostEffect(GhostType::Disabled);
         }
     };
-
 }

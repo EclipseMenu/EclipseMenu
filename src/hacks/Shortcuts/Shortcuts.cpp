@@ -1,9 +1,11 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/button.hpp>
+#include <modules/gui/components/keybind.hpp>
+#include <modules/hack/hack.hpp>
+#include <modules/i18n/translations.hpp>
 
 namespace eclipse::hacks::Shortcuts {
-
     class Shortcuts : public hack::Hack {
         using FileEvent = geode::Task<geode::Result<std::filesystem::path>>;
 
@@ -29,10 +31,11 @@ namespace eclipse::hacks::Shortcuts {
                 level = lil->m_level;
             }
 
-            if (!level) return Popup::create(
-                i18n::get_("common.error"),
-                i18n::get_("shortcuts.uncomplete-level.error")
-            );
+            if (!level)
+                return Popup::create(
+                    i18n::get_("common.error"),
+                    i18n::get_("shortcuts.uncomplete-level.error")
+                );
 
             Popup::create(
                 i18n::get_("shortcuts.uncomplete-level.title"),
@@ -117,7 +120,7 @@ namespace eclipse::hacks::Shortcuts {
             }
         }
 
-#ifdef GEODE_IS_WINDOWS
+        #ifdef GEODE_IS_WINDOWS
         static void injectDll() {
             static geode::EventListener<FileEvent> m_listener;
             geode::utils::file::FilePickOptions::Filter filter;
@@ -149,10 +152,10 @@ namespace eclipse::hacks::Shortcuts {
             });
             m_listener.setFilter(geode::utils::file::pick(
                 geode::utils::file::PickMode::OpenFile,
-                { geode::dirs::getGameDir(), { filter }}
+                {geode::dirs::getGameDir(), {filter}}
             ));
         }
-#endif
+        #endif
 
         static void openSaveFolder() {
             auto path = geode::dirs::getSaveDir();
@@ -181,12 +184,12 @@ namespace eclipse::hacks::Shortcuts {
             manager->addListener("shortcut.p1jump", [](bool down) {
                 auto gameLayer = utils::get<GJBaseGameLayer>();
                 if (!gameLayer) return;
-                gameLayer->handleButton(down, 1, true);
+                gameLayer->queueButton(1, down, false);
             });
             manager->addListener("shortcut.p2jump", [](bool down) {
                 auto gameLayer = utils::get<GJBaseGameLayer>();
                 if (!gameLayer) return;
-                gameLayer->handleButton(down, 1, false);
+                gameLayer->queueButton(1, down, true);
             });
         }
 
@@ -194,5 +197,4 @@ namespace eclipse::hacks::Shortcuts {
     };
 
     REGISTER_HACK(Shortcuts)
-
 }

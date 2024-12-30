@@ -74,7 +74,7 @@ namespace eclipse::labels {
         gui::Color color = gui::Color(1.f, 1.f, 1.f, 0.3f);
         std::string font = "bigFont.fnt";
         LabelsContainer::Alignment alignment = LabelsContainer::Alignment::TopLeft;
-        cocos2d::CCPoint offset = { 0, 0 };
+        cocos2d::CCPoint offset = {0, 0};
         std::vector<LabelEvent> events;
         size_t id = instanceCount++;
 

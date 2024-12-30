@@ -1,13 +1,13 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
-#include <Geode/modify/PlayLayer.hpp>
-#include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/GameObject.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-
     class ShowTriggers : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
@@ -23,7 +23,7 @@ namespace eclipse::hacks::Level {
     // :(
     // GameObject->m_objectType is set during GameObject::customSetup()
     // so we have to check the object ID manually instead
-    constexpr std::array<int, 131> triggerIds = {
+    static const std::unordered_set<int> triggerIds = {
         22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 55, 56,
         57, 58, 59, 105, 744, 899, 900, 901, 915, 1006, 1007,
         1049, 1268, 1346, 1347, 1520, 1585, 1595, 1611, 1612, 1613,
@@ -45,9 +45,7 @@ namespace eclipse::hacks::Level {
         void customSetup() override {
             bool editorEnabled = this->m_editorEnabled;
             int id = this->m_objectID;
-            this->m_editorEnabled = editorEnabled || std::ranges::any_of(triggerIds, [id](int id2) {
-                return id == id2;
-            });
+            this->m_editorEnabled = editorEnabled || triggerIds.contains(id);
 
             GameObject::customSetup();
             this->m_editorEnabled = editorEnabled;

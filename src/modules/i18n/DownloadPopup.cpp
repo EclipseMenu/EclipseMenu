@@ -1,9 +1,9 @@
 #include "DownloadPopup.hpp"
 
 #include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
+#include "translations.hpp"
 
 namespace eclipse::i18n {
-
     bool DownloadPopup::setup(std::string const& charset) {
         this->setID("download-popup"_spr);
         m_closeBtn->setVisible(false);
@@ -12,7 +12,7 @@ namespace eclipse::i18n {
 
         auto label = gui::cocos::TranslatedLabel::create("interface.font-download");
         label->setID("title"_spr);
-        m_mainLayer->addChildAtPosition(label, geode::Anchor::Top, { 0, -20 });
+        m_mainLayer->addChildAtPosition(label, geode::Anchor::Top, {0, -20});
 
         m_progressLabel = gui::cocos::FallbackBMFont::create("0% (0/6)");
         m_progressLabel->setID("progress-label"_spr);
@@ -23,12 +23,12 @@ namespace eclipse::i18n {
 
         m_progressBar = cocos2d::CCSprite::create("sliderBar.png");
         m_progressBar->setID("progress-bar"_spr);
-        cocos2d::ccTexParams params = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_CLAMP_TO_EDGE };
+        cocos2d::ccTexParams params = {GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_CLAMP_TO_EDGE};
         m_progressBar->getTexture()->setTexParameters(&params);
-        m_progressBar->setAnchorPoint({ 0, 0 });
-        m_progressBar->setPosition({ 2.f, 1.5f });
+        m_progressBar->setAnchorPoint({0, 0});
+        m_progressBar->setPosition({2.f, 1.5f});
         m_progressBarBG->addChild(m_progressBar, -1);
-        m_mainLayer->addChildAtPosition(m_progressBarBG, geode::Anchor::Bottom, { 0, 20 });
+        m_mainLayer->addChildAtPosition(m_progressBarBG, geode::Anchor::Bottom, {0, 20});
 
         m_totalFiles = BitmapFontsExtensions.size();
         this->handleFileDownloaded();
@@ -83,7 +83,10 @@ namespace eclipse::i18n {
         auto ext = BitmapFontsExtensions[m_filesDownloaded];
         auto path = geode::Mod::get()->getConfigDir() / "bmfonts" / GEODE_MOD_ID / fmt::format("font_{}{}", m_charset, ext);
 
-        auto url = fmt::format("https://raw.githubusercontent.com/EclipseMenu/EclipseMenu/refs/heads/main/resources/BitmapFonts/{}", path.filename().string());
+        auto url = fmt::format(
+            "https://raw.githubusercontent.com/EclipseMenu/EclipseMenu/refs/heads/main/resources/BitmapFonts/{}",
+            path.filename().string()
+        );
         this->startDownloadFile(path, url);
     }
 
@@ -105,7 +108,7 @@ namespace eclipse::i18n {
         menu->setID("menu"_spr);
         menu->addChild(btn);
         menu->alignItemsHorizontallyWithPadding(10.f);
-        m_mainLayer->addChildAtPosition(menu, geode::Anchor::Bottom, { 0, 25 });
+        m_mainLayer->addChildAtPosition(menu, geode::Anchor::Bottom, {0, 25});
     }
 
     DownloadPopup* DownloadPopup::create(std::string const& charset) {

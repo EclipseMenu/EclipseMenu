@@ -1,11 +1,11 @@
 #pragma once
 #include <modules/gui/gui.hpp>
-#include <imgui.h>
 #include "components/theme.hpp"
 #include "layouts/layout.hpp"
 
-namespace eclipse::gui::imgui {
+class ImFont;
 
+namespace eclipse::gui::imgui {
     class FontManager {
     public:
         class FontMetadata {
@@ -55,7 +55,7 @@ namespace eclipse::gui::imgui {
         [[nodiscard]] bool isToggled() const override;
         void shutdown() override;
         void queueAfterDrawing(const std::function<void()>& func) override;
-        void showPopup(const Popup &popup) override;
+        void showPopup(const Popup& popup) override;
         [[nodiscard]] RendererType getType() const override { return RendererType::ImGui; }
         void updateTabs() override;
 
@@ -88,5 +88,4 @@ namespace eclipse::gui::imgui {
         std::vector<std::function<void()>> m_runAfterDrawingQueue;
         std::vector<Popup> m_popups;
     };
-
 }

@@ -1,7 +1,12 @@
 #ifdef GEODE_IS_DESKTOP
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/combo.hpp>
+#include <modules/gui/components/input-float.hpp>
+#include <modules/gui/components/input-text.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
+#include <modules/i18n/translations.hpp>
 #include <modules/labels/variables.hpp>
 
 #include <discord_rpc.h>
@@ -10,7 +15,6 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Global {
-
     class DiscordRPC : public hack::Hack {
     public:
         constexpr static auto DEFAULT_CLIENT_ID = "1212016614325624852";
@@ -42,10 +46,14 @@ namespace eclipse::hacks::Global {
                 std::string keyStr;
                 if (addPrefix) {
                     switch (gameState) {
-                        case GameState::Menu: keyStr = "menu."; break;
-                        case GameState::Editor: keyStr = "editor."; break;
-                        case GameState::Level: keyStr = "level."; break;
-                        case GameState::Platformer: keyStr = "plat."; break;
+                        case GameState::Menu: keyStr = "menu.";
+                            break;
+                        case GameState::Editor: keyStr = "editor.";
+                            break;
+                        case GameState::Level: keyStr = "level.";
+                            break;
+                        case GameState::Platformer: keyStr = "plat.";
+                            break;
                     }
                 }
                 keyStr += key;
@@ -183,113 +191,116 @@ namespace eclipse::hacks::Global {
             // Setting default scripts:
             {
                 // Menu
-                config::setIfEmpty("global.discordrpc.menu.details", "Browsing menus");
-                config::setIfEmpty("global.discordrpc.menu.state", "");
-                config::setIfEmpty("global.discordrpc.menu.largeimage", "circle");
-                config::setIfEmpty("global.discordrpc.menu.largeimage.text", "Geometry Dash ({username})");
-                config::setIfEmpty("global.discordrpc.menu.smallimage", "");
-                config::setIfEmpty("global.discordrpc.menu.smallimage.text", "");
+                config::setIfEmpty<std::string_view>("global.discordrpc.menu.details", "Browsing menus");
+                config::setIfEmpty<std::string_view>("global.discordrpc.menu.state", "");
+                config::setIfEmpty<std::string_view>("global.discordrpc.menu.largeimage", "circle");
+                config::setIfEmpty<std::string_view>("global.discordrpc.menu.largeimage.text", "Geometry Dash ({username})");
+                config::setIfEmpty<std::string_view>("global.discordrpc.menu.smallimage", "");
+                config::setIfEmpty<std::string_view>("global.discordrpc.menu.smallimage.text", "");
 
                 // Editor
-                config::setIfEmpty("global.discordrpc.editor.details", "Working on \"{levelName}\"");
-                config::setIfEmpty("global.discordrpc.editor.state", "{objects} objects");
-                config::setIfEmpty("global.discordrpc.editor.largeimage", "circle");
-                config::setIfEmpty("global.discordrpc.editor.largeimage.text", "Geometry Dash ({username})");
-                config::setIfEmpty("global.discordrpc.editor.smallimage", "editor");
-                config::setIfEmpty("global.discordrpc.editor.smallimage.text", "Editing a level");
+                config::setIfEmpty<std::string_view>("global.discordrpc.editor.details", "Working on \"{levelName}\"");
+                config::setIfEmpty<std::string_view>("global.discordrpc.editor.state", "{objects} objects");
+                config::setIfEmpty<std::string_view>("global.discordrpc.editor.largeimage", "circle");
+                config::setIfEmpty<std::string_view>("global.discordrpc.editor.largeimage.text", "Geometry Dash ({username})");
+                config::setIfEmpty<std::string_view>("global.discordrpc.editor.smallimage", "editor");
+                config::setIfEmpty<std::string_view>("global.discordrpc.editor.smallimage.text", "Editing a level");
 
                 // Normal level
-                config::setIfEmpty("global.discordrpc.level.details", "{levelName} by {author}");
-                config::setIfEmpty("global.discordrpc.level.state", "Progress: {progress}% (Best {best}%)");
-                config::setIfEmpty("global.discordrpc.level.largeimage", "circle");
-                config::setIfEmpty("global.discordrpc.level.largeimage.text", "Geometry Dash ({username})");
-                config::setIfEmpty("global.discordrpc.level.smallimage", "{difficultyKey}");
-                config::setIfEmpty("global.discordrpc.level.smallimage.text", "{levelStars}{starEmoji} (ID: {levelID})");
+                config::setIfEmpty<std::string_view>("global.discordrpc.level.details", "{levelName} by {author}");
+                config::setIfEmpty<std::string_view>("global.discordrpc.level.state", "Progress: {progress}% (Best {best}%)");
+                config::setIfEmpty<std::string_view>("global.discordrpc.level.largeimage", "circle");
+                config::setIfEmpty<std::string_view>("global.discordrpc.level.largeimage.text", "Geometry Dash ({username})");
+                config::setIfEmpty<std::string_view>("global.discordrpc.level.smallimage", "{difficultyKey}");
+                config::setIfEmpty<std::string_view>(
+                    "global.discordrpc.level.smallimage.text", "{levelStars}{starEmoji} (ID: {levelID})"
+                );
 
                 // Platformer level
-                config::setIfEmpty("global.discordrpc.plat.details", "{levelName} by {author}");
-                config::setIfEmpty("global.discordrpc.plat.state", "Current time: {levelTime} s.");
-                config::setIfEmpty("global.discordrpc.plat.largeimage", "circle");
-                config::setIfEmpty("global.discordrpc.plat.largeimage.text", "Geometry Dash ({username})");
-                config::setIfEmpty("global.discordrpc.plat.smallimage", "{difficultyKey}");
-                config::setIfEmpty("global.discordrpc.plat.smallimage.text", "{levelStars}{moonEmoji} (ID: {levelID})");
+                config::setIfEmpty<std::string_view>("global.discordrpc.plat.details", "{levelName} by {author}");
+                config::setIfEmpty<std::string_view>("global.discordrpc.plat.state", "Current time: {levelTime} s.");
+                config::setIfEmpty<std::string_view>("global.discordrpc.plat.largeimage", "circle");
+                config::setIfEmpty<std::string_view>("global.discordrpc.plat.largeimage.text", "Geometry Dash ({username})");
+                config::setIfEmpty<std::string_view>("global.discordrpc.plat.smallimage", "{difficultyKey}");
+                config::setIfEmpty<std::string_view>("global.discordrpc.plat.smallimage.text", "{levelStars}{moonEmoji} (ID: {levelID})");
 
                 // Buttons
                 config::setIfEmpty("global.discordrpc.button1.enabled", false);
-                config::setIfEmpty("global.discordrpc.button1.text", "Button 1");
-                config::setIfEmpty("global.discordrpc.button1.url", "");
+                config::setIfEmpty<std::string_view>("global.discordrpc.button1.text", "Button 1");
+                config::setIfEmpty<std::string_view>("global.discordrpc.button1.url", "");
                 config::setIfEmpty("global.discordrpc.button2.enabled", false);
-                config::setIfEmpty("global.discordrpc.button2.text", "Button 2");
-                config::setIfEmpty("global.discordrpc.button2.url", "");
+                config::setIfEmpty<std::string_view>("global.discordrpc.button2.text", "Button 2");
+                config::setIfEmpty<std::string_view>("global.discordrpc.button2.url", "");
             }
 
             initializeDiscord();
             recompileScripts();
 
             tab->addToggle("global.discordrpc")
-                ->handleKeybinds()
-                ->callback([this](bool enabled) { toggleRPC(enabled); })
-                ->setDescription()
-                ->addOptions([this](auto opt) {
-                    opt->addInputText("global.discordrpc.client-id", "global.discordrpc.clientid");
-                    opt->addInputFloat("global.discordrpc.update-rate", "global.discordrpc.interval", 100, FLT_MAX, "%.0f")
-                        ->setDescription();
-                    opt->addCombo("global.discordrpc.time-mode", "global.discordrpc.timemode",
-                        {
-                            i18n::get_("global.discordrpc.time-mode.0"),
-                            i18n::get_("global.discordrpc.time-mode.1"),
-                            i18n::get_("global.discordrpc.time-mode.2"),
-                            i18n::get_("global.discordrpc.time-mode.3")
-                        },
-                        config::get<int>("global.discordrpc.timemode", 1)
-                    )->setDescription();
+               ->handleKeybinds()
+               ->callback([this](bool enabled) { toggleRPC(enabled); })
+               ->setDescription()
+               ->addOptions([this](auto opt) {
+                   opt->addInputText("global.discordrpc.client-id", "global.discordrpc.clientid");
+                   opt->addInputFloat("global.discordrpc.update-rate", "global.discordrpc.interval", 100, FLT_MAX, "%.0f")
+                      ->setDescription();
+                   opt->addCombo(
+                       "global.discordrpc.time-mode", "global.discordrpc.timemode",
+                       {
+                           i18n::get_("global.discordrpc.time-mode.0"),
+                           i18n::get_("global.discordrpc.time-mode.1"),
+                           i18n::get_("global.discordrpc.time-mode.2"),
+                           i18n::get_("global.discordrpc.time-mode.3")
+                       },
+                       config::get<int>("global.discordrpc.timemode", 1)
+                   )->setDescription();
 
-#define ADD_SCRIPT(name, id) opt->addInputText(name, "global.discordrpc." id)->callback([this](auto){ compileScript(id); })
+                   #define ADD_SCRIPT(name, id) opt->addInputText(name, "global.discordrpc." id)->callback([this](auto){ compileScript(id); })
 
-                    opt->addLabel("global.discordrpc.menus");
-                    ADD_SCRIPT("global.discordrpc.menu.details", "menu.details");
-                    ADD_SCRIPT("global.discordrpc.menu.state", "menu.state");
-                    ADD_SCRIPT("global.discordrpc.menu.large-image", "menu.largeimage");
-                    ADD_SCRIPT("global.discordrpc.menu.large-text", "menu.largeimage.text");
-                    ADD_SCRIPT("global.discordrpc.menu.small-image", "menu.smallimage");
-                    ADD_SCRIPT("global.discordrpc.menu.small-text", "menu.smallimage.text");
+                   opt->addLabel("global.discordrpc.menus");
+                   ADD_SCRIPT("global.discordrpc.menu.details", "menu.details");
+                   ADD_SCRIPT("global.discordrpc.menu.state", "menu.state");
+                   ADD_SCRIPT("global.discordrpc.menu.large-image", "menu.largeimage");
+                   ADD_SCRIPT("global.discordrpc.menu.large-text", "menu.largeimage.text");
+                   ADD_SCRIPT("global.discordrpc.menu.small-image", "menu.smallimage");
+                   ADD_SCRIPT("global.discordrpc.menu.small-text", "menu.smallimage.text");
 
-                    opt->addLabel("global.discordrpc.editor");
-                    ADD_SCRIPT("global.discordrpc.editor.details", "editor.details");
-                    ADD_SCRIPT("global.discordrpc.editor.state", "editor.state");
-                    ADD_SCRIPT("global.discordrpc.editor.large-image", "editor.largeimage");
-                    ADD_SCRIPT("global.discordrpc.editor.large-text", "editor.largeimage.text");
-                    ADD_SCRIPT("global.discordrpc.editor.small-image", "editor.smallimage");
-                    ADD_SCRIPT("global.discordrpc.editor.small-text", "editor.smallimage.text");
+                   opt->addLabel("global.discordrpc.editor");
+                   ADD_SCRIPT("global.discordrpc.editor.details", "editor.details");
+                   ADD_SCRIPT("global.discordrpc.editor.state", "editor.state");
+                   ADD_SCRIPT("global.discordrpc.editor.large-image", "editor.largeimage");
+                   ADD_SCRIPT("global.discordrpc.editor.large-text", "editor.largeimage.text");
+                   ADD_SCRIPT("global.discordrpc.editor.small-image", "editor.smallimage");
+                   ADD_SCRIPT("global.discordrpc.editor.small-text", "editor.smallimage.text");
 
-                    opt->addLabel("global.discordrpc.levels");
-                    ADD_SCRIPT("global.discordrpc.level.details", "level.details");
-                    ADD_SCRIPT("global.discordrpc.level.state", "level.state");
-                    ADD_SCRIPT("global.discordrpc.level.large-image", "level.largeimage");
-                    ADD_SCRIPT("global.discordrpc.level.large-text", "level.largeimage.text");
-                    ADD_SCRIPT("global.discordrpc.level.small-image", "level.smallimage");
-                    ADD_SCRIPT("global.discordrpc.level.small-text", "level.smallimage.text");
+                   opt->addLabel("global.discordrpc.levels");
+                   ADD_SCRIPT("global.discordrpc.level.details", "level.details");
+                   ADD_SCRIPT("global.discordrpc.level.state", "level.state");
+                   ADD_SCRIPT("global.discordrpc.level.large-image", "level.largeimage");
+                   ADD_SCRIPT("global.discordrpc.level.large-text", "level.largeimage.text");
+                   ADD_SCRIPT("global.discordrpc.level.small-image", "level.smallimage");
+                   ADD_SCRIPT("global.discordrpc.level.small-text", "level.smallimage.text");
 
-                    opt->addLabel("global.discordrpc.platformer");
-                    ADD_SCRIPT("global.discordrpc.platformer.details", "plat.details");
-                    ADD_SCRIPT("global.discordrpc.platformer.state", "plat.state");
-                    ADD_SCRIPT("global.discordrpc.platformer.large-image", "plat.largeimage");
-                    ADD_SCRIPT("global.discordrpc.platformer.large-text", "plat.largeimage.text");
-                    ADD_SCRIPT("global.discordrpc.platformer.small-image", "plat.smallimage");
-                    ADD_SCRIPT("global.discordrpc.platformer.small-text", "plat.smallimage.text");
+                   opt->addLabel("global.discordrpc.platformer");
+                   ADD_SCRIPT("global.discordrpc.platformer.details", "plat.details");
+                   ADD_SCRIPT("global.discordrpc.platformer.state", "plat.state");
+                   ADD_SCRIPT("global.discordrpc.platformer.large-image", "plat.largeimage");
+                   ADD_SCRIPT("global.discordrpc.platformer.large-text", "plat.largeimage.text");
+                   ADD_SCRIPT("global.discordrpc.platformer.small-image", "plat.smallimage");
+                   ADD_SCRIPT("global.discordrpc.platformer.small-text", "plat.smallimage.text");
 
-                    opt->addLabel("global.discordrpc.buttons");
-                    opt->addToggle("global.discordrpc.buttons.1", "global.discordrpc.button1.enabled")
-                        ->addOptions([this](auto opt){
-                            ADD_SCRIPT("global.discordrpc.buttons.text", "button1.text");
-                            ADD_SCRIPT("global.discordrpc.buttons.url", "button1.url");
-                        });
-                    opt->addToggle("global.discordrpc.buttons.2", "global.discordrpc.button2.enabled")
-                        ->addOptions([this](auto opt){
-                            ADD_SCRIPT("global.discordrpc.buttons.text", "button2.text");
-                            ADD_SCRIPT("global.discordrpc.buttons.url", "button2.url");
-                        });
-                });
+                   opt->addLabel("global.discordrpc.buttons");
+                   opt->addToggle("global.discordrpc.buttons.1", "global.discordrpc.button1.enabled")
+                      ->addOptions([this](auto opt) {
+                          ADD_SCRIPT("global.discordrpc.buttons.text", "button1.text");
+                          ADD_SCRIPT("global.discordrpc.buttons.url", "button1.url");
+                      });
+                   opt->addToggle("global.discordrpc.buttons.2", "global.discordrpc.button2.enabled")
+                      ->addOptions([this](auto opt) {
+                          ADD_SCRIPT("global.discordrpc.buttons.text", "button2.text");
+                          ADD_SCRIPT("global.discordrpc.buttons.url", "button2.url");
+                      });
+               });
         }
 
         void update() override {

@@ -1,18 +1,15 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-
     class SmartStartPos : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
-
-            tab->addToggle("level.smartstartpos")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("level.smartstartpos")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Smart StartPos"; }
@@ -26,10 +23,10 @@ namespace eclipse::hacks::Level {
             std::vector<GameObject*> m_dualPortals, m_gamemodePortals, m_miniPortals, m_speedChanges, m_mirrorPortals;
         };
 
-        GameObject* getClosestObject(std::vector<GameObject*>& vec, StartPosObject* startPos) {
+        static GameObject* getClosestObject(std::vector<GameObject*>& vec, StartPosObject* startPos) {
             GameObject* closest = nullptr;
 
-            std::ranges::sort(vec, [] (GameObject* a, GameObject* b) {
+            std::ranges::sort(vec, [](GameObject* a, GameObject* b) {
                 return a->getPositionX() < b->getPositionX();
             });
 
@@ -60,30 +57,23 @@ namespace eclipse::hacks::Level {
 
             if (obj) {
                 switch (obj->m_objectID) {
-                    case 12:
-                        startPosSettings->m_startMode = 0;
+                    case 12: startPosSettings->m_startMode = 0;
                         break;
-                    case 13:
-                        startPosSettings->m_startMode = 1;
+                    case 13: startPosSettings->m_startMode = 1;
                         break;
-                    case 47:
-                        startPosSettings->m_startMode = 2;
+                    case 47: startPosSettings->m_startMode = 2;
                         break;
-                    case 111:
-                        startPosSettings->m_startMode = 3;
+                    case 111: startPosSettings->m_startMode = 3;
                         break;
-                    case 660:
-                        startPosSettings->m_startMode = 4;
+                    case 660: startPosSettings->m_startMode = 4;
                         break;
-                    case 745:
-                        startPosSettings->m_startMode = 5;
+                    case 745: startPosSettings->m_startMode = 5;
                         break;
-                    case 1331:
-                        startPosSettings->m_startMode = 6;
+                    case 1331: startPosSettings->m_startMode = 6;
                         break;
-                    case 1933:
-                        startPosSettings->m_startMode = 7;
+                    case 1933: startPosSettings->m_startMode = 7;
                         break;
+                    default: break;
                 }
             }
 
@@ -97,21 +87,17 @@ namespace eclipse::hacks::Level {
             obj = getClosestObject(fields->m_speedChanges, startPos);
             if (obj) {
                 switch (obj->m_objectID) {
-                    case 200:
-                        startPosSettings->m_startSpeed = Speed::Slow;
+                    case 200: startPosSettings->m_startSpeed = Speed::Slow;
                         break;
-                    case 201:
-                        startPosSettings->m_startSpeed = Speed::Normal;
+                    case 201: startPosSettings->m_startSpeed = Speed::Normal;
                         break;
-                    case 202:
-                        startPosSettings->m_startSpeed = Speed::Fast;
+                    case 202: startPosSettings->m_startSpeed = Speed::Fast;
                         break;
-                    case 203:
-                        startPosSettings->m_startSpeed = Speed::Faster;
+                    case 203: startPosSettings->m_startSpeed = Speed::Faster;
                         break;
-                    case 1334:
-                        startPosSettings->m_startSpeed = Speed::Fastest;
+                    case 1334: startPosSettings->m_startSpeed = Speed::Fastest;
                         break;
+                    default: break;
                 }
             }
         }
@@ -141,10 +127,8 @@ namespace eclipse::hacks::Level {
         void addObject(GameObject* obj) {
             PlayLayer::addObject(obj);
 
-            switch (obj->m_objectID)
-            {
-                case 31:
-                    m_fields->m_startPositions.push_back(static_cast<StartPosObject *>(obj));
+            switch (obj->m_objectID) {
+                case 31: m_fields->m_startPositions.push_back(static_cast<StartPosObject*>(obj));
                     break;
                 case 12:
                 case 13:
@@ -153,30 +137,25 @@ namespace eclipse::hacks::Level {
                 case 660:
                 case 745:
                 case 1331:
-                case 1933:
-                    m_fields->m_gamemodePortals.push_back(obj);
+                case 1933: m_fields->m_gamemodePortals.push_back(obj);
                     break;
                 case 45:
-                case 46:
-                    m_fields->m_mirrorPortals.push_back(obj);
+                case 46: m_fields->m_mirrorPortals.push_back(obj);
                     break;
                 case 99:
-                case 101:
-                    m_fields->m_miniPortals.push_back(obj);
+                case 101: m_fields->m_miniPortals.push_back(obj);
                     break;
                 case 286:
-                case 287:
-                    m_fields->m_dualPortals.push_back(obj);
+                case 287: m_fields->m_dualPortals.push_back(obj);
                     break;
                 case 200:
                 case 201:
                 case 202:
                 case 203:
-                case 1334:
-                    m_fields->m_speedChanges.push_back(obj);
+                case 1334: m_fields->m_speedChanges.push_back(obj);
                     break;
+                default: break;
             }
         }
-
     };
 }

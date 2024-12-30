@@ -1,14 +1,17 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/button.hpp>
+#include <modules/gui/components/combo.hpp>
+#include <modules/hack/hack.hpp>
 #include <modules/recorder/recorder.hpp>
 
+#include <Geode/modify/CCScheduler.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/ShaderLayer.hpp>
-#include <Geode/modify/CCScheduler.hpp>
 
 #include <regex>
+#include <modules/i18n/translations.hpp>
 #include <modules/recorder/DSPRecorder.hpp>
 
 // android uses custom gd::string class
@@ -19,7 +22,6 @@
 #endif
 
 namespace eclipse::hacks::Recorder {
-
     static recorder::Recorder s_recorder;
 
     bool levelDone = false;
@@ -50,8 +52,7 @@ namespace eclipse::hacks::Recorder {
             i18n::get_("common.ok"),
             i18n::get_("recorder.open-folder"),
             [](bool result) {
-                if(result)
-                    return;
+                if (result) return;
 
                 geode::utils::file::openFolder(geode::Mod::get()->getSaveDir() / "renders");
             }
@@ -59,22 +60,26 @@ namespace eclipse::hacks::Recorder {
     }
 
     void applyWinSize() {
-        if(newDesignResolution.width != 0 && newDesignResolution.height != 0) {
+        if (newDesignResolution.width != 0 && newDesignResolution.height != 0) {
             auto view = utils::get<cocos2d::CCEGLView>();
-            
+
             utils::get<cocos2d::CCDirector>()->m_obWinSizeInPoints = newDesignResolution;
-            view->setDesignResolutionSize(newDesignResolution.width, newDesignResolution.height, ResolutionPolicy::kResolutionExactFit);
+            view->setDesignResolutionSize(
+                newDesignResolution.width, newDesignResolution.height, ResolutionPolicy::kResolutionExactFit
+            );
             view->m_fScaleX = newScreenScale.width;
             view->m_fScaleY = newScreenScale.height;
         }
     }
 
     void restoreWinSize() {
-        if(oldDesignResolution.width != 0 && oldDesignResolution.height != 0) {
+        if (oldDesignResolution.width != 0 && oldDesignResolution.height != 0) {
             auto view = utils::get<cocos2d::CCEGLView>();
 
             utils::get<cocos2d::CCDirector>()->m_obWinSizeInPoints = oldDesignResolution;
-            view->setDesignResolutionSize(oldDesignResolution.width, oldDesignResolution.height, ResolutionPolicy::kResolutionExactFit);
+            view->setDesignResolutionSize(
+                oldDesignResolution.width, oldDesignResolution.height, ResolutionPolicy::kResolutionExactFit
+            );
             view->m_fScaleX = originalScreenScale.width;
             view->m_fScaleY = originalScreenScale.height;
         }
@@ -118,7 +123,10 @@ namespace eclipse::hacks::Recorder {
         newDesignResolution = cocos2d::CCSize(roundf(320.f * aspectRatio), 320.f);
 
         originalScreenScale = cocos2d::CCSize(view->m_fScaleX, view->m_fScaleY);
-        newScreenScale = cocos2d::CCSize(static_cast<float>(s_recorder.m_renderSettings.m_width) / newDesignResolution.width, static_cast<float>(s_recorder.m_renderSettings.m_height) / newDesignResolution.height);
+        newScreenScale = cocos2d::CCSize(
+            static_cast<float>(s_recorder.m_renderSettings.m_width) / newDesignResolution.width,
+            static_cast<float>(s_recorder.m_renderSettings.m_height) / newDesignResolution.height
+        );
 
         if(oldDesignResolution != newDesignResolution)
             applyWinSize();
@@ -163,7 +171,7 @@ namespace eclipse::hacks::Recorder {
 
             tab->addInputFloat("recorder.framerate", "recorder.fps", 1.f, 360.f, "%.0f FPS");
             tab->addInputFloat("recorder.endscreen-duration", "recorder.endscreen", 0.f, 30.f, "%.2fs.");
-            tab->addInputFloat("recorder.bitrate", "recorder.bitrate", 1.f, 1000.f, "%.0fmbps");
+            tab->addInputFloat("recorder.bitrate", 1.f, 1000.f, "%.0fmbps");
             tab->addInputInt("recorder.res-x", "recorder.resolution.x", 1, 15360);
             tab->addInputInt("recorder.res-y", "recorder.resolution.y", 1, 8640);
 
@@ -190,7 +198,7 @@ namespace eclipse::hacks::Recorder {
             // });
 
             tab->addInputText("recorder.colorspace-args", "recorder.colorspace");
-            
+
             tab->addLabel("recorder.presets");
             tab->addButton("recorder.preset.cpu")->callback([] {
                 config::set<std::string>("recorder.codecString", "libx264");
@@ -216,7 +224,7 @@ namespace eclipse::hacks::Recorder {
 
     class $modify(InternalRecorderSLHook, ShaderLayer) {
         void visit() {
-            if(s_recorder.isRecording()) {
+            if (s_recorder.isRecording()) {
                 setScaleY(-1);
                 ShaderLayer::visit();
                 return setScaleY(1);
@@ -293,7 +301,7 @@ namespace eclipse::hacks::Recorder {
             GJBaseGameLayer::update(dt);
         }
     };
-    
+
     class $modify(InternalRecorderPLHook, PlayLayer) {
         void onQuit() {
             if (s_recorder.isRecording()) stop();
@@ -311,5 +319,4 @@ namespace eclipse::hacks::Recorder {
             PlayLayer::resetLevel();
         }
     };
-
 };

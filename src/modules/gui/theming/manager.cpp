@@ -7,14 +7,11 @@
 #include <Geode/utils/cocos.hpp>
 
 namespace eclipse::gui {
-    static auto IMPORT_PICK_OPTIONS = geode::utils::file::FilePickOptions {
-        std::nullopt,
-        {
-            {
-                "Eclipse Themes",
-                { "*.zip" }
-            }
-        }
+    static auto IMPORT_PICK_OPTIONS = geode::utils::file::FilePickOptions{
+        std::nullopt, {{
+            "Eclipse Themes",
+            {"*.zip"}
+        }}
     };
 
     int getDefaultThemeIndex(std::vector<ThemeMeta> const& themes) {
@@ -42,13 +39,13 @@ namespace eclipse::gui {
     }
 
     void ThemeManager::setDefaults() {
-#ifdef GEODE_IS_DESKTOP
+        #ifdef GEODE_IS_DESKTOP
         m_renderer = RendererType::ImGui;
         m_layoutMode = imgui::LayoutMode::Tabbed;
-#else
+        #else
         m_renderer = RendererType::Cocos2d;
         m_layoutMode = imgui::LayoutMode::Panel;
-#endif
+        #endif
 
         m_componentTheme = imgui::ComponentTheme::MegaHack;
         m_schemaVersion = THEME_SCHEMA_VERSION;
@@ -63,7 +60,7 @@ namespace eclipse::gui {
         m_blurSpeed = 0.3f;
         m_blurRadius = 1.f;
 
-        m_searchedColor = Color{ 255, 0, 0, 255 };
+        m_searchedColor = Color{255, 0, 0, 255};
 
         // TODO: fill this after all properties are figured out
     }
@@ -259,15 +256,13 @@ namespace eclipse::gui {
         return false;
     }
 
-    void ThemeManager::exportTheme(const std::filesystem::path &path) {
-
-    }
+    void ThemeManager::exportTheme(const std::filesystem::path& path) {}
 
     float ThemeManager::getGlobalScale() const {
         return m_uiScale * config::getTemp<float>("ui.scale", 1.f) * imgui::DEFAULT_SCALE;
     }
 
-    std::optional<ThemeMeta> ThemeManager::checkTheme(const std::filesystem::path &path) {
+    std::optional<ThemeMeta> ThemeManager::checkTheme(const std::filesystem::path& path) {
         if (!std::filesystem::exists(path)) return std::nullopt;
         std::ifstream file(path);
         if (!file.is_open()) return std::nullopt;
@@ -279,7 +274,7 @@ namespace eclipse::gui {
         auto name = json_try_get<std::string>(details, "name");
         if (!name) return std::nullopt;
 
-        return ThemeMeta { name.value(), path };
+        return ThemeMeta{name.value(), path};
     }
 
     std::vector<ThemeMeta> ThemeManager::listAvailableThemes() {
@@ -352,7 +347,7 @@ namespace eclipse::gui {
         m_componentTheme = theme;
     }
 
-    void ThemeManager::setSelectedFont(const std::string &value) {
+    void ThemeManager::setSelectedFont(const std::string& value) {
         if (auto imgui = imgui::ImGuiRenderer::get()) {
             imgui->getFontManager().setFont(value);
         }

@@ -1,19 +1,16 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
-#include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/EffectGameObject.hpp>
+#include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Player {
-
     class MuteLevelAudioOnDeath : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
-
-            tab->addToggle("player.mutelevelaudioondeath")
-                ->setDescription()
-                ->handleKeybinds();
+            tab->addToggle("player.mutelevelaudioondeath")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Mute Level Audio On Death"; }
@@ -85,7 +82,7 @@ namespace eclipse::hacks::Player {
 
     class $modify(MuteLevelAudioOnDeathEGOHook, EffectGameObject) {
         ADD_HOOKS_DELEGATE("player.mutelevelaudioondeath")
-        
+
         /*
         as of october 14, 2024, and as a direct result of the
         absolute sin of a death effect in level ID 110961285,
@@ -108,5 +105,4 @@ namespace eclipse::hacks::Player {
             if (player->m_isDead && id != 3602 && id != 1934) return EffectGameObject::triggerObject(p0, p1, p2);
         }
     };
-
 }

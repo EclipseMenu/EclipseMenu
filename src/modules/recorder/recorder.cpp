@@ -13,12 +13,12 @@ namespace eclipse::recorder {
     namespace ffmpeg = ffmpeg::events;
 
     class ProjectionDelegate : public cocos2d::CCDirectorDelegate {
-        virtual void updateProjection() override {
+        void updateProjection() override {
             kmGLMatrixMode(KM_GL_PROJECTION);
             kmGLLoadIdentity();
             kmMat4 orthoMatrix;
             auto size = utils::get<cocos2d::CCDirector>()->m_obWinSizeInPoints;
-            kmMat4OrthographicProjection(&orthoMatrix, 0, size.width, size.height, 0, -1024, 1024 );
+            kmMat4OrthographicProjection(&orthoMatrix, 0, size.width, size.height, 0, -1024, 1024);
             kmGLMultMatrix(&orthoMatrix);
             kmGLMatrixMode(KM_GL_MODELVIEW);
             kmGLLoadIdentity();
@@ -65,7 +65,7 @@ namespace eclipse::recorder {
         }
 
         auto res = ffmpegRecorder.init(m_renderSettings);
-        if(res.isErr()) {
+        if (res.isErr()) {
             stop();
             m_callback(res.unwrapErr());
             ffmpegRecorder.stop();
@@ -94,11 +94,10 @@ namespace eclipse::recorder {
         std::filesystem::path tempPath = m_renderSettings.m_outputFile.parent_path() / "music.mp4";
 
         res = ffmpeg::AudioMixer::mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath);
-        if(res.isErr())
-            m_callback(res.unwrapErr());
+        if (res.isErr()) m_callback(res.unwrapErr());
 
         std::filesystem::remove(m_renderSettings.m_outputFile);
-        std::filesystem::rename(tempPath,m_renderSettings.m_outputFile);
+        std::filesystem::rename(tempPath, m_renderSettings.m_outputFile);
     }
 
     std::vector<std::string> Recorder::getAvailableCodecs() {

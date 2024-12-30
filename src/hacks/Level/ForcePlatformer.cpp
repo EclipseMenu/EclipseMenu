@@ -1,19 +1,16 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-
     class ForcePlatformer : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
-
-            tab->addToggle("level.forceplatformer")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("level.forceplatformer")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Force Platformer"; }
@@ -25,7 +22,8 @@ namespace eclipse::hacks::Level {
         ADD_HOOKS_DELEGATE("level.forceplatformer")
 
         void loadLevelSettings() {
-            if(!utils::get<PlayLayer>() || m_levelSettings->m_platformerMode) return GJBaseGameLayer::loadLevelSettings();
+            if (!utils::get<PlayLayer>() || m_levelSettings->m_platformerMode)
+                return GJBaseGameLayer::loadLevelSettings();
 
             //length is changed by loadLevelSettings
             m_levelSettings->m_platformerMode = true;
@@ -38,8 +36,8 @@ namespace eclipse::hacks::Level {
 
     class $modify(ForcePlatformerPLHook, PlayLayer) {
         void resetLevel() {
-            auto val = config ::get("level.forceplatformer", false);
-            if(val != m_isPlatformer) {
+            auto val = config::get("level.forceplatformer", false);
+            if (val != m_isPlatformer) {
                 this->loadLevelSettings();
             }
             PlayLayer::resetLevel();

@@ -120,8 +120,8 @@ namespace eclipse::labels {
         };
     }
 
-#define READ_OPTIONAL(key) if (json.contains(#key)) event.key = json.at(#key).get<decltype(event.key)::value_type>()
-#define STORE_OPTIONAL(key) if (event.key.has_value()) json[#key] = event.key.value()
+    #define READ_OPTIONAL(key) if (json.contains(#key)) event.key = json.at(#key).get<decltype(event.key)::value_type>()
+    #define STORE_OPTIONAL(key) if (event.key.has_value()) json[#key] = event.key.value()
 
     void from_json(const nlohmann::json& json, LabelEvent& event) {
         event.enabled = json.value("enabled", true);

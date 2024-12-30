@@ -6,7 +6,6 @@ namespace eclipse::gui::cocos {
 }
 
 namespace eclipse::i18n {
-
     class DownloadPopup : public geode::Popup<std::string const&> {
     protected:
         bool setup(std::string const& charset) override;
@@ -29,8 +28,5 @@ namespace eclipse::i18n {
 
     public:
         static DownloadPopup* create(std::string const& charset);
-
     };
-
-
 }

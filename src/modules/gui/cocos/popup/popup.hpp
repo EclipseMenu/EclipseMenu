@@ -5,7 +5,6 @@
 #include "tab-menu.hpp"
 
 namespace eclipse::gui::cocos {
-
     class Popup : public geode::Popup<Tabs const&> {
     protected:
         bool setup(Tabs const& tabs) override;
@@ -25,5 +24,4 @@ namespace eclipse::gui::cocos {
         cocos2d::extension::CCScale9Sprite* m_contentBG = nullptr;
         ContentView* m_contentMenu = nullptr;
     };
-
 }

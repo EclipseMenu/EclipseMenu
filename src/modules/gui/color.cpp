@@ -1,7 +1,9 @@
 #include "color.hpp"
+#include <imgui.h>
+#include <fmt/format.h>
+#include <nlohmann/json.hpp>
 
 namespace eclipse::gui {
-
     const Color Color::WHITE = {1, 1, 1};
     const Color Color::BLACK = {0, 0, 0};
     const Color Color::RED = {1, 0, 0};
@@ -15,7 +17,7 @@ namespace eclipse::gui {
         return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
     }
 
-    Color &Color::operator=(const Color &other) {
+    Color& Color::operator=(const Color& other) {
         if (this == &other) return *this;
         r = other.r;
         g = other.g;
@@ -24,7 +26,7 @@ namespace eclipse::gui {
         return *this;
     }
 
-    Color &Color::operator=(Color &&other) noexcept {
+    Color& Color::operator=(Color&& other) noexcept {
         if (this == &other) return *this;
         r = other.r;
         g = other.g;
@@ -39,7 +41,7 @@ namespace eclipse::gui {
         return {r, g, b, a};
     }
 
-    Color &Color::operator=(const ImVec4 &col2) {
+    Color& Color::operator=(const ImVec4& col2) {
         r = col2.x;
         g = col2.y;
         b = col2.z;
@@ -95,6 +97,10 @@ namespace eclipse::gui {
         return {r + m, g + m, b + m, a};
     }
 
+    Color Color::fromHSV(const ImVec4& hsv) {
+        return fromHSV(hsv.x, hsv.y, hsv.z, hsv.w);
+    }
+
     Color Color::fromInt(int color, Color::IntType type) {
         float v1, v2, v3, v4;
         v1 = (float) ((color >> 24) & 0xFF) / 255.0f;
@@ -103,14 +109,10 @@ namespace eclipse::gui {
         v4 = (float) (color & 0xFF) / 255.0f;
 
         switch (type) {
-            default:
-                return {v1, v2, v3, v4};
-            case IntType::ARGB:
-                return {v2, v3, v4, v1};
-            case IntType::ABGR:
-                return {v4, v3, v2, v1};
-            case IntType::BGRA:
-                return {v3, v2, v1, v4};
+            default: return {v1, v2, v3, v4};
+            case IntType::ARGB: return {v2, v3, v4, v1};
+            case IntType::ABGR: return {v4, v3, v2, v1};
+            case IntType::BGRA: return {v3, v2, v1, v4};
         }
     }
 
@@ -121,18 +123,14 @@ namespace eclipse::gui {
         bv = static_cast<int>(this->b * 255);
         av = static_cast<int>(this->a * 255);
         switch (type) {
-            default:
-                return (rv << 24) | (gv << 16) | (bv << 8) | av;
-            case IntType::ARGB:
-                return (av << 24) | (rv << 16) | (gv << 8) | bv;
-            case IntType::ABGR:
-                return (av << 24) | (bv << 16) | (gv << 8) | rv;
-            case IntType::BGRA:
-                return (bv << 24) | (gv << 16) | (rv << 8) | av;
+            default: return (rv << 24) | (gv << 16) | (bv << 8) | av;
+            case IntType::ARGB: return (av << 24) | (rv << 16) | (gv << 8) | bv;
+            case IntType::ABGR: return (av << 24) | (bv << 16) | (gv << 8) | rv;
+            case IntType::BGRA: return (bv << 24) | (gv << 16) | (rv << 8) | av;
         }
     }
 
-    Color Color::fromString(const std::string &color, Color::IntType type) {
+    Color Color::fromString(const std::string& color, Color::IntType type) {
         uint32_t c = std::strtoul(color.c_str(), nullptr, 16);
         return fromInt(c, type);
     }

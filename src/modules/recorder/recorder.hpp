@@ -5,10 +5,8 @@
 #include "rendertexture.hpp"
 
 #include <mutex>
-#include <chrono>
 
 namespace eclipse::recorder {
-
     class Recorder {
     public:
         void start();
@@ -21,7 +19,7 @@ namespace eclipse::recorder {
         void setCallback(const std::function<void(std::string const&)>& callback) { m_callback = callback; }
 
         static std::vector<std::string> getAvailableCodecs();
-    
+
     public:
         ffmpeg::RenderSettings m_renderSettings{};
 

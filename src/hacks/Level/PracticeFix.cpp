@@ -1,27 +1,26 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 #include <modules/utils/GameCheckpoint.hpp>
 
-#include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/CheckpointObject.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
-#include <Geode/modify/CheckpointObject.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 using namespace geode::prelude;
 
 namespace eclipse::Hacks::Level {
-
     class PracticeFix : public hack::Hack {
     public:
         static bool shouldEnable() {
             return config::get<bool>("bot.practicefix", false) || config::get<int>("bot.state", 0) == 1;
         }
-        
+
     private:
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
-
             tab->addToggle("bot.practicefix")->setDescription()->handleKeybinds();
         }
 
@@ -48,8 +47,8 @@ namespace eclipse::Hacks::Level {
         }
 
     private:
-        eclipse::utils::FixPlayerCheckpoint m_checkpointPlayer1;
-        eclipse::utils::FixPlayerCheckpoint m_checkpointPlayer2;
+        utils::FixPlayerCheckpoint m_checkpointPlayer1;
+        utils::FixPlayerCheckpoint m_checkpointPlayer2;
     };
 
     class $modify(FixPlayLayer, PlayLayer) {
@@ -83,7 +82,6 @@ namespace eclipse::Hacks::Level {
 
             PlayLayer::loadFromCheckpoint(checkpoint);
         }
-
     };
 
     class $modify(PracticeFixLELHook, LevelEditorLayer) {
@@ -92,19 +90,19 @@ namespace eclipse::Hacks::Level {
 
             if (auto* playLayer = static_cast<FixPlayLayer*>(utils::get<PlayLayer>()))
                 playLayer->m_fields->m_checkpoints.clear();
-            
+
             return result;
         }
     };
 
     class $modify(PracticeFixCOHook, CheckpointObject) {
-#ifdef GEODE_IS_ANDROID
+        #ifdef GEODE_IS_ANDROID
         static CheckpointObject* create() { // this is so dumb
             auto result = CheckpointObject::create();
-#else 
+        #else
         bool init() override {
             auto result = CheckpointObject::init();
-#endif
+            #endif
 
             if (!PracticeFix::shouldEnable())
                 return result;
@@ -112,16 +110,17 @@ namespace eclipse::Hacks::Level {
             auto* playLayer = static_cast<FixPlayLayer*>(utils::get<PlayLayer>());
 
             if (playLayer->m_gameState.m_currentProgress > 0) {
-                CheckpointData data(playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr);
-#ifdef GEODE_IS_ANDROID
+                CheckpointData data(
+                    playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr
+                );
+                #ifdef GEODE_IS_ANDROID
                 playLayer->m_fields->m_checkpoints[result] = data;
-#else
-                playLayer->m_fields->m_checkpoints[(CheckpointObject*)this] = data;
-#endif
+                #else
+                playLayer->m_fields->m_checkpoints[(CheckpointObject*) this] = data;
+                #endif
             }
 
             return result;
         }
     };
-
 }

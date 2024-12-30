@@ -1,12 +1,12 @@
 #include <modules/gui/gui.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/components/float-toggle.hpp>
 
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/CCDelayTime.hpp>
 
 namespace eclipse::hacks::Player {
-
     class RespawnDelay : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
@@ -14,8 +14,7 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.respawndelay.toggle", false);
             config::setIfEmpty("player.respawndelay", 1.f);
 
-            tab->addFloatToggle("player.respawndelay", "player.respawndelay", 0.f, 120.f, "%.2f s.")
-               ->handleKeybinds();
+            tab->addFloatToggle("player.respawndelay", 0.f, 120.f, "%.2f s.")->handleKeybinds();
         }
 
         [[nodiscard]] int32_t getPriority() const override { return 1; }
@@ -44,5 +43,4 @@ namespace eclipse::hacks::Player {
             }
         }
     };
-
 }

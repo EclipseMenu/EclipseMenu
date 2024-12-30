@@ -1,18 +1,15 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/FMODAudioEngine.hpp>
 
 namespace eclipse::hacks::Player {
-
     class MuteRewardsSFX : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
-
-            tab->addToggle("player.muterewardssfx")
-                ->setDescription()
-                ->handleKeybinds();
+            tab->addToggle("player.muterewardssfx")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Mute Rewards SFX on Death"; }
@@ -20,7 +17,9 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(MuteRewardsSFX)
 
-    constexpr std::array<std::string_view, 4> badSFX = { "achievement_01.ogg", "magicExplosion.ogg", "gold02.ogg", "secretKey.ogg" };
+    constexpr std::array<std::string_view, 4> badSFX = {
+        "achievement_01.ogg", "magicExplosion.ogg", "gold02.ogg", "secretKey.ogg"
+    };
 
     class $modify(MuteRewardsSFXFMODAEHook, FMODAudioEngine) {
         static void onModify(auto& self) {
@@ -40,5 +39,4 @@ namespace eclipse::hacks::Player {
                 FMODAudioEngine::playEffect(path, speed, p2, volume);
         }
     };
-
 }

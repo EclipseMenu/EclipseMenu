@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseComponentNode.hpp"
-#include <modules/gui/cocos/popup/options-popup.hpp>
+
+#include <modules/gui/components/float-toggle.hpp>
 #include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::cocos {

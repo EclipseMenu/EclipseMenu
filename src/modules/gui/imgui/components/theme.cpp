@@ -2,11 +2,29 @@
 
 #include <imgui-cocos.hpp>
 #include <imgui_internal.h>
+#include <misc/cpp/imgui_stdlib.h>
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
 #include <modules/gui/theming/manager.hpp>
-#include <misc/cpp/imgui_stdlib.h>
 #include <modules/i18n/translations.hpp>
+#include <modules/labels/setting.hpp>
+#include <modules/labels/variables.hpp>
+
+#include <modules/gui/components/button.hpp>
+#include <modules/gui/components/color.hpp>
+#include <modules/gui/components/combo.hpp>
+#include <modules/gui/components/filesystem-combo.hpp>
+#include <modules/gui/components/float-toggle.hpp>
+#include <modules/gui/components/input-float.hpp>
+#include <modules/gui/components/input-int.hpp>
+#include <modules/gui/components/input-text.hpp>
+#include <modules/gui/components/int-toggle.hpp>
+#include <modules/gui/components/keybind.hpp>
+#include <modules/gui/components/label-settings.hpp>
+#include <modules/gui/components/label.hpp>
+#include <modules/gui/components/radio.hpp>
+#include <modules/gui/components/slider.hpp>
+#include <modules/gui/components/toggle.hpp>
 
 std::pair<std::string, float> truncateString(std::string_view str, float availWidth, bool canDelete = false) {
     auto labelMaxWidth = availWidth * (canDelete ? 0.5f : 0.6f);
@@ -62,7 +80,7 @@ namespace eclipse::gui::imgui {
 #undef CASE
     }
 
-    void Theme::handleTooltip(const std::string &text) {
+    void Theme::handleTooltip(const std::string& text) {
         if (text.empty()) return;
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
             ImVec2 pos = ImGui::GetMousePos();
@@ -163,7 +181,7 @@ namespace eclipse::gui::imgui {
         colors[ImGuiCol_FrameBgActive] = tm->getFrameBackground();
     }
 
-    bool Theme::beginWindow(const std::string &title) {
+    bool Theme::beginWindow(const std::string& title) {
         ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar;
         auto tm = ThemeManager::get();
         ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getTitleForegroundColor()));
@@ -329,7 +347,7 @@ namespace eclipse::gui::imgui {
         ImGui::PopItemWidth();
     }
 
-    void Theme::visitInputFloat(const std::shared_ptr<InputFloatComponent> &inputFloat) const {
+    void Theme::visitInputFloat(const std::shared_ptr<InputFloatComponent>& inputFloat) const {
         auto value = inputFloat->getValue();
         auto title = i18n::get(inputFloat->getTitle());
 
@@ -354,7 +372,7 @@ namespace eclipse::gui::imgui {
         ImGui::PopItemWidth();
     }
 
-    void Theme::visitInputInt(const std::shared_ptr<InputIntComponent> &inputInt) const {
+    void Theme::visitInputInt(const std::shared_ptr<InputIntComponent>& inputInt) const {
         auto value = inputInt->getValue();
         auto title = i18n::get(inputInt->getTitle());
 
@@ -594,11 +612,27 @@ namespace eclipse::gui::imgui {
                 labelSettings->triggerEditCallback();
             }
 
-            auto& text = settings->text;
-            if (ImGui::InputText(i18n::get("labels.text").data(), &text)) {
-                settings->text = text;
+            // auto& text = settings->text;
+            // if (ImGui::InputText(i18n::get("labels.text").data(), &text)) {
+            //     settings->text = text;
+            //     labelSettings->triggerEditCallback();
+            // }
+
+            ImGui::Text("%s", i18n::get("labels.text").data());
+            if (ImGui::InputTextMultiline("##code-editor", &settings->text, ImVec2(0, 0), ImGuiInputTextFlags_AllowTabInput)) {
                 labelSettings->triggerEditCallback();
             }
+
+            if (ImGui::CollapsingHeader(i18n::get("labels.preview").data())) {
+                auto res = rift::format(settings->text, labels::VariableManager::get().getVariables());
+                if (res.isOk()) {
+                    ImGui::TextWrapped("%s", res.unwrap().c_str());
+                } else {
+                    ImGui::TextWrapped("%s", res.unwrapErr().prettyPrint().c_str());
+                }
+            }
+
+            ImGui::Separator();
 
             int32_t currentFont = labels::getFontIndex(settings->font);
             if (ImGui::Combo(i18n::get("labels.font").data(), &currentFont, labels::fontNames.data(), labels::fontNames.size())) {
@@ -773,7 +807,7 @@ namespace eclipse::gui::imgui {
             labelSettings->triggerEditCallback();
     }
 
-    bool Theme::checkbox(const std::string &label, bool &value, bool isSearchedFor, const std::function<void()> &postDraw) const {
+    bool Theme::checkbox(const std::string& label, bool& value, bool isSearchedFor, const std::function<void()>& postDraw) const {
         auto tm = ThemeManager::get();
 
         ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(isSearchedFor ? tm->getSearchedColor() : tm->getCheckboxForegroundColor()));
@@ -787,10 +821,10 @@ namespace eclipse::gui::imgui {
         return result;
     }
 
-    bool Theme::checkboxWithSettings(const std::string &label, bool &value,
+    bool Theme::checkboxWithSettings(const std::string& label, bool& value,
                                      bool isSearchedFor,
-                                     const std::function<void()> &callback,
-                                     const std::function<void()> &postDraw,
+                                     const std::function<void()>& callback,
+                                     const std::function<void()>& postDraw,
                                      const std::string& popupId) const {
         auto tm = ThemeManager::get();
 
@@ -817,7 +851,7 @@ namespace eclipse::gui::imgui {
         return result;
     }
 
-    bool Theme::button(const std::string &text, bool isSearchedFor) const {
+    bool Theme::button(const std::string& text, bool isSearchedFor) const {
         ImGui::PushItemWidth(-1);
 
         auto tm = ThemeManager::get();

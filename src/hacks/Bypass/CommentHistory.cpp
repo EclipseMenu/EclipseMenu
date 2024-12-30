@@ -1,18 +1,15 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/ProfilePage.hpp>
 
 namespace eclipse::hacks::Bypass {
-
     class CommentHistory : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
-
-            tab->addToggle("bypass.commenthistory")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("bypass.commenthistory")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Comment History Bypass"; }
@@ -30,5 +27,4 @@ namespace eclipse::hacks::Bypass {
             score->m_commentHistoryStatus = originalCommentHistory;
         }
     };
-
 }

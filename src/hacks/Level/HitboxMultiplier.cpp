@@ -1,14 +1,14 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GameObject.hpp>
-#include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/OBB2D.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-
     static GameObject* s_rotatedGameObject = nullptr;
     static std::deque<GameObject*> s_affectedGameObjects;
 
@@ -18,9 +18,9 @@ namespace eclipse::hacks::Level {
 
         if ((gameObject == utils::get<GJBaseGameLayer>()->m_player1 || gameObject == utils::get<GJBaseGameLayer>()->m_player2))
             return config::get<float>("level.hitbox_multiplier.player", 1.f);
-        else if (gameObject->m_objectType == GameObjectType::Hazard || gameObject->m_objectType == GameObjectType::AnimatedHazard)
+        if (gameObject->m_objectType == GameObjectType::Hazard || gameObject->m_objectType == GameObjectType::AnimatedHazard)
             return config::get<float>("level.hitbox_multiplier.hazard", 1.f);
-        else if (gameObject->m_objectType == GameObjectType::Solid || gameObject->m_objectType == GameObjectType::Slope)
+        if (gameObject->m_objectType == GameObjectType::Solid || gameObject->m_objectType == GameObjectType::Slope)
             return config::get<float>("level.hitbox_multiplier.solid", 1.f);
 
         return 1.f;
@@ -74,15 +74,13 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.hitbox_multiplier.solid", 1.f);
             config::setIfEmpty("level.hitbox_multiplier.hazard", 1.f);
 
-            tab->addToggle("level.hitbox_multiplier")
-                ->handleKeybinds()
-                ->setDescription()
-                ->callback([](bool){forceHitboxRecalculation();})
-                ->addOptions([] (std::shared_ptr<gui::MenuTab> options) {
-                    options->addInputFloat("level.hitbox_multiplier.player", "level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx");
-                    options->addInputFloat("level.hitbox_multiplier.solid", "level.hitbox_multiplier.solid", 0.01f, 10.f, "%.2fx");
-                    options->addInputFloat("level.hitbox_multiplier.hazard", "level.hitbox_multiplier.hazard", 0.01f, 10.f, "%.2fx");
-                });
+            tab->addToggle("level.hitbox_multiplier")->handleKeybinds()->setDescription()
+               ->callback([](bool) { forceHitboxRecalculation(); })
+               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                   options->addInputFloat("level.hitbox_multiplier.player", 0.01f, 10.f, "%.2fx");
+                   options->addInputFloat("level.hitbox_multiplier.solid", 0.01f, 10.f, "%.2fx");
+                   options->addInputFloat("level.hitbox_multiplier.hazard", 0.01f, 10.f, "%.2fx");
+               });
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("level.hitbox_multiplier", false); }
@@ -124,7 +122,8 @@ namespace eclipse::hacks::Level {
 
     class $modify(HitboxMultiplierOBB2DHook, OBB2D) {
         void calculateWithCenter(cocos2d::CCPoint center, float width, float heigth, float rotation) {
-            if (!utils::get<GJBaseGameLayer>() || !config::get<bool>("level.hitbox_multiplier", false) || !s_rotatedGameObject) {
+            if (!utils::get<GJBaseGameLayer>() || !config::get<bool>("level.hitbox_multiplier", false) || !
+                s_rotatedGameObject) {
                 s_rotatedGameObject = nullptr;
                 return OBB2D::calculateWithCenter(center, width, heigth, rotation);
             }
@@ -133,7 +132,7 @@ namespace eclipse::hacks::Level {
 
             float multiplier = getMultiplier(s_rotatedGameObject);
             OBB2D::calculateWithCenter(center, width * multiplier, heigth * multiplier, rotation);
-            
+
             s_rotatedGameObject = nullptr;
         }
     };

@@ -1,12 +1,13 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
+#include <modules/keybinds/manager.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/UILayer.hpp>
 
 namespace eclipse::hacks::Player {
-
     // for on-screen UI
     static bool s_frameStepperPressed = false;
     static bool s_frameStepperDown = false;
@@ -34,14 +35,14 @@ namespace eclipse::hacks::Player {
             auto tab = gui::MenuTab::find("tab.player");
 
             tab->addToggle("player.framestepper")
-                ->setDescription()
-                ->handleKeybinds()
-                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addKeybind("player.framestepper.step_key", "player.framestepper.step_key");
-                    options->addToggle("player.framestepper.hold", "player.framestepper.hold");
-                    options->addInputFloat("player.framestepper.hold_delay", "player.framestepper.hold_delay", 0.0f, FLT_MAX, "%.2f");
-                    options->addInputInt("player.framestepper.hold_speed", "player.framestepper.hold_speed", 0);
-                });
+               ->setDescription()
+               ->handleKeybinds()
+               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                   options->addKeybind("player.framestepper.step_key", "player.framestepper.step_key");
+                   options->addToggle("player.framestepper.hold");
+                   options->addInputFloat("player.framestepper.hold_delay", 0.0f, FLT_MAX, "%.2f");
+                   options->addInputInt("player.framestepper.hold_speed", 0);
+               });
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.framestepper", false); }
@@ -153,8 +154,8 @@ namespace eclipse::hacks::Player {
             auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
             auto sprite = cocos2d::CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
             sprite->setFlipX(true);
-            m_stepForward = HoldingMenuItem::create(sprite,
-                [] { 
+            m_stepForward = HoldingMenuItem::create(
+                sprite, [] {
                     s_frameStepperPressed = true;
                     s_frameStepperDown = true;
                 },
@@ -188,7 +189,7 @@ namespace eclipse::hacks::Player {
     };
 
     // Desktop users don't need the on-screen UI
-#ifndef GEODE_IS_DESKTOP
+    #ifndef GEODE_IS_DESKTOP
     class $modify(FrameSFrameStepperUILHook, UILayer) {
         bool init(GJBaseGameLayer* bgl) {
             if (!UILayer::init(bgl))
@@ -200,6 +201,5 @@ namespace eclipse::hacks::Player {
             return true;
         }
     };
-#endif
-
+    #endif
 }

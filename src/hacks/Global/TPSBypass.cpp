@@ -1,11 +1,11 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/float-toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
-#include <modules/labels/variables.hpp>
 
 #ifndef GEODE_IS_MACOS
 constexpr float MIN_TPS = 0.f;
@@ -18,16 +18,17 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.tpsbypass", 240.f);
 
             auto tab = gui::MenuTab::find("tab.global");
-            tab->addFloatToggle("global.tpsbypass", "global.tpsbypass", MIN_TPS, MAX_TPS, "%.2f TPS")
+            tab->addFloatToggle("global.tpsbypass", MIN_TPS, MAX_TPS, "%.2f TPS")
                ->setDescription()
                ->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Physics Bypass"; }
         [[nodiscard]] int32_t getPriority() const override { return -14; }
+
         [[nodiscard]] bool isCheating() override {
             return config::get<bool>("global.tpsbypass.toggle", false) &&
-                config::get<float>("global.tpsbypass", 240.f) != 240.f;
+                   config::get<float>("global.tpsbypass", 240.f) != 240.f;
         }
     };
 
@@ -173,6 +174,5 @@ namespace eclipse::hacks::Global {
             LevelEditorLayer::postUpdate(fields->m_realDelta);
         }
     };
-
 }
 #endif

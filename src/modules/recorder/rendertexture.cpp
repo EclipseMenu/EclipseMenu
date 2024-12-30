@@ -5,7 +5,6 @@
 #include <modules/utils/SingletonCache.hpp>
 
 namespace eclipse::recorder {
-
     void RenderTexture::begin() {
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_old_fbo);
 
@@ -61,5 +60,4 @@ namespace eclipse::recorder {
         glBindFramebuffer(GL_FRAMEBUFFER, m_old_fbo);
         director->setViewport();
     }
-
-};
+}

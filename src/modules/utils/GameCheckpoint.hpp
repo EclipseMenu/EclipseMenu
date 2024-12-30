@@ -1,14 +1,10 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
-#include <modules/config/config.hpp>
-
-#include <Geode/modify/PlayLayer.hpp>
-#include <Geode/modify/GJBaseGameLayer.hpp>
+#pragma once
+#include <Geode/binding/PlayerObject.hpp>
 
 using namespace geode::prelude;
 
 namespace eclipse::utils {
-        class FixPlayerCheckpoint {
+    class FixPlayerCheckpoint {
     public:
         FixPlayerCheckpoint() = default;
 
@@ -255,16 +251,18 @@ namespace eclipse::utils {
             m_ignoreDamage = player->m_ignoreDamage;
             m_enable22Changes = player->m_enable22Changes;
 
-            for(int i = 0; i < player->m_touchingRings->count(); i++)
-                m_touchingRings.push_back(player->m_touchingRings->objectAtIndex(i));
+            for (int i = 0; i < player->m_touchingRings->count(); i++)
+                m_touchingRings.push_back(
+                    player->m_touchingRings->objectAtIndex(i)
+                );
 
             m_position = player->m_position;
             m_rotation = player->getRotation();
 
-            m_rotateObjectsRelated = player->m_rotateObjectsRelated; // unordered_map<int, GJPointDouble>
+            m_rotateObjectsRelated = player->m_rotateObjectsRelated;     // unordered_map<int, GJPointDouble>
             m_maybeRotatedObjectsMap = player->m_maybeRotatedObjectsMap; // unordered_map<int, GameObject*>
-            m_ringRelatedSet = player->m_ringRelatedSet; // unordered_set<int>
-            m_touchedRings = player->m_touchedRings; // unordered_set<int>
+            m_ringRelatedSet = player->m_ringRelatedSet;                 // unordered_set<int>
+            m_touchedRings = player->m_touchedRings;                     // unordered_set<int>
         }
 
         void apply(PlayerObject* player) {

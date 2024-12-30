@@ -6,7 +6,6 @@
 #include <Geode/modify/CCTouchDispatcher.hpp>
 
 namespace eclipse::keybinds {
-
     class $modify(MouseKeybindingsManagerCCTDHook, cocos2d::CCTouchDispatcher) {
         static void onModify(auto& self) {
             FIRST_PRIORITY("cocos2d::CCTouchDispatcher::touches");
@@ -18,14 +17,11 @@ namespace eclipse::keybinds {
             if (!touch) return CCTouchDispatcher::touches(touches, event, type);
 
             auto manager = Manager::get();
-            if (type == cocos2d::CCTOUCHBEGAN)
-                manager->registerKeyPress(Keys::MouseLeft);
-            else if (type == cocos2d::CCTOUCHENDED)
-                manager->registerKeyRelease(Keys::MouseLeft);
+            if (type == cocos2d::CCTOUCHBEGAN) manager->registerKeyPress(Keys::MouseLeft);
+            else if (type == cocos2d::CCTOUCHENDED) manager->registerKeyRelease(Keys::MouseLeft);
 
             cocos2d::CCTouchDispatcher::touches(touches, event, type);
         }
     };
-
 }
 #endif

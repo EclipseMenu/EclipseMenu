@@ -1,19 +1,21 @@
-#include <modules/gui/popup.hpp>
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
-#include <modules/config/config.hpp>
 #include <modules/bot/bot.hpp>
-#include <modules/keybinds/manager.hpp>
+#include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/popup.hpp>
+#include <modules/gui/components/button.hpp>
+#include <modules/gui/components/filesystem-combo.hpp>
+#include <modules/gui/components/radio.hpp>
+#include <modules/hack/hack.hpp>
+#include <modules/i18n/translations.hpp>
 
-#include <Geode/modify/PlayLayer.hpp>
-#include <Geode/modify/PlayerObject.hpp>
-#include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/CheckpointObject.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/PlayerObject.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 using namespace geode::prelude;
 
 namespace eclipse::hacks::Bot {
-
     static bot::Bot s_bot;
 
     void newReplay() {
@@ -21,7 +23,7 @@ namespace eclipse::hacks::Bot {
             i18n::get_("bot.new-replay"),
             i18n::get_("bot.new-replay.msg"),
             [&](bool result, std::string name) {
-                if(!result)
+                if (!result)
                     return;
 
                 s_bot.save(Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
@@ -41,14 +43,14 @@ namespace eclipse::hacks::Bot {
 
         std::filesystem::path replayPath = config::get<std::filesystem::path>("bot.selectedreplay", "temp");
 
-        if(std::filesystem::exists(replayPath)) {
+        if (std::filesystem::exists(replayPath)) {
             return Popup::create(
                 i18n::get_("common.warning"),
                 i18n::format("bot.overwrite", replayPath.filename().stem().string()),
                 i18n::get_("common.yes"),
                 i18n::get_("common.no"),
                 [&](bool result) {
-                    if(!result)
+                    if (!result)
                         return;
 
                     auto confirmReplayDirectory = config::get<std::filesystem::path>("bot.selectedreplay", "temp");
@@ -56,7 +58,9 @@ namespace eclipse::hacks::Bot {
                     s_bot.save(confirmReplayDirectory);
                     Popup::create(
                         i18n::get_("bot.saved"),
-                        i18n::format("bot.saved.msg", confirmReplayDirectory.filename().stem().string(), s_bot.getInputCount())
+                        i18n::format(
+                            "bot.saved.msg", confirmReplayDirectory.filename().stem().string(), s_bot.getInputCount()
+                        )
                     );
 
                     config::set("bot.selectedreplay", confirmReplayDirectory);
@@ -89,14 +93,14 @@ namespace eclipse::hacks::Bot {
     void loadReplay() {
         std::filesystem::path replayPath = config::get<std::string>("bot.selectedreplay", "");
 
-        if(s_bot.getInputCount() > 0) {
+        if (s_bot.getInputCount() > 0) {
             return Popup::create(
                 i18n::get_("common.warning"),
                 i18n::get_("bot.overwrite-current"),
                 i18n::get_("common.yes"),
                 i18n::get_("common.no"),
                 [&](bool result) {
-                    if(!result)
+                    if (!result)
                         return;
 
                     std::filesystem::path confirmReplayPath = config::get<std::string>("bot.selectedreplay", "");
@@ -111,7 +115,7 @@ namespace eclipse::hacks::Bot {
 
     void deleteReplay() {
         std::filesystem::path replayPath = config::get<std::string>("bot.selectedreplay", "");
-        if(!std::filesystem::exists(replayPath)) {
+        if (!std::filesystem::exists(replayPath)) {
             return Popup::create(
                 i18n::get_("bot.delete-invalid"),
                 i18n::get_("bot.delete-invalid.msg")
@@ -172,6 +176,7 @@ namespace eclipse::hacks::Bot {
             // only check if we are in playback mode and there are inputs
             return state == 2 && s_bot.getInputCount() != 0;
         }
+
         [[nodiscard]] const char* getId() const override { return "Bot"; }
     };
 
@@ -261,5 +266,4 @@ namespace eclipse::hacks::Bot {
             s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !realPlayer1, down);
         }
     };
-
 }

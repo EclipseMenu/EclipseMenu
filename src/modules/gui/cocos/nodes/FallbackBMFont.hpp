@@ -1,6 +1,5 @@
 #pragma once
-#include <modules/config/config.hpp>
-#include <modules/i18n/translations.hpp>
+
 #include <modules/utils/SingletonCache.hpp>
 #include <codecvt>
 
@@ -12,48 +11,13 @@
 
 namespace eclipse::gui::cocos {
 
-    inline static std::u16string UTF8ToUTF16(const std::string& utf8) {
-#ifdef GEODE_IS_WINDOWS
-        auto len = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
-        std::vector<uint16_t> utf16(len);
-        MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, reinterpret_cast<wchar_t*>(utf16.data()), len);
-        return std::u16string(reinterpret_cast<char16_t*>(utf16.data()));
-#elif defined(GEODE_IS_ANDROID)
-        auto str = cocos2d::cc_utf8_to_utf16(utf8.c_str());
-        auto ret = std::u16string(reinterpret_cast<char16_t*>(str));
-        delete[] str;
-        return ret;
-#else
-        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-        return convert.from_bytes(utf8);
-#endif
-    }
+    static std::u16string utf8ToUtf16(std::string_view utf8) noexcept;
 
-    inline static void setBatchSpriteColor(cocos2d::CCSpriteBatchNode* batch, const cocos2d::ccColor3B& color) {
-        if (auto children = batch->getChildren()) {
-            for (int i = 0; i < children->count(); i++) {
-                static_cast<cocos2d::CCSprite*>(children->objectAtIndex(i))->setColor(color);
-            }
-        }
-    }
+    static void setBatchSpriteColor(cocos2d::CCSpriteBatchNode* batch, const cocos2d::ccColor3B& color);
 
-    inline static void setBatchSpriteOpacity(cocos2d::CCSpriteBatchNode* batch, GLubyte opacity) {
-        if (auto children = batch->getChildren()) {
-            for (int i = 0; i < children->count(); i++) {
-                static_cast<cocos2d::CCSprite*>(children->objectAtIndex(i))->setOpacity(opacity);
-            }
-        }
-    }
+    static void setBatchSpriteOpacity(cocos2d::CCSpriteBatchNode* batch, GLubyte opacity);
 
-    inline static void setBatchSpriteColorAndOpacity(cocos2d::CCSpriteBatchNode* batch, const cocos2d::ccColor3B& color, GLubyte opacity) {
-        if (auto children = batch->getChildren()) {
-            for (int i = 0; i < children->count(); i++) {
-                auto sprite = static_cast<cocos2d::CCSprite*>(children->objectAtIndex(i));
-                sprite->setColor(color);
-                sprite->setOpacity(opacity);
-            }
-        }
-    }
+    static void setBatchSpriteColorAndOpacity(cocos2d::CCSpriteBatchNode* batch, const cocos2d::ccColor3B& color, GLubyte opacity);
 
     inline static const std::unordered_map<uint64_t, std::string_view> g_emojis = {
         { 0xD83D'DC7D, "alien.png"_spr },
@@ -141,7 +105,7 @@ namespace eclipse::gui::cocos {
                 if (m_sInitialStringUTF8 == newString) return;
                 m_sInitialStringUTF8 = newString;
             }
-            m_string = std::move(UTF8ToUTF16(newString));
+            m_string = std::move(utf8ToUtf16(newString));
             this->BaseLabel::setString(reinterpret_cast<uint16_t*>(m_string.data()), needUpdateLabel);
         }
 
@@ -200,52 +164,21 @@ namespace eclipse::gui::cocos {
         static FallbackBMFont* create(const std::string& text, const std::string& font, const std::string& fallbackFont);
 
         /// @brief Create a FallbackBMFont with the default font and fallback font.
-        static FallbackBMFont* create(const std::string& text) {
-            return FallbackBMFont::create(
-                text,
-                fmt::format("font_{}.fnt"_spr, i18n::getRequiredGlyphRangesString()),
-                "font_default.fnt"_spr
-            );
-        }
+        static FallbackBMFont* create(const std::string& text);
 
-        ~FallbackBMFont() override {
-            m_fallbackConfiguration->release();
-        }
+        ~FallbackBMFont() override;
 
         bool init(const std::string& text, const std::string& font, const std::string& fallbackFont);
 
-        void setString(std::string_view text) const {
-            m_label->Label::setString(text.data(), true);
-        }
+        void setString(std::string_view text) const;
 
-        void setFntFile(std::string_view fntFile) const {
-            m_label->setFntFile(fntFile);
-        }
+        void setFntFile(std::string_view fntFile) const;
 
-        void setColor(const cocos2d::ccColor3B& color) const {
-            m_label->setColor(color);
-            setBatchSpriteColor(m_fallbackBatch, color);
-        }
+        void setColor(const cocos2d::ccColor3B& color) const;
 
-        void setOpacity(GLubyte opacity) const {
-            m_label->setOpacity(opacity);
-            setBatchSpriteOpacity(m_fallbackBatch, opacity);
-        }
+        void setOpacity(GLubyte opacity) const;
 
-        void limitLabelWidth(float width, float defaultScale, float minScale) {
-            auto originalWidth = m_label->getContentSize().width;
-            auto scale = this->getScale();
-            if (originalWidth > width && width > 0.0f) {
-                scale = width / originalWidth;
-            }
-            if (defaultScale != 0.0f && defaultScale <= scale) {
-                scale = defaultScale;
-            }
-            if (minScale != 0.0f && minScale >= scale) {
-                scale = minScale;
-            }
-            this->setScale(scale);
-        }
+        void limitLabelWidth(float width, float defaultScale, float minScale);
 
         cocos2d::CCSpriteBatchNode* getSecondBatch() const { return m_fallbackBatch; }
 
@@ -267,22 +200,13 @@ namespace eclipse::gui::cocos {
 
         virtual bool init(const std::string& text, const std::string& font);
 
-        void setString(std::string_view text) const {
-            m_label->Label::setString(text.data(), true);
-        }
+        void setString(std::string_view text) const;
 
-        void setFntFile(std::string_view fntFile) const {
-            m_label->setFntFile(fntFile);
-        }
+        void setFntFile(std::string_view fntFile) const;
 
-        void setColor(const cocos2d::ccColor3B& color) const {
-            m_label->setColor(color);
-        }
+        void setColor(const cocos2d::ccColor3B& color) const;
 
-        void setOpacity(GLubyte opacity) const {
-            m_label->setOpacity(opacity);
-            setBatchSpriteOpacity(m_emojiBatch, opacity);
-        }
+        void setOpacity(GLubyte opacity) const;
 
         cocos2d::CCSpriteBatchNode* getSecondBatch() const { return m_emojiBatch; }
 
@@ -295,16 +219,7 @@ namespace eclipse::gui::cocos {
     /// @brief Label node that supports translation.
     class TranslatedLabel : public FallbackBMFont {
     public:
-        static TranslatedLabel* create(std::string_view key) {
-            auto ret = new TranslatedLabel();
-            ret->init(
-                i18n::get_(key),
-                fmt::format("font_{}.fnt"_spr, i18n::getRequiredGlyphRangesString()),
-                "font_default.fnt"_spr
-            );
-            ret->autorelease();
-            return ret;
-        }
+        static TranslatedLabel* create(std::string_view key);
     };
 
 }

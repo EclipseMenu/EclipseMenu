@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseComponentNode.hpp"
-#include <modules/gui/cocos/popup/options-popup.hpp>
+
+#include <modules/gui/components/filesystem-combo.hpp>
 
 namespace eclipse::gui::cocos {
     class FilesystemComboComponentNode : public BaseComponentNode<FilesystemComboComponentNode, cocos2d::CCMenu, FilesystemComboComponent, float> {

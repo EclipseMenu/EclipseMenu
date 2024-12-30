@@ -1,12 +1,14 @@
 #include "megahack.hpp"
 
 #include <imgui.h>
-#include <modules/gui/gui.hpp>
 #include <modules/gui/color.hpp>
+#include <modules/gui/gui.hpp>
 #include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::imgui::themes {
-    bool Megahack::checkbox(const std::string &label, bool &value, bool isSearchedFor, const std::function<void()> &postDraw) const {
+    bool Megahack::checkbox(
+        const std::string& label, bool& value, bool isSearchedFor, const std::function<void()>& postDraw
+    ) const {
         auto tm = ThemeManager::get();
         auto textColor = value ? tm->getCheckboxForegroundColor() : tm->getButtonDisabledForeground();
         auto scale = tm->getGlobalScale();
@@ -29,19 +31,22 @@ namespace eclipse::gui::imgui::themes {
 
         textColor.a *= ImGui::GetStyle().Alpha;
         ImGui::GetWindowDrawList()->AddRectFilled(
-                ImVec2(ImGui::GetItemRectMax().x - 5 * scale, ImGui::GetItemRectMin().y + 1 * scale),
-                ImVec2(ImGui::GetItemRectMax().x - 2 * scale, ImGui::GetItemRectMax().y - 1 * scale),
-                textColor);
+            ImVec2(ImGui::GetItemRectMax().x - 5 * scale, ImGui::GetItemRectMin().y + 1 * scale),
+            ImVec2(ImGui::GetItemRectMax().x - 2 * scale, ImGui::GetItemRectMax().y - 1 * scale),
+            textColor
+        );
 
         ImGui::PopItemWidth();
 
         return toggled;
     }
 
-    bool Megahack::checkboxWithSettings(const std::string &label, bool &value, bool isSearchedFor,
-                                        const std::function<void()> &callback,
-                                        const std::function<void()> &postDraw,
-                                        const std::string& popupId) const {
+    bool Megahack::checkboxWithSettings(
+        const std::string& label, bool& value, bool isSearchedFor,
+        const std::function<void()>& callback,
+        const std::function<void()>& postDraw,
+        const std::string& popupId
+    ) const {
         auto tm = ThemeManager::get();
         auto textColor = value ? tm->getCheckboxForegroundColor() : tm->getButtonDisabledForeground();
         auto scale = tm->getGlobalScale();
@@ -99,7 +104,7 @@ namespace eclipse::gui::imgui::themes {
         return toggled;
     }
 
-    bool Megahack::button(const std::string &text, bool isSearchedFor) const {
+    bool Megahack::button(const std::string& text, bool isSearchedFor) const {
         ImGui::PushItemWidth(-1);
 
         auto tm = ThemeManager::get();
@@ -130,18 +135,19 @@ namespace eclipse::gui::imgui::themes {
         auto scale = tm->getGlobalScale();
 
         ImGui::GetWindowDrawList()->AddLine(
-                ImVec2(ImGui::GetItemRectMin().x + 1, ImGui::GetItemRectMin().y + 1),
-                ImVec2(ImGui::GetItemRectMin().x + 1, ImGui::GetItemRectMax().y - 3),
-                color, 2.5f * scale);
+            ImVec2(ImGui::GetItemRectMin().x + 1, ImGui::GetItemRectMin().y + 1),
+            ImVec2(ImGui::GetItemRectMin().x + 1, ImGui::GetItemRectMax().y - 3),
+            color, 2.5f * scale
+        );
 
         ImGui::GetWindowDrawList()->AddLine(
-                ImVec2(ImGui::GetItemRectMax().x - 2, ImGui::GetItemRectMin().y + 1),
-                ImVec2(ImGui::GetItemRectMax().x - 2, ImGui::GetItemRectMax().y - 3),
-                color, 2.5f * scale);
+            ImVec2(ImGui::GetItemRectMax().x - 2, ImGui::GetItemRectMin().y + 1),
+            ImVec2(ImGui::GetItemRectMax().x - 2, ImGui::GetItemRectMax().y - 3),
+            color, 2.5f * scale
+        );
 
         ImGui::PopItemWidth();
 
         return pressed;
     }
-
 }

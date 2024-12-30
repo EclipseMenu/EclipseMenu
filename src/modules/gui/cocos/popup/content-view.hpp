@@ -6,7 +6,6 @@ namespace eclipse::gui {
 }
 
 namespace eclipse::gui::cocos {
-
     /// @brief A container that displays the current tab components.
     class ContentView : public cocos2d::CCNode {
     protected:
@@ -14,12 +13,11 @@ namespace eclipse::gui::cocos {
         ScrollLayer* m_contentLayer = nullptr;
 
     public:
-        static ContentView* create(cocos2d::CCSize const &size, const std::shared_ptr<MenuTab>& tab);
+        static ContentView* create(cocos2d::CCSize const& size, const std::shared_ptr<MenuTab>& tab);
         void setContent(const std::shared_ptr<MenuTab>& tab, bool resetScroll = true) const;
 
     protected:
-        bool init(cocos2d::CCSize const &size, const std::shared_ptr<MenuTab> &tab);
+        bool init(cocos2d::CCSize const& size, const std::shared_ptr<MenuTab>& tab);
         void loadContent(const std::shared_ptr<MenuTab>& tab) const;
     };
-
 }

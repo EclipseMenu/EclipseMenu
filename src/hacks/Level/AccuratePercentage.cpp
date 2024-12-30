@@ -1,6 +1,7 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/PlayLayer.hpp>
 
@@ -14,15 +15,13 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("level.accuratepercent.bugfix", true);
             config::setIfEmpty("level.accuratepercent.show_minutes", true);
 
-            tab->addToggle("level.accuratepercentage")
-                ->setDescription()
-                ->handleKeybinds()
-                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addToggle("level.accuratepercent.normal_mode");
-                    options->addInputInt("level.accuratepercent.amount", "level.accuratepercent.amount", 0, 15);
-                    options->addToggle("level.accuratepercent.bugfix");
-                    options->addToggle("level.accuratepercent.show_minutes");
-                });
+            tab->addToggle("level.accuratepercentage")->setDescription()->handleKeybinds()
+               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                   options->addToggle("level.accuratepercent.normal_mode");
+                   options->addInputInt("level.accuratepercent.amount", 0, 15);
+                   options->addToggle("level.accuratepercent.bugfix");
+                   options->addToggle("level.accuratepercent.show_minutes");
+               });
         }
 
         [[nodiscard]] const char* getId() const override { return "Accurate Percentage"; }

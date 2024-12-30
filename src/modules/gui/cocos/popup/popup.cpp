@@ -9,7 +9,6 @@
 #include "content-view.hpp"
 
 namespace eclipse::gui::cocos {
-
     bool Popup::setup(Tabs const& tabs) {
         const auto tm = ThemeManager::get();
         auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
@@ -36,11 +35,11 @@ namespace eclipse::gui::cocos {
 
         // Background for content
         m_contentBG = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
-        m_contentBG->setAnchorPoint({ 0, 1 });
+        m_contentBG->setAnchorPoint({0, 1});
         m_contentBG->setPosition(125.f, 270.f);
         m_contentBG->setColor(tm->getBackgroundColor().toCCColor3B());
         m_contentBG->setOpacity(tm->getBackgroundColor().getAlphaByte());
-        m_contentBG->setContentSize({ 345.f, 260.f });
+        m_contentBG->setContentSize({345.f, 260.f});
         m_contentBG->setID("content-bg"_spr);
         m_mainLayer->addChild(m_contentBG);
 
@@ -55,8 +54,8 @@ namespace eclipse::gui::cocos {
         m_mainLayer->addChild(m_tabMenu);
 
         // Content view
-        m_contentMenu = ContentView::create({ 345.f, 260.f }, tabs[currentTab]);
-        m_contentMenu->setAnchorPoint({ 0, 1 });
+        m_contentMenu = ContentView::create({345.f, 260.f}, tabs[currentTab]);
+        m_contentMenu->setAnchorPoint({0, 1});
         m_contentMenu->setPosition(125.f, 270.f);
         m_mainLayer->addChild(m_contentMenu, 1);
 
@@ -100,5 +99,4 @@ namespace eclipse::gui::cocos {
         geode::Popup<Tabs const&>::onExit();
         CocosRenderer::get()->shutdown(true);
     }
-
 }

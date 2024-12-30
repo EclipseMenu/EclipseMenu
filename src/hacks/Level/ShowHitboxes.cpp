@@ -1,17 +1,17 @@
-#include <modules/gui/gui.hpp>
-#include <modules/gui/color.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/color.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/CCDrawNode.hpp>
-#include <Geode/modify/PlayLayer.hpp>
-#include <Geode/modify/PlayerObject.hpp>
-#include <Geode/modify/LevelEditorLayer.hpp>
-#include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/GameObject.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/LevelEditorLayer.hpp>
+#include <Geode/modify/PlayerObject.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-
     /// @brief Check whether hitboxes made by RobTop should be drawn. (e.g. in practice mode)
     inline bool robtopHitboxCheck() {
         if (auto* pl = utils::get<PlayLayer>())
@@ -71,16 +71,16 @@ namespace eclipse::hacks::Level {
                 options->addToggle("level.showhitboxes.hideplayer");
                 options->addToggle("level.showhitboxes.ondeath")->handleKeybinds();
                 options->addToggle("level.showhitboxes.customcolors")->addOptions([](std::shared_ptr<gui::MenuTab> optionsColor) {
-                    optionsColor->addColorComponent("level.showhitboxes.solid_color", "level.showhitboxes.solid_color");
-                    optionsColor->addColorComponent("level.showhitboxes.danger_color", "level.showhitboxes.danger_color");
-                    optionsColor->addColorComponent("level.showhitboxes.other_color", "level.showhitboxes.other_color");
-                    optionsColor->addColorComponent("level.showhitboxes.player_color", "level.showhitboxes.player_color");
-                    optionsColor->addColorComponent("level.showhitboxes.player_color_inner", "level.showhitboxes.player_color_inner");
-                    optionsColor->addColorComponent("level.showhitboxes.player_color_rotated", "level.showhitboxes.player_color_rotated");
+                    optionsColor->addColorComponent("level.showhitboxes.solid_color");
+                    optionsColor->addColorComponent("level.showhitboxes.danger_color");
+                    optionsColor->addColorComponent("level.showhitboxes.other_color");
+                    optionsColor->addColorComponent("level.showhitboxes.player_color");
+                    optionsColor->addColorComponent("level.showhitboxes.player_color_inner");
+                    optionsColor->addColorComponent("level.showhitboxes.player_color_rotated");
                 });
-                options->addInputFloat("level.showhitboxes.bordersize", "level.showhitboxes.bordersize", 0.01f, 10.f, "%.2f");
-                options->addFloatToggle("level.showhitboxes.fillalpha", "level.showhitboxes.fillalpha", 0.f, 1.f);
-                options->addFloatToggle("level.showhitboxes.traillength", "level.showhitboxes.traillength", 1.f, 2000.f, "%.0f");
+                options->addInputFloat("level.showhitboxes.bordersize", 0.01f, 10.f, "%.2f");
+                options->addFloatToggle("level.showhitboxes.fillalpha", 0.f, 1.f);
+                options->addFloatToggle("level.showhitboxes.traillength", 1.f, 2000.f, "%.0f");
             });
         }
 
@@ -92,9 +92,10 @@ namespace eclipse::hacks::Level {
             if (auto* pl = utils::get<PlayLayer>())
                 // if not in practice with enabled hitboxes
                 return enabled && !pl->m_isPracticeMode;
-            
+
             return false;
         }
+
         [[nodiscard]] const char* getId() const override { return "Show Hitboxes"; }
     };
 
@@ -108,9 +109,8 @@ namespace eclipse::hacks::Level {
     };
 
     inline bool shouldDrawHitboxes() {
-        return config::get<bool>("level.showhitboxes", false) || (
-            s_isDead && config::get<bool>("level.showhitboxes.ondeath", false)
-        );
+        return config::get<bool>("level.showhitboxes", false)
+            || (s_isDead && config::get<bool>("level.showhitboxes.ondeath", false));
     }
 
     inline HitboxType getHitboxType(const gui::Color& color) {
@@ -121,8 +121,10 @@ namespace eclipse::hacks::Level {
         return HitboxType::Danger;
     }
 
-    inline void drawRect(cocos2d::CCDrawNode* node, const cocos2d::CCRect& rect, const gui::Color& color,
-                         float borderWidth, const gui::Color& borderColor) {
+    inline void drawRect(
+        cocos2d::CCDrawNode* node, const cocos2d::CCRect& rect, const gui::Color& color,
+        float borderWidth, const gui::Color& borderColor
+    ) {
         std::array vertices = {
             cocos2d::CCPoint(rect.getMinX(), rect.getMinY()),
             cocos2d::CCPoint(rect.getMinX(), rect.getMaxY()),
@@ -130,13 +132,18 @@ namespace eclipse::hacks::Level {
             cocos2d::CCPoint(rect.getMaxX(), rect.getMinY())
         };
         s_skipDrawHook = true;
-        
+
         node->drawPolygon(vertices.data(), vertices.size(), color, borderWidth, borderColor);
     }
 
-    void drawForPlayer(cocos2d::CCDrawNode* node, PlayerObject* player, const gui::Color& color, float borderWidth, const gui::Color& innerColor) {
+    void drawForPlayer(
+        cocos2d::CCDrawNode* node, PlayerObject* player, const gui::Color& color, float borderWidth,
+        const gui::Color& innerColor
+    ) {
         cocos2d::CCRect rect1 = player->getObjectRect();
-        cocos2d::CCRect rect2 = player->m_vehicleSize >= 1.f ? player->getObjectRect(0.25f, 0.25f) : player->getObjectRect(0.4f, 0.4f);
+        cocos2d::CCRect rect2 = player->m_vehicleSize >= 1.f
+                                    ? player->getObjectRect(0.25f, 0.25f)
+                                    : player->getObjectRect(0.4f, 0.4f);
 
         drawRect(node, rect1, color, borderWidth, {color.r, color.g, color.b, 1.f});
         drawRect(node, rect2, innerColor, borderWidth, {innerColor.r, innerColor.g, innerColor.b, 1.f});
@@ -159,19 +166,23 @@ namespace eclipse::hacks::Level {
 
         switch (HitboxType type = getHitboxType(borderColor)) {
             case HitboxType::Solid:
-                borderColor = !customColors ? borderColor : config::get<gui::Color>("level.showhitboxes.solid_color", gui::Color(0, 0.247, 1));
+                borderColor = !customColors ? borderColor
+                    : config::get<gui::Color>("level.showhitboxes.solid_color", gui::Color(0, 0.247, 1));
                 break;
             case HitboxType::Danger:
-                borderColor = !customColors ? borderColor : config::get<gui::Color>("level.showhitboxes.danger_color", gui::Color(1, 0, 0));
+                borderColor = !customColors ? borderColor
+                    : config::get<gui::Color>("level.showhitboxes.danger_color", gui::Color(1, 0, 0));
                 break;
             case HitboxType::Player:
-                borderColor = !customColors ? borderColor : config::get<gui::Color>("level.showhitboxes.player_color_rotated", gui::Color(1, 1, 0));
+                borderColor = !customColors ? borderColor
+                    : config::get<gui::Color>("level.showhitboxes.player_color_rotated", gui::Color(1, 1, 0));
                 hidePlayer = config::get<bool>("level.showhitboxes.hideplayer", false);
                 if (hidePlayer)
                     borderColor = gui::Color(0.f, 0.f, 0.f, 0.f);
                 break;
             case HitboxType::Other:
-                borderColor = !customColors ? borderColor : config::get<gui::Color>("level.showhitboxes.other_color", gui::Color(0, 1, 0));
+                borderColor = !customColors ? borderColor
+                    : config::get<gui::Color>("level.showhitboxes.other_color", gui::Color(0, 1, 0));
                 break;
         }
 
@@ -186,16 +197,20 @@ namespace eclipse::hacks::Level {
     }
 
     class $modify(ShowHitboxesCCDNHook, cocos2d::CCDrawNode) {
-        bool drawPolygon(cocos2d::CCPoint* vertex, unsigned int count, const cocos2d::ccColor4F& fillColor,
-                         float borderWidth, const cocos2d::ccColor4F& borderColor) {
+        bool drawPolygon(
+            cocos2d::CCPoint* vertex, unsigned int count, const cocos2d::ccColor4F& fillColor,
+            float borderWidth, const cocos2d::ccColor4F& borderColor
+        ) {
             borderWidth = abs(borderWidth);
 
             customDraw(this, (gui::Color&) fillColor, borderWidth, (gui::Color&) borderColor);
             return CCDrawNode::drawPolygon(vertex, count, fillColor, borderWidth, borderColor);
         }
 
-        bool drawCircle(const cocos2d::CCPoint& position, float radius, const cocos2d::ccColor4F& color,
-                        float borderWidth, const cocos2d::ccColor4F& borderColor, unsigned int segments) {
+        bool drawCircle(
+            const cocos2d::CCPoint& position, float radius, const cocos2d::ccColor4F& color,
+            float borderWidth, const cocos2d::ccColor4F& borderColor, unsigned int segments
+        ) {
             borderWidth = abs(borderWidth);
 
             customDraw(this, (gui::Color&) color, borderWidth, (gui::Color&) borderColor);
@@ -222,10 +237,16 @@ namespace eclipse::hacks::Level {
 
             auto borderSize = config::get<float>("level.showhitboxes.bordersize", 0.25f);
 
-            float alpha = config::get<bool>("level.showhitboxes.fillalpha.toggle", false) ? config::get<float>("level.showhitboxes.fillalpha", 0.25f) : 0.f;
+            float alpha = config::get<bool>("level.showhitboxes.fillalpha.toggle", false)
+                              ? config::get<float>("level.showhitboxes.fillalpha", 0.25f)
+                              : 0.f;
 
-            gui::Color playerColor = customColors ? config::get<gui::Color>("level.showhitboxes.player_color", gui::Color(1, 1, 0)) : gui::Color(1, 0, 0, alpha);
-            gui::Color playerColorInner = customColors ? config::get<gui::Color>("level.showhitboxes.player_color_inner", gui::Color(1, 1, 0)) : gui::Color(0, 1, 0, alpha);
+            gui::Color playerColor = customColors
+                                         ? config::get<gui::Color>("level.showhitboxes.player_color", gui::Color(1, 1, 0))
+                                         : gui::Color(1, 0, 0, alpha);
+            gui::Color playerColorInner = customColors
+                                              ? config::get<gui::Color>("level.showhitboxes.player_color_inner", gui::Color(1, 1, 0))
+                                              : gui::Color(0, 1, 0, alpha);
             playerColor.a = alpha;
             playerColorInner.a = alpha;
 
@@ -235,16 +256,32 @@ namespace eclipse::hacks::Level {
 
             if (config::get<bool>("level.showhitboxes.traillength.toggle", false)) {
                 for (const auto& [rect, _] : s_playerTrail1)
-                    drawRect(self->m_debugDrawNode, rect, playerColor, borderSize, {playerColor.r, playerColor.g, playerColor.b, 1.f});
+                    drawRect(
+                        self->m_debugDrawNode, rect,
+                        playerColor, borderSize,
+                        { playerColor.r, playerColor.g, playerColor.b, 1.f }
+                    );
 
                 for (const auto& [rect, _] : s_playerTrail2)
-                    drawRect(self->m_debugDrawNode, rect, playerColor, borderSize, {playerColor.r, playerColor.g, playerColor.b, 1.f});
+                    drawRect(
+                        self->m_debugDrawNode, rect,
+                        playerColor, borderSize,
+                        { playerColor.r, playerColor.g, playerColor.b, 1.f }
+                    );
 
                 for (const auto& [_, rect] : s_playerTrail1)
-                    drawRect(self->m_debugDrawNode, rect, playerColorInner, borderSize, {playerColorInner.r, playerColorInner.g, playerColorInner.b, 1.f});
+                    drawRect(
+                        self->m_debugDrawNode, rect,
+                        playerColorInner, borderSize,
+                        { playerColorInner.r, playerColorInner.g, playerColorInner.b, 1.f }
+                    );
 
                 for (const auto& [_, rect] : s_playerTrail2)
-                    drawRect(self->m_debugDrawNode, rect, playerColorInner, borderSize, {playerColorInner.r, playerColorInner.g, playerColorInner.b, 1.f});
+                    drawRect(
+                        self->m_debugDrawNode, rect,
+                        playerColorInner, borderSize,
+                        { playerColorInner.r, playerColorInner.g, playerColorInner.b, 1.f }
+                    );
             }
         }
     }
@@ -297,13 +334,17 @@ namespace eclipse::hacks::Level {
 
             s_playerTrail1.emplace_back(
                 m_player1->getObjectRect(),
-                m_player1->m_vehicleSize >= 1.f ? m_player1->getObjectRect(0.25f, 0.25f) : m_player1->getObjectRect(0.4f, 0.4f)
+                m_player1->m_vehicleSize >= 1.f
+                    ? m_player1->getObjectRect(0.25f, 0.25f)
+                    : m_player1->getObjectRect(0.4f, 0.4f)
             );
 
             if (m_gameState.m_isDualMode) {
                 s_playerTrail2.emplace_back(
                     m_player2->getObjectRect(),
-                    m_player2->m_vehicleSize >= 1.f ? m_player2->getObjectRect(0.25f, 0.25f) : m_player2->getObjectRect(0.4f, 0.4f)
+                    m_player2->m_vehicleSize >= 1.f
+                        ? m_player2->getObjectRect(0.25f, 0.25f)
+                        : m_player2->getObjectRect(0.4f, 0.4f)
                 );
             }
 

@@ -1,11 +1,11 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Player {
-
     class AutoClicker : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
@@ -15,14 +15,14 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty<int>("player.autoclick.intervalrelease", 1);
 
             tab->addToggle("player.autoclick")
-                ->handleKeybinds()
-                ->setDescription()
-                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addToggle("player.autoclick.p1");
-                    options->addToggle("player.autoclick.p2");
-                    options->addInputInt("player.autoclick.intervalhold", "player.autoclick.intervalhold", 1, 1000);
-                    options->addInputInt("player.autoclick.intervalrelease", "player.autoclick.intervalrelease", 1, 1000);
-                });
+               ->handleKeybinds()
+               ->setDescription()
+               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                   options->addToggle("player.autoclick.p1");
+                   options->addToggle("player.autoclick.p2");
+                   options->addInputInt("player.autoclick.intervalhold", 1, 1000);
+                   options->addInputInt("player.autoclick.intervalrelease", 1, 1000);
+               });
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.autoclick", false); }
@@ -53,5 +53,4 @@ namespace eclipse::hacks::Player {
             }
         }
     };
-
 }

@@ -1,22 +1,23 @@
 #include "DSPRecorder.hpp"
-#include <modules/utils/SingletonCache.hpp>
 #include <modules/config/config.hpp>
+#include <modules/utils/SingletonCache.hpp>
 
 bool recreating = false;
 
 FMOD_RESULT setSoftwareFormat(FMOD::System* system, int samplerate, FMOD_SPEAKERMODE speakermode, int numrawspeakers) {
-    float tps = eclipse::config::get<bool>("global.tpsbypass.toggle", false) ? eclipse::config::get<float>("global.tpsbypass", 240.f) : 240.f;
-    if(recreating)
+    if (recreating) {
+        float tps = eclipse::config::get<bool>("global.tpsbypass.toggle", false)
+                    ? eclipse::config::get<float>("global.tpsbypass", 240.f)
+                    : 240.f;
         samplerate *= tps / eclipse::config::get<float>("recorder.fps", 60.f);
-
+    }
     return system->setSoftwareFormat(samplerate, speakermode, numrawspeakers);
 }
 
 $execute {
     auto address = geode::addresser::getNonVirtual(&FMOD::System::setSoftwareFormat);
-    auto result = geode::Mod::get()->hook(reinterpret_cast<void *>(address), &setSoftwareFormat, "setSoftwareFormat");
-    if (result.isErr())
-        geode::log::error("Failed to hook setSoftwareFormat");
+    auto result = geode::Mod::get()->hook(reinterpret_cast<void*>(address), &setSoftwareFormat, "setSoftwareFormat");
+    if (result.isErr()) geode::log::error("Failed to hook setSoftwareFormat");
 }
 
 DSPRecorder* DSPRecorder::get() {
@@ -40,7 +41,7 @@ void DSPRecorder::stop() {
 
     auto engine = eclipse::utils::get<FMODAudioEngine>();
     engine->~FMODAudioEngine();
-    new (engine) FMODAudioEngine();
+    new(engine) FMODAudioEngine();
     engine->setupAudioEngine();
 
     m_masterGroup->removeDSP(m_dsp);
@@ -59,7 +60,7 @@ void DSPRecorder::init() {
     recreating = true;
     auto engine = eclipse::utils::get<FMODAudioEngine>();
     engine->~FMODAudioEngine();
-    new (engine) FMODAudioEngine();
+    new(engine) FMODAudioEngine();
     engine->setupAudioEngine();
     recreating = false;
     auto system = eclipse::utils::get<FMODAudioEngine>()->m_system;
@@ -88,7 +89,9 @@ void DSPRecorder::init() {
         return FMOD_OK;
     };
 
-    float tps = eclipse::config::get<bool>("global.tpsbypass.toggle", false) ? eclipse::config::get<float>("global.tpsbypass", 240.f) : 240.f;
+    float tps = eclipse::config::get<bool>("global.tpsbypass.toggle", false)
+                    ? eclipse::config::get<float>("global.tpsbypass", 240.f)
+                    : 240.f;
 
     system->createDSP(&desc, &m_dsp);
     system->getMasterChannelGroup(&m_masterGroup);
@@ -102,11 +105,12 @@ void DSPRecorder::tryUnpause(float time) {
     system->getSoftwareFormat(&sampleRate, nullptr, &channels);
 
     float fps = eclipse::config::get<float>("recorder.fps", 60.f);
-    float tps = eclipse::config::get<bool>("global.tpsbypass.toggle", false) ? eclipse::config::get<float>("global.tpsbypass", 240.f) : 240.f;
+    float tps = eclipse::config::get<bool>("global.tpsbypass.toggle", false)
+                    ? eclipse::config::get<float>("global.tpsbypass", 240.f)
+                    : 240.f;
     float mult = tps / fps * 2.f;
 
-    float songTime = (float)m_data.size() / ((float)sampleRate * (float)channels) * mult;
+    float songTime = (float) m_data.size() / ((float) sampleRate * (float) channels) * mult;
 
-    if(time >= songTime)
-        m_masterGroup->setPaused(false);
+    if (time >= songTime) m_masterGroup->setPaused(false);
 }
