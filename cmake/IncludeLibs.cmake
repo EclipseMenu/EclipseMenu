@@ -22,6 +22,7 @@ endif()
 
 CPMAddPackage("gh:matcool/gd-imgui-cocos#0207a36")
 CPMAddPackage("gh:maxnut/GDReplayFormat#5b8aeab")
+set(RIFT_INCLUDE_MATJSON ON)
 CPMAddPackage("gh:EclipseMenu/rift#60c9a83")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
 CPMAddPackage(
