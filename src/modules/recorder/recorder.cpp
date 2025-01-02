@@ -21,7 +21,7 @@ namespace km {
 #define DEFINE_ADDRESS(name, address, ...) \
     using func_t = decltype(&name); \
     auto func = reinterpret_cast<func_t>(address);\
-    static_assert(GEODE_COMP_GD_VERSION == BINDINGS_VERSION, "Address for " ##name " is outdated"); \
+    static_assert(GEODE_COMP_GD_VERSION == BINDINGS_VERSION, "Address for " #name " is outdated"); \
     return func(__VA_ARGS__)
 
     inline void GLMatrixMode(kmGLEnum mode) {
