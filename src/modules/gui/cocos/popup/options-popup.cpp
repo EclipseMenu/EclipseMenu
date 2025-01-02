@@ -31,17 +31,17 @@ namespace eclipse::gui::cocos {
 
         // Background for content
         m_contentBG = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
-        m_contentBG->setAnchorPoint({ 0, 1 });
+        m_contentBG->setAnchorPoint({0, 1});
         m_contentBG->setPosition(7.5f, 210.f);
         m_contentBG->setColor(tm->getBackgroundColor().toCCColor3B());
         //m_contentBG->setOpacity(128);
-        m_contentBG->setContentSize({ 385.f, 200.f });
+        m_contentBG->setContentSize({385.f, 200.f});
         m_contentBG->setID("content-bg"_spr);
         m_mainLayer->addChild(m_contentBG);
 
         // Content view
-        m_contentView = ContentView::create({ 385.f, 200.f }, tab);
-        m_contentView->setAnchorPoint({ 0, 1 });
+        m_contentView = ContentView::create({385.f, 200.f}, tab);
+        m_contentView->setAnchorPoint({0, 1});
         m_contentView->setPosition(7.5f, 210.f);
         m_mainLayer->addChild(m_contentView, 1);
 

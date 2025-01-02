@@ -1,21 +1,20 @@
 #include "imgui.hpp"
-#include <modules/config/config.hpp>
 #include <imgui-cocos.hpp>
 #include <utils.hpp>
-#include <modules/gui/theming/manager.hpp>
-#include <modules/gui/gui.hpp>
 #include <misc/cpp/imgui_stdlib.h>
+#include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/base-component.hpp>
+#include <modules/gui/theming/manager.hpp>
 #include <modules/i18n/translations.hpp>
 
 #include "components/megahack/megahack.hpp"
 #include "components/megaoverlay/megaoverlay.hpp"
-#include "layouts/tabbed.hpp"
 #include "layouts/panel.hpp"
 #include "layouts/sidebar.hpp"
-#include "modules/gui/gui.hpp"
+#include "layouts/tabbed.hpp"
 
 namespace eclipse::gui::imgui {
-
     bool ImGuiRenderer::s_initialized = false;
 
     std::string_view FontManager::FontMetadata::getName() const {
@@ -67,7 +66,7 @@ namespace eclipse::gui::imgui {
             for (auto& entry : std::filesystem::directory_iterator(path)) {
                 if (entry.path().extension() != ".ttf") continue;
                 auto filename = entry.path().stem().string();
-                FontMetadata font {filename, entry.path()};
+                FontMetadata font{filename, entry.path()};
                 result.push_back(font);
             }
         };
@@ -222,7 +221,7 @@ namespace eclipse::gui::imgui {
         m_theme->visit(component);
     }
 
-    bool ImGuiRenderer::beginWindow(const std::string &title) const {
+    bool ImGuiRenderer::beginWindow(const std::string& title) const {
         if (!m_theme) {
             geode::log::error("beginWindow called without initialized theme");
             return false;
@@ -290,8 +289,10 @@ namespace eclipse::gui::imgui {
             bool isOpen = false;
 
             ImGui::OpenPopup(popupName.c_str(), ImGuiPopupFlags_NoOpenOverExistingPopup | ImGuiPopupFlags_NoOpenOverItems);
-            ImGui::SetNextWindowSizeConstraints({MIN_POPUP_WIDTH * scale, MIN_POPUP_HEIGHT * scale},
-                                                {MAX_POPUP_WIDTH * scale, MAX_POPUP_HEIGHT * scale});
+            ImGui::SetNextWindowSizeConstraints(
+                {MIN_POPUP_WIDTH * scale, MIN_POPUP_HEIGHT * scale},
+                {MAX_POPUP_WIDTH * scale, MAX_POPUP_HEIGHT * scale}
+            );
             if (ImGui::BeginPopupModal(popupName.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
                 isOpen = true;
                 // if (keybinds::isKeyPressed(keybinds::Keys::Escape)) {

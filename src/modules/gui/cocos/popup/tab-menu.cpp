@@ -3,7 +3,7 @@
 #include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::cocos {
-    TabMenu* TabMenu::create(Tabs const &tabs, std::function<void(int)> const& callback) {
+    TabMenu* TabMenu::create(Tabs const& tabs, std::function<void(int)> const& callback) {
         auto ret = new TabMenu();
         if (ret->init(tabs, callback)) {
             ret->autorelease();
@@ -13,7 +13,7 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    TabButton* TabButton::create(const std::string &name, const cocos2d::CCSize &size) {
+    TabButton* TabButton::create(const std::string& name, const cocos2d::CCSize& size) {
         auto ret = new TabButton();
         if (ret->init(name, size)) {
             ret->autorelease();
@@ -36,7 +36,7 @@ namespace eclipse::gui::cocos {
         }
     }
 
-    bool TabMenu::init(Tabs const &tabs, std::function<void(int)> const& callback) {
+    bool TabMenu::init(Tabs const& tabs, std::function<void(int)> const& callback) {
         if (!CCMenu::init()) return false;
         this->setID("tab-menu"_spr);
 
@@ -45,7 +45,7 @@ namespace eclipse::gui::cocos {
         constexpr float height = 28.f;
         for (auto const& tab : tabs) {
             auto tabName = tab->getTitle();
-            auto tabSpr = TabButton::create(tabName, { width, height });
+            auto tabSpr = TabButton::create(tabName, {width, height});
             auto tabButton = geode::cocos::CCMenuItemExt::createSpriteExtra(
                 //ButtonSprite::create(tabName.c_str(), width, true, "bigFont.fnt", "GJ_button_01.png", height, 0.5f),
                 tabSpr,
@@ -62,14 +62,14 @@ namespace eclipse::gui::cocos {
 
         // setup layout
         auto layout = geode::AxisLayout::create(geode::Axis::Column)
-                        ->setAxisReverse(true)
-                        ->setAutoScale(true)
-                        ->setGrowCrossAxis(false)
-                        ->setCrossAxisOverflow(true)
-                        ->setGap(0.5f)
-                        ->setAxisAlignment(geode::AxisAlignment::End)
-                        ->setCrossAxisAlignment(geode::AxisAlignment::Start)
-                        ->setCrossAxisLineAlignment(geode::AxisAlignment::Start);
+                      ->setAxisReverse(true)
+                      ->setAutoScale(true)
+                      ->setGrowCrossAxis(false)
+                      ->setCrossAxisOverflow(true)
+                      ->setGap(0.5f)
+                      ->setAxisAlignment(geode::AxisAlignment::End)
+                      ->setCrossAxisAlignment(geode::AxisAlignment::Start)
+                      ->setCrossAxisLineAlignment(geode::AxisAlignment::Start);
         this->setAnchorPoint({0.f, 1.f});
         this->setContentHeight(260.f);
         this->setLayout(layout, true);
@@ -87,7 +87,7 @@ namespace eclipse::gui::cocos {
 
         m_label = TranslatedLabel::create(name);
         m_label->limitLabelWidth(100, 1.f, .2f);
-        m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", { 0.0f, 0.0f, 80.0f, 80.0f });
+        m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0.0f, 0.0f, 80.0f, 80.0f});
         m_bgSprite->setContentSize({size.width, size.height + 8.F}); // minimum 36
         m_bgSprite->setScaleY(.75F);
         this->addChildAtPosition(m_bgSprite, geode::Anchor::Center);

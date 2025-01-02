@@ -1,24 +1,20 @@
-#include "Geode/binding/LevelTools.hpp"
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <utility>
 
-#include <Geode/modify/PauseLayer.hpp>
-#include <Geode/modify/EditorUI.hpp>
 #include <Geode/modify/EditorPauseLayer.hpp>
+#include <Geode/modify/EditorUI.hpp>
 #include <Geode/modify/LevelTools.hpp>
+#include <Geode/modify/PauseLayer.hpp>
 
 namespace eclipse::hacks::Creator {
-
     class LevelEdit : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
-
-            tab->addToggle("creator.leveledit")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("creator.leveledit")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Level Edit"; }
@@ -50,7 +46,7 @@ namespace eclipse::hacks::Creator {
 
     // 2.207 added "read-only" mode into editor
     // we want to disable it
-#if GEODE_COMP_GD_VERSION > 22070
+    #if GEODE_COMP_GD_VERSION > 22070
     class $modify(LevelEditEUIHook, EditorUI) {
         void onSettings(CCObject* sender) {
             auto level = this->m_editorLayer->m_level;
@@ -70,10 +66,10 @@ namespace eclipse::hacks::Creator {
             level->m_levelType = levelType;
         }
     };
-#endif
+    #endif
 
-// due to some mysterious reason, this will crash in Debug mode
-#ifdef NDEBUG
+    // due to some mysterious reason, this will crash in Debug mode
+    #ifdef NDEBUG
     class $modify(LevelEditLTHook, LevelTools) {
         ENABLE_SAFE_HOOKS_ALL()
 
@@ -84,5 +80,5 @@ namespace eclipse::hacks::Creator {
             return config::get<bool>("creator.leveledit", false);
         }
     };
-#endif
+    #endif
 }

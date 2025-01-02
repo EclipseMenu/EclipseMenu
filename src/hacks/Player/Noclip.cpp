@@ -1,13 +1,17 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/color.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/float-toggle.hpp>
+#include <modules/gui/components/input-float.hpp>
+#include <modules/gui/components/int-toggle.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 #include <modules/labels/variables.hpp>
 
-#include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Player {
-
     class Noclip : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
@@ -21,18 +25,18 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.noclip.deathlimit", 2);
 
             tab->addToggle("player.noclip")
-                ->setDescription()
-                ->handleKeybinds()
-                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addToggle("player.noclip.p1");
-                    options->addToggle("player.noclip.p2");
-                    options->addFloatToggle("player.noclip.acclimit", "player.noclip.acclimit", 0.01f, 100.f, "%.2f")->handleKeybinds();
-                    options->addIntToggle("player.noclip.deathlimit", "player.noclip.deathlimit", 1, 100)->handleKeybinds();
-                    options->addToggle("player.noclip.tint");
-                    options->addColorComponent("player.noclip.color", "player.noclip.color");
-                    options->addInputFloat("player.noclip.opacity", "player.noclip.opacity", 0.f, 100.f, "%.0f%");
-                    options->addInputFloat("player.noclip.time", "player.noclip.time", 0.f, 5.f, "%.2fs")->setDescription();
-                });
+               ->setDescription()
+               ->handleKeybinds()
+               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                   options->addToggle("player.noclip.p1");
+                   options->addToggle("player.noclip.p2");
+                   options->addFloatToggle("player.noclip.acclimit", 0.01f, 100.f, "%.2f")->handleKeybinds();
+                   options->addIntToggle("player.noclip.deathlimit", 1, 100)->handleKeybinds();
+                   options->addToggle("player.noclip.tint");
+                   options->addColorComponent("player.noclip.color");
+                   options->addInputFloat("player.noclip.opacity", 0.f, 100.f, "%.0f%");
+                   options->addInputFloat("player.noclip.time", 0.f, 5.f, "%.2fs")->setDescription();
+               });
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("player.noclip", false); }
@@ -76,7 +80,7 @@ namespace eclipse::hacks::Player {
             if (!fields->m_noclipTint && config::get<bool>("player.noclip.tint", false)) {
                 auto color = config::get<gui::Color>("player.noclip.color", gui::Color::RED).toCCColor3B();
                 fields->m_noclipTint = cocos2d::CCLayerColor::create(
-                    cocos2d::_ccColor4B {color.r, color.g, color.b, 0}
+                    cocos2d::_ccColor4B{color.r, color.g, color.b, 0}
                 );
                 fields->m_noclipTint->setZOrder(1000);
                 fields->m_noclipTint->setID("nocliptint"_spr);
@@ -111,13 +115,17 @@ namespace eclipse::hacks::Player {
                     if (fields->m_wouldDie) {
                         if (fields->m_tintOpacity < 1.f) {
                             fields->m_tintOpacity += 0.25f;
-                            fields->m_noclipTint->setOpacity(fields->m_tintOpacity * config::get<float>("player.noclip.opacity", 90.f));
+                            fields->m_noclipTint->setOpacity(
+                                fields->m_tintOpacity * config::get<float>("player.noclip.opacity", 90.f)
+                            );
                         }
                         fields->m_wouldDie = false;
                     } else {
                         if (fields->m_tintOpacity > 0.f) {
                             fields->m_tintOpacity -= 0.25f;
-                            fields->m_noclipTint->setOpacity(fields->m_tintOpacity * config::get<float>("player.noclip.opacity", 90.f));
+                            fields->m_noclipTint->setOpacity(
+                                fields->m_tintOpacity * config::get<float>("player.noclip.opacity", 90.f)
+                            );
                         }
                     }
                 } else {
@@ -191,12 +199,12 @@ namespace eclipse::hacks::Player {
                 config::setTemp("noclipAccuracy", acc);
                 bool dead = (m_player1 && m_player1->m_isDead) || (m_player2 && m_player2->m_isDead);
                 //if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc <= config::get<float>("player.noclip.acclimit", 95.f) && !dead)
-                    //utils::get<PlayLayer>()->destroyPlayer(m_player1, (GameObject*)((int*)1));
+                //utils::get<PlayLayer>()->destroyPlayer(m_player1, (GameObject*)((int*)1));
             }
         }
     };
-
 }
+
 /*
 if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc < config::get<float>("player.noclip.acclimit", 95.f)) {
                     utils::get<PlayLayer>()->destroyPlayer(m_player1, nullptr);

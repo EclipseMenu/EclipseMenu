@@ -1,6 +1,7 @@
 #pragma once
-#include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 #include <modules/gui/popup.hpp>
+#include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
+#include <modules/i18n/translations.hpp>
 
 namespace eclipse::gui::cocos {
 

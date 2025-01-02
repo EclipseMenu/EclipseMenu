@@ -1,11 +1,12 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/color.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/HardStreak.hpp>
 
 namespace eclipse::hacks::Player {
-
     class CustomWaveTrail : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
@@ -16,20 +17,18 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.customwavetrail.value", 100.f);
             config::setIfEmpty("player.customwavetrail.color", gui::Color::WHITE);
 
-            tab->addToggle("player.customwavetrail")
-                ->handleKeybinds()
-                ->setDescription()
-                ->addOptions([](auto options) {
-                    options->addInputFloat("player.customwavetrail.scale", "player.customwavetrail.scale", 0.f, 10.f, "%.2f");
-                    options->addToggle("player.customwavetrail.rainbow")->addOptions([](auto opt) {
-                        opt->addInputFloat("player.customwavetrail.speed", "player.customwavetrail.speed", 0.f, FLT_MAX, "%.2f");
-                        opt->addInputFloat("player.customwavetrail.saturation", "player.customwavetrail.saturation", 0.f, 100.f, "%.2f");
-                        opt->addInputFloat("player.customwavetrail.value", "player.customwavetrail.value", 0.f, 100.f, "%.2f");
-                    });
-                    options->addToggle("player.customwavetrail.customcolor")->addOptions([](auto opt) {
-                        opt->addColorComponent("player.customwavetrail.color", "player.customwavetrail.color");
-                    });
-                });
+            tab->addToggle("player.customwavetrail")->handleKeybinds()->setDescription()
+               ->addOptions([](auto options) {
+                   options->addInputFloat("player.customwavetrail.scale", 0.f, 10.f, "%.2f");
+                   options->addToggle("player.customwavetrail.rainbow")->addOptions([](auto opt) {
+                       opt->addInputFloat("player.customwavetrail.speed", 0.f, FLT_MAX, "%.2f");
+                       opt->addInputFloat("player.customwavetrail.saturation", 0.f, 100.f, "%.2f");
+                       opt->addInputFloat("player.customwavetrail.value", 0.f, 100.f, "%.2f");
+                   });
+                   options->addToggle("player.customwavetrail.customcolor")->addOptions([](auto opt) {
+                       opt->addColorComponent("player.customwavetrail.color");
+                   });
+               });
         }
 
         [[nodiscard]] const char* getId() const override { return "Custom Wave Trail"; }
@@ -56,5 +55,4 @@ namespace eclipse::hacks::Player {
             HardStreak::updateStroke(dt);
         }
     };
-
 }

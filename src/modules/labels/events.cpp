@@ -10,9 +10,9 @@ namespace eclipse::labels {
 
     float Event::getProgress() const {
         auto now = std::chrono::steady_clock::now();
-        auto delay = event->delay * 1000; // how long to wait after the event starts
+        auto delay = event->delay * 1000;       // how long to wait after the event starts
         auto duration = event->duration * 1000; // how long the event should last after the condition is no longer met
-        auto easing = event->easing * 1000; // smoothing for the animation
+        auto easing = event->easing * 1000;     // smoothing for the animation
 
         if (event->type == LabelEvent::Type::Always) {
             return 1.f;
@@ -99,14 +99,14 @@ namespace eclipse::labels {
             // if it has ended, recreate it
             if (existing->hasEnded()) {
                 removeEvent(existing->event);
-                m_events.emplace_back(Event{ label->id, event.id, const_cast<LabelEvent*>(&event), label });
+                m_events.emplace_back(Event{label->id, event.id, const_cast<LabelEvent*>(&event), label});
             }
 
             existing->start();
             return;
         }
 
-        auto& e = m_events.emplace_back(Event{ label->id, event.id, const_cast<LabelEvent*>(&event), label });
+        auto& e = m_events.emplace_back(Event{label->id, event.id, const_cast<LabelEvent*>(&event), label});
         e.start();
     }
 
@@ -140,5 +140,3 @@ namespace eclipse::labels {
         return nullptr;
     }
 }
-
-

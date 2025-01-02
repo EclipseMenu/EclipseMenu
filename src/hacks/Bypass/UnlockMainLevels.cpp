@@ -1,15 +1,14 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GameLevelManager.hpp>
 
 namespace eclipse::hacks::Bypass {
-
     class UnlockMainLevels : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
-
             tab->addToggle("bypass.unlockmainlevels")->setDescription()->handleKeybinds();
         }
 
@@ -29,5 +28,4 @@ namespace eclipse::hacks::Bypass {
             return level;
         }
     };
-
 }

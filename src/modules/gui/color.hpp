@@ -1,12 +1,14 @@
 #pragma once
 
-#include <imgui.h>
-#include <cocos2d.h>
 #include <string>
-#include <cmath>
-#include <nlohmann/json.hpp>
+#include <Geode/cocos/include/ccTypes.h>
 
-#include <fmt/format.h>
+#ifndef INCLUDE_NLOHMANN_JSON_HPP_
+#include <nlohmann/json_fwd.hpp>
+#endif
+
+struct ImVec4;
+typedef unsigned int ImU32;
 
 namespace eclipse::gui {
     struct Color {
@@ -64,9 +66,7 @@ namespace eclipse::gui {
         /// @brief Creates a new color from HSV values
         /// @param hsv HSV values
         /// @return New color
-        static Color fromHSV(const ImVec4& hsv) {
-            return fromHSV(hsv.x, hsv.y, hsv.z, hsv.w);
-        }
+        static Color fromHSV(const ImVec4& hsv);
 
         enum class IntType {
             RGBA, ARGB,

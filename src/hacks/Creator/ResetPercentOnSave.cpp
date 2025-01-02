@@ -1,6 +1,7 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/EditorPauseLayer.hpp>
 
@@ -8,9 +9,7 @@ namespace eclipse::hacks::Creator {
     class ResetPercentOnSave : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
-            tab->addToggle("creator.resetpercentonsave")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("creator.resetpercentonsave")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Reset Percent on Save"; }

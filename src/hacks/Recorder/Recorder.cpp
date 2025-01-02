@@ -1,14 +1,18 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/button.hpp>
+#include <modules/gui/components/combo.hpp>
+#include <modules/hack/hack.hpp>
 #include <modules/recorder/recorder.hpp>
 
+#include <Geode/modify/CCScheduler.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/ShaderLayer.hpp>
-#include <Geode/modify/CCScheduler.hpp>
 
 #include <regex>
+#include <modules/i18n/translations.hpp>
+#include <modules/recorder/DSPRecorder.hpp>
 
 // android uses custom gd::string class
 #ifdef GEODE_IS_ANDROID
@@ -18,7 +22,6 @@
 #endif
 
 namespace eclipse::hacks::Recorder {
-
     static recorder::Recorder s_recorder;
 
     bool levelDone = false;
@@ -27,8 +30,8 @@ namespace eclipse::hacks::Recorder {
     float totalTime = 0.f;
     float afterEndTimer = 0.f;
 
-    double extraTime = 0.;
-    double lastFrameTime = 0.;
+    float extraTime = 0.f;
+    float lastFrameTime = 0.f;
 
     cocos2d::CCSize oldDesignResolution;
     cocos2d::CCSize newDesignResolution;
@@ -49,8 +52,7 @@ namespace eclipse::hacks::Recorder {
             i18n::get_("common.ok"),
             i18n::get_("recorder.open-folder"),
             [](bool result) {
-                if(result)
-                    return;
+                if (result) return;
 
                 geode::utils::file::openFolder(geode::Mod::get()->getSaveDir() / "renders");
             }
@@ -58,22 +60,26 @@ namespace eclipse::hacks::Recorder {
     }
 
     void applyWinSize() {
-        if(newDesignResolution.width != 0 && newDesignResolution.height != 0) {
+        if (newDesignResolution.width != 0 && newDesignResolution.height != 0) {
             auto view = utils::get<cocos2d::CCEGLView>();
-            
+
             utils::get<cocos2d::CCDirector>()->m_obWinSizeInPoints = newDesignResolution;
-            view->setDesignResolutionSize(newDesignResolution.width, newDesignResolution.height, ResolutionPolicy::kResolutionExactFit);
+            view->setDesignResolutionSize(
+                newDesignResolution.width, newDesignResolution.height, ResolutionPolicy::kResolutionExactFit
+            );
             view->m_fScaleX = newScreenScale.width;
             view->m_fScaleY = newScreenScale.height;
         }
     }
 
     void restoreWinSize() {
-        if(oldDesignResolution.width != 0 && oldDesignResolution.height != 0) {
+        if (oldDesignResolution.width != 0 && oldDesignResolution.height != 0) {
             auto view = utils::get<cocos2d::CCEGLView>();
 
             utils::get<cocos2d::CCDirector>()->m_obWinSizeInPoints = oldDesignResolution;
-            view->setDesignResolutionSize(oldDesignResolution.width, oldDesignResolution.height, ResolutionPolicy::kResolutionExactFit);
+            view->setDesignResolutionSize(
+                oldDesignResolution.width, oldDesignResolution.height, ResolutionPolicy::kResolutionExactFit
+            );
             view->m_fScaleX = originalScreenScale.width;
             view->m_fScaleY = originalScreenScale.height;
         }
@@ -85,8 +91,8 @@ namespace eclipse::hacks::Recorder {
         levelDone = false;
         popupShown = false;
         totalTime = 0.f;
-        extraTime = 0.;
-        lastFrameTime = 0.;
+        extraTime = 0.f;
+        lastFrameTime = 0.f;
         afterEndTimer = 0.f;
 
         GJGameLevel* lvl = utils::get<PlayLayer>()->m_level;
@@ -117,7 +123,10 @@ namespace eclipse::hacks::Recorder {
         newDesignResolution = cocos2d::CCSize(roundf(320.f * aspectRatio), 320.f);
 
         originalScreenScale = cocos2d::CCSize(view->m_fScaleX, view->m_fScaleY);
-        newScreenScale = cocos2d::CCSize(static_cast<float>(s_recorder.m_renderSettings.m_width) / newDesignResolution.width, static_cast<float>(s_recorder.m_renderSettings.m_height) / newDesignResolution.height);
+        newScreenScale = cocos2d::CCSize(
+            static_cast<float>(s_recorder.m_renderSettings.m_width) / newDesignResolution.width,
+            static_cast<float>(s_recorder.m_renderSettings.m_height) / newDesignResolution.height
+        );
 
         if(oldDesignResolution != newDesignResolution)
             applyWinSize();
@@ -127,41 +136,6 @@ namespace eclipse::hacks::Recorder {
 
     void stop() {
         s_recorder.stop();
-    }
-
-    void startAudio() {
-        stop();
-
-        utils::get<FMODAudioEngine>()->stopAllEffects();
-
-        auto lvl = utils::get<PlayLayer>()->m_level;
-        std::string trimmedLevelName = lvl->m_levelName;
-        std::erase(trimmedLevelName, '/');
-        std::erase(trimmedLevelName, '\\');
-        trimmedLevelName = std::regex_replace(trimmedLevelName, std::regex("\\s+"), " ");
-        auto renderPath = geode::Mod::get()->getSaveDir() / "renders" / STR(trimmedLevelName) / (fmt::format("{} - {}.mp4", trimmedLevelName, lvl->m_levelID.value()));
-
-        if (!std::filesystem::exists(renderPath)) {
-            geode::log::error("Render {} not found", renderPath);
-            return;
-        }
-
-        levelDone = false;
-        popupShown = false;
-        afterEndTimer = 0.f;
-
-        if (auto ell = utils::get<PlayLayer>()->getChildByType<EndLevelLayer>(0))
-            ell->removeFromParent();
-
-        utils::get<PlayLayer>()->stopAllActions();
-        utils::get<PlayLayer>()->startGame();
-        utils::get<PlayLayer>()->resetLevelFromStart();
-
-        s_recorder.startAudio(renderPath);
-    }
-
-    void stopAudio() {
-        s_recorder.stopAudio();
     }
 
     class InternalRecorder : public hack::Hack {
@@ -179,8 +153,6 @@ namespace eclipse::hacks::Recorder {
             tab->addButton("recorder.stop")->callback([] {
                 if (s_recorder.isRecording())
                     stop();
-                if (s_recorder.isRecordingAudio())
-                    stopAudio();
             });
 
             config::setIfEmpty("recorder.fps", 60.f);
@@ -188,7 +160,6 @@ namespace eclipse::hacks::Recorder {
             config::setIfEmpty("recorder.bitrate", 30.f);
             config::setIfEmpty("recorder.resolution.x", 1920.f);
             config::setIfEmpty("recorder.resolution.y", 1080.f);
-            config::setIfEmpty("recorder.audio", 2);
             config::setIfEmpty("recorder.hwType", 0);
             config::setIfEmpty("recorder.colorspace", "");
 
@@ -200,7 +171,7 @@ namespace eclipse::hacks::Recorder {
 
             tab->addInputFloat("recorder.framerate", "recorder.fps", 1.f, 360.f, "%.0f FPS");
             tab->addInputFloat("recorder.endscreen-duration", "recorder.endscreen", 0.f, 30.f, "%.2fs.");
-            tab->addInputFloat("recorder.bitrate", "recorder.bitrate", 1.f, 1000.f, "%.0fmbps");
+            tab->addInputFloat("recorder.bitrate", 1.f, 1000.f, "%.0fmbps");
             tab->addInputInt("recorder.res-x", "recorder.resolution.x", 1, 15360);
             tab->addInputInt("recorder.res-y", "recorder.resolution.y", 1, 8640);
 
@@ -226,14 +197,8 @@ namespace eclipse::hacks::Recorder {
             //     }
             // });
 
-            tab->addCombo("recorder.audio-mode", "recorder.audio", {
-                i18n::get_("recorder.audio-mode.disable"),
-                i18n::get_("recorder.audio-mode.ask"),
-                i18n::get_("recorder.audio-mode.always")
-            }, 0);
-
             tab->addInputText("recorder.colorspace-args", "recorder.colorspace");
-            
+
             tab->addLabel("recorder.presets");
             tab->addButton("recorder.preset.cpu")->callback([] {
                 config::set<std::string>("recorder.codecString", "libx264");
@@ -259,7 +224,7 @@ namespace eclipse::hacks::Recorder {
 
     class $modify(InternalRecorderSLHook, ShaderLayer) {
         void visit() {
-            if(s_recorder.isRecording()) {
+            if (s_recorder.isRecording()) {
                 setScaleY(-1);
                 ShaderLayer::visit();
                 return setScaleY(1);
@@ -293,71 +258,21 @@ namespace eclipse::hacks::Recorder {
     };
 
     class $modify(InternalRecorderBGLHook, GJBaseGameLayer) {
-        void syncMusic() {
-            //temp hardcoded
-            uint32_t tps = 240;
-
-            float songTime = (static_cast<float>(m_gameState.m_currentProgress) / tps) * 1000.f;
-            songTime += m_levelSettings->m_songOffset * 1000.f;
-
-            FMOD::Channel* audioChannel;
-
-            for (int i = 0; i < 2; i++) {
-                utils::get<FMODAudioEngine>()->m_system->getChannel(126 + i, &audioChannel);
-                if (audioChannel) {
-                    uint32_t channelTime = 0;
-                    audioChannel->getPosition(&channelTime, FMOD_TIMEUNIT_MS);
-
-                    if (channelTime <= 0)
-                        continue;
-
-                    if (channelTime - songTime > 0.25f || channelTime - songTime < -0.25f)
-                        audioChannel->setPosition(songTime, FMOD_TIMEUNIT_MS);
-                }
-            }
+        static void onModify(auto& self) {
+            SAFE_SET_PRIO("GJBaseGameLayer::update", SAFE_HOOK_PRIORITY + 1);
         }
 
         void update(float dt) {
-            if ((!s_recorder.isRecording() && !s_recorder.isRecordingAudio()) || m_gameState.m_currentProgress <= 0) return GJBaseGameLayer::update(dt);
+            if (!s_recorder.isRecording() || m_gameState.m_currentProgress <= 0) return GJBaseGameLayer::update(dt);
 
             float endscreen = config::get<float>("recorder.endscreen", 5.f);
+            eclipse::config::set<bool>("global.tpsbypass.toggle", true);
 
             if (levelDone) {
-                if (afterEndTimer > endscreen) {
-                    if (s_recorder.isRecording() && !popupShown) {
-                        switch(config::get<int>("recorder.audio", 2)) {
-                            case 1:
-                                popupShown = true;
-                                Popup::create(
-                                    i18n::get_("recorder.audio"),
-                                    i18n::get_("recorder.audio.msg"),
-                                    i18n::get_("common.yes"),
-                                    i18n::get_("common.no"),
-                                    [&](bool result) {
-                                        if(result) {
-                                            startAudio();
-                                            return;
-                                        }
-                                        stop();
-                                        endPopup();
-                                    }
-                                );
-                                break;
-                            case 2:
-                                startAudio();
-                                break;
-                            default:
-                            case 0:
-                                stop();
-                                endPopup();
-                                break;
-                        }
-                    }
-                    else if (s_recorder.isRecordingAudio()) {
-                        stopAudio();
-                        endPopup();
-                    }
-                    
+                if (afterEndTimer > endscreen && s_recorder.isRecording() && !popupShown) {
+                    popupShown = true;
+                    stop();
+                    endPopup();
                     return GJBaseGameLayer::update(dt);
                 }
                 afterEndTimer += dt;
@@ -371,14 +286,14 @@ namespace eclipse::hacks::Recorder {
 
             totalTime += dt;
 
-            double frameDt = 1. / static_cast<double>(fps) * timewarp;
-            double time = totalTime + extraTime - lastFrameTime;
+            float frameDt = 1. / fps * timewarp;
+            float time = totalTime + extraTime - lastFrameTime;
+
+            DSPRecorder::get()->tryUnpause(totalTime);
 
             if (time >= frameDt) {
                 extraTime = time - frameDt;
                 lastFrameTime = totalTime;
-
-                syncMusic();
 
                 s_recorder.captureFrame();
             }
@@ -386,11 +301,10 @@ namespace eclipse::hacks::Recorder {
             GJBaseGameLayer::update(dt);
         }
     };
-    
+
     class $modify(InternalRecorderPLHook, PlayLayer) {
         void onQuit() {
             if (s_recorder.isRecording()) stop();
-            if (s_recorder.isRecordingAudio()) stopAudio();
             PlayLayer::onQuit();
         }
 
@@ -404,13 +318,5 @@ namespace eclipse::hacks::Recorder {
             popupShown = false;
             PlayLayer::resetLevel();
         }
-
-        void pauseGame(bool paused) {
-            if (s_recorder.isRecordingAudio())
-                return;
-
-            PlayLayer::pauseGame(paused);
-        }
     };
-
 };

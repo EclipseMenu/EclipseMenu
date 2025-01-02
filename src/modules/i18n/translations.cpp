@@ -4,7 +4,6 @@
 #include <modules/labels/setting.hpp>
 
 namespace eclipse::i18n {
-
     nlohmann::json g_fallback = {
         {"language-code", "null"},
     };
@@ -105,7 +104,7 @@ namespace eclipse::i18n {
         auto fallback = json.contains("language-fallback") ? json["language-fallback"].get<std::string>() : "en";
         auto charset = json.contains("language-charset") ? json["language-charset"].get<std::string>() : "default";
 
-        return LanguageMetadata {
+        return LanguageMetadata{
             json["language-name"].get<std::string>(),
             json["language-code"].get<std::string>(),
             fallback,

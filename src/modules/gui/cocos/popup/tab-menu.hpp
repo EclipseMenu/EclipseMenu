@@ -3,7 +3,6 @@
 #include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 
 namespace eclipse::gui::cocos {
-
     /// @brief A container for tab buttons
     class TabMenu : public cocos2d::CCMenu {
     protected:
@@ -26,7 +25,7 @@ namespace eclipse::gui::cocos {
 
     public:
         void setState(bool active);
-        static TabButton* create(const std::string &name, const cocos2d::CCSize &size);
+        static TabButton* create(const std::string& name, const cocos2d::CCSize& size);
 
     protected:
         bool init(std::string name, cocos2d::CCSize size);

@@ -1,265 +1,31 @@
 #include "gui.hpp"
 
-#include <modules/config/config.hpp>
 #include <algorithm>
 
-#include "imgui/imgui.hpp"
 #include "cocos/cocos.hpp"
+#include "imgui/imgui.hpp"
 #include "theming/manager.hpp"
 
+#include "components/base-component.hpp"
+#include "components/button.hpp"
+#include "components/color.hpp"
+#include "components/combo.hpp"
+#include "components/filesystem-combo.hpp"
+#include "components/float-toggle.hpp"
+#include "components/input-float.hpp"
+#include "components/input-int.hpp"
+#include "components/input-text.hpp"
+#include "components/int-toggle.hpp"
+#include "components/keybind.hpp"
+#include "components/label-settings.hpp"
+#include "components/label.hpp"
+#include "components/radio.hpp"
+#include "components/slider.hpp"
+#include "components/toggle.hpp"
+
 namespace eclipse::gui {
-
-    size_t Component::m_uniqueID = 0;
-
-    template <typename T>
-    T get_value(std::string_view key, T defaultValue, bool useTemp) {
-        return useTemp ? config::getTemp<T>(key, defaultValue)
-            : config::get<T>(key, defaultValue);
-    }
-
-    template <typename T>
-    void store_value(std::string_view key, T value, bool useTemp) {
-        useTemp ? config::setTemp<T>(key, value)
-            : config::set<T>(key, value);
-    }
-
-    template <typename T>
-    void store_value_ref(std::string_view key, T const& value, bool useTemp) {
-        useTemp ? config::setTemp<T>(key, value)
-            : config::set<T>(key, value);
-    }
-
-    bool ToggleComponent::getValue() const {
-        return get_value(m_id, false, m_noSave);
-    }
-
-    void ToggleComponent::setValue(bool value) const {
-        store_value(m_id, value, m_noSave);
-    }
-
-    std::shared_ptr<Component> Component::find(size_t uid) {
-        const auto& engine = Engine::get();
-
-        for (auto& tab : engine->getTabs()) {
-            for (auto& component : tab->getComponents()) {
-                if (component->getUID() == uid) {
-                    return component;
-                }
-            }
-        }
-
-        return nullptr;
-    }
-
-    void ToggleComponent::addOptions(const std::function<void(std::shared_ptr<MenuTab>)>& options) {
-        if (!m_options)
-            m_options = std::make_shared<MenuTab>(m_title, false);
-
-        options(m_options);
-    }
-
-    ToggleComponent* ToggleComponent::handleKeybinds() {
-        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](bool down){
-            if (!down) return;
-            bool value = !getValue();
-            setValue(value);
-            this->triggerCallback(value);
-        });
-        m_hasKeybind = true;
-        return this;
-    }
-
-    int RadioButtonComponent::getValue() const {
-        return get_value(m_id, 0, m_noSave);
-    }
-
-    void RadioButtonComponent::setValue(int value) const {
-        store_value(m_id, value, m_noSave);
-    }
-
-    RadioButtonComponent* RadioButtonComponent::handleKeybinds() {
-        auto specialId = fmt::format("{}-{}", m_id, m_value);
-        keybinds::Manager::get()->registerKeybind(specialId, m_title, [this](bool down){
-            if (!down) return;
-            auto value = getChoice();
-            setValue(value);
-            this->triggerCallback(value);
-        });
-        m_hasKeybind = true;
-        return this;
-    }
-
-    int ComboComponent::getValue() const {
-        return get_value(m_id, 0, m_noSave);
-    }
-
-    void ComboComponent::setValue(int value) const {
-        store_value(m_id, value, m_noSave);
-    }
-
-
-    void ComboComponent::setValueIfEmpty(int value) const {
-        if(!config::has(m_id))
-            store_value(m_id, value, m_noSave);
-    }
-
-    std::filesystem::path FilesystemComboComponent::getValue() const {
-        return get_value(m_id, std::filesystem::path(), m_noSave);
-    }
-
-    void FilesystemComboComponent::setValue(std::filesystem::path path) const {
-        store_value(m_id, path, m_noSave);
-    }
-
-    void FilesystemComboComponent::setValue(int index) const {
-        setValue(m_items[index]);
-    }
-
-    void FilesystemComboComponent::globFiles() {
-        m_items.clear();
-
-        if(!std::filesystem::exists(m_directory))
-            return;
-
-        for (const auto& entry : std::filesystem::recursive_directory_iterator(m_directory))
-            m_items.push_back(entry.path());
-    }
-
-    float SliderComponent::getValue() const {
-        return get_value(m_id, 0.f, m_noSave);
-    }
-
-    void SliderComponent::setValue(float value) const {
-        store_value(m_id, value, m_noSave);
-    }
-
-    float InputFloatComponent::getValue() const {
-        return get_value(m_id, 0.f, m_noSave);
-    }
-
-    void InputFloatComponent::setValue(float value) const {
-        store_value(m_id, value, m_noSave);
-    }
-
-    int InputIntComponent::getValue() const {
-        return get_value(m_id, 0, m_noSave);
-    }
-
-    void InputIntComponent::setValue(int value) const {
-        store_value(m_id, value, m_noSave);
-    }
-
-    IntToggleComponent* IntToggleComponent::handleKeybinds() {
-        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](bool down){
-            if (!down) return;
-            bool value = !config::get<bool>(fmt::format("{}.toggle", this->getId()), false);
-            auto id = fmt::format("{}.toggle", this->getId());
-            m_noSave ? config::setTemp(id, value)
-                : config::set(id, value);
-            this->triggerCallback();
-        });
-        m_hasKeybind = true;
-        return this;
-    }
-
-    int IntToggleComponent::getValue() const {
-        return get_value(m_id, 0, m_noSave);
-    }
-
-    void IntToggleComponent::setValue(int value) const {
-        store_value(m_id, value, m_noSave);
-    }
-
-    bool IntToggleComponent::getState() const {
-        return get_value(fmt::format("{}.toggle", this->getId()), false, m_noSave);
-    }
-
-    void IntToggleComponent::setState(bool value) const {
-        store_value(fmt::format("{}.toggle", this->getId()), value, m_noSave);
-    }
-
-    FloatToggleComponent* FloatToggleComponent::handleKeybinds() {
-        keybinds::Manager::get()->registerKeybind(m_id, m_title, [this](bool down){
-            if (!down) return;
-            bool value = !config::get<bool>(fmt::format("{}.toggle", this->getId()), false);
-            auto id = fmt::format("{}.toggle", this->getId());
-            m_noSave ? config::setTemp(id, value)
-                : config::set(id, value);
-            this->triggerCallback();
-        });
-        m_hasKeybind = true;
-        return this;
-    }
-
-    float FloatToggleComponent::getValue() const {
-        return get_value(m_id, 0.f, m_noSave);
-    }
-
-    void FloatToggleComponent::setValue(float value) const {
-        store_value(m_id, value, m_noSave);
-    }
-
-    bool FloatToggleComponent::getState() const {
-        return get_value(fmt::format("{}.toggle", this->getId()), false, m_noSave);
-    }
-
-    void FloatToggleComponent::setState(bool value) const {
-        store_value(fmt::format("{}.toggle", this->getId()), value, m_noSave);
-    }
-
-    std::string InputTextComponent::getValue() const {
-        return get_value<std::string>(m_id, "", m_noSave);
-    }
-
-    void InputTextComponent::setValue(const std::string& value) const {
-        store_value_ref(m_id, value, m_noSave);
-    }
-
-    Color ColorComponent::getValue() const {
-        return get_value(m_id, Color::BLACK, m_noSave);
-    }
-
-    void ColorComponent::setValue(const Color& value) const {
-        store_value_ref(m_id, value, m_noSave);
-    }
-
-    ButtonComponent* ButtonComponent::handleKeybinds() {
-        keybinds::Manager::get()->registerKeybind(fmt::format("button.{}", m_title), m_title, [this](bool down){
-            if (!down) return;
-            this->triggerCallback();
-        });
-        m_hasKeybind = true;
-        return this;
-    }
-
-    void LabelSettingsComponent::triggerDeleteCallback() const {
-        if (m_deleteCallback) m_deleteCallback();
-
-        // We also have to clean up the keybind
-        keybinds::Manager::get()->unregisterKeybind(fmt::format("label.{}", m_settings->id));
-    }
-
-    void LabelSettingsComponent::triggerEditCallback() const {
-        if (m_editCallback) m_editCallback();
-
-        // Update the keybind title
-        auto keybind = keybinds::Manager::get()->getKeybind(fmt::format("label.{}", m_settings->id));
-        if (keybind.has_value()) {
-            keybind->get().setTitle(m_settings->name);
-        } else {
-            geode::log::warn("Keybind with ID 'label.{}' not found", m_settings->id);
-        }
-    }
-
-    LabelSettingsComponent* LabelSettingsComponent::handleKeybinds() {
-        keybinds::Manager::get()->registerKeybind(fmt::format("label.{}", m_settings->id), m_settings->name, [this](bool down){
-            if (!down) return;
-            this->m_settings->visible = !this->m_settings->visible;
-            this->triggerEditCallback();
-        });
-        m_hasKeybind = true;
-        return this;
-    }
+    MenuTab::MenuTab(std::string title, bool isSearchedFor)
+        : m_title(std::move(title)), m_isSearchedFor(isSearchedFor) {}
 
     void MenuTab::addComponent(const std::shared_ptr<Component>& component) {
         m_components.push_back(component);
@@ -267,17 +33,197 @@ namespace eclipse::gui {
     }
 
     void MenuTab::removeComponent(std::weak_ptr<Component> component) {
-        auto it = std::ranges::find_if(m_components, [&component](const std::shared_ptr<Component>& c) {
-            return component.lock() == c;
-        });
+        auto it = std::ranges::find_if(
+            m_components, [&component](const std::shared_ptr<Component>& c) {
+                return component.lock() == c;
+            }
+        );
 
         m_components[it - m_components.begin()].reset();
         m_components.erase(it);
     }
 
-    std::shared_ptr<MenuTab> MenuTab::find(std::string_view name) {
-        return Engine::get()->findTab(name);
+    std::shared_ptr<LabelComponent> MenuTab::addLabel(const std::string& title) {
+        auto label = std::make_shared<LabelComponent>(title);
+        addComponent(label);
+        return label;
     }
+
+    std::shared_ptr<ToggleComponent> MenuTab::addToggle(const std::string& id) {
+        auto toggle = std::make_shared<ToggleComponent>(id, id);
+        addComponent(toggle);
+        return toggle;
+    }
+
+    std::shared_ptr<ToggleComponent> MenuTab::addToggle(const std::string& title, const std::string& id) {
+        auto toggle = std::make_shared<ToggleComponent>(id, title);
+        addComponent(toggle);
+        return toggle;
+    }
+
+    std::shared_ptr<RadioButtonComponent> MenuTab::addRadioButton(
+        const std::string& title, const std::string& id, int value
+    ) {
+        auto button = std::make_shared<RadioButtonComponent>(id, title, value);
+        addComponent(button);
+        return button;
+    }
+
+    std::shared_ptr<ComboComponent> MenuTab::addCombo(
+        const std::string& title, const std::string& id, std::vector<std::string> items, int value
+    ) {
+        auto combo = std::make_shared<ComboComponent>(id, title, items, value);
+        addComponent(combo);
+        return combo;
+    }
+
+    std::shared_ptr<ComboComponent> MenuTab::addCombo(
+        const std::string& id, std::vector<std::string> items, int value
+    ) {
+        auto combo = std::make_shared<ComboComponent>(id, id, items, value);
+        addComponent(combo);
+        return combo;
+    }
+
+    std::shared_ptr<FilesystemComboComponent> MenuTab::addFilesystemCombo(
+        const std::string& title, const std::string& id, std::filesystem::path directory
+    ) {
+        auto combo = std::make_shared<FilesystemComboComponent>(id, title, directory);
+        addComponent(combo);
+        return combo;
+    }
+
+    std::shared_ptr<FilesystemComboComponent> MenuTab::addFilesystemCombo(
+        const std::string& id, std::filesystem::path directory
+    ) {
+        auto combo = std::make_shared<FilesystemComboComponent>(id, id, directory);
+        addComponent(combo);
+        return combo;
+    }
+
+    std::shared_ptr<SliderComponent> MenuTab::addSlider(
+        const std::string& title, const std::string& id, float min, float max, const std::string& format
+    ) {
+        auto slider = std::make_shared<SliderComponent>(title, id, min, max, format);
+        addComponent(slider);
+        return slider;
+    }
+
+    std::shared_ptr<SliderComponent> MenuTab::addSlider(
+        const std::string& id, float min, float max, const std::string& format
+    ) {
+        auto slider = std::make_shared<SliderComponent>(id, id, min, max, format);
+        addComponent(slider);
+        return slider;
+    }
+
+    std::shared_ptr<InputFloatComponent> MenuTab::addInputFloat(
+        const std::string& title, const std::string& id, float min, float max, const std::string& format
+    ) {
+        auto inputFloat = std::make_shared<InputFloatComponent>(title, id, min, max, format);
+        addComponent(inputFloat);
+        return inputFloat;
+    }
+
+    std::shared_ptr<InputFloatComponent> MenuTab::addInputFloat(
+        const std::string& id, float min, float max, const std::string& format
+    ) {
+        auto inputFloat = std::make_shared<InputFloatComponent>(id, id, min, max, format);
+        addComponent(inputFloat);
+        return inputFloat;
+    }
+
+    std::shared_ptr<InputIntComponent> MenuTab::addInputInt(
+        const std::string& title, const std::string& id, int min, int max
+    ) {
+        auto inputInt = std::make_shared<InputIntComponent>(title, id, min, max);
+        addComponent(inputInt);
+        return inputInt;
+    }
+
+    std::shared_ptr<InputIntComponent> MenuTab::addInputInt(const std::string& id, int min, int max) {
+        auto inputInt = std::make_shared<InputIntComponent>(id, id, min, max);
+        addComponent(inputInt);
+        return inputInt;
+    }
+
+    std::shared_ptr<IntToggleComponent> MenuTab::addIntToggle(
+        const std::string& title, const std::string& id, int min, int max
+    ) {
+        auto intToggle = std::make_shared<IntToggleComponent>(title, id, min, max);
+        addComponent(intToggle);
+        return intToggle;
+    }
+
+    std::shared_ptr<IntToggleComponent> MenuTab::addIntToggle(const std::string& id, int min, int max) {
+        auto intToggle = std::make_shared<IntToggleComponent>(id, id, min, max);
+        addComponent(intToggle);
+        return intToggle;
+    }
+
+    std::shared_ptr<FloatToggleComponent> MenuTab::addFloatToggle(
+        const std::string& title, const std::string& id, float min, float max, const std::string& format
+    ) {
+        auto floatToggle = std::make_shared<FloatToggleComponent>(title, id, min, max, format);
+        addComponent(floatToggle);
+        return floatToggle;
+    }
+
+    std::shared_ptr<FloatToggleComponent> MenuTab::addFloatToggle(
+        const std::string& id, float min, float max, const std::string& format
+    ) {
+        auto floatToggle = std::make_shared<FloatToggleComponent>(id, id, min, max, format);
+        addComponent(floatToggle);
+        return floatToggle;
+    }
+
+    std::shared_ptr<InputTextComponent> MenuTab::addInputText(const std::string& title, const std::string& id) {
+        auto inputText = std::make_shared<InputTextComponent>(title, id);
+        addComponent(inputText);
+        return inputText;
+    }
+
+    std::shared_ptr<InputTextComponent> MenuTab::addInputText(const std::string& id) {
+        auto inputText = std::make_shared<InputTextComponent>(id, id);
+        addComponent(inputText);
+        return inputText;
+    }
+
+    std::shared_ptr<ButtonComponent> MenuTab::addButton(const std::string& title) {
+        auto button = std::make_shared<ButtonComponent>(title);
+        addComponent(button);
+        return button;
+    }
+
+    std::shared_ptr<ColorComponent> MenuTab::addColorComponent(
+        const std::string& title, const std::string& id, bool hasOpacity
+    ) {
+        auto color = std::make_shared<ColorComponent>(title, id, hasOpacity);
+        addComponent(color);
+        return color;
+    }
+
+    std::shared_ptr<ColorComponent> MenuTab::addColorComponent(const std::string& id, bool hasOpacity) {
+        auto color = std::make_shared<ColorComponent>(id, id, hasOpacity);
+        addComponent(color);
+        return color;
+    }
+
+    std::shared_ptr<KeybindComponent> MenuTab::addKeybind(
+        const std::string& title, const std::string& id, bool canDelete
+    ) {
+        auto keybind = std::make_shared<KeybindComponent>(title, id, canDelete);
+        addComponent(keybind);
+        return keybind;
+    }
+
+    std::shared_ptr<LabelSettingsComponent> MenuTab::addLabelSetting(labels::LabelSettings* settings) {
+        auto labelSettings = std::make_shared<LabelSettingsComponent>(settings);
+        addComponent(labelSettings);
+        return labelSettings;
+    }
+
+    std::shared_ptr<MenuTab> MenuTab::find(std::string_view name) { return Engine::get()->findTab(name); }
 
     void Engine::setRenderer(RendererType type) {
         const auto tm = ThemeManager::get();
@@ -286,16 +232,12 @@ namespace eclipse::gui {
 
         switch (type) {
             default:
-#ifndef GEODE_IS_MOBILE
-            case RendererType::ImGui:
-                m_renderer = std::make_shared<imgui::ImGuiRenderer>();
+                #ifndef GEODE_IS_MOBILE
+            case RendererType::ImGui: m_renderer = std::make_shared<imgui::ImGuiRenderer>();
                 break;
-#endif
-#ifndef GEODE_IS_DESKTOP
-            case RendererType::Cocos2d:
-                m_renderer = std::make_shared<cocos::CocosRenderer>();
+                #endif
+            case RendererType::Cocos2d: m_renderer = std::make_shared<cocos::CocosRenderer>();
                 break;
-#endif
         }
 
         m_renderer->init();
@@ -339,5 +281,4 @@ namespace eclipse::gui {
 
         return tab;
     }
-
 }

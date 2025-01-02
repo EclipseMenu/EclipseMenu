@@ -1,18 +1,15 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/UILayer.hpp>
 
 namespace eclipse::hacks::Bypass {
-
     class PauseBuffering : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
-
-            tab->addToggle("bypass.pausebuffering")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("bypass.pausebuffering")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Pause Buffering"; }
@@ -33,5 +30,4 @@ namespace eclipse::hacks::Bypass {
             playLayer->m_gameState.m_pauseCounter = original;
         }
     };
-
 }

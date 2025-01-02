@@ -25,14 +25,14 @@ namespace eclipse::gui {
 }
 
 namespace eclipse::gui::imgui {
-
     constexpr float DEFAULT_SCALE = 1.0f GEODE_ANDROID(* 1.42f);
     constexpr float INV_DEFAULT_SCALE = 1.0f / DEFAULT_SCALE;
 
     extern std::vector<std::string> THEME_NAMES;
+
     enum class ComponentTheme {
-        ImGui, /// Classic Dear ImGui look
-        MegaHack, /// MegaHack v8 style
+        ImGui,       /// Classic Dear ImGui look
+        MegaHack,    /// MegaHack v8 style
         MegaOverlay, /// GDMegaOverlay style
     };
 
@@ -81,18 +81,17 @@ namespace eclipse::gui::imgui {
         virtual bool checkbox(
             const std::string& label, bool& value,
             bool isSearchedFor,
-            const std::function<void()>& postDraw = []{}
+            const std::function<void()>& postDraw = [] {}
         ) const;
         virtual bool checkboxWithSettings(
             const std::string& label, bool& value,
             bool isSearchedFor,
             const std::function<void()>& callback,
-            const std::function<void()>& postDraw = []{},
+            const std::function<void()>& postDraw = [] {},
             const std::string& popupId = "" // empty = use default
         ) const;
         virtual bool button(const std::string& text, bool isSearchedFor) const;
 
         virtual ComponentTheme getTheme() const { return ComponentTheme::ImGui; }
     };
-
 }

@@ -1,11 +1,7 @@
 #pragma once
 
-#include <modules/utils/SingletonCache.hpp>
-#include <Geode/platform/platform.hpp>
-#include <utils.hpp>
 #include <memory>
-#include <Geode/loader/Hook.hpp>
-#include <Geode/loader/Log.hpp>
+#include <utils.hpp>
 
 #define REGISTER_HACK(hackClass) $execute { eclipse::hack::Hack::registerHack<hackClass>(); }
 
@@ -150,7 +146,6 @@ static void onModify(auto& self) {\
 }
 
 namespace eclipse::hack {
-
     /// @brief Base class for all hacks.
     class Hack {
     public:
@@ -160,7 +155,7 @@ namespace eclipse::hack {
         static void registerHack(std::shared_ptr<Hack> hack);
 
         /// @brief Registers a hack by its type.
-        template<typename T, typename = std::enable_if_t<std::is_base_of_v<Hack, T>>>
+        template <typename T, typename = std::enable_if_t<std::is_base_of_v<Hack, T>>>
         static void registerHack() { registerHack(std::make_shared<T>()); }
 
         /// @brief Finds a hack by its ID.
@@ -193,5 +188,4 @@ namespace eclipse::hack {
         /// @brief Get hack's position priority (used for sorting)
         [[nodiscard]] virtual int32_t getPriority() const { return 0; }
     };
-
 }

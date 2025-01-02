@@ -1,7 +1,6 @@
 #pragma once
 
 namespace eclipse::utils {
-
     template <typename T>
     using base_type = std::remove_pointer_t<std::remove_cv_t<T>>;
 
@@ -53,7 +52,8 @@ namespace eclipse::utils {
         if constexpr (NestedInstance<type>) {
             return getNested<T>();
         } else {
-            constexpr bool isStatic = not_one_of_v<type,
+            constexpr bool isStatic = not_one_of_v<
+                type,
                 PlayLayer, LevelEditorLayer,
                 GJBaseGameLayer, MenuLayer,
                 cocos2d::CCScene
@@ -90,5 +90,4 @@ namespace eclipse::utils {
             else return *ref;
         }
     }
-
 }

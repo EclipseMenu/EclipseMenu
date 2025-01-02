@@ -1,12 +1,12 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GameToolbox.hpp>
 
 #ifndef GEODE_IS_WINDOWS // TODO: Make a patch for Windows
 namespace eclipse::hacks::Level {
-
     class RandomSeed : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
@@ -14,11 +14,11 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.randomseed.seed", 1);
 
             tab->addToggle("level.randomseed")
-                ->handleKeybinds()
-                ->setDescription()
-                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addInputInt("level.randomseed.seed", "level.randomseed.seed");
-                });
+               ->handleKeybinds()
+               ->setDescription()
+               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                   options->addInputInt("level.randomseed.seed", "level.randomseed.seed");
+               });
         }
 
         [[nodiscard]] bool isCheating() override { return config::get<bool>("level.randomseed", false); }
@@ -37,4 +37,5 @@ namespace eclipse::hacks::Level {
         }
     };
 }
+
 #endif

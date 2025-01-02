@@ -1,6 +1,7 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/float-toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #ifdef GEODE_IS_WINDOWS
 constexpr float MIN_FPS = 1.f;
@@ -28,8 +29,8 @@ namespace eclipse::hacks::Global {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addFloatToggle("global.fpsbypass", "global.fpsbypass", MIN_FPS, MAX_FPS, "%.2f FPS")
                ->handleKeybinds()
-               ->toggleCallback([]{ updateRefreshRate(); })
-               ->valueCallback([](float){ updateRefreshRate(); });
+               ->toggleCallback([] { updateRefreshRate(); })
+               ->valueCallback([](float) { updateRefreshRate(); });
         }
 
         void lateInit() override {

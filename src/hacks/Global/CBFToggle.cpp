@@ -1,6 +1,7 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #ifdef GEODE_IS_WINDOWS
 
@@ -14,12 +15,12 @@ namespace eclipse::hacks::Global {
 
             auto tab = gui::MenuTab::find("tab.global");
             tab->addToggle("global.click-between-frames", "syzzi.click_between_frames.toggle")
-                ->handleKeybinds()
-                ->setDescription()
-                ->callback([cbf](bool v){
-                    // soft-toggle means disable if true, so we invert the value
-                    cbf->setSettingValue<bool>("soft-toggle", !v);
-                })->disableSaving();
+               ->handleKeybinds()
+               ->setDescription()
+               ->callback([cbf](bool v) {
+                   // soft-toggle means disable if true, so we invert the value
+                   cbf->setSettingValue<bool>("soft-toggle", !v);
+               })->disableSaving();
 
             listenForSettingChanges<bool>("soft-toggle", [](bool v) {
                 config::setTemp("syzzi.click_between_frames.toggle", !v);

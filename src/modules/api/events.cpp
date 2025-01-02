@@ -3,6 +3,10 @@
 #include <modules/config/config.hpp>
 #include <modules/labels/variables.hpp>
 
+#include <modules/gui/components/toggle.hpp>
+#include <modules/gui/components/button.hpp>
+#include <modules/gui/components/label.hpp>
+
 namespace eclipse::api {
 using namespace geode::prelude;
 
@@ -35,8 +39,8 @@ void createGetRiftVariableListener() {
         auto val = labels::VariableManager::get().getVariable(std::string(e->getName()));
 
 #define HANDLE_CASE(type) \
-    if (val.is##type()) { e->setResult(Ok(val.get##type())); }\
-    else { e->setResult(Err("Value is not a " #type)); }
+if (val.is##type()) { e->setResult(Ok(val.get##type())); }\
+else { e->setResult(Err("Value is not a " #type)); }
 
         if constexpr (std::same_as<T, std::string>) {
             HANDLE_CASE(String)
@@ -49,6 +53,8 @@ void createGetRiftVariableListener() {
         } else if constexpr (std::same_as<T, label::null_t>) {
             if (val.isNull()) e->setResult(Ok(std::monostate{}));
             else e->setResult(Err("Value is not null"));
+        } else if constexpr (std::same_as<T, matjson::Value>) {
+            e->setResult(Ok(val.toJson()));
         } else {
             e->setResult(Err("Unsupported type"));
         }
@@ -136,11 +142,13 @@ $execute {
     createGetRiftVariableListener<int64_t>();
     createGetRiftVariableListener<double>();
     createGetRiftVariableListener<label::null_t>();
+    createGetRiftVariableListener<matjson::Value>();
     createSetRiftVariableListener<std::string>();
     createSetRiftVariableListener<bool>();
     createSetRiftVariableListener<int64_t>();
     createSetRiftVariableListener<double>();
     createSetRiftVariableListener<label::null_t>();
+    createSetRiftVariableListener<matjson::Value>();
 }
 
 }

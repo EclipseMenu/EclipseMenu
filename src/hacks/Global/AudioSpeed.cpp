@@ -1,11 +1,12 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/float-toggle.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/binding/FMODAudioEngine.hpp>
 
 namespace eclipse::hacks::Global {
-
     void setSpeed(FMOD::Channel* channel) {
         float speed = 1.f;
 
@@ -36,21 +37,17 @@ namespace eclipse::hacks::Global {
     }
 
     class AudioSpeed : public hack::Hack {
-
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
 
             config::setIfEmpty("global.audiospeed.toggle", false);
             config::setIfEmpty("global.audiospeed", 1.f);
 
-            tab->addFloatToggle("global.audiospeed", "global.audiospeed", 0.0001f, 1000.f, "%.4f")
-                ->handleKeybinds()
-                ->toggleCallback(updateChannels);
+            tab->addFloatToggle("global.audiospeed", 0.0001f, 1000.f, "%.4f")->handleKeybinds()
+               ->toggleCallback(updateChannels);
 
-            tab->addToggle("global.audiospeed.sync")
-                ->handleKeybinds()
-                ->callback([](bool){ updateChannels(); })
-                ->setDescription();
+            tab->addToggle("global.audiospeed.sync")->handleKeybinds()->setDescription()
+               ->callback([](bool) { updateChannels(); });
         }
 
         void update() override {
@@ -74,5 +71,4 @@ namespace eclipse::hacks::Global {
     };
 
     REGISTER_HACK(AudioSpeed)
-
 }

@@ -1,14 +1,14 @@
-#include <numbers>
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
-#include <modules/config/config.hpp>
-#include <modules/keybinds/manager.hpp>
 #include <imgui.h>
+#include <numbers>
+#include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
+#include <modules/keybinds/manager.hpp>
 
 #ifndef GEODE_IS_ANDROID
 
 namespace eclipse::hacks::Player {
-
     double degToRad(double degrees) {
         return degrees * std::numbers::pi / 180;
     }
@@ -51,7 +51,6 @@ namespace eclipse::hacks::Player {
     class ClickTeleport : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
-
             tab->addToggle("player.clicktp")->setDescription()->handleKeybinds();
         }
 
@@ -75,7 +74,6 @@ namespace eclipse::hacks::Player {
     };
 
     REGISTER_HACK(ClickTeleport)
-
 }
 
 #endif

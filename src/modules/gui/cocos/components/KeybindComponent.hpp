@@ -1,6 +1,9 @@
 #pragma once
 #include "BaseComponentNode.hpp"
 
+#include <modules/config/config.hpp>
+#include <modules/gui/components/keybind.hpp>
+
 namespace eclipse::gui::cocos {
     class SelectKeybindPopup : public geode::Popup<keybinds::Keys, std::function<void(keybinds::Keys)> const&> {
     public:

@@ -1,15 +1,17 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/color.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
-#include <Geode/modify/PlayLayer.hpp>
-#include <Geode/modify/PlayerObject.hpp>
-#include <Geode/modify/GJBaseGameLayer.hpp>
-#include <Geode/modify/LevelEditorLayer.hpp>
-#include <Geode/modify/GameObject.hpp>
 #include <Geode/modify/EffectGameObject.hpp>
 #include <Geode/modify/EnhancedGameObject.hpp>
+#include <Geode/modify/GameObject.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/HardStreak.hpp>
+#include <Geode/modify/LevelEditorLayer.hpp>
+#include <Geode/modify/PlayerObject.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Player {
     class TrajectorySimulation {
@@ -41,7 +43,7 @@ namespace eclipse::hacks::Player {
             };
 
             static TrajectoryDrawNode* instance = nullptr;
-            
+
             if (!instance) {
                 instance = TrajectoryDrawNode::create();
                 instance->retain();
@@ -54,15 +56,15 @@ namespace eclipse::hacks::Player {
     private:
         void drawRectangleHitbox(const cocos2d::CCRect& rect, const gui::Color& color, const gui::Color& borderColor) const {
             std::array vertices = {
-                cocos2d::CCPoint { rect.getMinX(), rect.getMinY() },
-                cocos2d::CCPoint { rect.getMinX(), rect.getMaxY() },
-                cocos2d::CCPoint { rect.getMaxX(), rect.getMaxY() },
-                cocos2d::CCPoint { rect.getMaxX(), rect.getMinY() }
+                cocos2d::CCPoint{rect.getMinX(), rect.getMinY()},
+                cocos2d::CCPoint{rect.getMinX(), rect.getMaxY()},
+                cocos2d::CCPoint{rect.getMaxX(), rect.getMaxY()},
+                cocos2d::CCPoint{rect.getMaxX(), rect.getMinY()}
             };
 
             getDrawNode()->drawPolygon(
                 vertices.data(), vertices.size(),
-                { color.r, color.g, color.b, 0 },
+                {color.r, color.g, color.b, 0},
                 0.25f, borderColor
             );
         }
@@ -71,8 +73,8 @@ namespace eclipse::hacks::Player {
             cocos2d::CCRect rect1 = player->getObjectRect();
             cocos2d::CCRect rect2 = player->getObjectRect(0.25f, 0.25f);
 
-            auto color = config::get<gui::Color>("level.showhitboxes.player_color", { 1.f, 0, 0, 1.f });
-            auto colorInner = config::get<gui::Color>("level.showhitboxes.player_color_inner", { 0, 1.f, 0, 1.f });
+            auto color = config::get<gui::Color>("level.showhitboxes.player_color", {1.f, 0, 0, 1.f});
+            auto colorInner = config::get<gui::Color>("level.showhitboxes.player_color_inner", {0, 1.f, 0, 1.f});
 
             drawRectangleHitbox(rect1, color, color);
             drawRectangleHitbox(rect2, colorInner, colorInner);
@@ -116,10 +118,10 @@ namespace eclipse::hacks::Player {
                 getDrawNode()->drawSegment(
                     initialPlayerPosition,
                     player->getPosition(), 0.65f,
-                    down ? cocos2d::ccColor4F{ 0.f, 1.f, 0.1f, 1.f } : cocos2d::ccColor4F{ 1.f, 0.f, 0.1f, 1.f }
+                    down ? cocos2d::ccColor4F{0.f, 1.f, 0.1f, 1.f} : cocos2d::ccColor4F{1.f, 0.f, 0.1f, 1.f}
                 );
             }
-            
+
             drawForPlayer(player);
         }
 
@@ -226,18 +228,15 @@ namespace eclipse::hacks::Player {
     class ShowTrajectory : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
-
-            gui::ToggleComponent* toggle = tab->addToggle("player.showtrajectory")
-                ->setDescription()
-                ->handleKeybinds();
+            auto toggle = tab->addToggle("player.showtrajectory")->setDescription()->handleKeybinds();
 
             config::setIfEmpty("player.showtrajectory.iterations", 300);
 
             toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                options->addInputInt("player.showtrajectory.iterations", "player.showtrajectory.iterations", 1, 1000);
+                options->addInputInt("player.showtrajectory.iterations", 1, 1000);
             });
 
-            config::addDelegate("player.showtrajectory", []() {
+            config::addDelegate("player.showtrajectory", [] {
                 auto value = config::get<bool>("player.showtrajectory", false);
                 s_simulation.getDrawNode()->setVisible(value);
             });
@@ -274,7 +273,7 @@ namespace eclipse::hacks::Player {
 
         void playEndAnimationToPos(cocos2d::CCPoint p0) {
             if (s_simulation.isSimulating()) return;
-            
+
             PlayLayer::playEndAnimationToPos(p0);
         }
 
@@ -283,7 +282,7 @@ namespace eclipse::hacks::Player {
             s_simulation.quit();
         }
     };
-    
+
     class $modify(ShowTrajectoryLELHook, LevelEditorLayer) {
         bool init(GJGameLevel* level, bool unk) {
             bool result = LevelEditorLayer::init(level, unk);
@@ -307,7 +306,7 @@ namespace eclipse::hacks::Player {
 
         void triggerObject(GJBaseGameLayer* p0, int p1, const gd::vector<int>* p2) override {
             if (s_simulation.isSimulating()) return;
-            
+
             return EffectGameObject::triggerObject(p0, p1, p2);
         }
     };
@@ -317,7 +316,7 @@ namespace eclipse::hacks::Player {
 
         void playShineEffect() {
             if (s_simulation.isSimulating()) return;
-            
+
             GameObject::playShineEffect();
         }
     };
@@ -333,7 +332,7 @@ namespace eclipse::hacks::Player {
 
         void incrementJumps() {
             if (s_simulation.isSimulating()) return;
-            
+
             PlayerObject::incrementJumps();
         }
 
@@ -346,7 +345,7 @@ namespace eclipse::hacks::Player {
 
         void ringJump(RingObject* p0, bool p1) {
             if (s_simulation.isSimulating()) return;
-            
+
             PlayerObject::ringJump(p0, p1);
         }
     };
@@ -357,11 +356,11 @@ namespace eclipse::hacks::Player {
         bool canBeActivatedByPlayer(PlayerObject* p0, EffectGameObject* p1) {
             if (s_simulation.isSimulating())
                 return false;
-            
+
             return GJBaseGameLayer::canBeActivatedByPlayer(p0, p1);
         }
 
-        void handleButton(bool down, int button, bool isPlayer1){
+        void handleButton(bool down, int button, bool isPlayer1) {
             if (button == 1)
                 s_simulation.handleButton(down, isPlayer1);
 
@@ -378,9 +377,9 @@ namespace eclipse::hacks::Player {
         void collisionCheckObjects(PlayerObject* player, gd::vector<GameObject*>* vec, int objectsCount, float dt) {
             if (s_simulation.isSimulating()) {
                 gd::vector<GameObject*> extra;
-#ifndef GEODE_IS_ANDROID // vector::reserve is not available on Android
+                #ifndef GEODE_IS_ANDROID // vector::reserve is not available on Android
                 extra.reserve(objectsCount);
-#endif
+                #endif
                 for (int i = 0; i < objectsCount; i++) {
                     GameObject* obj = vec->at(i);
                     if (obj->m_objectType == GameObjectType::Solid ||
@@ -410,6 +409,4 @@ namespace eclipse::hacks::Player {
             GJBaseGameLayer::updateCamera(dt);
         }
     };
-
-
 }

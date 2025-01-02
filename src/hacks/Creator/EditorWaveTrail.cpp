@@ -1,19 +1,17 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
-#include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/HardStreak.hpp>
+#include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Creator { // i didnt do this properly :P
 
     /*class EditorWaveTrail : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
-
-            tab->addToggle("creator.editorwave")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("creator.editorwave")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Editor Wave Trail"; }

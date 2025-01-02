@@ -6,15 +6,17 @@
 #include <string_view>
 #include <concepts>
 #include <Geode/loader/Event.hpp>
+#include <matjson.hpp>
 
 namespace eclipse::label {
 
     using null_t = std::monostate;
 
-    /// @brief Concept for supported types in the label system (bool, int64_t, double, std::string, RiftNull)
+    /// @brief Concept for supported types in the label system (bool, int64_t, double, std::string, RiftNull, matjson::Value)
     template <typename T>
     concept SupportedType = requires(T a) {
-        std::same_as<T, bool> || std::same_as<T, int64_t> || std::same_as<T, double> || std::same_as<T, std::string> || std::same_as<T, null_t>;
+        std::same_as<T, bool> || std::same_as<T, int64_t> || std::same_as<T, double> ||
+        std::same_as<T, std::string> || std::same_as<T, null_t> || std::same_as<T, matjson::Value>;
     };
 
 }

@@ -2,7 +2,6 @@
 #include <string_view>
 
 namespace eclipse::i18n {
-
     struct LanguageMetadata {
         std::string name;
         std::string code;
@@ -19,7 +18,7 @@ namespace eclipse::i18n {
 
     /// @brief Format a translation with the specified arguments.
     /// Note: use numbers in the format string to specify the argument index.
-    template <typename... Args>
+    template<typename... Args>
     std::string format(std::string_view key, Args&&... args) {
         return fmt::format(fmt::runtime(get(key)), std::forward<Args>(args)...);
     }
@@ -50,15 +49,15 @@ namespace eclipse::i18n {
     size_t getLanguageIndex();
 
     enum class GlyphRange : uint8_t {
-        Default = 0,
-        Greek = 1 << 0,
-        Korean = 1 << 1,
-        Japanese = 1 << 2,
-        ChineseFull = 1 << 3,
+        Default           = 0,
+        Greek             = 1 << 0,
+        Korean            = 1 << 1,
+        Japanese          = 1 << 2,
+        ChineseFull       = 1 << 3,
         ChineseSimplified = 1 << 4,
-        Cyrillic = 1 << 5,
-        Thai = 1 << 6,
-        Vietnamese = 1 << 7
+        Cyrillic          = 1 << 5,
+        Thai              = 1 << 6,
+        Vietnamese        = 1 << 7
     };
 
     bool operator&(GlyphRange lhs, GlyphRange rhs);
@@ -71,5 +70,4 @@ namespace eclipse::i18n {
 
     /// @brief Get a list of names of all available languages.
     std::vector<std::string> getAvailableLanguages();
-
 }

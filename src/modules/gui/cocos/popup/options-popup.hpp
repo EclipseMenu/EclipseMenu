@@ -5,7 +5,6 @@ namespace eclipse::gui {
 }
 
 namespace eclipse::gui::cocos {
-
     class ContentView;
 
     /// @brief A popup with a ContentView for displaying extra hack options.

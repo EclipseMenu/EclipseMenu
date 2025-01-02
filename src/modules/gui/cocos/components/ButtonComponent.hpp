@@ -1,6 +1,7 @@
 #pragma once
-
 #include "BaseComponentNode.hpp"
+
+#include <modules/gui/components/button.hpp>
 #include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::cocos {

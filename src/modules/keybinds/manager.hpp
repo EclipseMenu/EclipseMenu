@@ -10,7 +10,6 @@
 #include <optional>
 
 namespace eclipse::keybinds {
-
     enum class Keys {
         None,
 
@@ -87,7 +86,8 @@ namespace eclipse::keybinds {
         /// @param callback The callback to execute when the keybind is pressed.
         /// @param internal Whether the keybind is internal or not.
         Keybind(Keys key, std::string id, std::string title, std::function<void(bool)> callback, bool internal = false)
-            : m_key(key), m_id(std::move(id)), m_title(std::move(title)), m_callback(std::move(callback)), m_internal(internal) {}
+            : m_key(key), m_id(std::move(id)), m_title(std::move(title)), m_callback(std::move(callback)),
+              m_internal(internal) {}
 
         /// @brief Get the key of the keybind.
         [[nodiscard]] Keys getKey() const { return m_key; }
@@ -196,6 +196,4 @@ namespace eclipse::keybinds {
         friend bool isKeyPressed(Keys key);
         friend bool isKeyReleased(Keys key);
     };
-
-
 }

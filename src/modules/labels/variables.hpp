@@ -1,17 +1,15 @@
 #pragma once
+#include <rift.hpp>
 #include <string>
 #include <unordered_map>
-#include <rift.hpp>
 
 // Quickly assign a value to a label variable for debugging purposes.
 #define DEBUG_VAR(name, value) eclipse::labels::VariableManager::get().setVariable(name, rift::Value::from(value))
 
 namespace eclipse::labels {
-
     /// @brief Class that represents a variable manager, used to store and retrieve variables.
     class VariableManager {
     public:
-
         static VariableManager& get();
 
         /// @brief Set default variables (which usually don't change).
@@ -48,5 +46,4 @@ namespace eclipse::labels {
 
         rift::Object m_variables;
     };
-
 }

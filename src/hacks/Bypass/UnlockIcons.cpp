@@ -1,15 +1,14 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GameManager.hpp>
 
 namespace eclipse::hacks::Bypass {
-
     class UnlockIcons : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
-
             tab->addToggle("bypass.unlockicons")->handleKeybinds()->setDescription();
         }
 
@@ -22,18 +21,15 @@ namespace eclipse::hacks::Bypass {
         ENABLE_SAFE_HOOKS_ALL()
 
         bool isColorUnlocked(int key, UnlockType type) {
-            if (GameManager::isColorUnlocked(key, type))
-                return true;
+            if (GameManager::isColorUnlocked(key, type)) return true;
 
             return config::get<bool>("bypass.unlockicons", false);
         }
 
         bool isIconUnlocked(int key, IconType type) {
-            if (GameManager::isIconUnlocked(key, type))
-                return true;
+            if (GameManager::isIconUnlocked(key, type)) return true;
 
             return config::get<bool>("bypass.unlockicons", false);
         }
     };
-
 }

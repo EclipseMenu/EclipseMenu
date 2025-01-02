@@ -1,11 +1,11 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/float-toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/CCScheduler.hpp>
 
 namespace eclipse::hacks::Global {
-
     class Speedhack : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
@@ -15,15 +15,16 @@ namespace eclipse::hacks::Global {
             config::set("global.speedhack.toggle", false);
             config::setIfEmpty("global.speedhack", 1.f);
 
-            tab->addFloatToggle("global.speedhack", "global.speedhack", 0.0001f, 1000.f, "%.4f")
-                ->setDescription()
-                ->handleKeybinds();
+            tab->addFloatToggle("global.speedhack", 0.0001f, 1000.f, "%.4f")
+               ->setDescription()
+               ->handleKeybinds();
         }
 
-        [[nodiscard]] bool isCheating() override { 
-            return config::get<bool>("global.speedhack.toggle", false) && 
+        [[nodiscard]] bool isCheating() override {
+            return config::get<bool>("global.speedhack.toggle", false) &&
                    config::get<float>("global.speedhack", 1.f) != 1.f;
         }
+
         [[nodiscard]] const char* getId() const override { return "Speedhack"; }
         [[nodiscard]] int32_t getPriority() const override { return -10; }
     };
@@ -44,5 +45,4 @@ namespace eclipse::hacks::Global {
             CCScheduler::update(dt);
         }
     };
-
 }

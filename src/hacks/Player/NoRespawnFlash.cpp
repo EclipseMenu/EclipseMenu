@@ -1,18 +1,15 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Player {
-
     class NoRespawnFlash : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
-
-            tab->addToggle("player.norespawnflash")
-                ->setDescription()
-                ->handleKeybinds();
+            tab->addToggle("player.norespawnflash")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "No Respawn Flash"; }
@@ -24,5 +21,4 @@ namespace eclipse::hacks::Player {
         ALL_DELEGATES_AND_SAFE_PRIO("player.norespawnflash")
         void playSpawnEffect() {}
     };
-
 }

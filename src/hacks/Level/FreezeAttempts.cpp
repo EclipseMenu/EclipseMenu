@@ -1,15 +1,14 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-
     class FreezeAttempts : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
-
             tab->addToggle("level.freeze_attempts")->handleKeybinds()->setDescription();
         }
 
@@ -17,14 +16,15 @@ namespace eclipse::hacks::Level {
     };
 
     REGISTER_HACK(FreezeAttempts)
-    
+
     class $modify(FreezeAttemptsPLHook, PlayLayer) {
         struct Fields {
             std::uint32_t totalAttempts;
         };
 
         static void onModify(auto& self) {
-            HOOKS_TOGGLE("level.freeze_attempts", PlayLayer,
+            HOOKS_TOGGLE(
+                "level.freeze_attempts", PlayLayer,
                 "updateAttempts", "resetLevel", "onQuit"
             );
         }

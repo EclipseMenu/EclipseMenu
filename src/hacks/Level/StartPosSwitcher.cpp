@@ -1,6 +1,9 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/color.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/keybind.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
 
 #include <Geode/modify/PlayLayer.hpp>
@@ -8,7 +11,6 @@
 #include <modules/labels/variables.hpp>
 
 namespace eclipse::hacks::Level {
-
     static std::vector<StartPosObject*> startPosObjects;
     static int32_t currentStartPosIndex = 0;
 
@@ -28,19 +30,19 @@ namespace eclipse::hacks::Level {
             auto tab = gui::MenuTab::find("tab.level");
 
             tab->addToggle("level.startpos_switcher")
-                ->handleKeybinds()->setDescription()
-                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addKeybind("level.startpos_switcher.previous", "level.startpos_switcher.previous")->setInternal();
-                    options->addKeybind("level.startpos_switcher.next", "level.startpos_switcher.next")->setInternal();
-                    options->addToggle("level.startpos_switcher.reset_camera");
-                    options->addToggle("level.startpos_switcher.label")
-                        ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                            options->addInputFloat("label.startpos_switcher.scale", "label.startpos_switcher.scale", 0.1f, 2.f, "%.2fx");
-                            options->addInputFloat("label.startpos_switcher.alpha_mod", "label.startpos_switcher.alpha_mod", 0.f, 1.f);
-                            options->addColorComponent("label.startpos_switcher.color", "label.startpos_switcher.color", true);
-                            options->addToggle("label.startpos_switcher.buttons")->setDescription();
-                        });
-                });
+               ->handleKeybinds()->setDescription()
+               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                   options->addKeybind("level.startpos_switcher.previous", "level.startpos_switcher.previous")->setInternal();
+                   options->addKeybind("level.startpos_switcher.next", "level.startpos_switcher.next")->setInternal();
+                   options->addToggle("level.startpos_switcher.reset_camera");
+                   options->addToggle("level.startpos_switcher.label")
+                          ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                              options->addInputFloat("label.startpos_switcher.scale", 0.1f, 2.f, "%.2fx");
+                              options->addInputFloat("label.startpos_switcher.alpha_mod", 0.f, 1.f);
+                              options->addColorComponent("label.startpos_switcher.color", true);
+                              options->addToggle("label.startpos_switcher.buttons")->setDescription();
+                          });
+               });
 
             auto manager = keybinds::Manager::get();
             manager->addListener("level.startpos_switcher.previous", [](bool down) {
@@ -108,7 +110,8 @@ namespace eclipse::hacks::Level {
 
             m_previous = CCMenuItemSpriteExtra::create(
                 cocos2d::CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png"),
-                this, menu_selector(StartposSwitcherNode::onPrevious));
+                this, menu_selector(StartposSwitcherNode::onPrevious)
+            );
             m_previous->setID("arrow-previous");
 
             auto* sprite = cocos2d::CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
@@ -193,7 +196,7 @@ namespace eclipse::hacks::Level {
             // Center the node on the screen (center bottom)
             auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
             this->setPosition(winSize.width / 2.f, 30.f * scale);
- 
+
             auto label = fmt::format("{}/{}", currentStartPosIndex + 1, startPosObjects.size());
             if (label != m_labelText) {
                 m_labelText = label;
@@ -258,5 +261,4 @@ namespace eclipse::hacks::Level {
             }
         }
     };
-
 }

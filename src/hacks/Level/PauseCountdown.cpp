@@ -1,27 +1,24 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
-#include <Geode/modify/PauseLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 
 using namespace geode::prelude;
 
 namespace eclipse::hacks::Level {
-
     class PauseCount : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
 
             config::setIfEmpty("level.pausecount.time", 3.f);
 
-            tab->addToggle("level.pausecount")
-                ->handleKeybinds()
-                ->setDescription()
-                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addInputFloat("level.pausecount.time", "level.pausecount.time", 0.1f, 15.f, "%.2fs");
-                });
+            tab->addToggle("level.pausecount")->handleKeybinds()->setDescription()
+               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                   options->addInputFloat("level.pausecount.time", 0.1f, 15.f, "%.2fs");
+               });
         }
 
         [[nodiscard]] const char* getId() const override { return "Pause Countdown"; }
@@ -30,38 +27,39 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(PauseCount)
 
     class PauseCountdown : public CCLayerColor {
-        public:
-            static PauseCountdown* create() {
-                auto ret = new PauseCountdown;
-                if (ret && ret->init()) {
-                    ret->autorelease();
-                    return ret;
-                }
-                delete ret;
-                return nullptr;
+    public:
+        static PauseCountdown* create() {
+            auto ret = new PauseCountdown;
+            if (ret && ret->init()) {
+                ret->autorelease();
+                return ret;
             }
-        protected:
-            CCLabelBMFont* m_countdown = nullptr;
-            float m_totaldt = 3.f;
+            delete ret;
+            return nullptr;
+        }
 
-            bool init() override {
-                if (!CCLayerColor::initWithColor(ccc4(50, 50, 50, 100))) return false;
-                m_totaldt = config::get<float>("level.pausecount.time", 3.f);
-                m_countdown = CCLabelBMFont::create(std::to_string(static_cast<int>(m_totaldt)).c_str(), "goldFont.fnt");
-                m_countdown->setScale(1.5);
-                m_countdown->setPosition(utils::get<CCDirector>()->getWinSize() / 2);
-                addChild(m_countdown, 100);
+    protected:
+        CCLabelBMFont* m_countdown = nullptr;
+        float m_totaldt = 3.f;
 
-                this->schedule(schedule_selector(PauseCountdown::updateTimer));
+        bool init() override {
+            if (!CCLayerColor::initWithColor(ccc4(50, 50, 50, 100))) return false;
+            m_totaldt = config::get<float>("level.pausecount.time", 3.f);
+            m_countdown = CCLabelBMFont::create(std::to_string(static_cast<int>(m_totaldt)).c_str(), "goldFont.fnt");
+            m_countdown->setScale(1.5);
+            m_countdown->setPosition(utils::get<CCDirector>()->getWinSize() / 2);
+            addChild(m_countdown, 100);
 
-                return true;
-            }
+            this->schedule(schedule_selector(PauseCountdown::updateTimer));
 
-            void updateTimer(float dt) {
-                m_totaldt -= dt;
-                if (m_totaldt <= 0.5f) this->removeFromParent();
-                m_countdown->setString(std::to_string(static_cast<int>(m_totaldt) + 1).c_str());
-            }
+            return true;
+        }
+
+        void updateTimer(float dt) {
+            m_totaldt -= dt;
+            if (m_totaldt <= 0.5f) this->removeFromParent();
+            m_countdown->setString(std::to_string(static_cast<int>(m_totaldt) + 1).c_str());
+        }
     };
 
     class $modify(PauseBGLHook, GJBaseGameLayer) {
@@ -81,7 +79,9 @@ namespace eclipse::hacks::Level {
     class $modify(PauseCountdownPlayLHook, PlayLayer) {
         void pauseGame(bool paused) {
             if (paused) {
-                if (static_cast<PauseBGLHook*>(utils::get<GJBaseGameLayer>())->m_fields->pausedt < 0.01f || !config::get<bool>("level.pausecount", false)) PlayLayer::pauseGame(paused);
+                if (static_cast<PauseBGLHook*>(utils::get<GJBaseGameLayer>())->m_fields->pausedt < 0.01f
+                    || !config::get<bool>("level.pausecount", false))
+                    PlayLayer::pauseGame(paused);
             } else {
                 PlayLayer::pauseGame(paused);
                 auto* bg = static_cast<PauseBGLHook*>(utils::get<GJBaseGameLayer>());

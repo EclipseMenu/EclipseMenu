@@ -25,11 +25,14 @@ public:
     void parseButtonCaption(matjson::Value const& json, std::string const& key) {
         m_buttonCaption = json[key].asString().unwrap();
     }
+
     bool load(matjson::Value const& json) override { return true; }
     bool save(matjson::Value& json) const override { return true; }
     bool isDefaultValue() const override { return true; }
     std::string const& getButtonCaption() const { return m_buttonCaption; }
+
     void reset() override {}
+
     SettingNodeV3* createNode(float width) override;
 };
 
@@ -72,6 +75,7 @@ protected:
     }
 
     void onCommit() override {}
+
     void onResetToDefault() override {}
 
 public:

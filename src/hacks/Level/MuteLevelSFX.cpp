@@ -1,18 +1,15 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/EffectGameObject.hpp>
 
 namespace eclipse::hacks::Level {
-
     class MuteLevelSFX : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
-
-            tab->addToggle("level.mutelevelsfx")
-                ->setDescription()
-                ->handleKeybinds();
+            tab->addToggle("level.mutelevelsfx")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Mute Level SFX"; }

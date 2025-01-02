@@ -1,11 +1,11 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Level {
-
     void onHideParticles(bool state) {
         if (!state) return;
 
@@ -19,24 +19,24 @@ namespace eclipse::hacks::Level {
 
         if (!gjbgl) return;
 
-        for (const auto& [name, array] : geode::cocos::CCDictionaryExt<gd::string, cocos2d::CCArray*>{ gjbgl->m_particlesDict }) {
-            for (const auto& particle : geode::cocos::CCArrayExt<cocos2d::CCParticleSystemQuad*>{ array }) {
+        for (const auto& [name, array] : geode::cocos::CCDictionaryExt<gd::string, cocos2d::CCArray*>{gjbgl->m_particlesDict}) {
+            for (const auto& particle : geode::cocos::CCArrayExt<cocos2d::CCParticleSystemQuad*>{array}) {
                 particle->setVisible(miscParticlesEnabled);
             }
         }
 
-        for (const auto& [name, array] : geode::cocos::CCDictionaryExt<gd::string, cocos2d::CCArray*>{ gjbgl->m_claimedParticles }) {
-            for (const auto& particle : geode::cocos::CCArrayExt<cocos2d::CCParticleSystemQuad*>{ array }) {
+        for (const auto& [name, array] : geode::cocos::CCDictionaryExt<gd::string, cocos2d::CCArray*>{gjbgl->m_claimedParticles}) {
+            for (const auto& particle : geode::cocos::CCArrayExt<cocos2d::CCParticleSystemQuad*>{array}) {
                 particle->setVisible(customParticlesEnabled);
             }
         }
 
-        for (const auto& particle : geode::cocos::CCArrayExt<cocos2d::CCParticleSystemQuad*>{ gjbgl->m_unclaimedParticles }) {
+        for (const auto& particle : geode::cocos::CCArrayExt<cocos2d::CCParticleSystemQuad*>{gjbgl->m_unclaimedParticles}) {
             particle->setVisible(customParticlesEnabled);
         }
 
-        for (const auto& [name, array] : geode::cocos::CCDictionaryExt<gd::string, cocos2d::CCArray*>{ gjbgl->m_customParticles }) {
-            for (const auto& particle : geode::cocos::CCArrayExt<cocos2d::CCParticleSystemQuad*>{ array }) {
+        for (const auto& [name, array] : geode::cocos::CCDictionaryExt<gd::string, cocos2d::CCArray*>{gjbgl->m_customParticles}) {
+            for (const auto& particle : geode::cocos::CCArrayExt<cocos2d::CCParticleSystemQuad*>{array}) {
                 particle->setVisible(customParticlesEnabled);
             }
         }
@@ -50,14 +50,12 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.noparticles.nomiscparticles", true);
             config::setIfEmpty("level.noparticles.nocustomparticles", false);
 
-            tab->addToggle("level.noparticles")
-                ->handleKeybinds()
-                ->setDescription()
-                ->callback(onHideParticles)
-                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addToggle("level.noparticles.nomiscparticles")->setDescription();
-                    options->addToggle("level.noparticles.nocustomparticles")->setDescription();
-                });
+            tab->addToggle("level.noparticles")->handleKeybinds()->setDescription()
+               ->callback(onHideParticles)
+               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                   options->addToggle("level.noparticles.nomiscparticles")->setDescription();
+                   options->addToggle("level.noparticles.nocustomparticles")->setDescription();
+               });
         }
 
         void update() override {
@@ -73,7 +71,8 @@ namespace eclipse::hacks::Level {
         ENABLE_SAFE_HOOKS_ALL()
 
         cocos2d::CCParticleSystemQuad* spawnParticle(char const* plist, int zOrder, cocos2d::tCCPositionType positionType, cocos2d::CCPoint position) {
-            if (config::get<bool>("level.noparticles", false) && config::get<bool>("level.noparticles.nomiscparticles", false))
+            if (config::get<bool>("level.noparticles", false) &&
+                config::get<bool>("level.noparticles.nomiscparticles", false))
                 return nullptr;
 
             return GJBaseGameLayer::spawnParticle(plist, zOrder, positionType, position);

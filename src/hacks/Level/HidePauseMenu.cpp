@@ -1,18 +1,15 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/PauseLayer.hpp>
 
 namespace eclipse::hacks::Level {
-
     class HidePause : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
-
-            tab->addToggle("level.hidepause")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("level.hidepause")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Hide Pause Menu"; }

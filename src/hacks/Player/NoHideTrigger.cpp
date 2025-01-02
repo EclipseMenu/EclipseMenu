@@ -1,19 +1,16 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/EffectGameObject.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Player {
-
     class NoHideTrigger : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
-
-            tab->addToggle("player.nohidetrigger")
-                ->setDescription()
-                ->handleKeybinds();
+            tab->addToggle("player.nohidetrigger")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "No Hide Trigger"; }
@@ -29,8 +26,7 @@ namespace eclipse::hacks::Player {
                 case 1612: // Hide Trigger
                 case 1613: // Show Trigger
                     return;
-                default:
-                    return EffectGameObject::triggerObject(bgl, p1, p2);
+                default: return EffectGameObject::triggerObject(bgl, p1, p2);
             }
         }
     };
@@ -48,5 +44,4 @@ namespace eclipse::hacks::Player {
             options->m_hideP2 = originalHideP2;
         }
     };
-
 }

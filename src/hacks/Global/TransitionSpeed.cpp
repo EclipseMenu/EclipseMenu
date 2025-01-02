@@ -1,11 +1,11 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/float-toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/CCTransitionFade.hpp>
 
 namespace eclipse::hacks::Global {
-
     class TransitionSpeed : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
@@ -13,9 +13,7 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.transitionspeed.toggle", false);
             config::setIfEmpty("global.transitionspeed", 0.5f);
 
-            tab->addFloatToggle("global.transitionspeed", "global.transitionspeed", 0.f, 1.f, "%.2f")
-                ->setDescription()
-                ->handleKeybinds();
+            tab->addFloatToggle("global.transitionspeed", 0.f, 1.f, "%.2f")->setDescription()->handleKeybinds();
         }
 
         [[nodiscard]] const char* getId() const override { return "Transition Speed"; }
@@ -36,5 +34,4 @@ namespace eclipse::hacks::Global {
         }
         #endif
     };
-
 }

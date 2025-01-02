@@ -1,6 +1,7 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
 #include <Geode/modify/CCMotionStreak.hpp>
 #include <Geode/modify/PlayerObject.hpp>
@@ -10,14 +11,10 @@
 #endif
 
 namespace eclipse::hacks::Player {
-
     class NoTrail : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
-
-            tab->addToggle("player.notrail")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("player.notrail")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "No Trail"; }
@@ -28,10 +25,7 @@ namespace eclipse::hacks::Player {
     class AlwaysTrail : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
-
-            tab->addToggle("player.alwaystrail")
-                ->handleKeybinds()
-                ->setDescription();
+            tab->addToggle("player.alwaystrail")->handleKeybinds()->setDescription();
         }
 
         [[nodiscard]] const char* getId() const override { return "Always Show Trail"; }
@@ -40,7 +34,7 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(AlwaysTrail)
 
     // CCMotionStreak functions are too small to be hooked on ARM
-#ifdef GEODE_IS_ARM
+    #ifdef GEODE_IS_ARM
     class $modify(NoTrailPOHook, PlayerObject) {
         static void onModify(auto& self) {
             SAFE_HOOKS_ALL();
@@ -69,7 +63,7 @@ namespace eclipse::hacks::Player {
             }
         }
     };
-#else
+    #else
     class $modify(NoTrailCCMSHook, cocos2d::CCMotionStreak) {
         static void onModify(auto& self) {
             SAFE_HOOKS_ALL();
@@ -80,5 +74,5 @@ namespace eclipse::hacks::Player {
         void resumeStroke() {}
         void stopStroke() {}
     };
-#endif
+    #endif
 }

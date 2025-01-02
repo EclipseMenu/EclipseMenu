@@ -1,12 +1,13 @@
-#include <modules/gui/gui.hpp>
-#include <modules/hack/hack.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/float-toggle.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 
-#include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Player {
-
     class AutoKill : public hack::Hack {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
@@ -15,15 +16,13 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.autokill.percentage", 50.0f);
             config::setIfEmpty("player.autokill.time", 90.0f);
 
-            tab->addToggle("player.autokill")
-                ->handleKeybinds()
-                ->setDescription()
-                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                    options->addFloatToggle("player.autokill.percentage","player.autokill.percentage", 0.f, 100.f, "%.2f%%")
-                        ->handleKeybinds()->setDescription();
-                    options->addFloatToggle("player.autokill.time", "player.autokill.time", 0.f, FLT_MAX, "%.2f s.")
-                        ->handleKeybinds()->setDescription();
-                });
+            tab->addToggle("player.autokill")->handleKeybinds()->setDescription()
+               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                   options->addFloatToggle("player.autokill.percentage", 0.f, 100.f, "%.2f%%")
+                          ->handleKeybinds()->setDescription();
+                   options->addFloatToggle("player.autokill.time", 0.f, FLT_MAX, "%.2f s.")
+                          ->handleKeybinds()->setDescription();
+               });
         }
 
         [[nodiscard]] const char* getId() const override { return "Auto Kill"; }
@@ -64,5 +63,4 @@ namespace eclipse::hacks::Player {
                 killPlayer();
         }
     };
-
 }
