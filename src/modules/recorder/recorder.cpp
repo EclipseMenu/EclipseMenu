@@ -20,7 +20,7 @@ namespace km {
 
 #define DEFINE_ADDRESS(name, address, ...) \
     using func_t = decltype(&name); \
-    constexpr func_t func = (func_t)address;\
+    auto func = reinterpret_cast<func_t>(address);\
     static_assert(GEODE_COMP_GD_VERSION == BINDINGS_VERSION, "Address for " ##name " is outdated"); \
     return func(__VA_ARGS__)
 
@@ -50,7 +50,7 @@ namespace km {
 
     inline void GLMultMatrix(const kmMat4* pIn) {
         #ifdef GEODE_IS_MACOS
-        DEFINE_ADDRESS(kmGLMultMatrix, GEODE_ARM_MAC(0x1abb60) GEODE_INTEL_MAC(0x1f6070));
+        DEFINE_ADDRESS(kmGLMultMatrix, GEODE_ARM_MAC(0x1abb60) GEODE_INTEL_MAC(0x1f6070), pIn);
         #else
         kmGLMultMatrix(pIn);
         #endif
