@@ -25,7 +25,7 @@ namespace eclipse::i18n {
         return std::string(get(key));
     }
 
-    std::string_view stringExtension(std::string const& filename) {
+    std::string_view stringExtension(std::string_view filename) {
         // turns "en_US.lang.json" into "en_US"
         auto pos = filename.find_first_of('.');
         return filename.substr(0, pos);
