@@ -90,7 +90,7 @@ namespace eclipse::i18n {
 
         g_translations = json;
         updateLanguageCode(g_translations, it->path.filename().string());
-        config::setTemp("language.index", std::distance(langs.begin(), it));
+        config::setTemp<uint64_t>("language.index", std::distance(langs.begin(), it));
 
         // check if current fallback is the same as the new language
         if (g_fallback["language-code"].get<std::string>() != it->fallback)
