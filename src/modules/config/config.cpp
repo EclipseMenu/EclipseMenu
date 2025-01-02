@@ -220,6 +220,7 @@ namespace eclipse::config {
     INSTANTIATE(int);
     INSTANTIATE(int64_t);
     INSTANTIATE(uint64_t);
+    GEODE_MACOS(INSTANTIATE(size_t));
     INSTANTIATE(float);
     INSTANTIATE(double);
     INSTANTIATE(bool);
