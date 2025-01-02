@@ -3,7 +3,7 @@ add_library(third_party INTERFACE)
 
 # Include libraries
 add_library(imgui INTERFACE)
-CPMAddPackage("gh:EclipseMenu/imgui#dac32cb")
+CPMAddPackage("gh:EclipseMenu/imgui#1d4c752")
 target_include_directories(imgui INTERFACE ${imgui_SOURCE_DIR})
 target_sources(imgui INTERFACE
     ${imgui_SOURCE_DIR}/imgui.cpp

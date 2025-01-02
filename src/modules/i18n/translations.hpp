@@ -10,6 +10,8 @@ namespace eclipse::i18n {
         std::filesystem::path path;
     };
 
+    constexpr auto DEFAULT_LANGUAGE = "en_US";
+
     /// @brief Get a translation for the specified key.
     std::string_view get(std::string_view key);
 
@@ -24,7 +26,10 @@ namespace eclipse::i18n {
     }
 
     /// @brief Loads translations from the specified language file.
-    void setLanguage(std::string_view code);
+    bool setLanguage(std::string_view code);
+
+    /// @brief Load saved language (or reset to default).
+    void init();
 
     /// @brief Get the currently selected language code.
     std::string getCurrentLanguage();

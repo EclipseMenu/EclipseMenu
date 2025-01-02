@@ -119,7 +119,7 @@ $on_mod(Loaded) {
     config::load();
 
     // Load language files
-    i18n::setLanguage(config::get<std::string>("language", "en"));
+    i18n::init();
 
     // Initialize the hacks.
     hack::Hack::initializeHacks();

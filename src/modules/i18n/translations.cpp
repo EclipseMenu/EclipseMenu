@@ -1,4 +1,6 @@
 #include "translations.hpp"
+
+#include <Geode/utils/web.hpp>
 #include <nlohmann/json.hpp>
 #include <modules/config/config.hpp>
 #include <modules/labels/setting.hpp>
@@ -8,7 +10,7 @@ namespace eclipse::i18n {
         {"language-code", "null"},
     };
     nlohmann::json g_translations = {
-        {"language-code", "en"},
+        {"language-code", "en_US"},
         {"language-name", "English"}
     };
 
@@ -21,6 +23,16 @@ namespace eclipse::i18n {
 
     std::string get_(std::string_view key) {
         return std::string(get(key));
+    }
+
+    std::string_view stringExtension(std::string const& filename) {
+        // turns "en_US.lang.json" into "en_US"
+        auto pos = filename.find_first_of('.');
+        return filename.substr(0, pos);
+    }
+
+    void updateLanguageCode(nlohmann::json& json, std::string const& filename) {
+        json["language-code"] = stringExtension(filename);
     }
 
     // Dirty hack to refresh constant strings
@@ -59,23 +71,25 @@ namespace eclipse::i18n {
         if (json.is_discarded()) return;
 
         g_fallback = json;
+        updateLanguageCode(g_fallback, it->path.filename().string());
     }
 
-    void setLanguage(std::string_view code) {
+    bool setLanguage(std::string_view code) {
         auto langs = fetchAvailableLanguages();
         auto it = std::ranges::find_if(langs, [&](auto const& lang) {
             return lang.code == code;
         });
 
-        if (it == langs.end()) return;
+        if (it == langs.end()) return false;
 
         std::ifstream file(it->path);
-        if (!file) return;
+        if (!file) return false;
 
         auto json = nlohmann::json::parse(file, nullptr, false);
-        if (json.is_discarded()) return;
+        if (json.is_discarded()) return false;
 
         g_translations = json;
+        updateLanguageCode(g_translations, it->path.filename().string());
         config::setTemp("language.index", std::distance(langs.begin(), it));
 
         // check if current fallback is the same as the new language
@@ -83,11 +97,22 @@ namespace eclipse::i18n {
             loadFallback(it->fallback);
 
         refreshStaticArrays();
+        return true;
+    }
+
+    void init() {
+        auto language = config::get<std::string_view>("language", DEFAULT_LANGUAGE);
+        if (!setLanguage(language)) {
+            // fallback to English
+            setLanguage(DEFAULT_LANGUAGE);
+        }
+
+        downloadLanguages();
     }
 
     std::string getCurrentLanguage() {
         if (!g_translations.contains("language-code")) {
-            return "en";
+            return DEFAULT_LANGUAGE;
         }
         return g_translations["language-code"];
     }
@@ -99,14 +124,14 @@ namespace eclipse::i18n {
         auto json = nlohmann::json::parse(file, nullptr, false);
         if (json.is_discarded()) return std::nullopt;
 
-        if (!json.contains("language-name") || !json.contains("language-code")) return std::nullopt;
+        if (!json.contains("language-name") || !json.contains("language-native")) return std::nullopt;
 
-        auto fallback = json.contains("language-fallback") ? json["language-fallback"].get<std::string>() : "en";
+        auto fallback = json.contains("language-fallback") ? json["language-fallback"].get<std::string>() : DEFAULT_LANGUAGE;
         auto charset = json.contains("language-charset") ? json["language-charset"].get<std::string>() : "default";
 
         return LanguageMetadata{
             json["language-name"].get<std::string>(),
-            json["language-code"].get<std::string>(),
+            std::string(stringExtension(path.filename().string())),
             fallback,
             charset,
             path
@@ -149,14 +174,103 @@ namespace eclipse::i18n {
         return true;
     }
 
-    void downloadLanguages() {
+    void downloadLanguage(std::string const& code) {
+        static auto langsPath = geode::Mod::get()->getSaveDir() / "languages";
 
+        using namespace geode::utils;
+        static geode::EventListener<web::WebTask> s_listener;
+
+        s_listener.bind([code](web::WebTask::Event* e) {
+            if (web::WebResponse* value = e->getValue()) {
+                if (!value->ok()) {
+                    return;
+                }
+
+                auto content = value->string().unwrapOrDefault();
+                if (content.empty()) {
+                    geode::log::warn("Failed to download language file: {}", code);
+                    return;
+                }
+
+                std::filesystem::create_directories(langsPath);
+
+                auto path = langsPath / fmt::format("{}.lang.json", code);
+                std::ofstream file(path);
+                if (!file) {
+                    geode::log::warn("Failed to save language file: {}", path.string());
+                    return;
+                }
+
+                file << content;
+                file.close();
+                geode::log::debug("Downloaded language file: {}", code);
+            }
+        });
+
+        s_listener.setFilter(web::WebRequest().get(
+            fmt::format("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/main/translations/{}.lang.json", code)
+        ));
+    }
+
+    geode::Result<> handleLanguageMetadata(matjson::Value metadata) {
+        auto lastCheck = geode::Mod::get()->getSavedValue<int64_t>("language-check", ECLIPSE_TRANSLATION_TIMESTAMP);
+
+        GEODE_UNWRAP_INTO(auto metadataTimestamp, metadata["timestamp"].asUInt());
+        if (metadataTimestamp <= lastCheck) return geode::Ok();
+
+        // languages is an array of locale names
+        GEODE_UNWRAP_INTO(auto languages, metadata["languages"].asArray());
+        for (auto const& lang : languages) {
+            GEODE_UNWRAP_INTO(auto code, lang.asString());
+            downloadLanguage(code);
+        }
+
+        auto now = std::chrono::system_clock::now().time_since_epoch().count();
+        geode::Mod::get()->setSavedValue("language-check", now);
+        return geode::Ok();
+    }
+
+    void downloadLanguages() {
+        auto lastCheck = geode::Mod::get()->getSavedValue<int64_t>("language-check", ECLIPSE_TRANSLATION_TIMESTAMP);
+
+        // our build timestamp is newer than the last check (no need to check)
+        if (lastCheck <= ECLIPSE_TRANSLATION_TIMESTAMP) return;
+
+        // perform a check once per day
+        auto now = std::chrono::system_clock::now().time_since_epoch().count();
+        constexpr auto day = 24 * 60 * 60;
+        if (now - lastCheck < day) return;
+
+        geode::log::info("Checking for language updates...");
+
+        using namespace geode::utils;
+        static geode::EventListener<web::WebTask> s_listener;
+
+        s_listener.bind([](web::WebTask::Event* e) {
+            if (web::WebResponse* value = e->getValue()) {
+                if (!value->ok()) {
+                    return;
+                }
+
+                auto res = value->json();
+                if (!res) {
+                    geode::log::warn("Failed to parse language metadata");
+                    return;
+                }
+
+                (void) handleLanguageMetadata(*res);
+            }
+        });
+
+        s_listener.setFilter(web::WebRequest().get(
+            "https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/metadata/metadata.json"
+        ));
     }
 
     size_t getLanguageIndex() {
         auto langs = fetchAvailableLanguages();
         auto it = std::ranges::find_if(langs, [&](auto const& lang) {
-            return lang.code == config::get<std::string>("language", "en");
+            return lang.code == config::get<std::string>("language", DEFAULT_LANGUAGE);
         });
 
         if (it == langs.end()) return 0;
