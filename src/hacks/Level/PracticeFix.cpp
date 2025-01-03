@@ -90,7 +90,7 @@ namespace eclipse::Hacks::Level {
 
             if (m_gameState.m_currentProgress > 0) {
                 CheckpointData data(m_player1, m_gameState.m_isDualMode ? m_player2 : nullptr);
-                m_fields->m_checkpoints[checkpoint] = data;
+                m_fields->m_checkpoints[checkpoint] = std::move(data);
             }
 
             return checkpoint;
@@ -110,17 +110,6 @@ namespace eclipse::Hacks::Level {
             }
 
             PlayLayer::removeCheckpoint(first);
-        }
-    };
-
-    class $modify(PracticeFixLELHook, LevelEditorLayer) {
-        bool init(GJGameLevel* level, bool unk) {
-            bool result = LevelEditorLayer::init(level, unk);
-
-            if (auto* playLayer = static_cast<FixPlayLayer*>(utils::get<PlayLayer>()))
-                playLayer->m_fields->m_checkpoints.clear();
-
-            return result;
         }
     };
 }
