@@ -4,9 +4,6 @@
 #include <modules/hack/hack.hpp>
 #include <modules/utils/GameCheckpoint.hpp>
 
-#include <Geode/modify/CheckpointObject.hpp>
-#include <Geode/modify/GJBaseGameLayer.hpp>
-#include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 
 using namespace geode::prelude;
@@ -35,7 +32,7 @@ namespace eclipse::Hacks::Level {
         CheckpointData() = default;
 
         CheckpointData(PlayerObject* player1, PlayerObject* player2) {
-            m_checkpointPlayer1 = eclipse::utils::FixPlayerCheckpoint(player1);
+            m_checkpointPlayer1 = utils::FixPlayerCheckpoint(player1);
             if (player2)
                 m_checkpointPlayer2 = utils::FixPlayerCheckpoint(player2);
         }
@@ -55,11 +52,6 @@ namespace eclipse::Hacks::Level {
         struct Fields {
             std::unordered_map<CheckpointObject*, CheckpointData> m_checkpoints;
         };
-
-        void onQuit() {
-            m_fields->m_checkpoints.clear();
-            PlayLayer::onQuit();
-        }
 
         void resetLevel() {
             if (m_checkpointArray->count() <= 0)
