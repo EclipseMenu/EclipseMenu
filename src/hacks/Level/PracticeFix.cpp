@@ -96,7 +96,7 @@ namespace eclipse::Hacks::Level {
     };
 
     class $modify(PracticeFixCOHook, CheckpointObject) {
-        #if defined(GEODE_IS_ANDROID) || defined(GEODE_IS_ARM_MAC)
+        #if defined(GEODE_IS_ANDROID) || defined(GEODE_IS_ARM_MAC) || defined(GEODE_IS_IOS)
         static CheckpointObject* create() { // this is so dumb
             auto result = CheckpointObject::create();
         #else
@@ -113,7 +113,7 @@ namespace eclipse::Hacks::Level {
                 CheckpointData data(
                     playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr
                 );
-                #ifdef GEODE_IS_ANDROID
+                #if defined(GEODE_IS_ANDROID) || defined(GEODE_IS_ARM_MAC) || defined(GEODE_IS_IOS)
                 playLayer->m_fields->m_checkpoints[result] = data;
                 #else
                 playLayer->m_fields->m_checkpoints[(CheckpointObject*) this] = data;
