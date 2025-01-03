@@ -85,7 +85,6 @@ namespace eclipse::Hacks::Level {
 
         CheckpointObject* createCheckpoint() {
             auto checkpoint = PlayLayer::createCheckpoint();
-
             if (!checkpoint || !PracticeFix::shouldEnable())
                 return checkpoint;
 
@@ -95,6 +94,22 @@ namespace eclipse::Hacks::Level {
             }
 
             return checkpoint;
+        }
+
+        void removeCheckpoint(bool first) {
+            // remove the checkpoint from the map first
+            CheckpointObject* checkpoint = nullptr;
+            if (m_checkpointArray->count()) {
+                if (first) checkpoint = static_cast<CheckpointObject*>(m_checkpointArray->objectAtIndex(0));
+                else checkpoint = static_cast<CheckpointObject*>(m_checkpointArray->lastObject());
+            }
+
+            auto fields = m_fields.self();
+            if (checkpoint && fields->m_checkpoints.contains(checkpoint)) {
+                fields->m_checkpoints.erase(checkpoint);
+            }
+
+            PlayLayer::removeCheckpoint(first);
         }
     };
 
