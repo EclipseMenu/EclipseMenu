@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.21)
 add_library(third_party INTERFACE)
 
 add_library(imgui INTERFACE)
-CPMAddPackage("gh:ocornut/imgui#6982ce4")
+CPMAddPackage("gh:ocornut/imgui#1d4c752")
 target_include_directories(imgui INTERFACE ${imgui_SOURCE_DIR})
 target_sources(imgui INTERFACE
     ${imgui_SOURCE_DIR}/imgui.cpp
