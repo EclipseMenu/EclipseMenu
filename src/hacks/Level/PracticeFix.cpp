@@ -96,7 +96,7 @@ namespace eclipse::Hacks::Level {
     };
 
     class $modify(PracticeFixCOHook, CheckpointObject) {
-        #ifdef GEODE_IS_ANDROID
+        #if defined(GEODE_IS_ANDROID) || defined(GEODE_IS_ARM_MAC)
         static CheckpointObject* create() { // this is so dumb
             auto result = CheckpointObject::create();
         #else
