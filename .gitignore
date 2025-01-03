@@ -64,6 +64,7 @@ compile_commands.json.*
 build-android.sh
 bindings/
 bindingsbefore/
+resources/translations/*
 
 # CLion
 /cmake-*/

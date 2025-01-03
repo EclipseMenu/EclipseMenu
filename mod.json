@@ -41,7 +41,7 @@
 			"resources/Fonts/*.ttf",
 			"resources/Licenses/*.txt",
 			"resources/Themes/*.json",
-			"resources/Languages/*.json",
+			"resources/translations/*.json",
 			"resources/BitmapFonts/font_default*"
 		],
 		"sprites": [

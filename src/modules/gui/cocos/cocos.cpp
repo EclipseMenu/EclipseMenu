@@ -12,8 +12,8 @@ namespace eclipse::gui::cocos {
         // check if bitmap font exists
         if (!i18n::hasBitmapFont(i18n::getRequiredGlyphRangesString())) {
             geode::log::warn("Bitmap font not found for selected language, setting to English");
-            config::set<std::string_view>("language", "en");
-            i18n::setLanguage("en");
+            config::set<std::string_view>("language", i18n::DEFAULT_LANGUAGE);
+            i18n::setLanguage(i18n::DEFAULT_LANGUAGE);
         }
     }
 

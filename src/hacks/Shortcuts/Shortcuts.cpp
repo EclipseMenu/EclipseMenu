@@ -158,7 +158,7 @@ namespace eclipse::hacks::Shortcuts {
         #endif
 
         static void openSaveFolder() {
-            auto path = geode::dirs::getSaveDir();
+            auto path = geode::Mod::get()->getSaveDir();
             geode::utils::file::openFolder(path);
         }
 

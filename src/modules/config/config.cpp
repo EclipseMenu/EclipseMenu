@@ -220,6 +220,9 @@ namespace eclipse::config {
     INSTANTIATE(int);
     INSTANTIATE(int64_t);
     INSTANTIATE(uint64_t);
+    #if defined(GEODE_IS_MACOS) || defined(GEODE_IS_ANDROID32)
+    INSTANTIATE(size_t);
+    #endif
     INSTANTIATE(float);
     INSTANTIATE(double);
     INSTANTIATE(bool);

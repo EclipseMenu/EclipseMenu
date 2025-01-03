@@ -56,6 +56,7 @@ add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 # Libraries
 include(${CMAKE_SOURCE_DIR}/cmake/IncludeLibs.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/Translations.cmake)
 target_link_libraries(${PROJECT_NAME} third_party)
 
 # Setup Geode
