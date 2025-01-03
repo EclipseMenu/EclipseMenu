@@ -82,6 +82,20 @@ namespace eclipse::Hacks::Level {
 
             PlayLayer::loadFromCheckpoint(checkpoint);
         }
+
+        CheckpointObject* createCheckpoint() {
+            auto checkpoint = PlayLayer::createCheckpoint();
+
+            if (!checkpoint || !PracticeFix::shouldEnable())
+                return checkpoint;
+
+            if (m_gameState.m_currentProgress > 0) {
+                CheckpointData data(m_player1, m_gameState.m_isDualMode ? m_player2 : nullptr);
+                m_fields->m_checkpoints[checkpoint] = data;
+            }
+
+            return checkpoint;
+        }
     };
 
     class $modify(PracticeFixLELHook, LevelEditorLayer) {
@@ -90,35 +104,6 @@ namespace eclipse::Hacks::Level {
 
             if (auto* playLayer = static_cast<FixPlayLayer*>(utils::get<PlayLayer>()))
                 playLayer->m_fields->m_checkpoints.clear();
-
-            return result;
-        }
-    };
-
-    class $modify(PracticeFixCOHook, CheckpointObject) {
-        #if defined(GEODE_IS_ANDROID) || defined(GEODE_IS_ARM_MAC) || defined(GEODE_IS_IOS)
-        static CheckpointObject* create() { // this is so dumb
-            auto result = CheckpointObject::create();
-        #else
-        bool init() override {
-            auto result = CheckpointObject::init();
-            #endif
-
-            if (!PracticeFix::shouldEnable())
-                return result;
-
-            auto* playLayer = static_cast<FixPlayLayer*>(utils::get<PlayLayer>());
-
-            if (playLayer->m_gameState.m_currentProgress > 0) {
-                CheckpointData data(
-                    playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr
-                );
-                #if defined(GEODE_IS_ANDROID) || defined(GEODE_IS_ARM_MAC) || defined(GEODE_IS_IOS)
-                playLayer->m_fields->m_checkpoints[result] = data;
-                #else
-                playLayer->m_fields->m_checkpoints[(CheckpointObject*) this] = data;
-                #endif
-            }
 
             return result;
         }
