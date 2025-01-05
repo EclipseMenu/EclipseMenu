@@ -61,15 +61,16 @@ namespace eclipse::Hacks::Level {
         }
 
         void loadFromCheckpoint(CheckpointObject* checkpoint) {
-            auto* playLayer = static_cast<FixPlayLayer*>(utils::get<PlayLayer>());
+            if (PracticeFix::shouldEnable()) {
+                auto fields = m_fields.self();
+                if (fields->m_checkpoints.contains(checkpoint)) {
+                    PlayLayer::loadFromCheckpoint(checkpoint);
 
-            if (PracticeFix::shouldEnable() && playLayer->m_fields->m_checkpoints.contains(checkpoint)) {
-                PlayLayer::loadFromCheckpoint(checkpoint);
+                    CheckpointData& data = fields->m_checkpoints[checkpoint];
+                    data.apply(m_player1, m_gameState.m_isDualMode ? m_player2 : nullptr);
 
-                CheckpointData& data = playLayer->m_fields->m_checkpoints[checkpoint];
-                data.apply(playLayer->m_player1, playLayer->m_gameState.m_isDualMode ? playLayer->m_player2 : nullptr);
-
-                return;
+                    return;
+                }
             }
 
             PlayLayer::loadFromCheckpoint(checkpoint);

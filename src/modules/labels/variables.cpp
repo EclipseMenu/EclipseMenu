@@ -244,14 +244,14 @@ namespace eclipse::labels {
 
     void VariableManager::fetchTimeData() {
         auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        auto localTime = std::localtime(&time);
-        m_variables["hour"] = localTime->tm_hour;
-        m_variables["minute"] = localTime->tm_min;
-        m_variables["second"] = localTime->tm_sec;
-        m_variables["day"] = localTime->tm_mday;
-        m_variables["month"] = localTime->tm_mon + 1;
-        m_variables["monthName"] = utils::getMonthName(localTime->tm_mon);
-        m_variables["year"] = localTime->tm_year + 1900;
+        auto localTime = fmt::localtime(time);
+        m_variables["hour"] = localTime.tm_hour;
+        m_variables["minute"] = localTime.tm_min;
+        m_variables["second"] = localTime.tm_sec;
+        m_variables["day"] = localTime.tm_mday;
+        m_variables["month"] = localTime.tm_mon + 1;
+        m_variables["monthName"] = utils::getMonthName(localTime.tm_mon);
+        m_variables["year"] = localTime.tm_year + 1900;
         m_variables["clock"] = utils::getClock();
         m_variables["clock12"] = utils::getClock(true);
     }
@@ -274,6 +274,15 @@ namespace eclipse::labels {
         return s_lastDecoded;
     }
 
+    constexpr bool isRobTopLevelID(int levelID) {
+        return (levelID >= 1 && levelID <= 22) // Official levels
+               || (levelID >= 5001 && levelID <= 5004) // Platformer levels
+               || (levelID >= 1001 && levelID <= 1003) // GD Meltdown
+               || (levelID >= 2001 && levelID <= 2010) // GD World
+               || (levelID >= 4001 && levelID <= 4003) // GD SubZero
+               || levelID == 3001; // "The Challenge"
+    }
+
     void VariableManager::fetchLevelData(GJGameLevel* level) {
         if (!level) {
             // Reset all level variables
@@ -290,7 +299,7 @@ namespace eclipse::labels {
         }
 
         auto levelID = level->m_levelID.value();
-        bool isRobtopLevel = (levelID > 0 && levelID < 100) || (levelID >= 3001 && levelID <= 6000);
+        bool isRobtopLevel = isRobTopLevelID(levelID);
         auto levelDifficulty = getLevelDifficulty(level);
         m_variables["levelID"] = levelID;
         m_variables["levelName"] = rift::Value::string(level->m_levelName);
@@ -462,11 +471,6 @@ namespace eclipse::labels {
                 s_lastUpdate = now;
                 s_frames = 0;
             }
-        }
-
-        void pickupItem(EffectGameObject* obj) {
-            GJBaseGameLayer::pickupItem(obj);
-            geode::log::debug("pickupItem: {}", obj->m_secretCoinID);
         }
     };
 

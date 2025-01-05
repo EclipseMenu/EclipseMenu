@@ -10,6 +10,7 @@
 	"id": "eclipse.eclipse-menu",
 	"name": "Eclipse",
 	"links": {
+		"homepage": "https://eclipse.menu",
 		"source": "https://github.com/EclipseMenu/EclipseMenu",
         "community": "https://discord.gg/NnpwFRDMND"
 	},
