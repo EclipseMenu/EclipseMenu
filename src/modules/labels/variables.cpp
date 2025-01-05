@@ -89,6 +89,10 @@ namespace eclipse::labels {
         m_variables["nerdEmoji"] = "🤓";
         m_variables["sobEmoji"] = "😭";
         m_variables["explodingHeadEmoji"] = "🤯";
+        m_variables["diamondEmoji"] = "💎";
+        m_variables["diamondShardsEmoji"] = "💠";
+        m_variables["geodeEmoji"] = "🪩";
+        m_variables["orbsEmoji"] = "🔹";
 
         // special emojis
         m_variables["emojis"] = rift::Object{
@@ -229,6 +233,105 @@ namespace eclipse::labels {
         m_variables["fps"] = accumulateFPS(fps);
     }
 
+    constexpr int FIRST_PATH = 30;
+    constexpr int LAST_PATH = 39;
+    static const std::array<std::string, 10> PATH_NAMES = {
+        "fire", "ice", "poison", "shadow", "lava",
+        "earth", "blood", "metal", "light", "soul"
+    };
+    static const std::array<std::string, 15> STAT_NAMES_1 = {
+        "totalJumps", "totalAttempts", "completedLevels", "completedOnlineLevels",
+        "demons", "stars", "completedMapPacks", "goldCoins", "playersDestroyed",
+        "likedLevels", "ratedLevels", "userCoins", "diamonds", "orbs", "dailies",
+    };
+
+    inline int getStatFromDictionary(cocos2d::CCDictionary* dict, gd::string const& key) {
+        auto& str = dict->valueForKey(key)->m_sString;
+        if (str.empty()) return 0;
+        if (auto res = geode::utils::numFromString<int>(str)) {
+            return res.unwrap();
+        }
+        return 0;
+    }
+
+    // when m_usePlayerStatsCCDictionary is true
+    void playerStatsWithCCDict(rift::Object& variables) {
+        auto gsm = utils::get<GameStatsManager>();
+        auto playerStats = gsm->m_playerStats;
+
+        auto& stats = variables["stats"];
+        for (int i = 0; i < STAT_NAMES_1.size(); i++) {
+            stats[STAT_NAMES_1[i]] = getStatFromDictionary(playerStats, std::to_string(i + 1));
+        }
+
+        auto& stats2 = const_cast<rift::Object&>(stats.getObject()); // FIXME: add this api to rift
+        stats2["keys"] = getStatFromDictionary(playerStats, "21");
+        stats2["totalOrbs"] = getStatFromDictionary(playerStats, "22");
+        stats2["moons"] = getStatFromDictionary(playerStats, "28");
+        stats2["diamondShards"] = getStatFromDictionary(playerStats, "29");
+        stats2["gauntlets"] = getStatFromDictionary(playerStats, "40");
+        stats2["lists"] = getStatFromDictionary(playerStats, "41");
+
+        auto& shards = stats2["shards"];
+        for (int i = 16; i <= 27; i++) {
+            if (i == 21 || i == 22) continue; // skip demon keys and total orbs
+
+            int index = i - 16;
+            if (i > 22) index -= 2;
+
+            shards[PATH_NAMES[index]] = getStatFromDictionary(playerStats, std::to_string(i));
+        }
+
+        auto& paths = variables["paths"];
+        for (int i = 0; i <= PATH_NAMES.size(); i++) {
+            paths[PATH_NAMES[i]] = getStatFromDictionary(playerStats, std::to_string(i + FIRST_PATH));
+        }
+    }
+
+    inline int getStatIndex(int i, gd::unordered_map<int, int> const& seeds, gd::unordered_map<int, int> const& rands) {
+        auto rand = rands.find(i);
+        auto seed = seeds.find(i);
+        if (rand != rands.end() && seed != seeds.end()) {
+            return rand->second - seed->second;
+        }
+        return 0;
+    }
+
+    // when m_usePlayerStatsCCDictionary is false
+    void playerStatsWithMaps(rift::Object& variables) {
+        auto gsm = utils::get<GameStatsManager>();
+        auto const& seeds = gsm->m_playerStatsSeedMap;
+        auto const& rands = gsm->m_playerStatsRandMap;
+
+        auto& stats = variables["stats"];
+        for (int i = 1; i <= STAT_NAMES_1.size(); i++) {
+            stats[STAT_NAMES_1[i - 1]] = getStatIndex(i, seeds, rands);
+        }
+
+        auto& stats2 = const_cast<rift::Object&>(stats.getObject()); // FIXME: add this api to rift
+        stats2["keys"] = getStatIndex(21, seeds, rands);
+        stats2["totalOrbs"] = getStatIndex(22, seeds, rands);
+        stats2["moons"] = getStatIndex(28, seeds, rands);
+        stats2["diamondShards"] = getStatIndex(29, seeds, rands);
+        stats2["gauntlets"] = getStatIndex(40, seeds, rands);
+        stats2["lists"] = getStatIndex(41, seeds, rands);
+
+        auto& shards = stats2["shards"];
+        for (int i = 16; i <= 27; i++) {
+            if (i == 21 || i == 22) continue; // skip demon keys and total orbs
+
+            int index = i - 16;
+            if (i > 22) index -= 2;
+
+            shards[PATH_NAMES[index]] = getStatIndex(i, seeds, rands);
+        }
+
+        auto& paths = variables["paths"];
+        for (int i = FIRST_PATH; i <= LAST_PATH; i++) {
+            paths[PATH_NAMES[i - FIRST_PATH]] = getStatIndex(i, seeds, rands);
+        }
+    }
+
     void VariableManager::fetchGeneralData() {
         auto* gameManager = utils::get<GameManager>();
         m_variables["username"] = rift::Value::string(gameManager->m_playerName);
@@ -240,6 +343,20 @@ namespace eclipse::labels {
         m_variables["robotIcon"] = utils::getPlayerIcon(PlayerMode::Robot);
         m_variables["spiderIcon"] = utils::getPlayerIcon(PlayerMode::Spider);
         m_variables["swingIcon"] = utils::getPlayerIcon(PlayerMode::Swing);
+
+        auto gsm = utils::get<GameStatsManager>();
+        if (gsm->m_usePlayerStatsCCDictionary) {
+            playerStatsWithCCDict(m_variables);
+        } else {
+            playerStatsWithMaps(m_variables);
+        }
+
+        if (gsm->m_activePath >= FIRST_PATH && gsm->m_activePath <= LAST_PATH) {
+            m_variables["currentPath"] = PATH_NAMES[gsm->m_activePath - FIRST_PATH];
+        } else {
+            m_variables["currentPath"] = {};
+        }
+
     }
 
     void VariableManager::fetchTimeData() {
@@ -283,6 +400,44 @@ namespace eclipse::labels {
                || levelID == 3001; // "The Challenge"
     }
 
+    int getTotalOrbsForLevel(GJGameLevel* level, int levelID) {
+        static int s_lastLevelID = -1;
+        static int s_lastTotalOrbs = 0;
+        if (levelID == s_lastLevelID) return s_lastTotalOrbs;
+        s_lastLevelID = levelID;
+        s_lastTotalOrbs = utils::get<GameStatsManager>()->getBaseCurrencyForLevel(level);
+        return s_lastTotalOrbs;
+    }
+
+    int getCurrentOrbsForLevel(GJGameLevel* level, int levelID) {
+        auto gsm = utils::get<GameStatsManager>();
+        auto totalOrbs = getTotalOrbsForLevel(level, levelID);
+        auto dailyId = level->m_dailyID.value();
+
+        cocos2d::CCDictionary* currencyScores;
+        if (dailyId <= 0) {
+            if (level->m_levelType == GJLevelType::Local) {
+                currencyScores = gsm->m_mainCurrencyScores;
+            } else if (level->m_gauntletLevel) {
+                currencyScores = gsm->m_gauntletCurrencyScores;
+            } else {
+                currencyScores = gsm->m_onlineCurrencyScores;
+            }
+            dailyId = levelID;
+        } else {
+            currencyScores = gsm->m_timelyCurrencyScores;
+        }
+
+        auto& str = currencyScores->valueForKey(std::to_string(dailyId))->m_sString;
+        if (str.empty()) return 0;
+        if (auto res = geode::utils::numFromString<int>(str)) {
+            auto resValue = res.unwrap();
+            if (resValue >= 100) return totalOrbs * 1.25;
+            return std::floor(totalOrbs * (resValue / 100.f));
+        }
+        return 0;
+    }
+
     void VariableManager::fetchLevelData(GJGameLevel* level) {
         if (!level) {
             // Reset all level variables
@@ -317,6 +472,9 @@ namespace eclipse::labels {
             m_variables["best"] =formatTime(level->m_bestTime);
         else
             m_variables["best"] = level->m_normalPercent.value();
+
+        m_variables["totalLevelOrbs"] = static_cast<int>(getTotalOrbsForLevel(level, levelID) * 1.25);
+        m_variables["levelOrbs"] = getCurrentOrbsForLevel(level, levelID);
     }
 
     void VariableManager::fetchPlayerData(PlayerObject* player, bool isPlayer2) {
