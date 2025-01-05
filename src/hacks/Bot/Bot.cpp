@@ -251,19 +251,32 @@ namespace eclipse::hacks::Bot {
             std::optional<gdr::Input> input = std::nullopt;
 
             while ((input = s_bot.poll(m_gameState.m_currentProgress)) != std::nullopt) {
-                GJBaseGameLayer::handleButton(input->down, (int) input->button, !input->player2);
+                PlayerObject* player = input->player2 ? m_player2 : m_player1;
+                if(input->down) player->pushButton((PlayerButton)input->button);
+                else player->releaseButton((PlayerButton)input->button);
             }
         }
+    };
 
-        void handleButton(bool down, int button, bool player1) {
-            GJBaseGameLayer::handleButton(down, button, player1);
+    class $modify(BotPlayerHook, PlayerObject) {
+        bool pushButton(PlayerButton button) {
+            bool result = PlayerObject::pushButton(button);
 
-            if (s_bot.getState() != bot::State::RECORD)
-                return;
+            if (!m_gameLayer || s_bot.getState() != bot::State::RECORD)
+                return result;
+            
+            s_bot.recordInput(m_gameLayer->m_gameState.m_currentProgress, button, this == m_gameLayer->m_player2, true);
+            return result;
+        }
 
-            bool realPlayer1 = m_levelSettings->m_twoPlayerMode ? player1 : player1 || !m_gameState.m_isDualMode;
+        bool releaseButton(PlayerButton button) {
+            bool result = PlayerObject::releaseButton(button);
 
-            s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !realPlayer1, down);
+            if (!m_gameLayer || s_bot.getState() != bot::State::RECORD)
+                return result;
+            
+            s_bot.recordInput(m_gameLayer->m_gameState.m_currentProgress, button, this == m_gameLayer->m_player2, false);
+            return result;
         }
     };
 }
