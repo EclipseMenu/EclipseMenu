@@ -244,7 +244,12 @@ namespace eclipse::hacks::Recorder {
                 if (framerate < 1)
                     framerate = 1;
 
+                float tps = eclipse::config::get<bool>("global.tpsbypass.toggle", false)
+                                ? eclipse::config::get<float>("global.tpsbypass", 240.f)
+                                : 240.f;
+
                 dt = 1.f / framerate;
+                dt *= framerate / tps;
 
                 applyWinSize();
                 CCScheduler::update(dt);
