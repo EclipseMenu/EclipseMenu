@@ -190,9 +190,6 @@ namespace eclipse::hacks::Bot {
         }
 
         void resetLevel() {
-            bool p1hold = m_player1->m_holdingButtons[1];
-            bool p2hold = m_player2->m_holdingButtons[1];
-
             PlayLayer::resetLevel();
 
             static Mod* cbfMod = geode::Loader::get()->getLoadedMod("syzzi.click_between_frames");
@@ -200,7 +197,9 @@ namespace eclipse::hacks::Bot {
                 if(cbfMod)
                     cbfMod->setSettingValue<bool>("soft-toggle", true);
 
-                eclipse::config::set<bool>("global.tpsbypass.toggle", true);
+                config::set<bool>("level.checkpointdelay", true);
+                config::set<bool>("global.tpsbypass.toggle", true);
+                config::set<float>("global.tpsbypass", s_bot.getFramerate());
             }
 
             if (s_bot.getState() == bot::State::RECORD) {
