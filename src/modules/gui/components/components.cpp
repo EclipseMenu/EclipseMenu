@@ -52,6 +52,10 @@ namespace eclipse::gui {
         store_value(m_id, value, m_noSave);
     }
 
+    bool operator&(ComponentFlags lhs, ComponentFlags rhs) {
+        return static_cast<uint8_t>(lhs) & static_cast<uint8_t>(rhs);
+    }
+
     Component::Component() { m_uid = m_uniqueID++; }
 
     std::shared_ptr<Component> Component::find(size_t uid) {
@@ -71,7 +75,7 @@ namespace eclipse::gui {
     const std::string& Component::getTitle() const { return getId(); }
     const std::string& Component::getDescription() const { return m_description; }
     ComponentType Component::getType() const { return m_type; }
-    void Component::disableSaving() { m_noSave = true; }
+    Component* Component::disableSaving() { m_noSave = true; return this; }
     bool Component::isSaveDisabled() const { return m_noSave; }
 
     Component* Component::setDescription(std::string description) {
@@ -81,6 +85,8 @@ namespace eclipse::gui {
 
     bool Component::isSearchedFor() const { return m_isSearchedFor; }
     void Component::setSearchedFor(bool state) { m_isSearchedFor = state; }
+    ComponentFlags Component::getFlags() const { return m_flags; }
+    Component* Component::setFlags(ComponentFlags flags) { m_flags = flags; return this; }
 
     #pragma endregion BaseComponent
 

@@ -64,6 +64,8 @@ namespace eclipse::gui::cocos {
         // Add the tab components
         for (size_t i = 0; i < tab->getComponents().size(); ++i) {
             auto& component = tab->getComponents()[i];
+            if (component->getFlags() & ComponentFlags::DisableCocos) continue;
+
             switch (component->getType()) {
                 case ComponentType::Label: {
                     auto label = TranslatedLabel::create(component->getTitle());

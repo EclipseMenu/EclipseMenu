@@ -1,8 +1,9 @@
 #include "tabbed.hpp"
-#include <modules/gui/imgui/imgui.hpp>
+#include <utils.hpp>
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
-#include <utils.hpp>
+#include <modules/gui/components/base-component.hpp>
+#include <modules/gui/imgui/imgui.hpp>
 #include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::imgui {
@@ -19,6 +20,7 @@ namespace eclipse::gui::imgui {
         for (auto& tab : tabs) {
             m_windows.emplace_back(tab->getTitle(), [tab] {
                 for (auto& component : tab->getComponents()) {
+                    if (component->getFlags() & ComponentFlags::DisableTabbed) continue;
                     ImGuiRenderer::get()->visitComponent(component);
                 }
             });
@@ -123,14 +125,16 @@ namespace eclipse::gui::imgui {
             config::set("windows", windowStates);
         }
 
-        double duration = config::get("menu.animationDuration", 0.3);
-        auto easingType = config::get("menu.animationEasingType", animation::Easing::Quadratic);
-        auto easingMode = config::get("menu.animationEasingMode", animation::EasingMode::EaseInOut);
-        auto easing = animation::getEasingFunction(easingType, easingMode);
+        if (config::get<bool>("menu.animateWindows", true)) {
+            double duration = config::get("menu.animationDuration", 0.3);
+            auto easingType = config::get("menu.animationEasingType", animation::Easing::Quadratic);
+            auto easingMode = config::get("menu.animationEasingMode", animation::EasingMode::EaseInOut);
+            auto easing = animation::getEasingFunction(easingType, easingMode);
 
-        for (auto& window : m_windows) {
-            auto target = state ? window.getPosition() : randomWindowPosition(window);
-            m_actions.push_back(window.animateTo(target, duration, easing));
+            for (auto& window : m_windows) {
+                auto target = state ? window.getPosition() : randomWindowPosition(window);
+                m_actions.push_back(window.animateTo(target, duration, easing));
+            }
         }
     }
 
