@@ -19,11 +19,11 @@ jobs:
             os: macos-latest
 
           - name: Android32
-            os: ubuntu-latest
+            os: ubuntu-24.04
             target: Android32
 
           - name: Android64
-            os: ubuntu-latest
+            os: ubuntu-24.04
             target: Android64
 
     name: ${{ matrix.config.name }}
