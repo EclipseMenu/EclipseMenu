@@ -90,7 +90,7 @@ namespace eclipse::debug {
     };
 }
 
-#ifdef ECLIPSE_TRACING
+#ifdef ECLIPSE_DEBUG_BUILD
 #define PROFILER(name) eclipse::debug::Profiler GEODE_CONCAT(profiler, __LINE__)(name)
 #define PROFILER_FUNC1(line) GET_FUNC_NAME(newName_##line); PROFILER(newName_##line)
 #define PROFILER_FUNC2(line) PROFILER_FUNC1(line)

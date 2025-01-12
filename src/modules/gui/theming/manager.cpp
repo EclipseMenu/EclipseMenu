@@ -61,7 +61,7 @@ namespace eclipse::gui {
         m_blurSpeed = 0.3f;
         m_blurRadius = 1.f;
 
-        m_searchedColor = Color{255, 0, 0, 255};
+        m_searchedColor = Color{ 255, 0, 0, 255 };
 
         // TODO: fill this after all properties are figured out
     }
@@ -125,6 +125,11 @@ namespace eclipse::gui {
         if (renderer) this->setRenderer(static_cast<RendererType>(*renderer));
         if (layout) this->setLayoutMode(static_cast<imgui::LayoutMode>(*layout));
         if (theme) this->setComponentTheme(static_cast<imgui::ComponentTheme>(*theme));
+
+        // force renderer to cocos2d on launch
+        #if defined(ECLIPSE_DEBUG_BUILD) && defined(GEODE_IS_MOBILE)
+        this->setRenderer(RendererType::Cocos2d);
+        #endif
 
         auto other = json["other"];
         try_assign(m_uiScale, other, "uiScale");

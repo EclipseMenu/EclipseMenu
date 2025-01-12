@@ -1,5 +1,7 @@
 #include "tab-menu.hpp"
 
+#include "utils.hpp"
+
 #include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 #include <modules/gui/theming/manager.hpp>
 
@@ -57,14 +59,6 @@ namespace eclipse::gui::cocos {
                     callback(tag);
                     // this is so dumb
                     m_hasActivatedTab = true;
-                    if (auto delegate = geode::cast::typeinfo_cast<CCTouchDelegate*>(this)) {
-                        if (auto handler = cocos2d::CCTouchDispatcher::get()->findHandler(delegate)) {
-                            if (auto dispatcher = cocos2d::CCTouchDispatcher::get()) {
-                                //dispatcher->setPriority(handler->m_nPriority - 1, delegate);
-                                dispatcher->setPriority(-503, delegate);
-                            }
-                        }
-                    }
                 }
             );
             tabButton->setTag(i++);
@@ -93,14 +87,8 @@ namespace eclipse::gui::cocos {
         upButton->setFlipY(true);
         auto downButton = cocos2d::CCSprite::createWithSpriteFrameName("GJ_chatBtn_01_001.png");
 
-        if (auto delegate = geode::cast::typeinfo_cast<CCTouchDelegate*>(this)) {
-            if (auto handler = cocos2d::CCTouchDispatcher::get()->findHandler(delegate)) {
-                if (auto dispatcher = cocos2d::CCTouchDispatcher::get()) {
-                    //dispatcher->setPriority(handler->m_nPriority - 1, delegate);
-                    dispatcher->setPriority(-503, delegate);
-                }
-            }
-        }
+        this->setTouchPriority(utils::get<cocos2d::CCTouchDispatcher>()->getTargetPrio());
+        utils::get<cocos2d::CCTouchDispatcher>()->registerForcePrio(this, 2);
 
         return true;
     }

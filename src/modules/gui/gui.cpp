@@ -232,12 +232,12 @@ namespace eclipse::gui {
 
         switch (type) {
             default:
-            #ifndef GEODE_IS_MOBILE
+            #if !defined(GEODE_IS_MOBILE) || defined(ECLIPSE_DEBUG_BUILD)
             case RendererType::ImGui:
                 m_renderer = std::make_shared<imgui::ImGuiRenderer>();
                 break;
             #endif
-            #ifndef GEODE_IS_DESKTOP
+            #if !defined(GEODE_IS_DESKTOP) || defined(ECLIPSE_DEBUG_BUILD)
             case RendererType::Cocos2d:
                 m_renderer = std::make_shared<cocos::CocosRenderer>();
                 break;

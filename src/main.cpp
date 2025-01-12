@@ -38,16 +38,18 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
     bool init() override {
         if (!MenuLayer::init()) return false;
 
-        // {
-        //     auto menu = this->getChildByID("bottom-menu");
-        //     auto rendererSwitchButton = CCMenuItemSpriteExtra::create(
-        //         cocos2d::CCSprite::createWithSpriteFrameName("GJ_editModeBtn_001.png"),
-        //         this, menu_selector(EclipseButtonMLHook::onToggleRenderer)
-        //     );
-        //     rendererSwitchButton->setID("render-switch"_spr);
-        //     menu->addChild(rendererSwitchButton);
-        //     menu->updateLayout();
-        // }
+        #ifdef ECLIPSE_DEBUG_BUILD
+        {
+            auto menu = this->getChildByID("bottom-menu");
+            auto rendererSwitchButton = CCMenuItemSpriteExtra::create(
+                cocos2d::CCSprite::createWithSpriteFrameName("GJ_editModeBtn_001.png"),
+                this, menu_selector(EclipseButtonMLHook::onToggleRenderer)
+            );
+            rendererSwitchButton->setID("render-switch"_spr);
+            menu->addChild(rendererSwitchButton);
+            menu->updateLayout();
+        }
+        #endif
 
         if (s_isInitialized) return true;
 

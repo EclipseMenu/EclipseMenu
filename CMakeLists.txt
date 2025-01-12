@@ -50,10 +50,12 @@ if (APPLE)
   set_source_files_properties(${MACOS_SOURCES} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 endif()
 
-# Used to enable profiling
-if (DEFINED ECLIPSE_TRACING)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE ECLIPSE_TRACING)
-endif()
+# Debug macro
+target_compile_definitions(
+  ${PROJECT_NAME} PRIVATE
+    $<$<CONFIG:Debug>:ECLIPSE_DEBUG_BUILD>
+    $<$<CONFIG:RelWithDebInfo>:ECLIPSE_DEBUG_BUILD>
+)
 
 # Add Geode
 if (NOT DEFINED ENV{GEODE_SDK})

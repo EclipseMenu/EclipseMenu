@@ -138,24 +138,14 @@ namespace eclipse::gui::cocos {
     ScrollLayer* ScrollLayer::create(cocos2d::CCRect const& rect, bool scroll, bool vertical) {
         auto ret = new ScrollLayer(rect, scroll, vertical);
         ret->autorelease();
+
+        ret->setTouchPriority(utils::get<cocos2d::CCTouchDispatcher>()->getTargetPrio());
+        utils::get<cocos2d::CCTouchDispatcher>()->registerForcePrio(ret, 2);
+
         return ret;
     }
     ScrollLayer* ScrollLayer::create(cocos2d::CCSize const& size, bool scroll, bool vertical) {
         return ScrollLayer::create({ 0, 0, size.width, size.height }, scroll, vertical);
-    }
-    void ScrollLayer::fixTouchPrio() {
-        auto oldThis = this;
-        if (auto delegate = geode::cast::typeinfo_cast<CCTouchDelegate*>(this)) {
-            if (auto handler = cocos2d::CCTouchDispatcher::get()->findHandler(delegate)) {
-                geode::Loader::get()->queueInMainThread([this, handler, delegate, oldThis]() {
-                    if (oldThis != nullptr && handler != nullptr && delegate != nullptr) {
-                        if (auto dispatcher = cocos2d::CCTouchDispatcher::get()) {
-                            dispatcher->setPriority(handler->m_nPriority - 2, delegate);
-                        }
-                    }
-                });
-            }
-        }
     }
     void ScrollLayer::touchFinish(cocos2d::CCTouch* touch) {
         auto touchPoint = utils::get<cocos2d::CCDirector>()->convertToGL(touch->getLocationInView());

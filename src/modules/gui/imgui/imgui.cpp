@@ -14,7 +14,7 @@
 #include "layouts/sidebar.hpp"
 #include "layouts/tabbed.hpp"
 
-#ifdef ECLIPSE_TRACING
+#ifdef ECLIPSE_DEBUG_BUILD
 #include <modules/debug/benchmark.hpp>
 #include <modules/keybinds/manager.hpp>
 
@@ -217,7 +217,7 @@ namespace eclipse::gui::imgui {
         if (m_theme) m_theme->update();
         if (m_layout) m_layout->draw();
         renderPopups();
-        #ifdef ECLIPSE_TRACING
+        #ifdef ECLIPSE_DEBUG_BUILD
         showTracingPopup();
         #endif
         m_insideDraw = false;

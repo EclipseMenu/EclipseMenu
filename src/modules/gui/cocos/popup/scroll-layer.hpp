@@ -30,7 +30,6 @@ namespace eclipse::gui::cocos {
         ScrollLayer(cocos2d::CCRect const& rect, bool scrollWheelEnabled, bool vertical);
 
     public:
-        void fixTouchPrio();
         void scrollToTop();
         static ScrollLayer* create(cocos2d::CCRect const& rect, bool scrollWheelEnabled = true, bool vertical = true);
         static ScrollLayer* create(cocos2d::CCSize const& size, bool scrollWheelEnabled = true, bool vertical = true);
