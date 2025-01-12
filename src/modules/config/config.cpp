@@ -14,15 +14,34 @@
 
 namespace eclipse::config {
 
-    static nlohmann::json storage;
-    static nlohmann::json tempStorage;
-    static std::unordered_map<std::string_view, std::vector<std::function<void()>>> callbacks;
+    using CallbackMap = std::unordered_map<std::string_view, std::vector<std::function<void()>>>;
+
+    CallbackMap& getCallbacks() {
+        static CallbackMap callbacks;
+        return callbacks;
+    }
 
     nlohmann::json& getStorage() {
+        static nlohmann::json storage = [] {
+            auto path = geode::Mod::get()->getSaveDir() / "config.json";
+            std::ifstream file(path);
+            if (!file.is_open()) {
+                geode::log::warn("Failed to open config file, creating a new one.");
+                return nlohmann::json::object();
+            }
+            auto res = nlohmann::json::parse(file, nullptr, false);
+            if (res.is_discarded()) {
+                geode::log::warn("Failed to parse config file, creating a new one.");
+                return nlohmann::json::object();
+            }
+            geode::log::debug("Loaded config file");
+            return res;
+        }();
         return storage;
     }
 
     nlohmann::json& getTempStorage() {
+        static nlohmann::json tempStorage;
         return tempStorage;
     }
 
@@ -33,13 +52,15 @@ namespace eclipse::config {
         std::ifstream file(path);
         if (!file.is_open()) return false;
 
+        auto& storage = getStorage();
         storage = nlohmann::json::parse(file, nullptr, false);
         file.close();
 
-        return !getStorage().is_discarded();
+        return !storage.is_discarded();
     }
 
     void executeCallbacks(std::string_view name) {
+        auto& callbacks = getCallbacks();
         auto it = callbacks.find(name);
         if (it == callbacks.end()) return;
         for (const auto& callback : it->second) {
@@ -48,6 +69,7 @@ namespace eclipse::config {
     }
 
     void addDelegate(std::string_view key, std::function<void()> callback) {
+        auto& callbacks = getCallbacks();
         callbacks[key].push_back(std::move(callback));
     }
 
@@ -56,11 +78,12 @@ namespace eclipse::config {
     }
 
     void load() {
-        auto path = geode::Mod::get()->getSaveDir() / "config.json";
-        if (!loadFile(path)) {
-            geode::log::warn("Failed to load config file, creating a new one.");
-            storage = nlohmann::json::object();
-        }
+        // Unused now
+        // auto path = geode::Mod::get()->getSaveDir() / "config.json";
+        // if (!loadFile(path)) {
+        //     geode::log::warn("Failed to load config file, creating a new one.");
+        //     getStorage() = nlohmann::json::object();
+        // }
     }
 
     /// @brief Save config file to path

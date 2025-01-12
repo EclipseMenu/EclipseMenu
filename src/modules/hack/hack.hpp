@@ -67,16 +67,14 @@ do {\
         auto hook = res.unwrap();\
         hooks.push_back(hook);\
     }\
-    geode::queueInMainThread([hooks]{\
+    auto value = config::get(id, false);\
+    for (auto h : hooks) {\
+        h->setAutoEnable(value);\
+    }\
+    config::addDelegate(id, [hooks] {\
         auto value = config::get(id, false);\
-        for (auto h : hooks) {\
+        for (auto h : hooks)\
             (void)(value ? h->enable() : h->disable());\
-        }\
-        config::addDelegate(id, [hooks] {\
-            auto value = config::get(id, false);\
-            for (auto h : hooks)\
-                (void)(value ? h->enable() : h->disable());\
-        });\
     });\
 } while (0)
 
@@ -87,17 +85,15 @@ do {\
     for (auto& [name, hook] : self.m_hooks) {\
         hooks.push_back(hook.get());\
     }\
-    geode::queueInMainThread([hooks]{\
+    auto value = config::get(id, false);\
+    for (auto h : hooks) {\
+        h->setAutoEnable(value);\
+    }\
+    config::addDelegate(id, [hooks] {\
         auto value = config::get(id, false);\
         for (auto h : hooks) {\
             (void)(value ? h->enable() : h->disable());\
         }\
-        config::addDelegate(id, [hooks] {\
-            auto value = config::get(id, false);\
-            for (auto h : hooks) {\
-                (void)(value ? h->enable() : h->disable());\
-            }\
-        });\
     });\
 } while (0)
 
