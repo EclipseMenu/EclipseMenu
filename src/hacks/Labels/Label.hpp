@@ -22,7 +22,7 @@ namespace eclipse::hacks::Labels {
         }
 
         /// @brief Initialize the label with the specified text and font.
-        bool init(const std::string& text, const std::string& font) override;
+        bool init(const std::string& text, const std::string& font);
 
         /// @brief Set the parent container of the label.
         void setParentContainer(LabelsContainer* container) { m_parentContainer = container; }

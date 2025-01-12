@@ -1,8 +1,9 @@
 #pragma once
 #include <modules/gui/gui.hpp>
-#include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 
 namespace eclipse::gui::cocos {
+    class TranslatedLabel;
+
     /// @brief A container for tab buttons
     class TabMenu : public cocos2d::CCMenu {
     protected:
@@ -21,11 +22,11 @@ namespace eclipse::gui::cocos {
     /// @brief Tab buttons for both activating and deactivating
     class TabButton : public cocos2d::CCNode {
     protected:
-        cocos2d::extension::CCScale9Sprite* m_bgSprite;
-        TranslatedLabel* m_label;
+        cocos2d::extension::CCScale9Sprite* m_bgSprite{};
+        TranslatedLabel* m_label{};
 
     public:
-        void setState(bool active);
+        void setState(bool active) const;
         static TabButton* create(const std::string& name, const cocos2d::CCSize& size);
 
     protected:

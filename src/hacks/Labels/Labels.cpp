@@ -251,6 +251,7 @@ namespace eclipse::hacks::Labels {
                     label->setColor(setting.color.toCCColor3B());
                     label->setOpacity(setting.color.getAlphaByte());
                     label->setVisible(setting.visible);
+                    label->setAlignment(setting.fontAlignment);
 
                     if (setting.absolutePosition) {
                         auto offset = setting.offset;
@@ -296,7 +297,7 @@ namespace eclipse::hacks::Labels {
                         fields->m_absoluteLabels.emplace_back(label, [&setting](SmartLabel* label) {
                             if (setting.hasEvents()) {
                                 auto [visible, scale, color, font] = setting.processEvents();
-                                label->setFntFile(font);
+                                label->setFont(font);
                                 label->setScale(scale);
                                 label->setColor(color.toCCColor3B());
                                 label->setOpacity(color.getAlphaByte());
@@ -312,7 +313,7 @@ namespace eclipse::hacks::Labels {
                         container->addLabel(label, [&setting](SmartLabel* label) {
                             if (setting.hasEvents()) {
                                 auto [visible, scale, color, font] = setting.processEvents();
-                                label->setFntFile(font);
+                                label->setFont(font);
                                 label->setScale(scale);
                                 label->setColor(color.toCCColor3B());
                                 label->setOpacity(color.getAlphaByte());

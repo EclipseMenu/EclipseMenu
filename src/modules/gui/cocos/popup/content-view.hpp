@@ -1,11 +1,12 @@
 #pragma once
-#include <modules/gui/cocos/popup/scroll-layer.hpp>
 
 namespace eclipse::gui {
     class MenuTab;
 }
 
 namespace eclipse::gui::cocos {
+    class ScrollLayer;
+
     /// @brief A container that displays the current tab components.
     class ContentView : public cocos2d::CCNode {
     protected:

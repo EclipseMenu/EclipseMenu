@@ -47,6 +47,10 @@ namespace eclipse::i18n {
         labels::alignmentNames[7] = get("labels.alignment.bottom-center").data();
         labels::alignmentNames[8] = get("labels.alignment.bottom-right").data();
 
+        labels::fontAlignmentNames[0] = get("labels.font-alignment.left").data();
+        labels::fontAlignmentNames[1] = get("labels.font-alignment.center").data();
+        labels::fontAlignmentNames[2] = get("labels.font-alignment.right").data();
+
         for (size_t i = 0; i < labels::eventNames.size(); ++i) {
             labels::eventNames[i] = get(fmt::format("labels.events.types.{}", i)).data();
         }

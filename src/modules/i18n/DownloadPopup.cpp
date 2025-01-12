@@ -14,7 +14,7 @@ namespace eclipse::i18n {
         label->setID("title"_spr);
         m_mainLayer->addChildAtPosition(label, geode::Anchor::Top, {0, -20});
 
-        m_progressLabel = gui::cocos::FallbackBMFont::create("0% (0/6)");
+        m_progressLabel = gui::cocos::TranslatedLabel::createRaw("0% (0/6)");
         m_progressLabel->setID("progress-label"_spr);
         m_mainLayer->addChildAtPosition(m_progressLabel, geode::Anchor::Center);
 

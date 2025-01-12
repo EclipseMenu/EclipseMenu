@@ -16,7 +16,9 @@ namespace eclipse::utils {
     constexpr bool one_of_v = !not_one_of_v<T, Args...>;
 
     template <typename T>
-    concept HasSharedState = requires { T::get(); } || requires { T::sharedDispatcher(); };
+    concept HasSharedState = requires { T::get(); }
+            || requires { T::sharedDispatcher(); }
+            || requires { T::sharedConfiguration(); };
 
     template <typename T>
     concept NestedInstance = one_of_v<base_type<T>, EditorUI, UILayer>;
@@ -79,6 +81,8 @@ namespace eclipse::utils {
             } else if constexpr (isStatic) {
                 if constexpr (std::is_same_v<type, cocos2d::CCIMEDispatcher>) {
                     ref = cocos2d::CCIMEDispatcher::sharedDispatcher();
+                } else if constexpr (std::is_same_v<type, cocos2d::CCConfiguration>) {
+                    ref = cocos2d::CCConfiguration::sharedConfiguration();
                 } else {
                     ref = type::get();
                 }

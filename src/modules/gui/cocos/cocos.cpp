@@ -6,6 +6,7 @@
 
 #include "nodes/ModalPopup.hpp"
 #include "popup/options-popup.hpp"
+#include "popup/popup.hpp"
 
 namespace eclipse::gui::cocos {
     void CocosRenderer::init() {

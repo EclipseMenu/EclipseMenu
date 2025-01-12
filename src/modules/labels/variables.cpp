@@ -85,6 +85,7 @@ namespace eclipse::labels {
         m_variables["likeEmoji"] = "👍";
         m_variables["dislikeEmoji"] = "👎";
         m_variables["personInSteamyRoomEmoji"] = "🧖";
+        m_variables["sleepingAccommodationEmoji"] = "🛌";
         m_variables["eclipseEmoji"] = "🌗";
         m_variables["nerdEmoji"] = "🤓";
         m_variables["sobEmoji"] = "😭";
@@ -100,6 +101,22 @@ namespace eclipse::labels {
             {"secretCoin", rift::Array{"⭕", "🟡"}},
             {"startPos", "🧿"},
             {"practice", "♦️"},
+        };
+
+        // regional indicators
+
+        m_variables["ri"] = rift::Object{
+            {"a", "🇦"}, {"b", "🇧"}, {"c", "🇨"}, {"d", "🇩"},
+            {"e", "🇪"}, {"f", "🇫"}, {"g", "🇬"}, {"h", "🇭"},
+            {"i", "🇮"}, {"j", "🇯"}, {"k", "🇰"}, {"l", "🇱"},
+            {"m", "🇲"}, {"n", "🇳"}, {"o", "🇴"}, {"p", "🇵"},
+            {"q", "🇶"}, {"r", "🇷"}, {"s", "🇸"}, {"t", "🇹"},
+            {"u", "🇺"}, {"v", "🇻"}, {"w", "🇼"}, {"x", "🇽"},
+            {"y", "🇾"}, {"z", "🇿"},
+            {"num", rift::Array{
+                "0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣",
+                "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"
+            }},
         };
 
         // Fetch everything else

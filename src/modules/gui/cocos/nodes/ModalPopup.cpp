@@ -8,7 +8,7 @@ namespace eclipse::gui::cocos {
 
     ModalPopup* ModalPopup::create(eclipse::Popup const& settings) {
         auto ret = new ModalPopup();
-        if (ret->initAnchored(260.f, 160.f, settings)) {
+        if (ret->initAnchored(260.f, 160.f, settings, "GJ_square04.png")) {
             ret->autorelease();
             return ret;
         }
@@ -20,20 +20,17 @@ namespace eclipse::gui::cocos {
         m_closeBtn->setVisible(false);
 
         m_settings = settings;
-        m_bgSprite->setVisible(false);
+        m_bgSprite->setColor({ 100, 100, 100});
 
-        auto bg = cocos2d::extension::CCScale9Sprite::create("square01_001.png");
-        bg->setContentSize(m_size);
-        bg->setID("bg"_spr);
-        m_mainLayer->addChildAtPosition(bg, geode::Anchor::Center);
-
-        auto title = TranslatedLabel::create(settings.getTitle());
+        auto title = TranslatedLabel::createRaw(settings.getTitle());
         title->setID("title"_spr);
+        title->limitLabelWidth(m_size.width - 30.f, 1.f, 0.25f);
+        title->setColor({ 64, 255, 160 });
         m_mainLayer->addChildAtPosition(title, geode::Anchor::Top, { 0.f, -20.f });
 
-        auto message = FallbackBMFont::create(settings.getMessage());
-        message->limitLabelWidth(m_size.width - 30.f, 1.f, 0.25f);
+        auto message = TranslatedLabel::createWrappedRaw(settings.getMessage(), m_size.width - 30.f, 0.8f);
         message->setID("message"_spr);
+        message->setAlignment(BMFontAlignment::Center);
         m_mainLayer->addChildAtPosition(message, geode::Anchor::Center, { 0.f, 10.f });
 
         auto buttonsMenu = cocos2d::CCMenu::create();
@@ -76,7 +73,7 @@ namespace eclipse::gui::cocos {
     }
 
     cocos2d::CCNode* ModalPopup::createButtonSprite(std::string const& text) const {
-        auto label = FallbackBMFont::create(text);
+        auto label = TranslatedLabel::createRaw(text);
         label->setScale(0.9f);
         auto bg = cocos2d::extension::CCScale9Sprite::create("geode.loader/GE_button_05.png");
         bg->setContentSize({ label->getContentSize().width + 20.f, 28.f });

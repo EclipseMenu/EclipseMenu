@@ -1,6 +1,5 @@
 #pragma once
 #include <modules/gui/gui.hpp>
-#include "popup/popup.hpp"
 
 namespace eclipse::gui::cocos {
 
@@ -12,7 +11,6 @@ namespace eclipse::gui::cocos {
     class TabButton;
     class ScrollLayer;
     class ContentView;
-    class FallbackBMFont;
 
     class CocosRenderer : public Renderer {
     public:

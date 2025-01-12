@@ -664,6 +664,12 @@ namespace eclipse::gui::imgui {
                 labelSettings->triggerEditCallback();
             }
 
+            auto fontAlignment = settings->fontAlignment;
+            if (ImGui::Combo(i18n::get("labels.font-alignment").data(), reinterpret_cast<int*>(&fontAlignment), labels::fontAlignmentNames.data(), labels::fontAlignmentNames.size())) {
+                settings->fontAlignment = fontAlignment;
+                labelSettings->triggerEditCallback();
+            }
+
             auto absolute = settings->absolutePosition;
             if (this->checkbox(i18n::get("labels.absolute").data(), absolute, false)) {
                 settings->absolutePosition = absolute;

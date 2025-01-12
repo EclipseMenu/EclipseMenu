@@ -9,7 +9,7 @@ namespace eclipse::gui::cocos {
         TranslatedLabel* m_label = nullptr;
         CCMenuItemSpriteExtra* m_infoButton = nullptr;
         cocos2d::extension::CCScale9Sprite* m_background = nullptr;
-        FallbackBMFont* m_valueLabel = nullptr;
+        TranslatedLabel* m_valueLabel = nullptr;
 
         int m_index = 0;
 
@@ -76,7 +76,7 @@ namespace eclipse::gui::cocos {
             arrowBtn2->setTag(-1);
             this->addChildAtPosition(arrowBtn2, geode::Anchor::Right, { -115.f, 0.f });
 
-            m_valueLabel = FallbackBMFont::create(m_component->getValue().filename().string());
+            m_valueLabel = TranslatedLabel::createRaw(m_component->getValue().filename().string());
             m_background->addChildAtPosition(m_valueLabel, geode::Anchor::Center, { 0.f, 0.f });
 
             auto& items = m_component->getItems();

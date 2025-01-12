@@ -72,7 +72,7 @@ namespace eclipse::gui::cocos {
 
     class KeybindComponentNode : public BaseComponentNode<KeybindComponentNode, cocos2d::CCMenu, KeybindComponent, float> {
     protected:
-        FallbackBMFont* m_keyName{};
+        TranslatedLabel* m_keyName{};
 
     public:
         bool init(float width) override {
@@ -103,7 +103,7 @@ namespace eclipse::gui::cocos {
             }
 
             auto key = config::get<keybinds::Keys>(m_component->getId(), keybinds::Keys::None);
-            m_keyName = FallbackBMFont::create(keybinds::keyToString(key));
+            m_keyName = TranslatedLabel::createRaw(keybinds::keyToString(key));
 
             auto btnWidth = width * 0.3f;
             auto btnSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", { 0.0f, 0.0f, 80.0f, 80.0f });

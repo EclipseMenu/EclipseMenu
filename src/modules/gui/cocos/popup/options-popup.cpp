@@ -2,6 +2,7 @@
 
 #include <modules/gui/gui.hpp>
 #include <modules/gui/cocos/cocos.hpp>
+#include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 #include <modules/gui/theming/manager.hpp>
 
 #include "content-view.hpp"

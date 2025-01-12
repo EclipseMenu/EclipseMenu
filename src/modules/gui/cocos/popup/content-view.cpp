@@ -15,6 +15,7 @@
 #include <modules/gui/cocos/components/ToggleComponent.hpp>
 
 #include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
+#include "scroll-layer.hpp"
 
 namespace eclipse::gui::cocos {
     ContentView* ContentView::create(cocos2d::CCSize const& size, const std::shared_ptr<MenuTab>& tab) {

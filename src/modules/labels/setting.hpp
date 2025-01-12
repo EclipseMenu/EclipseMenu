@@ -4,6 +4,8 @@
 #include <nlohmann/json.hpp>
 #include "events.hpp"
 
+enum class BMFontAlignment;
+
 namespace eclipse::labels {
     using LabelsContainer = hacks::Labels::LabelsContainer;
 
@@ -11,6 +13,10 @@ namespace eclipse::labels {
         "Top Left", "Top Center", "Top Right",
         "Center Left", "Center", "Center Right",
         "Bottom Left", "Bottom Center", "Bottom Right"
+    };
+
+    inline static std::array fontAlignmentNames = {
+        "Left", "Center", "Right"
     };
 
     constexpr std::array fontFiles = {
@@ -74,6 +80,7 @@ namespace eclipse::labels {
         gui::Color color = gui::Color(1.f, 1.f, 1.f, 0.3f);
         std::string font = "bigFont.fnt";
         LabelsContainer::Alignment alignment = LabelsContainer::Alignment::TopLeft;
+        BMFontAlignment fontAlignment = static_cast<BMFontAlignment>(0);
         cocos2d::CCPoint offset = {0, 0};
         std::vector<LabelEvent> events;
         size_t id = instanceCount++;

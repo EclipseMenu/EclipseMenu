@@ -9,7 +9,7 @@ namespace eclipse::gui::cocos {
         TranslatedLabel* m_label = nullptr;
         CCMenuItemSpriteExtra* m_infoButton = nullptr;
         cocos2d::extension::CCScale9Sprite* m_background = nullptr;
-        FallbackBMFont* m_valueLabel = nullptr;
+        TranslatedLabel* m_valueLabel = nullptr;
 
     public:
         void updateLabel() const {
@@ -77,9 +77,9 @@ namespace eclipse::gui::cocos {
 
             int index = m_component->getValue();
             if (index < 0 || index >= m_component->getItems().size()) {
-                m_valueLabel = FallbackBMFont::create("");
+                m_valueLabel = TranslatedLabel::createRaw("");
             } else {
-                m_valueLabel = FallbackBMFont::create(m_component->getItems().at(m_component->getValue()));
+                m_valueLabel = TranslatedLabel::createRaw(m_component->getItems().at(m_component->getValue()));
             }
             m_background->addChildAtPosition(m_valueLabel, geode::Anchor::Center, { 0.f, 0.f });
             updateLabel();

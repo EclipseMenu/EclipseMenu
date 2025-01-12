@@ -3,7 +3,7 @@
 #include "base-component.hpp"
 
 namespace eclipse::labels {
-    class LabelSettings;
+    struct LabelSettings;
 }
 
 namespace eclipse::gui {

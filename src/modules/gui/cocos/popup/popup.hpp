@@ -1,10 +1,10 @@
 #pragma once
 #include <modules/gui/gui.hpp>
 
-#include "content-view.hpp"
-#include "tab-menu.hpp"
-
 namespace eclipse::gui::cocos {
+    class TabMenu;
+    class ContentView;
+
     class Popup : public geode::Popup<Tabs const&> {
     protected:
         bool setup(Tabs const& tabs) override;

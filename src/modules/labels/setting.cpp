@@ -101,6 +101,7 @@ namespace eclipse::labels {
         settings.offset.x = json.value("offset-x", 0.f);
         settings.offset.y = json.value("offset-y", 0.f);
         settings.alignment = static_cast<LabelsContainer::Alignment>(json.value("alignment", 0));
+        settings.fontAlignment = static_cast<BMFontAlignment>(json.value("fontAlignment", 0));
         settings.events = json.value("events", std::vector<LabelEvent>());
     }
 
@@ -116,6 +117,7 @@ namespace eclipse::labels {
             {"offset-x", settings.offset.x},
             {"offset-y", settings.offset.y},
             {"alignment", static_cast<int>(settings.alignment)},
+            {"fontAlignment", static_cast<int>(settings.fontAlignment)},
             {"events", settings.events}
         };
     }

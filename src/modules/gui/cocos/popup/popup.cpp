@@ -1,12 +1,13 @@
 #include "popup.hpp"
-#include <modules/gui/cocos/cocos.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/cocos/cocos.hpp>
 #include <modules/gui/theming/manager.hpp>
 #include <modules/utils/SingletonCache.hpp>
 
 #include <utility>
 
 #include "content-view.hpp"
+#include "tab-menu.hpp"
 
 namespace eclipse::gui::cocos {
     bool Popup::setup(Tabs const& tabs) {

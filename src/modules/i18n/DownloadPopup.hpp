@@ -2,7 +2,7 @@
 #include <Geode/utils/web.hpp>
 
 namespace eclipse::gui::cocos {
-    class FallbackBMFont;
+    class TranslatedLabel;
 }
 
 namespace eclipse::i18n {
@@ -20,7 +20,7 @@ namespace eclipse::i18n {
         std::string m_charset;
         int m_filesDownloaded = 0, m_totalFiles = 6;
 
-        gui::cocos::FallbackBMFont* m_progressLabel = nullptr;
+        gui::cocos::TranslatedLabel* m_progressLabel = nullptr;
         cocos2d::CCSprite* m_progressBar = nullptr;
         cocos2d::CCSprite* m_progressBarBG = nullptr;
 

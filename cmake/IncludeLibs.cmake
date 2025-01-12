@@ -24,6 +24,7 @@ CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
 set(RIFT_INCLUDE_MATJSON ON)
 CPMAddPackage("gh:EclipseMenu/rift#5f68961")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
+CPMAddPackage("gh:simdutf/simdutf@6.0.0")
 CPMAddPackage(
     NAME nlohmann_json
     GITHUB_REPOSITORY nlohmann/json
@@ -44,6 +45,7 @@ target_link_libraries(third_party INTERFACE
     imgui-cocos
     nlohmann_json::nlohmann_json
     rift
+    simdutf
 )
 
 if (NOT ANDROID)

@@ -1,5 +1,6 @@
 #include "tab-menu.hpp"
 
+#include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 #include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::cocos {
@@ -73,7 +74,6 @@ namespace eclipse::gui::cocos {
 
         // setup layout
         auto layout = geode::AxisLayout::create(geode::Axis::Column)
-                      //->setAxisReverse(true)
                       ->setAutoScale(true)
                       //->setAutoScale(false)
                       ->setAxisReverse(true)
@@ -121,7 +121,7 @@ namespace eclipse::gui::cocos {
         return true;
     }
 
-    void TabButton::setState(bool active) {
+    void TabButton::setState(bool active) const {
         // this definitely won't be a problem in the future
         if (m_bgSprite == nullptr || m_label == nullptr) return;
         const auto tm = ThemeManager::get();
