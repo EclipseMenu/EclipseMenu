@@ -8,6 +8,7 @@ namespace eclipse::gui::cocos {
     protected:
         std::vector<CCMenuItemSpriteExtra*> m_tabs;
         int m_activeTab = 0;
+        bool m_hasActivatedTab = false;
 
     public:
         static TabMenu* create(Tabs const& tabs, std::function<void(int)> const& callback);

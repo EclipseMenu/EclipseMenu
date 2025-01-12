@@ -160,9 +160,34 @@ namespace eclipse::gui::cocos {
             false
         );
         layer->updateLayout(false);
+
+        //geode::cocos::handleTouchPriorityWith(m_contentLayer, -503, false);
         m_contentLayer->fixTouchPrio();
+        
         geode::Loader::get()->queueInMainThread([this, layer] { // because i apparently have to do this to prevent crashes!?
-            m_contentLayer->setTouchEnabled(layer->getContentHeight() > 260.0F);
+            //m_contentLayer->setTouchEnabled(layer->getContentHeight() > 260.0F);
+            // this is stupid, dont do what I did just now, this is a mess!
+            for (auto child : geode::cocos::CCArrayExt<cocos2d::CCNode*>(layer->getChildren())) {
+                if (auto node = geode::cast::typeinfo_cast<cocos2d::CCNode*>(child)) {
+                    for (auto child2 : geode::cocos::CCArrayExt<cocos2d::CCNode*>(node->getChildren())) {
+                        if (auto delegate = geode::cast::typeinfo_cast<cocos2d::CCTouchDelegate*>(child2)) {
+                            if (auto handler = cocos2d::CCTouchDispatcher::get()->findHandler(delegate)) {
+                                if (auto dispatcher = cocos2d::CCTouchDispatcher::get()) {
+                                    dispatcher->setPriority(-503, delegate);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    if (auto delegate = geode::cast::typeinfo_cast<cocos2d::CCTouchDelegate*>(child)) {
+                        if (auto handler = cocos2d::CCTouchDispatcher::get()->findHandler(delegate)) {
+                            if (auto dispatcher = cocos2d::CCTouchDispatcher::get()) {
+                                dispatcher->setPriority(-503, delegate);
+                            }
+                        }
+                    }
+                }
+            }
         });
     }
 }

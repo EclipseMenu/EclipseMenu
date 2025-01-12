@@ -39,6 +39,8 @@ namespace eclipse::gui::cocos {
     bool TabMenu::init(Tabs const& tabs, std::function<void(int)> const& callback) {
         if (!CCMenu::init()) return false;
         this->setID("tab-menu"_spr);
+        //std::vector<std::shared_ptr<MenuTab>> newTabs = tabs;
+        //newTabs.pop_back();
 
         int i = 0;
         constexpr float width = 120.f;
@@ -47,12 +49,21 @@ namespace eclipse::gui::cocos {
             auto tabName = tab->getTitle();
             auto tabSpr = TabButton::create(tabName, {width, height});
             auto tabButton = geode::cocos::CCMenuItemExt::createSpriteExtra(
-                //ButtonSprite::create(tabName.c_str(), width, true, "bigFont.fnt", "GJ_button_01.png", height, 0.5f),
                 tabSpr,
                 [this, callback](auto caller) {
                     auto tag = caller->getTag();
                     this->setActiveTab(tag);
                     callback(tag);
+                    // this is so dumb
+                    m_hasActivatedTab = true;
+                    if (auto delegate = geode::cast::typeinfo_cast<CCTouchDelegate*>(this)) {
+                        if (auto handler = cocos2d::CCTouchDispatcher::get()->findHandler(delegate)) {
+                            if (auto dispatcher = cocos2d::CCTouchDispatcher::get()) {
+                                //dispatcher->setPriority(handler->m_nPriority - 1, delegate);
+                                dispatcher->setPriority(-503, delegate);
+                            }
+                        }
+                    }
                 }
             );
             tabButton->setTag(i++);
@@ -62,27 +73,42 @@ namespace eclipse::gui::cocos {
 
         // setup layout
         auto layout = geode::AxisLayout::create(geode::Axis::Column)
-                      ->setAxisReverse(true)
+                      //->setAxisReverse(true)
                       ->setAutoScale(true)
+                      //->setAutoScale(false)
+                      ->setAxisReverse(true)
                       ->setGrowCrossAxis(false)
                       ->setCrossAxisOverflow(true)
                       ->setGap(0.5f)
                       ->setAxisAlignment(geode::AxisAlignment::End)
                       ->setCrossAxisAlignment(geode::AxisAlignment::Start)
                       ->setCrossAxisLineAlignment(geode::AxisAlignment::Start);
-        this->setAnchorPoint({0.f, 1.f});
+        this->setAnchorPoint({0.5f, 0.5f});
         this->setContentHeight(260.f);
         this->setLayout(layout, true);
 
         this->setActiveTab(0);
+
+        auto upButton = cocos2d::CCSprite::createWithSpriteFrameName("GJ_chatBtn_01_001.png");
+        upButton->setFlipY(true);
+        auto downButton = cocos2d::CCSprite::createWithSpriteFrameName("GJ_chatBtn_01_001.png");
+
+        if (auto delegate = geode::cast::typeinfo_cast<CCTouchDelegate*>(this)) {
+            if (auto handler = cocos2d::CCTouchDispatcher::get()->findHandler(delegate)) {
+                if (auto dispatcher = cocos2d::CCTouchDispatcher::get()) {
+                    //dispatcher->setPriority(handler->m_nPriority - 1, delegate);
+                    dispatcher->setPriority(-503, delegate);
+                }
+            }
+        }
 
         return true;
     }
 
     bool TabButton::init(std::string name, cocos2d::CCSize size) {
         if (!CCNode::init()) return false;
+        this->setScale(0.9F);
         this->setID(fmt::format("tab-button-{}"_spr, name));
-        size.width += 15.F; // 135
         this->setContentSize(size);
 
         m_label = TranslatedLabel::create(name);
