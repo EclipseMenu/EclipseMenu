@@ -51,11 +51,13 @@ if (APPLE)
 endif()
 
 # Debug macro
-target_compile_definitions(
-  ${PROJECT_NAME} PRIVATE
-    $<$<CONFIG:Debug>:ECLIPSE_DEBUG_BUILD>
-    $<$<CONFIG:RelWithDebInfo>:ECLIPSE_DEBUG_BUILD>
-)
+if (NOT DEFINED ENV{GITHUB_ACTIONS})
+  target_compile_definitions(
+    ${PROJECT_NAME} PRIVATE
+      $<$<CONFIG:Debug>:ECLIPSE_DEBUG_BUILD>
+      $<$<CONFIG:RelWithDebInfo>:ECLIPSE_DEBUG_BUILD>
+  )
+endif()
 
 # Add Geode
 if (NOT DEFINED ENV{GEODE_SDK})
