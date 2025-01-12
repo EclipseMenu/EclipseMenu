@@ -43,6 +43,16 @@ namespace eclipse::gui::cocos {
         m_contentBG->setID("content-bg"_spr);
         m_mainLayer->addChild(m_contentBG);
 
+        // Tab menu BG 
+        auto bgTab = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        bgTab->setAnchorPoint({0, 0.5});
+        bgTab->setContentSize({115, 260});
+        bgTab->setColor({155,155,155});
+        bgTab->setColor(tm->getBackgroundColor().toCCColor3B());
+        bgTab->setPosition(6.f, 140.f);
+        bgTab->setID("tab-bg"_spr);
+        m_mainLayer->addChild(bgTab);
+
         // Tab menu
         auto currentTab = config::get<int>("menu.current_tab", 0);
         currentTab = std::min(currentTab, static_cast<int>(tabs.size()) - 1);
@@ -51,7 +61,7 @@ namespace eclipse::gui::cocos {
         });
         m_tabMenu->setPosition(7.5f, 270.f);
         m_tabMenu->setActiveTab(currentTab);
-        m_mainLayer->addChild(m_tabMenu);
+        bgTab->addChildAtPosition(m_tabMenu, geode::Anchor::Center);
 
         // Content view
         m_contentMenu = ContentView::create({345.f, 260.f}, tabs[currentTab]);

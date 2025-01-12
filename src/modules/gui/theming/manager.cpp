@@ -5,6 +5,7 @@
 #include <modules/gui/imgui/imgui.hpp>
 #include <Geode/Loader.hpp>
 #include <Geode/utils/cocos.hpp>
+#include <modules/gui/blur/blur.hpp>
 
 namespace eclipse::gui {
     static auto IMPORT_PICK_OPTIONS = geode::utils::file::FilePickOptions{
@@ -372,5 +373,10 @@ namespace eclipse::gui {
 
     void ThemeManager::setFontSize(float value) {
         m_fontSize = value;
+    }
+
+    void ThemeManager::setBlurEnabled(bool value) {
+        m_enableBlur = value;
+        blur::toggle(value);
     }
 }

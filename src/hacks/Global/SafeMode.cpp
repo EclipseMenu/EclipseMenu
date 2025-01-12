@@ -1,3 +1,4 @@
+#include <modules/api/mods.hpp>
 #include <modules/config/config.hpp>
 #include <modules/gui/color.hpp>
 #include <modules/gui/gui.hpp>
@@ -27,6 +28,10 @@ namespace eclipse::hacks::Global {
     class AutoSafeMode : public hack::Hack {
     public:
         static bool hasCheats() {
+            for (auto& [_, callback] : api::getCheats()) {
+                if (callback()) return true;
+            }
+
             const auto& hacks = hack::Hack::getHacks();
             return std::ranges::any_of(hacks, [](auto& hack) {
                 return hack->isCheating();
@@ -46,6 +51,13 @@ namespace eclipse::hacks::Global {
                     s_attemptCheats[hack->getId()] = true;
                 } else if (s_attemptCheats.contains(hack->getId())) {
                     s_attemptCheats[hack->getId()] = false;
+                }
+            }
+            for (const auto& [id, active] : api::getCheats()) {
+                if (active()) {
+                    s_attemptCheats[id] = true;
+                } else if (s_attemptCheats.contains(id)) {
+                    s_attemptCheats[id] = false;
                 }
             }
         }

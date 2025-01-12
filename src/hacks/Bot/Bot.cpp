@@ -190,9 +190,6 @@ namespace eclipse::hacks::Bot {
         }
 
         void resetLevel() {
-            bool p1hold = m_player1->m_holdingButtons[1];
-            bool p2hold = m_player2->m_holdingButtons[1];
-
             PlayLayer::resetLevel();
 
             static Mod* cbfMod = geode::Loader::get()->getLoadedMod("syzzi.click_between_frames");
@@ -200,7 +197,9 @@ namespace eclipse::hacks::Bot {
                 if(cbfMod)
                     cbfMod->setSettingValue<bool>("soft-toggle", true);
 
-                eclipse::config::set<bool>("global.tpsbypass.toggle", true);
+                config::set<bool>("level.checkpointdelay", true);
+                config::set<bool>("global.tpsbypass.toggle", true);
+                config::set<float>("global.tpsbypass", s_bot.getFramerate());
             }
 
             if (s_bot.getState() == bot::State::RECORD) {
@@ -251,7 +250,16 @@ namespace eclipse::hacks::Bot {
             std::optional<gdr::Input> input = std::nullopt;
 
             while ((input = s_bot.poll(m_gameState.m_currentProgress)) != std::nullopt) {
-                GJBaseGameLayer::handleButton(input->down, (int) input->button, !input->player2);
+                auto performButton = input->down ? &PlayerObject::pushButton : &PlayerObject::releaseButton;
+                if(m_levelSettings->m_twoPlayerMode) {
+                    PlayerObject* player = input->player2 ? m_player2 : m_player1;
+                    (player->*performButton)((PlayerButton)input->button);
+                    continue;
+                }
+
+                (m_player1->*performButton)((PlayerButton)input->button);
+                if(m_gameState.m_isDualMode)
+                    (m_player2->*performButton)((PlayerButton)input->button);
             }
         }
 
@@ -262,7 +270,6 @@ namespace eclipse::hacks::Bot {
                 return;
 
             bool realPlayer1 = m_levelSettings->m_twoPlayerMode ? player1 : player1 || !m_gameState.m_isDualMode;
-
             s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !realPlayer1, down);
         }
     };

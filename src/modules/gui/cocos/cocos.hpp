@@ -7,6 +7,13 @@ namespace eclipse::gui::cocos {
     class OptionsPopup;
     class ModalPopup;
 
+    class Popup;
+    class TabMenu;
+    class TabButton;
+    class ScrollLayer;
+    class ContentView;
+    class FallbackBMFont;
+
     class CocosRenderer : public Renderer {
     public:
         static std::shared_ptr<CocosRenderer> get() {

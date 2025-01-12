@@ -1,6 +1,7 @@
 #include "sidebar.hpp"
-#include <modules/gui/imgui/imgui.hpp>
 #include <modules/gui/gui.hpp>
+#include <modules/gui/components/base-component.hpp>
+#include <modules/gui/imgui/imgui.hpp>
 #include <modules/gui/theming/manager.hpp>
 #include <modules/i18n/translations.hpp>
 
@@ -13,6 +14,7 @@ namespace eclipse::gui::imgui {
         for (auto& tab : tabs) {
             m_tabs.emplace_back(tab->getTitle(), [tab] {
                 for (auto& component : tab->getComponents()) {
+                    if (component->getFlags() & ComponentFlags::DisableSidebar) continue;
                     ImGuiRenderer::get()->visitComponent(component);
                 }
             });

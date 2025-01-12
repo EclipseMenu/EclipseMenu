@@ -149,7 +149,8 @@ namespace eclipse::gui {
         PROPERTY(float, m_borderSize, BorderSize)
 
         /// Whether to use blur
-        PROPERTY(bool, m_enableBlur, BlurEnabled)
+        PROPERTY_CS(bool, m_enableBlur, BlurEnabled)
+        void setBlurEnabled(bool value);
         /// Blur animation speed
         PROPERTY(float, m_blurSpeed, BlurSpeed)
         /// Blur intensity

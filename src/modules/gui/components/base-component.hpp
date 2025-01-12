@@ -11,6 +11,24 @@ namespace eclipse::gui {
         Button, Keybind, LabelSettings, FilesystemCombo, IntToggle
     };
 
+    enum class ComponentFlags : uint8_t {
+        None = 0, // No flags (default)
+
+        DisableCocos = 1 << 0, // Hide the component in cocos renderer mode
+
+        DisableTabbed = 1 << 1, // Hide the component in tabbed layout (imgui)
+        DisablePanel = 1 << 2, // Hide the component in panel layout (imgui)
+        DisableSidebar = 1 << 3, // Hide the component in sidebar layout (imgui)
+
+        OnlyTabbed = DisablePanel | DisableSidebar | DisableCocos, // Display exclusively in tabbed layout (imgui)
+        OnlyPanel = DisableTabbed | DisableSidebar | DisableCocos, // Display exclusively in panel layout (imgui)
+        OnlySidebar = DisableTabbed | DisablePanel | DisableCocos, // Display exclusively in sidebar layout (imgui)
+
+        DisableImGui = DisableTabbed | DisablePanel | DisableSidebar, // Hide the component in imgui renderer mode
+    };
+
+    bool operator&(ComponentFlags lhs, ComponentFlags rhs);
+
     class Component {
     public:
         virtual ~Component() = default;
@@ -43,7 +61,7 @@ namespace eclipse::gui {
 
         /// @brief Excludes value from being saved into main configuration file
         /// Useful for some internal values. (Uses temporary storage).
-        void disableSaving();
+        Component* disableSaving();
 
         /// @brief Whether current component should use temporary storage
         [[nodiscard]] bool isSaveDisabled() const;
@@ -57,12 +75,19 @@ namespace eclipse::gui {
         /// @brief Sets the component's search state
         void setSearchedFor(bool state);;
 
+        /// @brief Get the component's flags
+        [[nodiscard]] ComponentFlags getFlags() const;
+
+        /// @brief Set the component's flags
+        Component* setFlags(ComponentFlags flags);
+
     protected:
         static size_t m_uniqueID;
         size_t m_uid;
         ComponentType m_type = ComponentType::Unknown;
         bool m_noSave = false;
         bool m_isSearchedFor = false;
+        ComponentFlags m_flags = ComponentFlags::None;
         std::string m_description;
     };
 }

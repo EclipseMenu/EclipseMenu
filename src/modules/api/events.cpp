@@ -1,14 +1,19 @@
 #include <eclipse.hpp>
-#include <modules/gui/gui.hpp>
 #include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
 #include <modules/labels/variables.hpp>
 
-#include <modules/gui/components/toggle.hpp>
 #include <modules/gui/components/button.hpp>
 #include <modules/gui/components/label.hpp>
+#include <modules/gui/components/toggle.hpp>
+
+#include "mods.hpp"
 
 namespace eclipse::api {
 using namespace geode::prelude;
+
+std::map<std::string, std::function<bool()>> g_cheats;
+std::map<std::string, std::function<bool()>> const& getCheats() { return g_cheats; }
 
 template <config::SupportedType T>
 void createGetConfigListener() {
@@ -149,6 +154,12 @@ $execute {
     createSetRiftVariableListener<double>();
     createSetRiftVariableListener<label::null_t>();
     createSetRiftVariableListener<matjson::Value>();
+
+    /* Modules */
+    new EventListener<EventFilter<events::RegisterCheatEvent>>(+[](events::RegisterCheatEvent* e) {
+        g_cheats[e->getName()] = e->getCallback();
+        return ListenerResult::Stop;
+    });
 }
 
 }

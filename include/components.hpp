@@ -3,11 +3,13 @@
 #define ECLIPSE_COMPONENTS_HPP
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <utility>
-#include <memory>
-#include <Geode/loader/Setting.hpp>
 #include <Geode/loader/Event.hpp>
+#include <Geode/loader/Setting.hpp>
+
+#include "config.hpp"
 
 namespace eclipse::components {
     enum class ComponentType {

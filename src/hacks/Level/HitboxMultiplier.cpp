@@ -122,8 +122,7 @@ namespace eclipse::hacks::Level {
 
     class $modify(HitboxMultiplierOBB2DHook, OBB2D) {
         void calculateWithCenter(cocos2d::CCPoint center, float width, float heigth, float rotation) {
-            if (!utils::get<GJBaseGameLayer>() || !config::get<bool>("level.hitbox_multiplier", false) || !
-                s_rotatedGameObject) {
+            if (!s_rotatedGameObject || !utils::get<GJBaseGameLayer>() || !config::get<bool>("level.hitbox_multiplier", false)) {
                 s_rotatedGameObject = nullptr;
                 return OBB2D::calculateWithCenter(center, width, heigth, rotation);
             }

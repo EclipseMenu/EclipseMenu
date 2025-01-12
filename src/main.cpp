@@ -22,6 +22,7 @@
 #include <modules/gui/components/input-float.hpp>
 #include <modules/gui/components/input-text.hpp>
 #include <modules/gui/components/toggle.hpp>
+#include <modules/gui/imgui/animation/easing.hpp>
 
 using namespace eclipse;
 
@@ -153,30 +154,30 @@ $on_mod(Loaded) {
         tab->addInputFloat("interface.ui-scale", "uiScale", 0.75f, 2.f, "x%.3f")
            ->callback([](float value) {
                ThemeManager::get()->setUIScale(value);
-           })->disableSaving();
+           })->disableSaving()->setFlags(ComponentFlags::DisableCocos);
 
         auto fontCombo = tab->addCombo("interface.font", "fontIndex", ThemeManager::getFontNames(), 0);
         fontCombo->callback([](int value) {
             ThemeManager::get()->setSelectedFont(value);
-        })->disableSaving();
+        })->disableSaving()->setFlags(ComponentFlags::DisableCocos);
         tab->addInputFloat("interface.font-size", "fontSize", 10.f, 64.f)
            ->callback([](float value) {
                if (value >= 10.f) ThemeManager::get()->setFontSize(value);
-           })->disableSaving();
+           })->disableSaving()->setFlags(ComponentFlags::DisableCocos);
         tab->addButton("interface.reload-fonts")->callback([fontCombo] {
             ImGuiCocos::get().reload();
             fontCombo->setItems(ThemeManager::getFontNames());
-        });
+        })->setFlags(ComponentFlags::DisableCocos);
 
         tab->addCombo("interface.layout-type", "layout", {"Tabbed", "Panel", "Sidebar"}, 0)
            ->callback([](int value) {
                ThemeManager::get()->setLayoutMode(static_cast<imgui::LayoutMode>(value));
-           })->disableSaving();
+           })->disableSaving()->setFlags(ComponentFlags::DisableCocos);
 
         tab->addCombo("interface.style", "style", imgui::THEME_NAMES, 0)
            ->callback([](int value) {
                ThemeManager::get()->setComponentTheme(static_cast<imgui::ComponentTheme>(value));
-           })->disableSaving();
+           })->disableSaving()->setFlags(ComponentFlags::DisableCocos);
 
         auto blurToggle = tab->addToggle("interface.enable-blur", "blurEnabled")
                              ->callback([](bool value) { ThemeManager::get()->setBlurEnabled(value); });
@@ -186,6 +187,23 @@ $on_mod(Loaded) {
                ->disableSaving();
         });
         blurToggle->disableSaving();
+        blurToggle->setFlags(ComponentFlags::DisableCocos);
+
+        config::setIfEmpty<bool>("menu.animateWindows", true);
+        config::setIfEmpty("menu.animationDuration", 0.3);
+        config::setIfEmpty("menu.animationEasingType", animation::Easing::Quadratic);
+        config::setIfEmpty("menu.animationEasingMode", animation::EasingMode::EaseInOut);
+        auto animateToggle = tab->addToggle("menu.animateWindows");
+        animateToggle->addOptions([](auto opt) {
+                opt->addInputFloat("menu.animationDuration", 0.f, 10.f, "%.3f s");
+                opt->addCombo("menu.animationEasingType", {
+                    "Linear", "Sine", "Quadratic", "Cubic",
+                    "Quartic", "Quintic", "Exponential",
+                    "Circular", "Backwards", "Elastic", "Bounce"
+                }, 2);
+                opt->addCombo("menu.animationEasingMode", { "Ease In", "Ease Out", "Ease In Out" }, 2);
+            });
+        animateToggle->setFlags(ComponentFlags::OnlyTabbed);
 
         auto accentColor = tab->addColorComponent("interface.accent-color", "accent", true);
         accentColor->callback([](const Color& color) {
