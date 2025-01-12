@@ -120,6 +120,11 @@ bool BMFontConfiguration::parseImageFileName(std::istringstream& line, std::stri
     return true;
 }
 
+struct MyConfig : cocos2d::CCConfiguration {
+    static MyConfig* get() { return static_cast<MyConfig*>(sharedConfiguration()); }
+    GLuint maxTextureSize() const { return m_nMaxTextureSize; }
+};
+
 bool BMFontConfiguration::parseCommonArguments(std::istringstream& line) {
     std::string keypair;
 
@@ -135,7 +140,7 @@ bool BMFontConfiguration::parseCommonArguments(std::istringstream& line) {
         if (key == "lineHeight") {
             m_commonHeight = fastParse<int>(value);
         } else if (key == "scaleW" || key == "scaleH") {
-            if (fastParse<int>(value) > eclipse::utils::get<cocos2d::CCConfiguration>()->getMaxTextureSize()) {
+            if (fastParse<int>(value) > eclipse::utils::get<MyConfig>()->maxTextureSize()) {
                 return false;
             }
         } else if (key == "pages") {
