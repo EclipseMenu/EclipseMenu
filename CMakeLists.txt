@@ -3,7 +3,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 
 project(EclipseMenu VERSION 1.0.0 LANGUAGES CXX)
 
@@ -17,8 +16,13 @@ endif()
 file(GLOB_RECURSE SOURCES src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${MACOS_SOURCES})
 
-# Enable LTO for smaller binaries
-set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+# Configure for GitHub Actions builds
+if (DEFINED ENV{GITHUB_ACTIONS})
+  # Enable LTO for smaller binaries
+  set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE GITHUB_ACTIONS)
+  message(STATUS "GitHub Actions build detected")
+endif()
 
 # Make sure we can include headers from src
 target_include_directories(${PROJECT_NAME} PRIVATE src include)
@@ -44,6 +48,11 @@ endif()
 # macOS specific settings
 if (APPLE)
   set_source_files_properties(${MACOS_SOURCES} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+endif()
+
+# Used to enable profiling
+if (DEFINED ECLIPSE_TRACING)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE ECLIPSE_TRACING)
 endif()
 
 # Add Geode

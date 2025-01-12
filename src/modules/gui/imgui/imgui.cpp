@@ -14,6 +14,70 @@
 #include "layouts/sidebar.hpp"
 #include "layouts/tabbed.hpp"
 
+#ifdef ECLIPSE_TRACING
+#include <modules/debug/benchmark.hpp>
+#include <modules/keybinds/manager.hpp>
+
+void showTracingPopup() {
+    using namespace eclipse;
+    static bool isOpen = false;
+    static auto _ = [] {
+        auto& keybind = keybinds::Manager::get()->addListener("debug.tracing", [](bool down) {
+            if (down) isOpen = !isOpen;
+        });
+        keybind.setKey(keybinds::Keys::F3);
+        return 0;
+    }();
+
+    if (!isOpen) return;
+
+    if (ImGui::Begin("Profiler", &isOpen)) {
+        auto& tabs = debug::Profiler::getTimes();
+        ImGui::Text("Total profilers: %zu", tabs.size());
+        if (ImGui::BeginTabBar("TracingTabs")) {
+            for (auto const& [tab, data] : tabs) {
+                auto ind = tab.find_first_of(')');
+                auto name = tab.substr(ind + 1);
+
+                if (ImGui::BeginTabItem(name.c_str())) {
+                    ImGui::Text("Function: %s", name.c_str());
+                    auto filename = tab.substr(1, ind);
+                    ImGui::Text("File: %s", filename.c_str());
+
+                    if (data.empty()) {
+                        ImGui::Text("No data available.");
+                        ImGui::EndTabItem();
+                        continue;
+                    }
+
+                    std::vector<float> times;
+                    times.reserve(data.size());
+                    auto it = data.begin();
+                    float minTime = *it;
+                    float maxTime = *it;
+                    while (it != data.end()) {
+                        times.push_back(*it);
+                        if (*it < minTime) minTime = *it;
+                        if (*it > maxTime) maxTime = *it;
+                        ++it;
+                    }
+
+                    // build a graph
+                    auto availableSize = ImGui::GetContentRegionAvail();
+                    ImGui::PlotLines("##graph", times.data(), times.size(), 0, nullptr, minTime, maxTime, ImVec2(availableSize.x, 100));
+
+                    ImGui::Text("Average: %.3f us", debug::Profiler::averageTimeFor(tab) / 1000.f);
+
+                    ImGui::EndTabItem();
+                }
+            }
+            ImGui::EndTabBar();
+        }
+    }
+    ImGui::End();
+}
+#endif
+
 namespace eclipse::gui::imgui {
     bool ImGuiRenderer::s_initialized = false;
 
@@ -153,6 +217,9 @@ namespace eclipse::gui::imgui {
         if (m_theme) m_theme->update();
         if (m_layout) m_layout->draw();
         renderPopups();
+        #ifdef ECLIPSE_TRACING
+        showTracingPopup();
+        #endif
         m_insideDraw = false;
         setLayoutMode(m_queuedMode);
     }
