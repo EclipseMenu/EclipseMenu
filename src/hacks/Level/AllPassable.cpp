@@ -40,7 +40,7 @@ namespace eclipse::hacks::Player {
                             obj->m_fields->m_isPassable = obj->m_isPassable;
                             obj->m_fields->checked = true;
                         }
-                        obj->m_isPassable = config::get<bool>("level.allpassable", true) || obj->m_fields->m_isPassable;
+                        obj->m_isPassable = config::get<bool>("level.allpassable", false) || obj->m_fields->m_isPassable;
                     }
                 }
                });
