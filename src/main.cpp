@@ -195,15 +195,27 @@ $on_mod(Loaded) {
         config::setIfEmpty("menu.animationDuration", 0.3);
         config::setIfEmpty("menu.animationEasingType", animation::Easing::Quadratic);
         config::setIfEmpty("menu.animationEasingMode", animation::EasingMode::EaseInOut);
-        auto animateToggle = tab->addToggle("menu.animateWindows");
+        auto animateToggle = tab->addToggle("menu.animateWindows")->setDescription();
         animateToggle->addOptions([](auto opt) {
                 opt->addInputFloat("menu.animationDuration", 0.f, 10.f, "%.3f s");
                 opt->addCombo("menu.animationEasingType", {
-                    "Linear", "Sine", "Quadratic", "Cubic",
-                    "Quartic", "Quintic", "Exponential",
-                    "Circular", "Backwards", "Elastic", "Bounce"
+                    i18n::get_("menu.animationEasingType.0"),
+                    i18n::get_("menu.animationEasingType.1"),
+                    i18n::get_("menu.animationEasingType.2"),
+                    i18n::get_("menu.animationEasingType.3"),
+                    i18n::get_("menu.animationEasingType.4"),
+                    i18n::get_("menu.animationEasingType.5"),
+                    i18n::get_("menu.animationEasingType.6"),
+                    i18n::get_("menu.animationEasingType.7"),
+                    i18n::get_("menu.animationEasingType.8"),
+                    i18n::get_("menu.animationEasingType.9"),
+                    i18n::get_("menu.animationEasingType.10"),
                 }, 2);
-                opt->addCombo("menu.animationEasingMode", { "Ease In", "Ease Out", "Ease In Out" }, 2);
+                opt->addCombo("menu.animationEasingMode", {
+                    i18n::get_("menu.animationEasingMode.0"),
+                    i18n::get_("menu.animationEasingMode.1"),
+                    i18n::get_("menu.animationEasingMode.2"),
+                }, 2);
             });
         animateToggle->setFlags(ComponentFlags::OnlyTabbed);
 
