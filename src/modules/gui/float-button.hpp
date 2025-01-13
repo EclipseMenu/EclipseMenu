@@ -1,6 +1,10 @@
 #pragma once
 #include <cocos2d.h>
 
+#if defined(GEODE_IS_MOBILE) // || defined(ECLIPSE_DEBUG_BUILD)
+#define ECLIPSE_USE_FLOATING_BUTTON
+#endif
+
 namespace eclipse::gui {
 
     class FloatingButton : public cocos2d::CCMenu {
@@ -8,7 +12,7 @@ namespace eclipse::gui {
         // how many units required to begin dragging the button
         constexpr static float MIN_MOVE_DISTANCE = 5.f;
         // move progress per second
-        constexpr static float MOVE_SPEED = 9.2f;
+        constexpr static float MOVE_SPEED = 9.75f;
         // how many units until the button snaps to touch pos
         constexpr static float SNAP_MARGIN = 0.1f;
 

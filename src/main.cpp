@@ -21,6 +21,7 @@
 #include <modules/gui/components/combo.hpp>
 #include <modules/gui/components/input-float.hpp>
 #include <modules/gui/components/input-text.hpp>
+#include <modules/gui/components/label.hpp>
 #include <modules/gui/components/toggle.hpp>
 #include <modules/gui/imgui/animation/easing.hpp>
 
@@ -59,7 +60,7 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         // Initialize the GUI engine.
         gui::Engine::get()->init();
 
-        #ifdef GEODE_IS_MOBILE
+        #ifdef ECLIPSE_USE_FLOATING_BUTTON
         // This will create the floating button and keep it across scenes
         gui::FloatingButton::get()->setCallback([]{ toggleMenu(); });
         #endif
@@ -218,6 +219,22 @@ $on_mod(Loaded) {
                 }, 2);
             });
         animateToggle->setFlags(ComponentFlags::OnlyTabbed);
+
+    #ifdef ECLIPSE_USE_FLOATING_BUTTON
+
+        config::setIfEmpty<float>("float-btn.max-opacity", 1.f);
+        config::setIfEmpty<float>("float-btn.min-opacity", 0.5f);
+        config::setIfEmpty<bool>("float-btn.show-in-level", false);
+        config::setIfEmpty<bool>("float-btn.show-in-editor", true);
+        config::setIfEmpty<float>("float-btn.scale", 0.25f);
+        tab->addLabel("float-btn.title")->setFlags(ComponentFlags::DisableImGui);
+        tab->addInputFloat("float-btn.max-opacity", 0.f, 1.f)->setFlags(ComponentFlags::DisableImGui);
+        tab->addInputFloat("float-btn.min-opacity", 0.f, 1.f)->setFlags(ComponentFlags::DisableImGui);
+        tab->addToggle("float-btn.show-in-level")->setFlags(ComponentFlags::DisableImGui);
+        tab->addToggle("float-btn.show-in-editor")->setFlags(ComponentFlags::DisableImGui);
+        tab->addInputFloat("float-btn.scale", 0.f, 1.f)->setFlags(ComponentFlags::DisableImGui);
+
+    #endif
 
         auto accentColor = tab->addColorComponent("interface.accent-color", "accent", true);
         accentColor->callback([](const Color& color) {
