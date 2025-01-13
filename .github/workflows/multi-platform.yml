@@ -3,11 +3,7 @@ name: Build Eclipse
 on:
   workflow_dispatch:
   push:
-    branches:
-      - "**"
   pull_request:
-    branches:
-      - "**"
 
 jobs:
   build:
@@ -15,28 +11,29 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - name: Windows
-          os: windows-latest
-          build-type: RelWithDebInfo
+          - name: Windows
+            os: windows-latest
+            build-type: RelWithDebInfo
 
-        - name: macOS
-          os: macos-latest
+          - name: macOS
+            os: macos-latest
 
-        - name: Android32
-          os: ubuntu-latest
-          target: Android32
+          - name: Android32
+            os: ubuntu-24.04
+            target: Android32
 
-        - name: Android64
-          os: ubuntu-latest
-          target: Android64
+          - name: Android64
+            os: ubuntu-24.04
+            target: Android64
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Build the mod
+      - name: Build
         uses: geode-sdk/build-geode-mod@main
         with:
           bindings: EclipseMenu/bindings
@@ -53,10 +50,12 @@ jobs:
     needs: ['build']
 
     steps:
-      - uses: geode-sdk/build-geode-mod/combine@main
+      - name: Combine builds
+        uses: geode-sdk/build-geode-mod/combine@main
         id: build
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
           name: Build Output
           path: ${{ steps.build.outputs.build-output }}
@@ -66,7 +65,8 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: echo "has-nightly-webhook=${{ secrets.NIGHTLY_WEBHOOK != '' }}" >> $GITHUB_OUTPUT
 
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         if: ${{ steps.check.outputs.has-nightly-webhook == 'true' }}
 
       - name: Get commit messages
@@ -76,8 +76,6 @@ jobs:
           echo "commit-message=$(git log -1 --pretty=format:"%s" | head -n 1)" >> $GITHUB_OUTPUT
           # echo "commit-message-full=$(echo $COMMIT_MESSAGE | tail -n +2)" >> $GITHUB_OUTPUT # Bash is weird, this doesn't work
           echo "build-color=#$(git log -1 --pretty=format:"%h" | cut -c 1-6)" >> $GITHUB_OUTPUT
-        #env:
-        #  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
 
       - name: Upload release to Discord
         uses: prevter/discord-webhook@main
