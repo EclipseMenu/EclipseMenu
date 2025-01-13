@@ -10,17 +10,19 @@ namespace eclipse::hacks::Player {
     class $modify(AllPassGOHook, GameObject) {
         struct Fields {
             bool m_isPassable = false;
-            bool checked = false;
+            bool m_checked = false;
         };
     };
 
     class $modify(AllPassPLHook, PlayLayer) {
+        ADD_HOOKS_DELEGATE("level.allpassable")
+
         void setupHasCompleted() {
             PlayLayer::setupHasCompleted();
-            if (!config::get<bool>("level.allpassable", false)) return;
-            for (auto obj : geode::cocos::CCArrayExt<AllPassGOHook *>(m_objects)) {
-                obj->m_fields->m_isPassable = obj->m_isPassable;
-                obj->m_fields->checked = true;
+            for (auto obj : geode::cocos::CCArrayExt<AllPassGOHook*>(m_objects)) {
+                auto fields = obj->m_fields.self();
+                fields->m_isPassable = obj->m_isPassable;
+                fields->m_checked = true;
                 obj->m_isPassable = true;
             }
         }
@@ -35,12 +37,13 @@ namespace eclipse::hacks::Player {
                ->handleKeybinds()
                ->callback([] (bool toggled) {
                 if (auto pl = utils::get<PlayLayer>()) {
-                    for (auto obj : geode::cocos::CCArrayExt<AllPassGOHook *>(pl->m_objects)) {
-                        if (!obj->m_fields->checked) {
-                            obj->m_fields->m_isPassable = obj->m_isPassable;
-                            obj->m_fields->checked = true;
+                    for (auto obj : geode::cocos::CCArrayExt<AllPassGOHook*>(pl->m_objects)) {
+                        auto fields = obj->m_fields.self();
+                        if (!fields->m_checked) {
+                            fields->m_isPassable = obj->m_isPassable;
+                            fields->m_checked = true;
                         }
-                        obj->m_isPassable = toggled || obj->m_fields->m_isPassable;
+                        obj->m_isPassable = toggled || fields->m_isPassable;
                     }
                 }
                });
