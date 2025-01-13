@@ -14,7 +14,7 @@ namespace eclipse::hacks::Player {
         };
     };
 
-    class $modify(PlayLayer) {
+    class $modify(AllPassPLHook, PlayLayer) {
         void setupHasCompleted() {
             PlayLayer::setupHasCompleted();
             if (!config::get<bool>("level.allpassable", false)) return;
