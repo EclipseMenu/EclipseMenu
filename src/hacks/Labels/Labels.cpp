@@ -352,6 +352,7 @@ namespace eclipse::hacks::Labels {
                 container->update();
             }
             for (auto& [label, update] : fields->m_absoluteLabels) {
+                label->setVisible(visible);
                 update(label);
             }
         }
@@ -390,6 +391,10 @@ namespace eclipse::hacks::Labels {
             labelsLayer->realignContainers(recreate);
         }
 
+    public:
+        static const std::vector<labels::LabelSettings> DEFAULT_LABELS;
+
+    private:
         void init() override {
             auto tab = gui::MenuTab::find("tab.labels");
             config::setIfEmpty("labels.visible", true);
@@ -397,21 +402,7 @@ namespace eclipse::hacks::Labels {
             config::setIfEmpty("labels.cheat-indicator.scale", 0.5f);
             config::setIfEmpty("labels.cheat-indicator.opacity", 0.35f);
 
-            s_labels = config::get<std::vector<labels::LabelSettings>>(
-                "labels", {
-                    {"Testmode", "{isTestMode ?? 'Testmode'}", false},
-                    {"Attempt", "Attempt {attempt}", false},
-                    {"Percentage", "{isPlatformer ? time : progress + '%'}", false},
-                    {"Level Time", "{time}", false},
-                    {"Best Run", "Best run: {runFrom}-{bestRun}%", false},
-                    {"Clock", "{clock}", false},
-                    {"FPS", "FPS: {round(fps)}", false},
-                    {"CPS", "{cps}/{clicks}/{maxCps} CPS", false}, // TODO: Add click trigger
-                    {"Noclip Accuracy", "{ noclip ?? $'Accuracy: {noclipAccuracy}%'}", false},
-                    // TODO: Add death trigger
-                    {"Noclip Deaths", "{ noclip ?? 'Deaths: ' + noclipDeaths}", false},
-                }
-            );
+            s_labels = config::get<std::vector<labels::LabelSettings>>("labels", DEFAULT_LABELS);
 
             tab->addToggle("labels.visible")
                ->callback([](bool) { updateLabels(); })
@@ -490,7 +481,7 @@ namespace eclipse::hacks::Labels {
                 );
             });
             tab->addButton("labels.add-new")->callback([this] {
-                gui::Engine::queueAfterDrawing([&] {
+                gui::Engine::queueAfterDrawing([this] {
                     labels::LabelSettings newSetting;
                     if (!s_labels.empty()) {
                         // Copy some settings from existing labels
@@ -507,6 +498,21 @@ namespace eclipse::hacks::Labels {
                     createLabelComponent();
                 });
             });
+            std::vector<std::string> presets;
+            presets.reserve(DEFAULT_LABELS.size());
+            for (const auto& preset : DEFAULT_LABELS) {
+                presets.push_back(preset.name);
+            }
+            tab->addCombo("labels.presets", presets, 0)
+               ->callback([this](int value) {
+                   if (value < 0 || value >= DEFAULT_LABELS.size()) return;
+                   auto preset = DEFAULT_LABELS[value];
+                   preset.visible = true;
+                   s_labels.push_back(std::move(preset));
+                   config::set("labels", s_labels);
+                   updateLabels(true);
+                   createLabelComponent();
+               });
             createLabelComponent();
         }
 
@@ -648,6 +654,52 @@ namespace eclipse::hacks::Labels {
 
         std::vector<std::shared_ptr<gui::LabelSettingsComponent>> m_labelToggles;
     };
+
+    const std::vector<labels::LabelSettings> Labels::DEFAULT_LABELS = {
+        {"FPS", "FPS: {round(fps)}", false},
+        {"Testmode", "{isPracticeMode ? emojis.practice + 'Practice' : isTestMode ?? emojis.startPos + 'Testmode'}", false},
+        {"Run From", "{!isPlatformer && (isPracticeMode || isTestMode) ?? 'From: ' + floor(runStart) + '%'}", false},
+        {"Attempt", "Attempt {attempt}", false},
+        {"Percentage", "{isPlatformer ? time : progress + '%'}", false},
+        {"Level Time", "{time}", false},
+        {"Best Run", "Best run: {runFrom}-{bestRun}%", false},
+        {"Clock", "{clock}", false},
+        {
+            "CPS", "{cps}/{clicks}/{maxCps} CPS", false,
+            false, 0.35f, gui::Color(1.f, 1.f, 1.f, 0.3f),
+            "bigFont.fnt", LabelsContainer::Alignment::TopLeft,
+            BMFontAlignment::Left, {0, 0}, {{
+                true, labels::LabelEvent::Type::OnButtonHold,
+                "", std::nullopt, std::nullopt,
+                gui::Color(0, 1, 0), 0.6f, std::nullopt,
+                0.f, 0.f, 0.1f
+            }}
+        },
+        {
+            "Noclip Accuracy", "{ noclip ?? $'Accuracy: {noclipAccuracy}%'}", false,
+            false, 0.35f, gui::Color(1.f, 1.f, 1.f, 0.3f),
+            "bigFont.fnt", LabelsContainer::Alignment::TopLeft,
+            BMFontAlignment::Left, {0, 0}, {{
+                true, labels::LabelEvent::Type::OnNoclipDeath,
+                "", std::nullopt, std::nullopt,
+                gui::Color(1, 0, 0), 0.6f, std::nullopt,
+                0.f, 0.f, 0.1f
+            }}
+        },
+        {
+            "Noclip Deaths", "{ noclip ?? 'Deaths: ' + noclipDeaths}", false,
+            false, 0.35f, gui::Color(1.f, 1.f, 1.f, 0.3f),
+            "bigFont.fnt", LabelsContainer::Alignment::TopLeft,
+            BMFontAlignment::Left, {0, 0}, {{
+                true, labels::LabelEvent::Type::OnNoclipDeath,
+                "", std::nullopt, std::nullopt,
+                gui::Color(1, 0, 0), 0.6f, std::nullopt,
+                0.f, 0.f, 0.1f
+            }}
+        },
+    };
+
+
 
     REGISTER_HACK(Labels)
 }

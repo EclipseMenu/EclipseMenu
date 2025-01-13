@@ -27,7 +27,6 @@ namespace eclipse::labels {
         ~LabelEvent();
 
         inline static size_t instanceCount = 0;
-        size_t id = instanceCount++;
 
         bool enabled = true;      // whether the event is enabled
         Type type = Type::Custom; // type of the event
@@ -45,6 +44,8 @@ namespace eclipse::labels {
         float delay = 0.f;    // delay before the animation starts
         float duration = 0.f; // how long the new state should last after condition is no longer met
         float easing = 0.f;   // time to ease in/out the animation (only for scale and color)
+
+        size_t id = instanceCount++;
     };
 
     /// @brief Holds information about event that happened.
