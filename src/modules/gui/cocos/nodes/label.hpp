@@ -134,6 +134,24 @@ public:
     void limitLabelWidth(float width, float defaultScale, float minScale);
 
 protected:
+    struct CachedBatch {
+        cocos2d::CCSpriteBatchNode* node = nullptr; // batch node
+        std::vector<cocos2d::CCSprite*> sprites;    // initialized sprites for this batch
+
+        CachedBatch() = default;
+        CachedBatch(cocos2d::CCSpriteBatchNode* node) : node(node) {}
+        operator bool() const { return node != nullptr; }
+        cocos2d::CCSpriteBatchNode* operator->() const { return node; }
+        cocos2d::CCSprite* operator[](size_t index) const {
+            if (index >= sprites.size()) return nullptr;
+            return sprites[index];
+        }
+        void addChild(cocos2d::CCSprite* sprite, int z, int tag) {
+            node->addChild(sprite, z, tag);
+            sprites.push_back(sprite);
+        }
+    };
+
     static int kerningAmountForChars(uint32_t first, uint32_t second, const BMFontConfiguration* config);
 
     /// @brief Hide all characters of the label.
@@ -152,9 +170,9 @@ protected:
     const BMFontDef* getFontDefForChar(
         char32_t c, const BMFontConfiguration* config,
         float& outScale, size_t& outIndex,
-        cocos2d::CCSpriteBatchNode*& outBatch,
+        CachedBatch*& outBatch,
         BMFontConfiguration*& outConfig
-    ) const;
+    );
 
     std::u32string_view parseEmoji(std::u32string_view text, uint32_t& index) const;
 
@@ -164,11 +182,11 @@ protected:
         float scaleFactor, int& nextX, int nextY, int commonHeight,
         int& longestLine, std::vector<cocos2d::CCSprite*>& currentLine,
         size_t& emojiIndex
-    ) const;
+    );
 
     /// @brief Fetches or creates a sprite with the provided rect. [Internal]
     cocos2d::CCSprite* getSpriteForChar(
-        cocos2d::CCSpriteBatchNode* batch, size_t index,
+        CachedBatch& batch, size_t index,
         float scale, cocos2d::CCRect const& rect
     ) const;
 
@@ -236,14 +254,14 @@ protected:
 
     // Children
     struct FontCfg {
-        BMFontConfiguration* config;       // font configuration
-        cocos2d::CCSpriteBatchNode* batch; // corresponding batch node
-        std::optional<float> scale;        // auto scale by default
+        BMFontConfiguration* config; // font configuration
+        CachedBatch batch;           // corresponding batch node
+        std::optional<float> scale;  // auto scale by default
     };
 
-    cocos2d::CCSpriteBatchNode* m_mainBatch = nullptr;        // Primary font batch
-    cocos2d::CCSpriteBatchNode* m_spriteSheetBatch = nullptr; // Sprite sheet batch for emoji characters
-    std::vector<FontCfg> m_fontBatches;                       // Font batches for alternate fonts
+    CachedBatch m_mainBatch;            // Primary font batch
+    CachedBatch m_spriteSheetBatch;     // Sprite sheet batch for emoji characters
+    std::vector<FontCfg> m_fontBatches; // Font batches for alternate fonts
     //  std::vector<cocos2d::CCSprite*> m_sprites;            // Classic sprites
 
     // Internal properties

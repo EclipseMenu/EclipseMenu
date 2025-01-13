@@ -120,11 +120,6 @@ bool BMFontConfiguration::parseImageFileName(std::istringstream& line, std::stri
     return true;
 }
 
-struct MyConfig : cocos2d::CCConfiguration {
-    static MyConfig* get() { return static_cast<MyConfig*>(sharedConfiguration()); }
-    GLuint maxTextureSize() const { return m_nMaxTextureSize; }
-};
-
 bool BMFontConfiguration::parseCommonArguments(std::istringstream& line) {
     std::string keypair;
 
@@ -140,7 +135,7 @@ bool BMFontConfiguration::parseCommonArguments(std::istringstream& line) {
         if (key == "lineHeight") {
             m_commonHeight = fastParse<int>(value);
         } else if (key == "scaleW" || key == "scaleH") {
-            if (fastParse<int>(value) > eclipse::utils::get<MyConfig>()->maxTextureSize()) {
+            if (fastParse<int>(value) > eclipse::utils::get<cocos2d::CCConfiguration>()->m_nMaxTextureSize) {
                 return false;
             }
         } else if (key == "pages") {
@@ -272,11 +267,11 @@ constexpr static bool isVariationSelector(char32_t c) {
 }
 
 constexpr static bool isDigit(char32_t c) {
-    return c >= 0x0030 && c <= 0x0039;
+    return c <= 0x0039 && c >= 0x0030;
 }
 
 constexpr static bool shouldParseDigitRegionalIndicator(std::u32string_view text) {
-    return isDigit(text[0]) && text.size() > 2 && isVariationSelector(text[1]) && text[2] == 0x20E3;
+    return isDigit(text[0]) && text.size() > 2 && text[2] == 0x20E3 && isVariationSelector(text[1]);
 }
 
 Label* Label::create(std::string_view text, std::string_view font) {
@@ -411,7 +406,7 @@ void Label::addFont(std::string_view font, std::optional<float> scale) {
     // add the font
     auto batch = cocos2d::CCSpriteBatchNode::create(newConfig->getAtlasName().c_str());
     batch->setID(fmt::format("font-batch-{}", m_fontBatches.size()));
-    m_fontBatches.push_back({newConfig, batch, scale});
+    m_fontBatches.push_back({newConfig, CachedBatch(batch), scale});
     this->addChild(batch, 0, m_fontBatches.size());
 }
 
@@ -422,7 +417,7 @@ void Label::enableEmojis(std::string_view sheetFileName, const EmojiMap* frameNa
     } else {
         m_spriteSheetBatch = cocos2d::CCSpriteBatchNode::create(sheetFileName.data());
         m_spriteSheetBatch->setID("emoji-sheet");
-        this->addChild(m_spriteSheetBatch, 0, -1);
+        this->addChild(m_spriteSheetBatch.node, 0, -1);
     }
     m_emojiMap = frameNames;
 }
@@ -466,8 +461,8 @@ void Label::setAlignment(BMFontAlignment alignment) {
 }
 
 void Label::limitLabelWidth(float width, float defaultScale, float minScale) {
-    auto originalWidth = getContentSize().width;
-    auto scale = this->getScale();
+    auto originalWidth = m_obContentSize.width;
+    auto scale = this->m_fScaleX;
     if (originalWidth > width && width > 0.0f) {
         scale = width / originalWidth;
     }
@@ -492,7 +487,8 @@ int Label::kerningAmountForChars(uint32_t first, uint32_t second, const BMFontCo
 void Label::hideAllChars() const {
     for (auto& line : m_lines) {
         for (auto& charSprite : line) {
-            charSprite->setVisible(false);
+            charSprite->m_bVisible = false;
+            charSprite->m_bDirty = true;
         }
     }
 }
@@ -502,7 +498,7 @@ void Label::updateAlignment() const {
         return;
     }
 
-    auto contentSize = this->getContentSize();
+    auto contentWidth = this->m_obContentSize.width;
 
     for (auto& line : m_lines) {
         if (line.empty()) {
@@ -512,13 +508,13 @@ void Label::updateAlignment() const {
         float offset = 0;
         if (m_alignment == BMFontAlignment::Right) {
             auto last = line.back();
-            offset = contentSize.width - last->getPositionX() - last->getScaledContentWidth() * 0.5;
+            offset = contentWidth - last->m_obPosition.x - last->m_obContentSize.width * last->m_fScaleX * 0.5;
         } else if (m_alignment == BMFontAlignment::Center) {
             auto first = line.front();
             auto last = line.back();
-            auto endPos = last->getPositionX() + last->getScaledContentWidth() * 0.5;
-            auto startPos = first->getPositionX() - first->getScaledContentWidth() * 0.5;
-            offset = (contentSize.width - endPos + startPos) * 0.5;
+            auto endPos = last->m_obPosition.x + last->m_obContentSize.width * last->m_fScaleX * 0.5;
+            auto startPos = first->m_obPosition.x - first->m_obContentSize.width * first->m_fScaleX * 0.5;
+            offset = (contentWidth - endPos + startPos) * 0.5;
         } else if (m_alignment == BMFontAlignment::Justify) {
             // TODO: justify
         }
@@ -528,7 +524,7 @@ void Label::updateAlignment() const {
         }
 
         for (auto& charSprite : line) {
-            charSprite->setPositionX(charSprite->getPositionX() + offset);
+            charSprite->setPositionX(charSprite->m_obPosition.x + offset);
         }
     }
 }
@@ -584,11 +580,11 @@ void Label::updateCharsWrapped() {
 
     BMFontConfiguration* currentConfig = m_fontConfig;
     const BMFontDef* fontDef = nullptr;
-    char32_t prevChar = -1;
+    char32_t prevChar;
     int kerningAmount = 0;
     int nextX = 0;
     int longestLine = 0;
-    auto scaleFactor = eclipse::utils::get<cocos2d::CCDirector>()->getContentScaleFactor();
+    auto scaleFactor = eclipse::utils::get<cocos2d::CCDirector>()->m_fContentScaleFactor;
 
     auto& spaceDef = mainCharset.at(' ');
     auto spaceWidth = (m_extraKerning + spaceDef.xAdvance) / scaleFactor;
@@ -599,7 +595,6 @@ void Label::updateCharsWrapped() {
     struct Word {
         std::vector<cocos2d::CCSprite*> sprites;
         float xOffset = 0.f;
-        float xAdvance = 0.f;
         int fromX = 0;
         int toX = 0;
     };
@@ -631,7 +626,7 @@ void Label::updateCharsWrapped() {
                 // find the font definition for the character
                 float scale = 1.f;
                 size_t fontIndex = 0;
-                cocos2d::CCSpriteBatchNode* currentBatch = m_mainBatch;
+                auto* currentBatch = &m_mainBatch;
 
                 if (m_spriteSheetBatch && shouldParseDigitRegionalIndicator(word.substr(k))) {
                     checkForEmoji(
@@ -667,29 +662,26 @@ void Label::updateCharsWrapped() {
                 };
 
                 // Re-using existing sprites for performance reasons
-                auto fontChar = getSpriteForChar(currentBatch, index, scale, rect);
+                auto fontChar = getSpriteForChar(*currentBatch, index, scale, rect);
                 currentSpriteWord.sprites.push_back(fontChar);
 
                 rect.size.width *= scale;
                 rect.size.height *= scale;
 
                 int yOffset = commonHeight - fontDef->yOffset * scale;
-                cocos2d::CCPoint fontPos = {
-                    static_cast<float>(nextX) + fontDef->xOffset * scale + fontDef->rect.size.width * 0.5f * scale + kerningAmount,
+
+                auto& pos = fontChar->m_obPosition;
+                pos.x = (
+                    static_cast<float>(nextX) + fontDef->xOffset * scale + fontDef->rect.size.width * 0.5f * scale + kerningAmount
+                ) / scaleFactor;
+                pos.y = (
                     static_cast<float>(nextY) + yOffset - rect.size.height * 0.5f * scaleFactor
-                };
-                fontChar->setPosition({
-                    fontPos.x / scaleFactor,
-                    fontPos.y / scaleFactor
-                });
+                ) / scaleFactor;
 
                 // update kerning
                 auto advance = m_extraKerning + fontDef->xAdvance * scale + kerningAmount;
                 nextX += advance;
                 prevChar = c;
-
-                // store last character advance
-                currentSpriteWord.xAdvance = advance / scaleFactor;
 
                 ++index;
             }
@@ -700,7 +692,6 @@ void Label::updateCharsWrapped() {
             currentSpriteLine.push_back(std::move(currentSpriteWord));
             currentSpriteWord.sprites.clear();
             currentSpriteWord.xOffset = 0;
-            currentSpriteWord.xAdvance = 0;
         }
 
         // add the line to the lines
@@ -727,13 +718,13 @@ void Label::updateCharsWrapped() {
 
             if (!word.sprites.empty()) {
                 // add the word to the line
-                float startX = word.sprites.front()->getPositionX() - word.sprites.front()->getScaledContentSize().width * 0.5f;
+                auto front = word.sprites.front();
+                float startX = front->m_obPosition.x - front->m_obContentSize.width * front->m_fScaleX * 0.5f;
                 for (auto& sprite : word.sprites) {
-                    float diff = sprite->getPositionX() - startX;
-                    sprite->setPositionX(nextX + diff);
+                    sprite->m_obPosition.x += nextX - startX;
                     currentLine.push_back(sprite);
                 }
-                nextX += wordWidth /*+ word.xAdvance*/;
+                nextX += wordWidth;
             }
 
             // append space
@@ -751,8 +742,7 @@ void Label::updateCharsWrapped() {
     int nextY = commonHeightScaled * m_lines.size() - commonHeightScaled;
     for (auto& line : m_lines) {
         for (auto& sprite : line) {
-            float posY = sprite->getPositionY();
-            sprite->setPositionY(nextY + posY);
+            sprite->m_obPosition.y += nextY;
         }
         nextY -= commonHeightScaled;
     }
@@ -780,8 +770,8 @@ void Label::updateCharsWrapped() {
 
 const BMFontDef* Label::getFontDefForChar(
     char32_t c, const BMFontConfiguration* config, float& outScale, size_t& outIndex,
-    cocos2d::CCSpriteBatchNode*& outBatch, BMFontConfiguration*& outConfig
-) const {
+    CachedBatch*& outBatch, BMFontConfiguration*& outConfig
+) {
     auto& mainCharset = config->getFontDefDictionary();
     auto it = mainCharset.find(c);
     if (it != mainCharset.end()) {
@@ -797,7 +787,7 @@ const BMFontDef* Label::getFontDefForChar(
 
     // check other fonts
     for (size_t i = 0; i < m_fontBatches.size(); ++i) {
-        const auto& [config, batch, scale] = m_fontBatches[i];
+        auto& [config, batch, scale] = m_fontBatches[i];
         auto& charset = config->getFontDefDictionary();
         it = charset.find(c);
         if (it != charset.end()) {
@@ -810,7 +800,7 @@ const BMFontDef* Label::getFontDefForChar(
                 outScale = m_fontConfig->getCommonHeight() / static_cast<float>(config->getCommonHeight());
             }
             outIndex = i + 1;
-            outBatch = batch;
+            outBatch = &batch;
             outConfig = config;
             return &it->second;
         }
@@ -862,19 +852,19 @@ std::u32string_view Label::parseEmoji(std::u32string_view text, uint32_t& index)
 void Label::checkForEmoji(
     std::u32string_view text, uint32_t& index, float scaleFactor, int& nextX, int nextY, int commonHeight,
     int& longestLine, std::vector<cocos2d::CCSprite*>& currentLine, size_t& emojiIndex
-) const {
-    if (m_spriteSheetBatch == nullptr) {
+) {
+    if (!m_spriteSheetBatch) {
         return;
     }
 
     auto decodedEmoji = parseEmoji(text, index);
     auto emojiIt = m_emojiMap->find(decodedEmoji);
     if (emojiIt != m_emojiMap->end()) {
-        auto sprite = static_cast<cocos2d::CCSprite*>(m_spriteSheetBatch->getChildByTag(static_cast<int>(emojiIndex)));
+        auto sprite = m_spriteSheetBatch[emojiIndex];
         if (!sprite) {
             // create new sprite
             sprite = cocos2d::CCSprite::createWithSpriteFrameName(emojiIt->second);
-            m_spriteSheetBatch->addChild(sprite, emojiIndex, emojiIndex);
+            m_spriteSheetBatch.addChild(sprite, emojiIndex, emojiIndex);
 
             // modify opacity and color
             if (m_useEmojiColors) {
@@ -883,8 +873,8 @@ void Label::checkForEmoji(
             sprite->setOpacity(m_opacity);
         } else {
             auto spriteFrame = eclipse::utils::get<cocos2d::CCSpriteFrameCache>()->spriteFrameByName(emojiIt->second);
+            sprite->m_bVisible = true;
             sprite->setTextureRect(spriteFrame->getRect(), spriteFrame->isRotated(), spriteFrame->getOriginalSize());
-            sprite->setVisible(true);
         }
 
         // calculate size
@@ -917,15 +907,15 @@ void Label::checkForEmoji(
 }
 
 cocos2d::CCSprite* Label::getSpriteForChar(
-    cocos2d::CCSpriteBatchNode* batch, size_t index, float scale, cocos2d::CCRect const& rect
+    CachedBatch& batch, size_t index, float scale, cocos2d::CCRect const& rect
 ) const {
-    auto fontChar = static_cast<cocos2d::CCSprite*>(batch->getChildByTag(static_cast<int>(index)));
+    auto fontChar = batch[index];
     if (!fontChar) {
         fontChar = new cocos2d::CCSprite();
 
         fontChar->initWithTexture(batch->getTexture(), rect);
         fontChar->setScale(scale);
-        batch->addChild(fontChar, index, index);
+        batch.addChild(fontChar, index, index);
         fontChar->release();
 
         // Apply label properties
@@ -936,7 +926,7 @@ cocos2d::CCSprite* Label::getSpriteForChar(
         fontChar->updateDisplayedOpacity(m_opacity);
     } else {
         // reusing existing sprite
-        fontChar->setVisible(true);
+        fontChar->m_bVisible = true;
         fontChar->setTextureRect(rect, false, rect.size);
     }
     return fontChar;
@@ -998,9 +988,8 @@ void Label::updateChars() {
 
         size_t fontIndex = 0;
         float scale = 1.f;
-        cocos2d::CCSpriteBatchNode* batch = m_mainBatch;
-
-        if (m_spriteSheetBatch && shouldParseDigitRegionalIndicator(m_unicodeText.substr(i))) {
+        auto* batch = &m_mainBatch;
+        if (m_spriteSheetBatch && shouldParseDigitRegionalIndicator(std::u32string_view(m_unicodeText).substr(i))) {
             checkForEmoji(
                 m_unicodeText, i, scaleFactor,
                 nextX, nextY, commonHeight,
@@ -1030,7 +1019,7 @@ void Label::updateChars() {
         };
 
         // Re-using existing sprites for performance reasons
-        auto fontChar = getSpriteForChar(batch, index, scale, rect);
+        auto fontChar = getSpriteForChar(*batch, index, scale, rect);
         currentLine.push_back(fontChar);
 
         rect.size.width *= scale;
@@ -1076,7 +1065,7 @@ void Label::updateColors() const {
                 continue;
             }
 
-            if (charSprite->getParent() == m_spriteSheetBatch) {
+            if (charSprite->m_pParent == m_spriteSheetBatch.node) {
                 charSprite->updateDisplayedColor(cocos2d::ccc3(255, 255, 255));
             } else {
                 charSprite->updateDisplayedColor(m_color);
@@ -1109,7 +1098,7 @@ bool Label::init(std::string_view text, std::string_view font, BMFontAlignment a
 
     m_mainBatch->setID("main-batch");
     this->setScale(scale);
-    this->addChild(m_mainBatch, 0, 0);
+    this->addChild(m_mainBatch.node, 0, 0);
 
     this->setAnchorPoint({0.5f, 0.5f});
     this->setString(text);
