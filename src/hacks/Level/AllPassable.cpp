@@ -4,22 +4,24 @@
 #include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GameObject.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Player {
     class $modify(AllPassGOHook, GameObject) {
         struct Fields {
             bool m_isPassable = false;
+            bool checked = false;
         };
+    };
 
-        ENABLE_SAFE_HOOKS_ALL()
-
-        void customSetup() {
-            GameObject::customSetup();
-
-            m_fields->m_isPassable = m_isPassable;
-            // Because in the editor, uh stuff might get messed up
-            if (PlayLayer::get()) {
-                m_isPassable = config::get<bool>("level.allpassable", true) || m_fields->m_isPassable;
+    class $modify(PlayLayer) {
+        void setupHasCompleted() {
+            PlayLayer::setupHasCompleted();
+            if (!config::get<bool>("level.allpassable", false)) return;
+            for (auto obj : geode::cocos::CCArrayExt<AllPassGOHook *>(m_objects)) {
+                obj->m_fields->m_isPassable = obj->m_isPassable;
+                obj->m_fields->checked = true;
+                obj->m_isPassable = true;
             }
         }
     };
@@ -31,9 +33,13 @@ namespace eclipse::hacks::Player {
             tab->addToggle("level.allpassable")
                ->setDescription()
                ->handleKeybinds()
-               ->callback([this] (bool toggled) {
-                if (auto pl = PlayLayer::get()) {
-                    for (auto obj : geode::cocos::CCArrayExt<AllPassGOHook>(pl->m_objects)) {
+               ->callback([] (bool toggled) {
+                if (auto pl = utils::get<PlayLayer>()) {
+                    for (auto obj : geode::cocos::CCArrayExt<AllPassGOHook *>(pl->m_objects)) {
+                        if (!obj->m_fields->checked) {
+                            obj->m_fields->m_isPassable = obj->m_isPassable;
+                            obj->m_fields->checked = true;
+                        }
                         obj->m_isPassable = config::get<bool>("level.allpassable", true) || obj->m_fields->m_isPassable;
                     }
                 }
