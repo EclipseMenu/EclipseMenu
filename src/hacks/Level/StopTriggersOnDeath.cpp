@@ -6,7 +6,7 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class StopTriggersOnDeath : public hack::Hack {
+    class $hack(StopTriggersOnDeath) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.stoptrigondeath")->setDescription()->handleKeybinds();

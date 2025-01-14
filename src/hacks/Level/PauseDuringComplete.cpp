@@ -6,7 +6,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class PauseDuringComplete : public hack::Hack {
+    class $hack(PauseDuringComplete) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.pauseduringcomplete")->setDescription()->handleKeybinds();

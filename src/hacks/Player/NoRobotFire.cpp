@@ -6,7 +6,7 @@
 #include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Player {
-    class NoRobotFire : public hack::Hack {
+    class $hack(NoRobotFire) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.norobotfire")->setDescription()->handleKeybinds();

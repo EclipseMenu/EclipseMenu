@@ -6,7 +6,7 @@
 #include <Geode/modify/UILayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class CheckpointDelay : public hack::Hack {
+    class $hack(CheckpointDelay) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.checkpointdelay")->handleKeybinds()->setDescription();

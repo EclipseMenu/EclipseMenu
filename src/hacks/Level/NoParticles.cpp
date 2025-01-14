@@ -42,7 +42,7 @@ namespace eclipse::hacks::Level {
         }
     }
 
-    class NoParticles : public hack::Hack {
+    class $hack(NoParticles) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
 

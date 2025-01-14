@@ -6,7 +6,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class ZeroPercentPractice : public hack::Hack {
+    class $hack(ZeroPercentPractice) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.zeropercentpractice")->handleKeybinds()->setDescription();

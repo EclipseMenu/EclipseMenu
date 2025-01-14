@@ -7,7 +7,7 @@
 #include <Geode/modify/HardStreak.hpp>
 
 namespace eclipse::hacks::Player {
-    class CustomWaveTrail : public hack::Hack {
+    class $hack(CustomWaveTrail) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
 

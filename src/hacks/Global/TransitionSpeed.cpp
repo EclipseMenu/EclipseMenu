@@ -6,7 +6,7 @@
 #include <Geode/modify/CCTransitionFade.hpp>
 
 namespace eclipse::hacks::Global {
-    class TransitionSpeed : public hack::Hack {
+    class $hack(TransitionSpeed) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
 

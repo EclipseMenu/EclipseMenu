@@ -29,7 +29,7 @@ namespace eclipse::hacks::Global {
         utils::get<FMODAudioEngine>()->m_backgroundMusicChannel->addDSP(0, pitchShifter);
     }
 
-    class PitchShift : public hack::Hack {
+    class $hack(PitchShift) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
 

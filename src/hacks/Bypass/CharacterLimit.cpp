@@ -6,7 +6,7 @@
 #include <Geode/modify/CCTextInputNode.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class CharLimit : public hack::Hack {
+    class $hack(CharLimit) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.charlimit")->handleKeybinds()->setDescription();

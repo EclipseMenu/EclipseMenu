@@ -6,7 +6,7 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Player {
-    class AutoClicker : public hack::Hack {
+    class $hack(AutoClicker) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
 
@@ -25,7 +25,7 @@ namespace eclipse::hacks::Player {
                });
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("player.autoclick", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("player.autoclick"); }
         [[nodiscard]] const char* getId() const override { return "Auto Clicker"; }
     };
 

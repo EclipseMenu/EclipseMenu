@@ -6,13 +6,13 @@
 #include <Geode/modify/ShaderLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class NoShader : public hack::Hack {
+    class $hack(NoShader) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.noshader")->handleKeybinds()->setDescription();
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("level.noshader", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("level.noshader"); }
         [[nodiscard]] const char* getId() const override { return "No Shaders"; }
     };
 

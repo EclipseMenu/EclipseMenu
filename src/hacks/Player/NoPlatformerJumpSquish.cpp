@@ -6,7 +6,7 @@
 #include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Player {
-    class NoPlatformerJumpSquish : public hack::Hack {
+    class $hack(NoPlatformerJumpSquish) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.noplatformersquish")->setDescription()->handleKeybinds();

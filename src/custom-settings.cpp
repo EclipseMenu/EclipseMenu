@@ -1,5 +1,7 @@
-#include <Geode/loader/SettingV3.hpp>
+#include <Geode/binding/ButtonSprite.hpp>
 #include <Geode/loader/Mod.hpp>
+#include <Geode/loader/SettingV3.hpp>
+#include <Geode/ui/Popup.hpp>
 #include <modules/gui/theming/manager.hpp>
 
 using namespace geode::prelude;

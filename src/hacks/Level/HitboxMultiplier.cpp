@@ -65,7 +65,7 @@ namespace eclipse::hacks::Level {
         s_rotatedGameObject = nullptr;
     }
 
-    class HitboxMultiplier : public hack::Hack {
+    class $hack(HitboxMultiplier) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
 
@@ -83,7 +83,7 @@ namespace eclipse::hacks::Level {
                });
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("level.hitbox_multiplier", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("level.hitbox_multiplier"); }
         [[nodiscard]] const char* getId() const override { return "Hitbox Multiplier"; }
     };
 

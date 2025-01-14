@@ -14,7 +14,7 @@ namespace eclipse::hacks::Level {
     static std::vector<StartPosObject*> startPosObjects;
     static int32_t currentStartPosIndex = 0;
 
-    class StartPosSwitcher : public hack::Hack {
+    class $hack(StartPosSwitcher) {
     public:
         void init() override {
             config::setIfEmpty("level.startpos_switcher", false);

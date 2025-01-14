@@ -25,7 +25,7 @@ namespace eclipse::hacks::Level {
         }
     };
 
-    class LegacyReversePhysics : public hack::Hack {
+    class $hack(LegacyReversePhysics) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
 
@@ -39,8 +39,9 @@ namespace eclipse::hacks::Level {
 
         //player would be cheating only if level is new physics and legacy physics is active
         //otherwise the hack being on doesn't matter
-        [[nodiscard]] bool isCheating() override {
-            if (!config::get<bool>("level.legacyreversephysics", false)) return false;
+        [[nodiscard]] bool isCheating() const override {
+            CACHE_CONFIG_BOOL(legacyPhysics, "level.legacyreversephysics");
+            if (!legacyPhysics) return false;
             auto pl = utils::get<PlayLayer>();
             if (!pl) return false;
 

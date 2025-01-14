@@ -6,7 +6,7 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class PlatGamemodes : public hack::Hack {
+    class $hack(PlatGamemodes) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.platgamemodes")->setDescription()->handleKeybinds();

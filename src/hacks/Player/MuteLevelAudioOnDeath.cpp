@@ -7,7 +7,7 @@
 #include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Player {
-    class MuteLevelAudioOnDeath : public hack::Hack {
+    class $hack(MuteLevelAudioOnDeath) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.mutelevelaudioondeath")->setDescription()->handleKeybinds();

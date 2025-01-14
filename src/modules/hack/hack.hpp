@@ -3,8 +3,6 @@
 #include <memory>
 #include <utils.hpp>
 
-#define REGISTER_HACK(hackClass) $execute { eclipse::hack::Hack::registerHack<hackClass>(); }
-
 constexpr int32_t SAFE_HOOK_PRIORITY = 0x500000;
 constexpr int32_t FIRST_HOOK_PRIORITY = -0x500000;
 
@@ -141,30 +139,31 @@ static void onModify(auto& self) {\
     HOOKS_TOGGLE_ALL(id);\
 }
 
+// Makes a fast static variable that is updated when the config changes
+#define CACHE_CONFIG(type, name, cfg, default) \
+    static type name = (config::addDelegate(cfg, [] { \
+        name = config::get<type>(cfg, default); \
+    }), config::get<type>(cfg, default))
+
+// Makes a fast static bool variable that is updated when the config changes
+#define CACHE_CONFIG_BOOL(name, cfg) CACHE_CONFIG(bool, name, cfg, false)
+
+// Uses the cached bool and returns it in one macro
+#define RETURN_CACHED_BOOL(cfg) CACHE_CONFIG_BOOL(cached, cfg); return cached
+
+#ifdef GEODE_IS_WINDOWS
+    #define ECLIPSE_DLL __declspec(dllexport)
+#else
+    #define ECLIPSE_DLL __attribute__((visibility("default")))
+#endif
+
 namespace eclipse::hack {
     /// @brief Base class for all hacks.
+    /// @tparam V Hack class type. Used for some preprocessor magic.
+    template <typename V>
     class Hack {
     public:
         virtual ~Hack() = default;
-
-        /// @brief Registers a hack to be initialized
-        static void registerHack(std::shared_ptr<Hack> hack);
-
-        /// @brief Registers a hack by its type.
-        template <typename T, typename = std::enable_if_t<std::is_base_of_v<Hack, T>>>
-        static void registerHack() { registerHack(std::make_shared<T>()); }
-
-        /// @brief Finds a hack by its ID.
-        [[nodiscard]] static std::weak_ptr<Hack> find(const std::string& id);
-
-        /// @brief Get all registered hacks.
-        [[nodiscard]] static const std::vector<std::shared_ptr<Hack>>& getHacks();
-
-        /// @brief Initializes all hacks.
-        static void initializeHacks();
-
-        /// @brief Late initializes all hacks.
-        static void lateInitializeHacks();
 
         /// @brief Initializes the hack. Used to add GUI elements.
         virtual void init() = 0;
@@ -175,13 +174,63 @@ namespace eclipse::hack {
         /// @brief Callback for CCSchedule::update, called every frame.
         virtual void update() {}
 
-        /// @brief Returns whether the hack should be considered cheating and is enabled.
-        [[nodiscard]] virtual bool isCheating() { return false; }
+        /// @brief Check whether the hack should trip the safe mode.
+        [[nodiscard]] virtual bool isCheating() const { return false; }
 
         /// @brief Get the hack's ID. (unique identifier)
         [[nodiscard]] virtual const char* getId() const = 0;
 
         /// @brief Get hack's position priority (used for sorting)
         [[nodiscard]] virtual int32_t getPriority() const { return 0; }
+
+        static constexpr bool HAS_IS_CHEATING = !std::is_same_v<decltype(&V::isCheating), decltype(&Hack::isCheating)>;
+        static constexpr bool HAS_UPDATE = !std::is_same_v<decltype(&V::update), decltype(&Hack::update)>;
     };
+
+    using BaseHack = Hack<void>;
+    using HackPtr = std::shared_ptr<BaseHack>;
+    using WeakHackPtr = std::weak_ptr<BaseHack>;
+
+    /// @brief Finds a hack by its ID.
+    [[nodiscard]] WeakHackPtr find(std::string_view id);
+
+    /// @brief Get all registered hacks. (non-const)
+    [[nodiscard]] std::vector<HackPtr>& getHacks();
+
+    /// @brief Get hacks that have an update method.
+    [[nodiscard]] std::vector<HackPtr>& getUpdatedHacks();
+
+    /// @brief Get hacks that have an isCheating method.
+    [[nodiscard]] std::vector<HackPtr>& getCheatingHacks();
+
+    /// @brief Check if all hacks have already been initialized.
+    [[nodiscard]] bool isLateInit();
+
+    /// @brief Initializes all hacks.
+    void initializeHacks();
+
+    /// @brief Late initializes all hacks.
+    void lateInitializeHacks();
+
+    template <typename T>
+    void registerHack() {
+        auto& hacks = getHacks();
+        auto hack = std::make_shared<T>();
+        auto ptr = std::reinterpret_pointer_cast<BaseHack>(hack);
+        hacks.push_back(ptr);
+        if (isLateInit()) {
+            hack->init();
+        }
+
+        if constexpr (T::HAS_UPDATE) {
+            getUpdatedHacks().push_back(ptr);
+        }
+        if constexpr (T::HAS_IS_CHEATING) {
+            getCheatingHacks().push_back(ptr);
+        }
+    }
+
+    #define REGISTER_HACK(hackClass) $execute { eclipse::hack::registerHack<hackClass>(); }
+
+    #define $hack(name) dummy_##name##_hack; struct ECLIPSE_DLL name : eclipse::hack::Hack<name>
 }

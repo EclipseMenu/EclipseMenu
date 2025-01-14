@@ -70,7 +70,7 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         config::setIfEmpty("menu.toggleKey", keybinds::Keys::Tab);
         key.setKey(config::get<keybinds::Keys>("menu.toggleKey", keybinds::Keys::Tab));
         key.setInitialized(true);
-        hack::Hack::lateInitializeHacks();
+        hack::lateInitializeHacks();
 
         s_isInitialized = true;
 
@@ -93,7 +93,7 @@ public:
     }
 
     void update(float dt) override {
-        for (const auto& hack : hack::Hack::getHacks())
+        for (const auto& hack : hack::getUpdatedHacks())
             hack->update();
 
         // Add ability for ImGui to capture right click
@@ -126,7 +126,7 @@ $on_mod(Loaded) {
     i18n::init();
 
     // Initialize the hacks.
-    hack::Hack::initializeHacks();
+    hack::initializeHacks();
 
     // Load keybinds
     keybinds::Manager::get()->init();

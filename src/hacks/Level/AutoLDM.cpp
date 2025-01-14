@@ -8,7 +8,7 @@
 
 namespace eclipse::hacks::Level {
 
-    class AutoLDM : public hack::Hack {
+    class $hack(AutoLDM) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.autoldm")->handleKeybinds()->setDescription();

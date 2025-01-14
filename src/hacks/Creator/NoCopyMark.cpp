@@ -6,7 +6,7 @@
 #include <Geode/modify/EditLevelLayer.hpp>
 
 namespace eclipse::hacks::Creator {
-    class NoCopyMark : public hack::Hack {
+    class $hack(NoCopyMark) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("creator.nocopymark")->handleKeybinds()->setDescription();

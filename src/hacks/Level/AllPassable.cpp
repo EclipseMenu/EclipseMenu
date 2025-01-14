@@ -28,7 +28,7 @@ namespace eclipse::hacks::Player {
         }
     };
 
-    class AllPassable : public hack::Hack {
+    class $hack(AllPassable) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
 
@@ -49,7 +49,7 @@ namespace eclipse::hacks::Player {
                });
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("level.allpassable", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("level.allpassable"); }
         [[nodiscard]] const char* getId() const override { return "All Passable"; }
     };
 

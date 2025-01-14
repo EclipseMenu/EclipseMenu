@@ -7,7 +7,7 @@
 #include <Geode/modify/SongSelectNode.hpp>
 
 namespace eclipse::hacks::Creator {
-    class DefaultSongBypass : public hack::Hack {
+    class $hack(DefaultSongBypass) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("creator.defaultsongbypass")->handleKeybinds()->setDescription();

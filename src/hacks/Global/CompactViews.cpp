@@ -7,7 +7,7 @@
 #include <Geode/modify/LevelCell.hpp>
 
 namespace eclipse::hacks::Global {
-    class CompactEditorLevels : public hack::Hack {
+    class $hack(CompactEditorLevels) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addToggle("global.compacteditorlevels")->handleKeybinds()->setDescription();
@@ -16,7 +16,7 @@ namespace eclipse::hacks::Global {
         [[nodiscard]] const char* getId() const override { return "Compact Editor Levels"; }
     };
 
-    class CompactProfileComments : public hack::Hack {
+    class $hack(CompactProfileComments) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addToggle("global.compactprofilecomments")->handleKeybinds()->setDescription();

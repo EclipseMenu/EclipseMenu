@@ -11,7 +11,7 @@
 #include <Geode/modify/SecretLayer2.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class UnlockVaults : public hack::Hack {
+    class $hack(UnlockVaults) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.unlockvaults")->handleKeybinds()->setDescription();

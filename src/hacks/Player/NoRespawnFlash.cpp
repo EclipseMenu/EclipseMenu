@@ -6,7 +6,7 @@
 #include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Player {
-    class NoRespawnFlash : public hack::Hack {
+    class $hack(NoRespawnFlash) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.norespawnflash")->setDescription()->handleKeybinds();

@@ -6,7 +6,7 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class LevelKick : public hack::Hack {
+    class $hack(LevelKick) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.levelkick")->handleKeybinds()->setDescription();

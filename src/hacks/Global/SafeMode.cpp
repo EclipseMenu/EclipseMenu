@@ -25,14 +25,13 @@ namespace eclipse::hacks::Global {
     // Whether the last attempt had tripped any cheats
     bool s_trippedLastAttempt = false;
 
-    class AutoSafeMode : public hack::Hack {
-    public:
+    class $hack(AutoSafeMode) {
         static bool hasCheats() {
             for (auto& [_, callback] : api::getCheats()) {
                 if (callback()) return true;
             }
 
-            const auto& hacks = hack::Hack::getHacks();
+            const auto& hacks = hack::getCheatingHacks();
             return std::ranges::any_of(hacks, [](auto& hack) {
                 return hack->isCheating();
             });
@@ -46,7 +45,7 @@ namespace eclipse::hacks::Global {
         }
 
         static void updateCheatStates() {
-            for (const auto& hack : hack::Hack::getHacks()) {
+            for (const auto& hack : hack::getCheatingHacks()) {
                 if (hack->isCheating()) {
                     s_attemptCheats[hack->getId()] = true;
                 } else if (s_attemptCheats.contains(hack->getId())) {
@@ -87,7 +86,6 @@ namespace eclipse::hacks::Global {
             )->show();
         }
 
-    private:
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
 
@@ -106,7 +104,7 @@ namespace eclipse::hacks::Global {
         [[nodiscard]] const char* getId() const override { return "Auto Safe Mode"; }
     };
 
-    class SafeMode : public hack::Hack {
+    class $hack(SafeMode) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
 

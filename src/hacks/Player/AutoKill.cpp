@@ -8,7 +8,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Player {
-    class AutoKill : public hack::Hack {
+    class $hack(AutoKill) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
 

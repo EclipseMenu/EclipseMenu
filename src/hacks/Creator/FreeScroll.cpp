@@ -6,7 +6,7 @@
 #include <Geode/modify/EditorUI.hpp>
 
 namespace eclipse::hacks::Creator {
-    class FreeScroll : public hack::Hack {
+    class $hack(FreeScroll) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("creator.freescroll")->handleKeybinds()->setDescription();

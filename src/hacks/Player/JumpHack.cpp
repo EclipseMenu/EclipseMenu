@@ -7,13 +7,13 @@
 #include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Player {
-    class JumpHack : public hack::Hack {
+    class $hack(JumpHack) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.jumphack")->setDescription()->handleKeybinds();
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("player.jumphack", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("player.jumphack"); }
         [[nodiscard]] const char* getId() const override { return "Jump Hack"; }
     };
 

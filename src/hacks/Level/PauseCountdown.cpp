@@ -9,7 +9,7 @@
 using namespace geode::prelude;
 
 namespace eclipse::hacks::Level {
-    class PauseCount : public hack::Hack {
+    class $hack(PauseCount) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
 

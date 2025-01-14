@@ -6,7 +6,7 @@
 #include <Geode/modify/GameManager.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class UnlockShops : public hack::Hack {
+    class $hack(UnlockShops) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.unlockshops")->handleKeybinds()->setDescription();

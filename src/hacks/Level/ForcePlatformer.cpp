@@ -7,7 +7,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class ForcePlatformer : public hack::Hack {
+    class $hack(ForcePlatformer) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.forceplatformer")->handleKeybinds()->setDescription();

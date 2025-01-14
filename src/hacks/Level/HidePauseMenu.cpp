@@ -6,7 +6,7 @@
 #include <Geode/modify/PauseLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class HidePause : public hack::Hack {
+    class $hack(HidePause) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.hidepause")->handleKeybinds()->setDescription();

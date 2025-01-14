@@ -6,7 +6,7 @@
 #include <Geode/modify/LevelInfoLayer.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class CopyBypass : public hack::Hack {
+    class $hack(CopyBypass) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("bypass.copybypass")->handleKeybinds()->setDescription();

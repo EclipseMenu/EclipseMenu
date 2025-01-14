@@ -8,13 +8,13 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class ShowTriggers : public hack::Hack {
+    class $hack(ShowTriggers) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.showtriggers")->handleKeybinds()->setDescription();
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("level.showtriggers", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("level.showtriggers"); }
         [[nodiscard]] const char* getId() const override { return "Show Triggers"; }
     };
 

@@ -6,7 +6,7 @@
 #include <Geode/modify/UILayer.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class PauseBuffering : public hack::Hack {
+    class $hack(PauseBuffering) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.pausebuffering")->handleKeybinds()->setDescription();

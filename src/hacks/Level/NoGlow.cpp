@@ -6,7 +6,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class NoGlow : public hack::Hack {
+    class $hack(NoGlow) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.noglow")->handleKeybinds()->setDescription();

@@ -6,7 +6,7 @@
 #include <Geode/modify/GameToolbox.hpp>
 
 namespace eclipse::hacks::Global {
-    class NoShortNumbers : public hack::Hack {
+    class $hack(NoShortNumbers) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addToggle("global.noshortnumbers")->setDescription()->handleKeybinds()

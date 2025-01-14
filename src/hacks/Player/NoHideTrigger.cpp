@@ -7,7 +7,7 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Player {
-    class NoHideTrigger : public hack::Hack {
+    class $hack(NoHideTrigger) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.nohidetrigger")->setDescription()->handleKeybinds();

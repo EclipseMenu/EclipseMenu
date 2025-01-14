@@ -11,7 +11,7 @@
 #include <Geode/modify/PauseLayer.hpp>
 
 namespace eclipse::hacks::Creator {
-    class LevelEdit : public hack::Hack {
+    class $hack(LevelEdit) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("creator.leveledit")->handleKeybinds()->setDescription();

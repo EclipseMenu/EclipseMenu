@@ -6,7 +6,7 @@
 #include <Geode/modify/EditorUI.hpp>
 
 namespace eclipse::hacks::Creator {
-    class CustomObjectBypass : public hack::Hack {
+    class $hack(CustomObjectBypass) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("creator.customobjectbypass")->handleKeybinds()->setDescription();

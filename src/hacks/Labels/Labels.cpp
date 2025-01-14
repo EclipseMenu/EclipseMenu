@@ -340,20 +340,21 @@ namespace eclipse::hacks::Labels {
         }
 
         void updateLabels(float) {
-            bool visible = config::get<bool>("labels.visible", true);
+            CACHE_CONFIG(bool, visible, "labels.visible", true);
+            CACHE_CONFIG_BOOL(showInEditor, "labels.show-in-editor");
 
             auto fields = m_fields.self();
-            visible &= !fields->m_isEditor || config::get<bool>("labels.show-in-editor", false);
+            bool actualVisibility = visible && (!showInEditor && !fields->m_isEditor);
 
-            if (visible) labels::VariableManager::get().refetch();
+            if (actualVisibility) labels::VariableManager::get().refetch();
 
             for (auto& container : fields->m_containers) {
-                container->setVisible(visible);
+                container->setVisible(actualVisibility);
                 container->update();
             }
             for (auto& [label, update] : fields->m_absoluteLabels) {
-                label->setVisible(visible);
-                update(label);
+                label->setVisible(actualVisibility);
+                if (actualVisibility) update(label);
             }
         }
 
@@ -382,7 +383,7 @@ namespace eclipse::hacks::Labels {
         }
     };
 
-    class Labels : public hack::Hack {
+    class $hack(Labels) {
         static void updateLabels(bool recreate = false) {
             auto* layer = utils::get<UILayer>();
             if (!layer) return;
@@ -391,10 +392,8 @@ namespace eclipse::hacks::Labels {
             labelsLayer->realignContainers(recreate);
         }
 
-    public:
         static const std::vector<labels::LabelSettings> DEFAULT_LABELS;
 
-    private:
         void init() override {
             auto tab = gui::MenuTab::find("tab.labels");
             config::setIfEmpty("labels.visible", true);

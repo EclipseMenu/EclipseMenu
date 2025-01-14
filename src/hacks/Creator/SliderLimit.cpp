@@ -8,7 +8,7 @@
 
 namespace eclipse::hacks::Creator {
     // TODO: bypass certain sliders in editor
-    class SliderLimit : public hack::Hack {
+    class $hack(SliderLimit) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("creator.sliderlimit")->handleKeybinds()->setDescription();

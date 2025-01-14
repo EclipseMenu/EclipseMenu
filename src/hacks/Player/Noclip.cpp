@@ -12,7 +12,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Player {
-    class Noclip : public hack::Hack {
+    class $hack(Noclip) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
 
@@ -39,7 +39,7 @@ namespace eclipse::hacks::Player {
                });
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("player.noclip", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("player.noclip"); }
         [[nodiscard]] const char* getId() const override { return "Noclip"; }
     };
 

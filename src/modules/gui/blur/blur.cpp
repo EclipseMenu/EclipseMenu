@@ -199,7 +199,7 @@ namespace eclipse::gui::blur {
     void setupPostProcess() {
         if (utils::shouldUseLegacyDraw()) return;
 
-        auto size = cocos2d::CCEGLView::get()->getFrameSize() * geode::utils::getDisplayFactor();
+        auto size = utils::get<cocos2d::CCEGLView>()->getFrameSize() * geode::utils::getDisplayFactor();
 
         ppRt0.setup((GLsizei)size.width, (GLsizei)size.height);
         ppRt1.setup((GLsizei)size.width, (GLsizei)size.height);
@@ -226,8 +226,8 @@ namespace eclipse::gui::blur {
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        auto vertexPath = std::string{ cocos2d::CCFileUtils::get()->fullPathForFilename("pp-vert.glsl"_spr, false) };
-        auto fragmentPath = std::string{ cocos2d::CCFileUtils::get()->fullPathForFilename("pp-frag.glsl"_spr, false) };
+        auto vertexPath = std::string{ utils::get<cocos2d::CCFileUtils>()->fullPathForFilename("pp-vert.glsl"_spr, false) };
+        auto fragmentPath = std::string{ utils::get<cocos2d::CCFileUtils>()->fullPathForFilename("pp-frag.glsl"_spr, false) };
 
         auto res = ppShader.compile(vertexPath, fragmentPath);
         if (!res) return geode::log::error("Failed to compile shader: {}", res.unwrapErr());
@@ -378,7 +378,7 @@ namespace eclipse::gui::blur {
         auto duration = tm->getBlurSpeed();
         auto toggled = Engine::get()->isToggled();
 
-        auto deltaTimeMod = cocos2d::CCDirector::get()->getDeltaTime();
+        auto deltaTimeMod = utils::get<cocos2d::CCDirector>()->getActualDeltaTime();
         blurTimer += toggled ? deltaTimeMod : -deltaTimeMod;
         blurTimer = std::clamp(blurTimer, 0.f, duration);
 

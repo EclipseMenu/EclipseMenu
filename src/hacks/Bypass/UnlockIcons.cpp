@@ -6,7 +6,7 @@
 #include <Geode/modify/GameManager.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class UnlockIcons : public hack::Hack {
+    class $hack(UnlockIcons) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.unlockicons")->handleKeybinds()->setDescription();

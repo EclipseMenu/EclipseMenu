@@ -7,7 +7,7 @@
 
 namespace eclipse::hacks::Level {
 
-    class NoMirror : public hack::Hack {
+    class $hack(NoMirror) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.nomirror")->setDescription()->handleKeybinds();

@@ -6,7 +6,7 @@
 #include <Geode/modify/ProfilePage.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class CommentHistory : public hack::Hack {
+    class $hack(CommentHistory) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.commenthistory")->handleKeybinds()->setDescription();

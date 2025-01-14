@@ -6,7 +6,7 @@
 #include <modules/i18n/translations.hpp>
 
 namespace eclipse::hacks::Shortcuts {
-    class Shortcuts : public hack::Hack {
+    class $hack(Shortcuts) {
         using FileEvent = geode::Task<geode::Result<std::filesystem::path>>;
 
         static void openSettings() {

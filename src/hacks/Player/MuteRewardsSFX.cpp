@@ -6,7 +6,7 @@
 #include <Geode/modify/FMODAudioEngine.hpp>
 
 namespace eclipse::hacks::Player {
-    class MuteRewardsSFX : public hack::Hack {
+    class $hack(MuteRewardsSFX) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.muterewardssfx")->setDescription()->handleKeybinds();

@@ -6,7 +6,7 @@
 #include <Geode/modify/LevelEditorLayer.hpp>
 
 namespace eclipse::hacks::Creator {
-    class SmoothTrail : public hack::Hack {
+    class $hack(SmoothTrail) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("creator.smoothtrail")->handleKeybinds()->setDescription();

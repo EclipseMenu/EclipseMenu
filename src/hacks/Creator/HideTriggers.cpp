@@ -9,7 +9,7 @@
 namespace eclipse::hacks::Creator {
     static std::vector<GameObject*> s_editorTriggers;
 
-    class HideTriggers : public hack::Hack {
+    class $hack(HideTriggers) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("creator.hidetriggers")->handleKeybinds()->setDescription();

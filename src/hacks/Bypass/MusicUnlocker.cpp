@@ -6,7 +6,7 @@
 #include <Geode/modify/GameStatsManager.hpp>
 
 namespace eclipse::hacks::Cosmetic {
-    class PracticeMusic : public hack::Hack {
+    class $hack(PracticeMusic) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.practicemusic")->handleKeybinds()->setDescription()
@@ -18,7 +18,7 @@ namespace eclipse::hacks::Cosmetic {
         [[nodiscard]] const char* getId() const override { return "Practice Music Sync"; }
     };
 
-    class MusicCustomizer : public hack::Hack {
+    class $hack(MusicCustomizer) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
 

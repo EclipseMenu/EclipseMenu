@@ -142,7 +142,7 @@ namespace eclipse::hacks::Bot {
         );
     }
 
-    class Bot : public hack::Hack {
+    class $hack(Bot) {
         void init() override {
             const auto updateBotState = [](int state) {
                 static bool wasTps = eclipse::config::get<bool>("global.tpsbypass.toggle", true);
@@ -171,8 +171,8 @@ namespace eclipse::hacks::Bot {
             tab->addButton("common.delete")->callback(deleteReplay);
         }
 
-        [[nodiscard]] bool isCheating() override {
-            auto state = config::get<int>("bot.state", 0);
+        [[nodiscard]] bool isCheating() const override {
+            CACHE_CONFIG(int, state, "bot.state", 0);
             // only check if we are in playback mode and there are inputs
             return state == 2 && s_bot.getInputCount() != 0;
         }

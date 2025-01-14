@@ -6,7 +6,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class CheckpointLimit : public hack::Hack {
+    class $hack(CheckpointLimit) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.checkpointlimit")->handleKeybinds()->setDescription();

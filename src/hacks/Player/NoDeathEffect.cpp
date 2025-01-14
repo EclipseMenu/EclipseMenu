@@ -7,7 +7,7 @@
 
 namespace eclipse::hacks::Player {
 
-    class NoDeathEffect : public hack::Hack {
+    class $hack(NoDeathEffect) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.nodeatheffect")->setDescription()->handleKeybinds();

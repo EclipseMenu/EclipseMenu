@@ -7,7 +7,7 @@
 
 #ifndef GEODE_IS_WINDOWS // TODO: Make a patch for Windows
 namespace eclipse::hacks::Level {
-    class RandomSeed : public hack::Hack {
+    class $hack(RandomSeed) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
 
@@ -21,7 +21,7 @@ namespace eclipse::hacks::Level {
                });
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("level.randomseed", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("level.randomseed"); }
         [[nodiscard]] const char* getId() const override { return "Random Seed"; }
     };
 

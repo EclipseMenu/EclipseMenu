@@ -11,7 +11,7 @@
 #endif
 
 namespace eclipse::hacks::Player {
-    class NoTrail : public hack::Hack {
+    class $hack(NoTrail) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.notrail")->handleKeybinds()->setDescription();
@@ -22,7 +22,7 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(NoTrail)
 
-    class AlwaysTrail : public hack::Hack {
+    class $hack(AlwaysTrail) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.alwaystrail")->handleKeybinds()->setDescription();

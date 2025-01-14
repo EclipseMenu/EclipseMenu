@@ -6,7 +6,7 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class PracticeCoins : public hack::Hack {
+    class $hack(PracticeCoins) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.practicecoins")->setDescription()->handleKeybinds();

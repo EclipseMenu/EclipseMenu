@@ -16,7 +16,7 @@
 #endif
 
 namespace eclipse::hacks::Global {
-    class LockCursor : public hack::Hack {
+    class $hack(LockCursor) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addToggle("global.lockcursor")->setDescription()->handleKeybinds();

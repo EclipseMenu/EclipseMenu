@@ -6,7 +6,7 @@
 #include <Geode/modify/LevelInfoLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class AutoSongDownload : public hack::Hack {
+    class $hack(AutoSongDownload) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.autosongdownload")->handleKeybinds()->setDescription();

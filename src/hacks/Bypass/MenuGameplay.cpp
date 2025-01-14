@@ -7,7 +7,7 @@
 #include <Geode/modify/MenuGameLayer.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class MenuGameplay : public hack::Hack {
+    class $hack(MenuGameplay) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.menugameplay")->handleKeybinds()->setDescription();

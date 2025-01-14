@@ -6,7 +6,7 @@
 #include <Geode/modify/EditorPauseLayer.hpp>
 
 namespace eclipse::hacks::Creator {
-    class ResetPercentOnSave : public hack::Hack {
+    class $hack(ResetPercentOnSave) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("creator.resetpercentonsave")->handleKeybinds()->setDescription();

@@ -12,8 +12,7 @@ namespace eclipse::hacks::Player {
     static bool s_frameStepperPressed = false;
     static bool s_frameStepperDown = false;
 
-    class FrameStepper : public hack::Hack {
-    public:
+    class $hack(FrameStepper) {
         static bool isPressed() {
             auto stepKey = config::get<keybinds::Keys>("player.framestepper.step_key", keybinds::Keys::C);
             return s_frameStepperPressed || keybinds::isKeyPressed(stepKey);
@@ -24,7 +23,6 @@ namespace eclipse::hacks::Player {
             return s_frameStepperDown || keybinds::isKeyDown(stepKey);
         }
 
-    private:
         void init() override {
             config::setIfEmpty("player.framestepper", false);
             config::setIfEmpty("player.framestepper.step_key", keybinds::Keys::C);
@@ -45,7 +43,7 @@ namespace eclipse::hacks::Player {
                });
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("player.framestepper", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("player.framestepper"); }
         [[nodiscard]] const char* getId() const override { return "Frame Stepper"; }
     };
 

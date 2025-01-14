@@ -29,7 +29,7 @@ namespace eclipse::hacks::Player {
         change_particles_state(bgl->m_player2, !state);
     }
 
-    class NoParticles : public hack::Hack {
+    class $hack(NoParticles) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
 

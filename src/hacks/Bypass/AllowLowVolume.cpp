@@ -7,7 +7,7 @@
 #include <Geode/modify/PauseLayer.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class AllowLowVolume : public hack::Hack {
+    class $hack(AllowLowVolume) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.allowlowvolume")->handleKeybinds()->setDescription();

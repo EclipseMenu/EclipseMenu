@@ -34,7 +34,7 @@ namespace eclipse::hacks::Level {
 
     static std::deque<std::pair<cocos2d::CCRect, cocos2d::CCRect>> s_playerTrail1, s_playerTrail2;
 
-    class ShowHitboxes : public hack::Hack {
+    class $hack(ShowHitboxes) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
 
@@ -84,9 +84,10 @@ namespace eclipse::hacks::Level {
             });
         }
 
-        [[nodiscard]] bool isCheating() override {
-            bool enabled = config::get<bool>("level.showhitboxes", false);
-            if (config::get<bool>("level.showhitboxes.ondeath", false))
+        [[nodiscard]] bool isCheating() const override {
+            CACHE_CONFIG_BOOL(enabled, "level.showhitboxes");
+            CACHE_CONFIG_BOOL(onDeath, "level.showhitboxes.ondeath");
+            if (onDeath)
                 return false; // on-death hitboxes are fine
 
             if (auto* pl = utils::get<PlayLayer>())

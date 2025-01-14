@@ -6,13 +6,13 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class InstantComplete : public hack::Hack {
+    class $hack(InstantComplete) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.instantcomplete")->handleKeybinds()->setDescription();
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("bypass.instantcomplete", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("bypass.instantcomplete"); }
         [[nodiscard]] const char* getId() const override { return "Instant Complete"; }
     };
 

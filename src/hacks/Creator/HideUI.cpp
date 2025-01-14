@@ -7,7 +7,7 @@
 
 namespace eclipse::hacks::Creator {
 
-    class HideUI : public hack::Hack {
+    class $hack(HideUI) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("creator.hideui")->handleKeybinds()->setDescription();

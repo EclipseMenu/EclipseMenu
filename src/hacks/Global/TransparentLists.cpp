@@ -6,7 +6,7 @@
 #include <Geode/modify/CCLayerColor.hpp>
 
 namespace eclipse::hacks::Global {
-    class TransparentLists : public hack::Hack {
+    class $hack(TransparentLists) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addToggle("global.transparentlists")->handleKeybinds()->setDescription();

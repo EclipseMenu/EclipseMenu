@@ -38,7 +38,7 @@ namespace eclipse::hacks::Level {
         }
     }
 
-    class AlwaysShowCoins : public hack::Hack {
+    class $hack(AlwaysShowCoins) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.alwaysshowcoins")->handleKeybinds()->setDescription()

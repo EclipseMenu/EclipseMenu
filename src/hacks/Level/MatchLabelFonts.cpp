@@ -6,7 +6,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class MatchLabelFonts : public hack::Hack {
+    class $hack(MatchLabelFonts) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.matchlabelfonts")->setDescription()->handleKeybinds();

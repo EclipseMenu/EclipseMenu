@@ -6,7 +6,7 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class NoPortalLightning final : public hack::Hack {
+    class $hack(NoPortalLightning) {
         void init() override {
             gui::MenuTab::find("tab.level")
                     ->addToggle("level.noportallightning")

@@ -6,7 +6,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class FreezeAttempts : public hack::Hack {
+    class $hack(FreezeAttempts) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.freeze_attempts")->handleKeybinds()->setDescription();

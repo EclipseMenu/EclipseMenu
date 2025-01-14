@@ -225,7 +225,7 @@ namespace eclipse::hacks::Player {
 
     static TrajectorySimulation s_simulation;
 
-    class ShowTrajectory : public hack::Hack {
+    class $hack(ShowTrajectory) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             auto toggle = tab->addToggle("player.showtrajectory")->setDescription()->handleKeybinds();
@@ -242,7 +242,7 @@ namespace eclipse::hacks::Player {
             });
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("player.showtrajectory", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("player.showtrajectory"); }
         [[nodiscard]] const char* getId() const override { return "Show Trajectory"; }
     };
 

@@ -8,7 +8,7 @@
 #include <Geode/modify/CCTextInputNode.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class CharFilter : public hack::Hack {
+    class $hack(CharFilter) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.charfilter")->handleKeybinds()->setDescription();

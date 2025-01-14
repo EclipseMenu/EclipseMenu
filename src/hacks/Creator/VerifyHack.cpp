@@ -6,7 +6,7 @@
 #include <Geode/modify/EditLevelLayer.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class VerifyHack : public hack::Hack {
+    class $hack(VerifyHack) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("bypass.verifyhack")->handleKeybinds()->setDescription();

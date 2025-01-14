@@ -15,8 +15,10 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Global {
-    class DiscordRPC : public hack::Hack {
-    public:
+    std::chrono::time_point<std::chrono::steady_clock> s_lastDiscordUpdate;
+    std::map<std::string, std::unique_ptr<rift::Script>> s_discordScripts;
+
+    class $hack(DiscordRPC) {
         constexpr static auto DEFAULT_CLIENT_ID = "1212016614325624852";
         static time_t startTimestamp, levelTimestamp;
 
@@ -57,8 +59,8 @@ namespace eclipse::hacks::Global {
                     }
                 }
                 keyStr += key;
-                auto it = m_scripts.find(keyStr);
-                return it != m_scripts.end() ? it->second.get() : nullScript.get();
+                auto it = s_discordScripts.find(keyStr);
+                return it != s_discordScripts.end() ? it->second.get() : nullScript.get();
             };
 
             DiscordRichPresence presence = {};
@@ -130,13 +132,13 @@ namespace eclipse::hacks::Global {
         void compileScript(const std::string& name) {
             auto res = rift::compile(config::get<std::string>("global.discordrpc." + name, ""));
             if (res.isOk()) {
-                m_scripts[name] = std::move(res.unwrap());
+                s_discordScripts[name] = std::move(res.unwrap());
             }
         }
 
         void recompileScripts() {
             // Delete all scripts
-            m_scripts.clear();
+            s_discordScripts.clear();
 
             // Compile all scripts
             // Menu
@@ -307,19 +309,15 @@ namespace eclipse::hacks::Global {
             if (!config::get<bool>("global.discordrpc", false)) return;
             auto interval = config::get<float>("global.discordrpc.interval", 200.0f);
             auto now = std::chrono::steady_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastUpdate).count();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - s_lastDiscordUpdate).count();
             if (static_cast<float>(elapsed) >= interval) {
                 refreshPresence();
-                m_lastUpdate = now;
+                s_lastDiscordUpdate = now;
             }
         }
 
         [[nodiscard]] const char* getId() const override { return "Discord RPC"; }
-
-        std::chrono::time_point<std::chrono::steady_clock> m_lastUpdate;
-        std::map<std::string, std::unique_ptr<rift::Script>> m_scripts;
     };
-
 
     time_t DiscordRPC::startTimestamp = 0;
     time_t DiscordRPC::levelTimestamp = 0;

@@ -9,19 +9,16 @@
 using namespace geode::prelude;
 
 namespace eclipse::Hacks::Level {
-    class PracticeFix : public hack::Hack {
-    public:
+    class $hack(PracticeFix) {
         static bool shouldEnable() {
             return config::get<bool>("bot.practicefix", false) || config::get<int>("bot.state", 0) == 1;
         }
 
-    private:
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("bot.practicefix")->setDescription()->handleKeybinds();
         }
 
-        [[nodiscard]] bool isCheating() override { return false; }
         [[nodiscard]] const char* getId() const override { return "Practice Fix"; }
     };
 

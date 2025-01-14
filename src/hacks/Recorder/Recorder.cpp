@@ -138,7 +138,7 @@ namespace eclipse::hacks::Recorder {
         s_recorder.stop();
     }
 
-    class InternalRecorder : public hack::Hack {
+    class $hack(InternalRecorder) {
         void init() override {}
 
         void lateInit() override {

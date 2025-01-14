@@ -7,7 +7,7 @@
 #include <Geode/modify/CCDelayTime.hpp>
 
 namespace eclipse::hacks::Player {
-    class RespawnDelay : public hack::Hack {
+    class $hack(RespawnDelay) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
 

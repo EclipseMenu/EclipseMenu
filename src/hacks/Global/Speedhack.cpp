@@ -6,7 +6,7 @@
 #include <Geode/modify/CCScheduler.hpp>
 
 namespace eclipse::hacks::Global {
-    class Speedhack : public hack::Hack {
+    class $hack(Speedhack) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
 
@@ -20,9 +20,10 @@ namespace eclipse::hacks::Global {
                ->handleKeybinds();
         }
 
-        [[nodiscard]] bool isCheating() override {
-            return config::get<bool>("global.speedhack.toggle", false) &&
-                   config::get<float>("global.speedhack", 1.f) != 1.f;
+        [[nodiscard]] bool isCheating() const override {
+            CACHE_CONFIG_BOOL(toggle, "global.speedhack.toggle");
+            CACHE_CONFIG(float, speed, "global.speedhack", 1.f);
+            return toggle && speed != 1.f;
         }
 
         [[nodiscard]] const char* getId() const override { return "Speedhack"; }

@@ -8,7 +8,7 @@
 
 namespace eclipse::hacks::Creator { // i didnt do this properly :P
 
-    /*class EditorWaveTrail : public hack::Hack {
+    /*class $hack(EditorWaveTrail) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.creator");
             tab->addToggle("creator.editorwave")->handleKeybinds()->setDescription();

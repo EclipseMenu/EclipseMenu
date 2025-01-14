@@ -6,7 +6,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class SmartStartPos : public hack::Hack {
+    class $hack(SmartStartPos) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.smartstartpos")->handleKeybinds()->setDescription();

@@ -9,7 +9,7 @@
 #include <Geode/modify/CCParticleSystemQuad.hpp>
 
 namespace eclipse::hacks::Level {
-    class HideLevelCompleteVFX : public hack::Hack {
+    class $hack(HideLevelCompleteVFX) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.hidelevelcomplete")->setDescription()->handleKeybinds();

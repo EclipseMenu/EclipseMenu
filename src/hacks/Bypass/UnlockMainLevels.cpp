@@ -6,7 +6,7 @@
 #include <Geode/modify/GameLevelManager.hpp>
 
 namespace eclipse::hacks::Bypass {
-    class UnlockMainLevels : public hack::Hack {
+    class $hack(UnlockMainLevels) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.unlockmainlevels")->setDescription()->handleKeybinds();

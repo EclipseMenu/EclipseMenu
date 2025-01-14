@@ -12,7 +12,7 @@ constexpr float MIN_TPS = 0.f;
 constexpr float MAX_TPS = 100000.f;
 
 namespace eclipse::hacks::Global {
-    class TPSBypass : public hack::Hack {
+    class $hack(TPSBypass) {
     public:
         void init() override {
             config::setIfEmpty("global.tpsbypass", 240.f);
@@ -26,9 +26,10 @@ namespace eclipse::hacks::Global {
         [[nodiscard]] const char* getId() const override { return "Physics Bypass"; }
         [[nodiscard]] int32_t getPriority() const override { return -14; }
 
-        [[nodiscard]] bool isCheating() override {
-            return config::get<bool>("global.tpsbypass.toggle", false) &&
-                   config::get<float>("global.tpsbypass", 240.f) != 240.f;
+        [[nodiscard]] bool isCheating() const override {
+            CACHE_CONFIG_BOOL(toggle, "global.tpsbypass.toggle");
+            CACHE_CONFIG(float, tps, "global.tpsbypass", 240.f);
+            return toggle && tps != 240.f;
         }
     };
 

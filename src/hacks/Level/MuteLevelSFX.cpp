@@ -6,7 +6,7 @@
 #include <Geode/modify/EffectGameObject.hpp>
 
 namespace eclipse::hacks::Level {
-    class MuteLevelSFX : public hack::Hack {
+    class $hack(MuteLevelSFX) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.mutelevelsfx")->setDescription()->handleKeybinds();

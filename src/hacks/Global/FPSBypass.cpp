@@ -8,7 +8,7 @@ constexpr float MIN_FPS = 1.f;
 constexpr float MAX_FPS = 100000.f;
 
 namespace eclipse::hacks::Global {
-    class FPSBypass : public hack::Hack {
+    class $hack(FPSBypass) {
     public:
         static void updateRefreshRate() {
             auto* gm = utils::get<GameManager>();

@@ -2,11 +2,12 @@
 #include <modules/gui/gui.hpp>
 #include <modules/gui/components/toggle.hpp>
 #include <modules/hack/hack.hpp>
+#include <modules/labels/variables.hpp>
 
 #ifdef GEODE_IS_WINDOWS
 
 namespace eclipse::hacks::Global {
-    class CBFToggle : public hack::Hack {
+    class $hack(CBFToggle) {
         void init() override {}
 
         void lateInit() override {
@@ -24,9 +25,11 @@ namespace eclipse::hacks::Global {
 
             listenForSettingChanges<bool>("soft-toggle", [](bool v) {
                 config::setTemp("syzzi.click_between_frames.toggle", !v);
+                labels::VariableManager::get().setVariable("cbf", !v);
             }, cbf);
 
             config::setTemp("syzzi.click_between_frames.toggle", !cbf->getSettingValue<bool>("soft-toggle"));
+            labels::VariableManager::get().setVariable("cbf", cbf->getSettingValue<bool>("soft-toggle"));
         }
 
         [[nodiscard]] const char* getId() const override { return "Click Between Frames"; }

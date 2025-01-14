@@ -6,13 +6,13 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class AutoPickupCoins : public hack::Hack {
+    class $hack(AutoPickupCoins) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
             tab->addToggle("level.autopickupcoins")->handleKeybinds()->setDescription();
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("level.autopickupcoins", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("level.autopickupcoins"); }
         [[nodiscard]] const char* getId() const override { return "Auto Pickup Coins"; }
     };
 

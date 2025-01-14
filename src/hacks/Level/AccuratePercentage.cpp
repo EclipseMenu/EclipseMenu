@@ -6,7 +6,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 namespace eclipse::hacks::Global {
-    class AccuratePercentage : public hack::Hack {
+    class $hack(AccuratePercentage) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
 

@@ -48,7 +48,7 @@ namespace eclipse::hacks::Player {
         };
     }
 
-    class ClickTeleport : public hack::Hack {
+    class $hack(ClickTeleport) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.clicktp")->setDescription()->handleKeybinds();
@@ -69,7 +69,7 @@ namespace eclipse::hacks::Player {
             }
         }
 
-        [[nodiscard]] bool isCheating() override { return config::get<bool>("player.clicktp", false); }
+        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("player.clicktp"); }
         [[nodiscard]] const char* getId() const override { return "Click Teleport"; }
     };
 

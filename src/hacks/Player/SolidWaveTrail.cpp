@@ -7,7 +7,7 @@
 #include <Geode/modify/CCDrawNode.hpp>
 
 namespace eclipse::hacks::Player {
-    class SolidWaveTrail : public hack::Hack {
+    class $hack(SolidWaveTrail) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.solidwavetrail")->setDescription()->handleKeybinds();
