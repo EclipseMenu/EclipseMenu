@@ -43,7 +43,11 @@ namespace eclipse::gui::imgui {
     }
 
     bool TabbedLayout::shouldRender() const {
-        return Engine::get()->isToggled() || !m_actions.empty();
+        return Engine::get()->isToggled() || wantStayVisible();
+    }
+
+    bool TabbedLayout::wantStayVisible() const {
+        return !m_actions.empty() || m_preloadStep < 2;
     }
 
     void TabbedLayout::draw() {
@@ -60,7 +64,7 @@ namespace eclipse::gui::imgui {
                     auto windowStates = config::get("windows", std::vector<nlohmann::json>());
                     for (auto& windowState: windowStates) {
                         auto title = windowState.at("title").get<std::string>();
-                        auto window = std::find_if(m_windows.begin(), m_windows.end(), [&title](const Window &window) {
+                        auto window = std::ranges::find_if(m_windows, [&title](const Window &window) {
                             return window.getTitle() == title;
                         });
                         if (window != m_windows.end())

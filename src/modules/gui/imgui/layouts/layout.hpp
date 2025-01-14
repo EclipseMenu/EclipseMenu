@@ -17,6 +17,10 @@ namespace eclipse::gui::imgui {
         virtual void draw() = 0;
         virtual void toggle(bool state) = 0;
 
+        // this function should return true as long as you want the layout to stay visible
+        // after the menu has been toggled off
+        virtual bool wantStayVisible() const { return false; }
+
         [[nodiscard]] LayoutMode getMode() const { return m_mode; }
 
     protected:

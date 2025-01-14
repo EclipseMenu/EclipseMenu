@@ -18,20 +18,25 @@
 #include <modules/debug/benchmark.hpp>
 #include <modules/keybinds/manager.hpp>
 
+static bool isTracingPopupOpen = false;
+
 void showTracingPopup() {
     using namespace eclipse;
-    static bool isOpen = false;
     static auto _ = [] {
         auto& keybind = keybinds::Manager::get()->addListener("debug.tracing", [](bool down) {
-            if (down) isOpen = !isOpen;
+            if (down) {
+                isTracingPopupOpen = !isTracingPopupOpen;
+                if (auto imgui = gui::imgui::ImGuiRenderer::get())
+                    imgui->refreshDisplayState();
+            }
         });
         keybind.setKey(keybinds::Keys::F3);
         return 0;
     }();
 
-    if (!isOpen) return;
+    if (!isTracingPopupOpen) return;
 
-    if (ImGui::Begin("Profiler", &isOpen)) {
+    if (ImGui::Begin("Profiler", &isTracingPopupOpen)) {
         auto& tabs = debug::Profiler::getTimes();
         ImGui::Text("Total profilers: %zu", tabs.size());
         if (ImGui::BeginTabBar("TracingTabs")) {
@@ -213,6 +218,8 @@ namespace eclipse::gui::imgui {
         auto scale = ImGui::GetIO().DisplaySize.x / 1920.f;
         config::setTemp("ui.scale", scale);
 
+        bool wantVisible = m_isOpened;
+
         m_insideDraw = true;
         if (m_theme) m_theme->update();
         if (m_layout) m_layout->draw();
@@ -229,6 +236,7 @@ namespace eclipse::gui::imgui {
 
         utils::updateCursorState(m_isOpened);
         m_layout->toggle(m_isOpened);
+        refreshDisplayState();
     }
 
     bool ImGuiRenderer::isToggled() const {
@@ -311,6 +319,7 @@ namespace eclipse::gui::imgui {
 
     void ImGuiRenderer::showPopup(const Popup& popup) {
         m_popups.push_back(popup);
+        refreshDisplayState();
     }
 
     void ImGuiRenderer::drawFinished() {
@@ -318,6 +327,7 @@ namespace eclipse::gui::imgui {
             f();
         }
         m_runAfterDrawingQueue.clear();
+        refreshDisplayState();
     }
 
     // https://stackoverflow.com/a/70073137/16349466
@@ -426,5 +436,16 @@ namespace eclipse::gui::imgui {
             }
             return false;
         }).begin(), m_popups.end());
+    }
+
+    void ImGuiRenderer::refreshDisplayState() const {
+        bool wantVisible = m_isOpened;
+        if (m_layout) wantVisible |= m_layout->wantStayVisible();
+        wantVisible |= !m_popups.empty();
+        #ifdef ECLIPSE_DEBUG_BUILD
+        wantVisible |= isTracingPopupOpen;
+        #endif
+
+        ImGuiCocos::get().setVisible(wantVisible);
     }
 }

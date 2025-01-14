@@ -71,6 +71,9 @@ namespace eclipse::gui::imgui {
 
         FontManager& getFontManager() { return m_fontManager; }
 
+        /// @brief Sets the setVisible flag on ImGuiCocos to the current expected state
+        void refreshDisplayState() const;
+
     private:
         void drawFinished();
         void renderPopups();
