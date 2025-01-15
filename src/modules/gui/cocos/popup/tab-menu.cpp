@@ -30,6 +30,9 @@ namespace eclipse::gui::cocos {
         if (idx < 0 || idx >= m_tabs.size()) return;
 
         m_activeTab = idx;
+        if (m_activeTab > 8) {
+            m_currentPage = std::max(0, m_activeTab - 8);
+        }
         for (int i = 0; i < m_tabs.size(); ++i) {
             bool active = i == idx;
             auto tab = m_tabs[i];
@@ -39,11 +42,33 @@ namespace eclipse::gui::cocos {
         }
     }
 
+    void TabMenu::regenTabs() {
+        for (auto const& tab : m_tabs) {
+            tab->setContentHeight(0.f);
+            tab->setVisible(false);
+        }
+        int amount = 9;
+        auto newTabs = utils::gradualPaginate<CCMenuItemSpriteExtra*>(m_tabs, amount, m_currentPage);
+        m_upArrow->setVisible(m_currentPage != 0 && m_tabs.size() > 10);
+        m_downArrow->setVisible(m_tabs.size() > 10 && (int)(m_tabs.size() / 4) != m_currentPage);
+        for (auto const& tab : newTabs) {
+            tab->setContentHeight(28.f);
+            tab->setVisible(true);
+        }
+        this->updateLayout();
+    }
     bool TabMenu::init(Tabs const& tabs, std::function<void(int)> const& callback) {
         if (!CCMenu::init()) return false;
         this->setID("tab-menu"_spr);
-        //std::vector<std::shared_ptr<MenuTab>> newTabs = tabs;
-        //newTabs.pop_back();
+
+        auto upSpr = cocos2d::CCSprite::createWithSpriteFrameName("GJ_chatBtn_01_001.png");
+        upSpr->setScale(1.5F);
+        upSpr->setFlipY(true);
+        m_upArrow = geode::cocos::CCMenuItemExt::createSpriteExtra(upSpr, [this](auto caller){
+            m_currentPage--;
+            regenTabs();
+        });
+        this->addChild(m_upArrow);
 
         int i = 0;
         constexpr float width = 120.f;
@@ -63,29 +88,35 @@ namespace eclipse::gui::cocos {
             );
             tabButton->setTag(i++);
             this->addChild(tabButton);
+            tabButton->setVisible(false);
             m_tabs.push_back(tabButton);
         }
+        auto downSpr = cocos2d::CCSprite::createWithSpriteFrameName("GJ_chatBtn_01_001.png");
+        downSpr->setScale(1.5F);
+        m_downArrow = geode::cocos::CCMenuItemExt::createSpriteExtra(downSpr, [this](auto caller){
+            m_currentPage++;
+            regenTabs();
+        });
+        this->addChild(m_downArrow);
+
+        regenTabs();
 
         // setup layout
         auto layout = geode::AxisLayout::create(geode::Axis::Column)
-                      ->setAutoScale(true)
-                      //->setAutoScale(false)
+                      //->setAutoScale(true)
+                      ->setAutoScale(false)
                       ->setAxisReverse(true)
                       ->setGrowCrossAxis(false)
                       ->setCrossAxisOverflow(true)
                       ->setGap(0.5f)
                       ->setAxisAlignment(geode::AxisAlignment::End)
                       ->setCrossAxisAlignment(geode::AxisAlignment::Start)
-                      ->setCrossAxisLineAlignment(geode::AxisAlignment::Start);
+                      ->setCrossAxisLineAlignment(geode::AxisAlignment::Center);
         this->setAnchorPoint({0.5f, 0.5f});
         this->setContentHeight(260.f);
         this->setLayout(layout, true);
 
         this->setActiveTab(0);
-
-        auto upButton = cocos2d::CCSprite::createWithSpriteFrameName("GJ_chatBtn_01_001.png");
-        upButton->setFlipY(true);
-        auto downButton = cocos2d::CCSprite::createWithSpriteFrameName("GJ_chatBtn_01_001.png");
 
         this->setTouchPriority(utils::get<cocos2d::CCTouchDispatcher>()->getTargetPrio());
         utils::get<cocos2d::CCTouchDispatcher>()->registerForcePrio(this, 2);
