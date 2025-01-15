@@ -228,11 +228,11 @@ $on_mod(Loaded) {
         config::setIfEmpty<bool>("float-btn.show-in-editor", true);
         config::setIfEmpty<float>("float-btn.scale", 0.25f);
         tab->addLabel("float-btn.title")->setFlags(ComponentFlags::DisableImGui);
-        tab->addInputFloat("float-btn.max-opacity", 0.f, 1.f)->setFlags(ComponentFlags::DisableImGui);
-        tab->addInputFloat("float-btn.min-opacity", 0.f, 1.f)->setFlags(ComponentFlags::DisableImGui);
+        tab->addInputFloat("float-btn.max-opacity", 0.1f, 1.f)->setFlags(ComponentFlags::DisableImGui);
+        tab->addInputFloat("float-btn.min-opacity", 0.1f, 1.f)->setFlags(ComponentFlags::DisableImGui);
         tab->addToggle("float-btn.show-in-level")->setFlags(ComponentFlags::DisableImGui);
         tab->addToggle("float-btn.show-in-editor")->setFlags(ComponentFlags::DisableImGui);
-        tab->addInputFloat("float-btn.scale", 0.f, 1.f)->setFlags(ComponentFlags::DisableImGui);
+        tab->addInputFloat("float-btn.scale", 0.15f, 1.f)->setFlags(ComponentFlags::DisableImGui);
 
     #endif
 
