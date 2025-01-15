@@ -139,18 +139,6 @@ static void onModify(auto& self) {\
     HOOKS_TOGGLE_ALL(id);\
 }
 
-// Makes a fast static variable that is updated when the config changes
-#define CACHE_CONFIG(type, name, cfg, default) \
-    static type name = (config::addDelegate(cfg, [] { \
-        name = config::get<type>(cfg, default); \
-    }), config::get<type>(cfg, default))
-
-// Makes a fast static bool variable that is updated when the config changes
-#define CACHE_CONFIG_BOOL(name, cfg) CACHE_CONFIG(bool, name, cfg, false)
-
-// Uses the cached bool and returns it in one macro
-#define RETURN_CACHED_BOOL(cfg) CACHE_CONFIG_BOOL(cached, cfg); return cached
-
 #ifdef GEODE_IS_WINDOWS
     #define ECLIPSE_DLL __declspec(dllexport)
 #else

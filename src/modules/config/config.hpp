@@ -10,7 +10,6 @@
 #endif
 
 namespace eclipse::config {
-
     /// @brief Get the container for the configuration file.
     nlohmann::json& getStorage();
 
@@ -19,6 +18,9 @@ namespace eclipse::config {
 
     /// @brief Used internally to trigger callbacks for a value change
     void executeCallbacks(std::string_view name);
+
+    /// @brief Used internally to trigger callbacks for a value change in temporary storage
+    void executeTempCallbacks(std::string_view name);
 
     /// @brief Load the configuration file.
     void load();
@@ -93,6 +95,11 @@ namespace eclipse::config {
     /// @param callback Callback to call when value is changed
     void addDelegate(std::string_view key, std::function<void()> callback);
 
+    /// @brief Registers a delegate which is called when a specific value in temp is changed
+    /// @param key Key of the value which should have a delegate
+    /// @param callback Callback to call when value is changed
+    void addTempDelegate(std::string_view key, std::function<void()> callback);
+
     /// @brief Check if a key exists in the temporary storage.
     /// @param key Key to check.
     /// @return True if the key exists in the temporary storage.
@@ -120,4 +127,33 @@ namespace eclipse::config {
     /// @param value Value to set.
     template<typename T>
     void setTemp(std::string_view key, const T& value);
+
+    namespace __impl {
+        template <size_t N>
+        struct Key {
+            char data[N];
+            explicit(false) constexpr Key(const char* str) { std::copy_n(str, N, data); }
+        };
+
+        template <size_t N>
+        Key(const char(&)[N]) -> Key<N - 1>;
+    }
+
+    /// @brief Cached version of get function to avoid multiple lookups.
+    template <__impl::Key key, typename T>
+    T get(const T& defaultValue = T{}) {
+        static T value = (addDelegate(key.data, [] {
+            value = get<T>(key.data, T{});
+        }), get<T>(key.data, defaultValue));
+        return value;
+    }
+
+    /// @brief Cached version of getTemp function to avoid multiple lookups.
+    template <__impl::Key key, typename T>
+    T getTemp(const T& defaultValue = T{}) {
+        static T value = (addTempDelegate(key.data, [] {
+            value = getTemp<T>(key.data, T{});
+        }), getTemp<T>(key.data, defaultValue));
+        return value;
+    }
 }

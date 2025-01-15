@@ -85,8 +85,8 @@ namespace eclipse::hacks::Level {
         }
 
         [[nodiscard]] bool isCheating() const override {
-            CACHE_CONFIG_BOOL(enabled, "level.showhitboxes");
-            CACHE_CONFIG_BOOL(onDeath, "level.showhitboxes.ondeath");
+            auto enabled = config::get<"level.showhitboxes", bool>();
+            auto onDeath = config::get<"level.showhitboxes.ondeath", bool>();
             if (onDeath)
                 return false; // on-death hitboxes are fine
 

@@ -12,7 +12,7 @@ namespace eclipse::hacks::Level {
             tab->addToggle("level.noshader")->handleKeybinds()->setDescription();
         }
 
-        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("level.noshader"); }
+        [[nodiscard]] bool isCheating() const override { return config::get<"level.noshader", bool>(); }
         [[nodiscard]] const char* getId() const override { return "No Shaders"; }
     };
 

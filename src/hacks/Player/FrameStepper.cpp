@@ -43,7 +43,7 @@ namespace eclipse::hacks::Player {
                });
         }
 
-        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("player.framestepper"); }
+        [[nodiscard]] bool isCheating() const override { return config::get<"player.framestepper", bool>(); }
         [[nodiscard]] const char* getId() const override { return "Frame Stepper"; }
     };
 

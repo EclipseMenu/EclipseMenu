@@ -340,8 +340,8 @@ namespace eclipse::hacks::Labels {
         }
 
         void updateLabels(float) {
-            CACHE_CONFIG(bool, visible, "labels.visible", true);
-            CACHE_CONFIG_BOOL(showInEditor, "labels.show-in-editor");
+            auto visible = config::get<"labels.visible", bool>(true);
+            auto showInEditor = config::get<"labels.show-in-editor", bool>();
 
             auto fields = m_fields.self();
             bool actualVisibility = visible && (!showInEditor && !fields->m_isEditor);

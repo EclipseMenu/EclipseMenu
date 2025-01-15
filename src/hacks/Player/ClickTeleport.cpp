@@ -69,7 +69,7 @@ namespace eclipse::hacks::Player {
             }
         }
 
-        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("player.clicktp"); }
+        [[nodiscard]] bool isCheating() const override { return config::get<"player.clicktp", bool>(); }
         [[nodiscard]] const char* getId() const override { return "Click Teleport"; }
     };
 

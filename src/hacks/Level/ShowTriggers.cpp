@@ -14,7 +14,7 @@ namespace eclipse::hacks::Level {
             tab->addToggle("level.showtriggers")->handleKeybinds()->setDescription();
         }
 
-        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("level.showtriggers"); }
+        [[nodiscard]] bool isCheating() const override { return config::get<"level.showtriggers", bool>(); }
         [[nodiscard]] const char* getId() const override { return "Show Triggers"; }
     };
 

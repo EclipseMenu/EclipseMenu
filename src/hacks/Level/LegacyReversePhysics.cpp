@@ -40,7 +40,7 @@ namespace eclipse::hacks::Level {
         //player would be cheating only if level is new physics and legacy physics is active
         //otherwise the hack being on doesn't matter
         [[nodiscard]] bool isCheating() const override {
-            CACHE_CONFIG_BOOL(legacyPhysics, "level.legacyreversephysics");
+            auto legacyPhysics = config::get<"level.legacyreversephysics", bool>();
             if (!legacyPhysics) return false;
             auto pl = utils::get<PlayLayer>();
             if (!pl) return false;

@@ -49,7 +49,7 @@ namespace eclipse::hacks::Player {
                });
         }
 
-        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("level.allpassable"); }
+        [[nodiscard]] bool isCheating() const override { return config::get<"level.allpassable", bool>(); }
         [[nodiscard]] const char* getId() const override { return "All Passable"; }
     };
 

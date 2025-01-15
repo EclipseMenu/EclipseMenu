@@ -21,6 +21,11 @@ namespace eclipse::config {
         return callbacks;
     }
 
+    CallbackMap& getTempCallbacks() {
+        static CallbackMap tempCallbacks;
+        return tempCallbacks;
+    }
+
     nlohmann::json& getStorage() {
         static nlohmann::json storage = [] {
             auto path = geode::Mod::get()->getSaveDir() / "config.json";
@@ -68,8 +73,22 @@ namespace eclipse::config {
         }
     }
 
+    void executeTempCallbacks(std::string_view name) {
+        auto& callbacks = getTempCallbacks();
+        auto it = callbacks.find(name);
+        if (it == callbacks.end()) return;
+        for (const auto& callback : it->second) {
+            callback();
+        }
+    }
+
     void addDelegate(std::string_view key, std::function<void()> callback) {
         auto& callbacks = getCallbacks();
+        callbacks[key].push_back(std::move(callback));
+    }
+
+    void addTempDelegate(std::string_view key, std::function<void()> callback) {
+        auto& callbacks = getTempCallbacks();
         callbacks[key].push_back(std::move(callback));
     }
 
@@ -215,6 +234,7 @@ namespace eclipse::config {
     template <typename T>
     void setTemp(std::string_view key, const T& value) {
         getTempStorage()[key] = value;
+        executeTempCallbacks(key);
     }
 
     // Explicit instantiations

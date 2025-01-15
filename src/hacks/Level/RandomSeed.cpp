@@ -21,7 +21,7 @@ namespace eclipse::hacks::Level {
                });
         }
 
-        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("level.randomseed"); }
+        [[nodiscard]] bool isCheating() const override { return config::get<"level.randomseed", bool>(); }
         [[nodiscard]] const char* getId() const override { return "Random Seed"; }
     };
 

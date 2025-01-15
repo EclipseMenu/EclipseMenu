@@ -59,27 +59,24 @@ namespace eclipse::hacks::Global {
         static bool shouldUpdate() {
             static bool lastSpeedhack = false;
 
-            CACHE_CONFIG_BOOL(speedhack, "global.speedhack.toggle");
-            CACHE_CONFIG_BOOL(audiospeed, "global.audiospeed.toggle");
-            CACHE_CONFIG_BOOL(syncWithSpeedhack, "global.audiospeed.sync");
+            auto speedhack = config::get<"global.speedhack.toggle", bool>();
+            auto audioSpeed = config::get<"global.audiospeed.toggle", bool>();
+            auto syncWithSpeedhack = config::get<"global.audiospeed.sync", bool>();
 
             bool toggleSpeedhack = lastSpeedhack != speedhack;
             lastSpeedhack = speedhack;
 
-            return (speedhack || toggleSpeedhack) && syncWithSpeedhack || audiospeed;
+            return (speedhack || toggleSpeedhack) && syncWithSpeedhack || audioSpeed;
         }
 
         static float getSpeed() {
-            CACHE_CONFIG_BOOL(audiospeedToggle, "global.audiospeed.toggle");
-            if (audiospeedToggle) {
-                CACHE_CONFIG(float, audiospeed, "global.audiospeed", 1.f);
-                return audiospeed;
+            if (config::get<"global.audiospeed.toggle", bool>()) {
+                return config::get<"global.audiospeed", float>(1.f);
             }
 
-            CACHE_CONFIG_BOOL(syncWithSpeedhack, "global.audiospeed.sync");
-            if (syncWithSpeedhack) {
-                CACHE_CONFIG(float, speedhack, "global.speedhack", 1.f);
-                CACHE_CONFIG_BOOL(speedhackToggle, "global.speedhack.toggle");
+            if (config::get<"global.audiospeed.sync", bool>()) {
+                auto speedhack = config::get<"global.speedhack", float>(1.f);
+                auto speedhackToggle = config::get<"global.speedhack.toggle", bool>();
                 return speedhackToggle ? speedhack : 1.f;
             }
 

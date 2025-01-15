@@ -21,8 +21,8 @@ namespace eclipse::hacks::Global {
         }
 
         [[nodiscard]] bool isCheating() const override {
-            CACHE_CONFIG_BOOL(toggle, "global.speedhack.toggle");
-            CACHE_CONFIG(float, speed, "global.speedhack", 1.f);
+            auto toggle = config::get<"global.speedhack.toggle", bool>();
+            auto speed = config::get<"global.speedhack", float>(1.f);
             return toggle && speed != 1.f;
         }
 

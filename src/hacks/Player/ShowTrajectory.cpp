@@ -242,7 +242,7 @@ namespace eclipse::hacks::Player {
             });
         }
 
-        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("player.showtrajectory"); }
+        [[nodiscard]] bool isCheating() const override { return config::get<"player.showtrajectory", bool>(); }
         [[nodiscard]] const char* getId() const override { return "Show Trajectory"; }
     };
 

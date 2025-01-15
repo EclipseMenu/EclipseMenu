@@ -27,8 +27,8 @@ namespace eclipse::hacks::Global {
         [[nodiscard]] int32_t getPriority() const override { return -14; }
 
         [[nodiscard]] bool isCheating() const override {
-            CACHE_CONFIG_BOOL(toggle, "global.tpsbypass.toggle");
-            CACHE_CONFIG(float, tps, "global.tpsbypass", 240.f);
+            auto toggle = config::get<"global.tpsbypass.toggle", bool>();
+            auto tps = config::get<"global.tpsbypass", float>(240.f);
             return toggle && tps != 240.f;
         }
     };

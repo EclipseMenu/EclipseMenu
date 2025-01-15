@@ -13,7 +13,7 @@ namespace eclipse::hacks::Player {
             tab->addToggle("player.jumphack")->setDescription()->handleKeybinds();
         }
 
-        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("player.jumphack"); }
+        [[nodiscard]] bool isCheating() const override { return config::get<"player.jumphack", bool>(); }
         [[nodiscard]] const char* getId() const override { return "Jump Hack"; }
     };
 

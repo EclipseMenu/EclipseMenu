@@ -12,7 +12,7 @@ namespace eclipse::hacks::Bypass {
             tab->addToggle("bypass.instantcomplete")->handleKeybinds()->setDescription();
         }
 
-        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("bypass.instantcomplete"); }
+        [[nodiscard]] bool isCheating() const override { return config::get<"bypass.instantcomplete", bool>(); }
         [[nodiscard]] const char* getId() const override { return "Instant Complete"; }
     };
 

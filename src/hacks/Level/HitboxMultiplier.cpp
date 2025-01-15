@@ -83,7 +83,7 @@ namespace eclipse::hacks::Level {
                });
         }
 
-        [[nodiscard]] bool isCheating() const override { RETURN_CACHED_BOOL("level.hitbox_multiplier"); }
+        [[nodiscard]] bool isCheating() const override { return config::get<"level.hitbox_multiplier", bool>(); }
         [[nodiscard]] const char* getId() const override { return "Hitbox Multiplier"; }
     };
 
