@@ -20,10 +20,12 @@ namespace eclipse::gui::cocos {
                 return;
             }
             m_valueLabel->setString(m_component->getItems()[m_index].filename().string());
-            m_valueLabel->limitLabelWidth(200.f, 2.f, 0.25f);
+            m_valueLabel->limitLabelWidth(70.f, 1.5f, 0.25f);
         }
 
         void scroll(CCObject* sender) {
+            if (m_component->getItems().empty()) return;
+
             int tag = sender->getTag();
             int value = m_index + tag;
             if (value < 0) value = std::max<int>(m_component->getItems().size() - 1, 0);
@@ -77,7 +79,7 @@ namespace eclipse::gui::cocos {
             this->addChildAtPosition(arrowBtn2, geode::Anchor::Right, { -115.f, 0.f });
 
             m_valueLabel = TranslatedLabel::createRaw(m_component->getValue().filename().string());
-            m_background->addChildAtPosition(m_valueLabel, geode::Anchor::Center, { 0.f, 0.f });
+            this->addChildAtPosition(m_valueLabel, geode::Anchor::Right, { -70.f, 0.f });
 
             auto& items = m_component->getItems();
             if (items.empty()) {

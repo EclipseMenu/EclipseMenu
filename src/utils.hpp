@@ -119,34 +119,34 @@ namespace eclipse::utils {
 
     /// @brief Returns a specific page of items from a given Vector.
     /// @tparam T Type of item.
+    /// @param array Vector to paginate.
     /// @param size Amount of items per page.
     /// @param page Page number to retrieve.
-    /// @return A paginated vector containing the items of the specified page.
+    /// @return A paginated span containing the items of the specified page.
     template <typename T>
-    std::vector<T> paginate(const std::vector<T>& array, int size, int page) {
-        std::vector<T> result;
-        if (size <= 0) return result;
+    std::span<T> paginate(const std::vector<T>& array, int size, int page) {
+        if (size <= 0) return {};
         int startIndex = page * size;
         int endIndex = std::min(startIndex + size, static_cast<int>(array.size()));
-        if (startIndex >= array.size()) return result;
-        result.insert(result.end(), array.begin() + startIndex, array.begin() + endIndex);
-        return result;
+        if (startIndex >= array.size()) return {};
+        // result.insert(result.end(), array.begin() + startIndex, array.begin() + endIndex);
+        return {const_cast<T*>(array.data()) + startIndex, static_cast<size_t>(endIndex - startIndex)};
     }
 
     /// @brief Returns a "gradual" page of items from a given Vector.
     /// @tparam T Type of item.
+    /// @param array Vector to paginate.
     /// @param size Amount of items per "gradual" page.
     /// @param page "Gradual" page number to retrieve.
-    /// @return A paginated vector containing the items of the specified "gradual" page.
+    /// @return A paginated span containing the items of the specified "gradual" page.
     template <typename T>
-    std::vector<T> gradualPaginate(const std::vector<T>& array, int size, int page) {
-        std::vector<T> result;
-        if (size <= 0) return result;
-        if (page < 0) return result;
+    std::span<T> gradualPaginate(const std::vector<T>& array, int size, int page) {
+        if (size <= 0) return {};
+        if (page < 0) return {};
         int startIndex = page;
         int endIndex = std::min(startIndex + size, static_cast<int>(array.size()));
-        if (startIndex >= array.size()) return result;
-        result.insert(result.end(), array.begin() + startIndex, array.begin() + endIndex);
-        return result;
+        if (startIndex >= array.size()) return {};
+        // result.insert(result.end(), array.begin() + startIndex, array.begin() + endIndex);
+        return {const_cast<T*>(array.data()) + startIndex, static_cast<size_t>(endIndex - startIndex)};
     }
 }

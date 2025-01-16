@@ -33,7 +33,7 @@ namespace eclipse::gui::cocos {
             m_label->limitLabelWidth(labelSize, 1.f, 0.25f);
             this->addChildAtPosition(m_label, geode::Anchor::Left, { 15.f, 0.f });
 
-            m_textInput = geode::TextInput::create(120, m_component->getTitle().c_str());
+            m_textInput = geode::TextInput::create(120, m_component->getTitle().c_str(), "font_default.fnt"_spr);
             m_textInput->setAnchorPoint({ 0.5f, 0.5f });
             m_textInput->getInputNode()->setAllowedChars(".0123456789");
             m_textInput->setDelegate(this);

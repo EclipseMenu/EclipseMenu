@@ -3,7 +3,6 @@
 
 #include <modules/gui/cocos/popup/options-popup.hpp>
 #include <modules/gui/components/toggle.hpp>
-#include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::cocos {
     class ToggleComponentNode : public BaseComponentNode<ToggleComponentNode, cocos2d::CCMenu, ToggleComponent, float> {
@@ -14,22 +13,6 @@ namespace eclipse::gui::cocos {
         CCMenuItemSpriteExtra* m_infoButton = nullptr;
 
     public:
-        cocos2d::extension::CCScale9Sprite* createButton(bool check) {
-            const auto tm = ThemeManager::get();
-            // prizm men 
-            auto box = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", { 0.0f, 0.0f, 0.0f, 0.0f });
-            box->setScale(0.285F);
-            if (check) {
-                auto checkmark = cocos2d::CCSprite::create("checkmark.png"_spr);
-                checkmark->setScale(0.3F);
-                checkmark->setAnchorPoint({0,0});
-                checkmark->setPosition({6,15});
-                box->addChild(checkmark);
-                checkmark->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
-            }
-            box->setColor(tm->getCheckboxBackgroundColor().toCCColor3B());
-            return box;
-        }
         bool init(float width) override {
             if (!CCMenu::init()) return false;
             const auto tm = ThemeManager::get();
@@ -38,7 +21,7 @@ namespace eclipse::gui::cocos {
             this->setContentSize({ width, 28.f });
 
             //m_toggler = geode::cocos::CCMenuItemExt::createTogglerWithStandardSprites(0.7f, [this](auto) {
-            m_toggler = geode::cocos::CCMenuItemExt::createToggler(createButton(true), createButton(false), [this](auto) {
+            m_toggler = geode::cocos::CCMenuItemExt::createToggler(createButton("checkmark.png"_spr), createButton(nullptr), [this](auto) {
                 auto value = !this->m_component->getValue();
                 m_component->setValue(value);
                 m_component->triggerCallback(value);
@@ -50,7 +33,8 @@ namespace eclipse::gui::cocos {
             auto labelSize = width - 35.f;
             auto offset = 0.f;
             if (auto options = m_component->getOptions().lock()) {
-                m_extraButton = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName("GJ_optionsBtn02_001.png", 0.5f, [options](auto) {
+                m_extraButton = geode::cocos::CCMenuItemExt::createSpriteExtra(
+                    createButton("settings.png"_spr, 0.35f), [options](auto) {
                     OptionsPopup::create(options)->show();
                 });
                 m_extraButton->setAnchorPoint({ 0.5, 0.5f });

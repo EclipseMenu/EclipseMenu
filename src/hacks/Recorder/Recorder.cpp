@@ -145,6 +145,11 @@ namespace eclipse::hacks::Recorder {
             auto ffmpeg = geode::Loader::get()->getLoadedMod("eclipse.ffmpeg-api");
             if (!ffmpeg) return;
 
+            // check if ffmpeg-api is 1.2.0 or higher
+            if (ffmpeg->getVersion() < geode::VersionInfo(1, 2, 0)) {
+                return;
+            }
+
             s_recorder.setCallback(callback);
 
             auto tab = gui::MenuTab::find("tab.recorder");

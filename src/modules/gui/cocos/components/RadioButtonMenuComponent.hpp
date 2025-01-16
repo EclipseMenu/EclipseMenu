@@ -11,19 +11,20 @@ namespace eclipse::gui::cocos {
         std::vector<std::pair<CCMenuItemToggler*, int>> m_toggles;
 
     public:
-        cocos2d::CCSprite* createRadioButton(bool check) {
+        static cocos2d::CCSprite* createRadioButton(bool check) {
             const auto tm = ThemeManager::get();
-            auto box = cocos2d::CCSprite::create("circle.png"_spr);
-            box->setScale(1.3F);
+            auto box = cocos2d::CCSprite::createWithSpriteFrameName("circle.png"_spr);
+            box->setScale(0.45f);
             if (check) {
-                auto checkmark = cocos2d::CCSprite::create("circle.png"_spr);
-                checkmark->setScale(0.7F);
+                auto checkmark = cocos2d::CCSprite::createWithSpriteFrameName("circle.png"_spr);
+                checkmark->setScale(0.7f);
                 box->addChildAtPosition(checkmark, geode::Anchor::Center);
                 checkmark->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
             }
             box->setColor(tm->getCheckboxBackgroundColor().toCCColor3B());
             return box;
         }
+
         void addRadioButton(std::shared_ptr<RadioButtonComponent> const& radioButton, float width) {
             const auto tm = ThemeManager::get();
             constexpr float height = 28.f;
@@ -53,7 +54,7 @@ namespace eclipse::gui::cocos {
 
             auto label = TranslatedLabel::create(radioButton->getTitle());
             label->setAnchorPoint({ 0, 0.5f });
-            label->limitLabelWidth(width - 30.f, 1.f, 0.25f);
+            label->limitLabelWidth(width - 40.f, 1.f, 0.25f);
             label->setColor(tm->getCheckboxForegroundColor().toCCColor3B());
             node->addChildAtPosition(label, geode::Anchor::Left, { 30.f, 0.f });
 
@@ -66,18 +67,16 @@ namespace eclipse::gui::cocos {
             this->setID(fmt::format("radio-group-{}"_spr, m_radioButtons[0]->getId()));
 
             for (auto const& radioButton : m_radioButtons) {
-                addRadioButton(radioButton, width);
+                addRadioButton(radioButton, width / m_radioButtons.size() - 5.f);
             }
 
             this->setContentSize({ width, 28.f * m_radioButtons.size() });
 
             this->setLayout(
-                geode::ColumnLayout::create()
+                geode::RowLayout::create()
                     ->setGap(0.f)
                     ->setAutoScale(false)
-                    ->setAxisReverse(true)
-                    ->setAutoGrowAxis(this->getContentHeight())
-                    ->setAxisAlignment(geode::AxisAlignment::End)
+                    ->setAxisAlignment(geode::AxisAlignment::Between)
             );
 
             return true;

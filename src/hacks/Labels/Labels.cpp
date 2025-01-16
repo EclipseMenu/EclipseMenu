@@ -14,6 +14,7 @@
 #include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/UILayer.hpp>
+#include <modules/gui/cocos/cocos.hpp>
 
 #include "Label.hpp"
 
@@ -392,6 +393,12 @@ namespace eclipse::hacks::Labels {
             labelsLayer->realignContainers(recreate);
         }
 
+        static void refreshCocosUI() {
+            if (auto cocos = gui::cocos::CocosRenderer::get()) {
+                cocos->refreshPage();
+            }
+        }
+
         static const std::vector<labels::LabelSettings> DEFAULT_LABELS;
 
         void init() override {
@@ -649,6 +656,8 @@ namespace eclipse::hacks::Labels {
 
                 m_labelToggles.push_back(toggle);
             }
+
+            refreshCocosUI();
         }
 
         std::vector<std::shared_ptr<gui::LabelSettingsComponent>> m_labelToggles;

@@ -46,18 +46,17 @@
 			"resources/BitmapFonts/font_default*"
 		],
 		"sprites": [
-			"resources/ECLIPSE-android.png",
-			"resources/checkmark.png",
-			"resources/circle.png"
+			"resources/ECLIPSE-android.png"
 		],
 		"spritesheets": {
-			"emojis": [ "resources/Emojis/*.png" ]
+			"emojis": [ "resources/Emojis/*.png" ],
+			"UISheet": [ "resources/UISheet/*.png" ]
 		}
 	},
 	"dependencies": [
         {
             "id": "eclipse.ffmpeg-api",
-            "version": ">=1.1.3",
+            "version": ">=1.2.0",
             "importance": "suggested"
         }
 	],

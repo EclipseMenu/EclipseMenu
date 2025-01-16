@@ -1,6 +1,7 @@
 #pragma once
 #include <modules/gui/popup.hpp>
 #include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
+#include <modules/gui/theming/manager.hpp>
 #include <modules/i18n/translations.hpp>
 
 namespace eclipse::gui::cocos {
@@ -33,6 +34,19 @@ namespace eclipse::gui::cocos {
                 i18n::get_(m_component->getTitle()),
                 i18n::get_(m_component->getDescription())
             );
+        }
+
+        static cocos2d::CCSprite* createButton(const char* innerFrameName, float scale = 0.4f) {
+            const auto tm = ThemeManager::get();
+            auto box = cocos2d::CCSprite::createWithSpriteFrameName("rectangle.png"_spr);
+            box->setScale(scale);
+            if (innerFrameName) {
+                auto inner = cocos2d::CCSprite::createWithSpriteFrameName(innerFrameName);
+                box->addChildAtPosition(inner, geode::Anchor::Center);
+                inner->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
+            }
+            box->setColor(tm->getCheckboxBackgroundColor().toCCColor3B());
+            return box;
         }
     };
 

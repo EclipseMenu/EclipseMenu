@@ -13,22 +13,6 @@ namespace eclipse::gui::cocos {
         geode::TextInput* m_textInput = nullptr;
 
     public:
-        cocos2d::extension::CCScale9Sprite* createButton(bool check) {
-            const auto tm = ThemeManager::get();
-            // prizm men 
-            auto box = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", { 0.0f, 0.0f, 0.0f, 0.0f });
-            box->setScale(0.285F);
-            if (check) {
-                auto checkmark = cocos2d::CCSprite::create("checkmark.png"_spr);
-                checkmark->setScale(0.3F);
-                checkmark->setAnchorPoint({0,0});
-                checkmark->setPosition({6,15});
-                box->addChild(checkmark);
-                checkmark->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
-            }
-            box->setColor(tm->getCheckboxBackgroundColor().toCCColor3B());
-            return box;
-        }
         bool init(float width) override {
             if (!CCMenu::init()) return false;
             const auto tm = ThemeManager::get();
@@ -36,7 +20,9 @@ namespace eclipse::gui::cocos {
             this->setID(fmt::format("toggle-{}"_spr, m_component->getId()));
             this->setContentSize({ width, 28.f });
 
-            m_toggler = geode::cocos::CCMenuItemExt::createToggler(createButton(true), createButton(false), [this](auto) {
+            m_toggler = geode::cocos::CCMenuItemExt::createToggler(
+                createButton("checkmark.png"_spr), createButton(nullptr),
+                [this](auto) {
                 auto value = !this->m_component->getState();
                 m_component->setState(value);
                 m_component->triggerCallback();
@@ -62,7 +48,7 @@ namespace eclipse::gui::cocos {
             m_label->setColor(tm->getCheckboxForegroundColor().toCCColor3B());
             this->addChildAtPosition(m_label, geode::Anchor::Left, { 30.f, 0.f });
 
-            m_textInput = geode::TextInput::create(120, m_component->getTitle().c_str());
+            m_textInput = geode::TextInput::create(120, m_component->getTitle().c_str(), "font_default.fnt"_spr);
             m_textInput->setAnchorPoint({ 0.5f, 0.5f });
             m_textInput->getInputNode()->setAllowedChars(".0123456789");
             m_textInput->setDelegate(this);
