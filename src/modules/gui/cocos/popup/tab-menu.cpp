@@ -47,10 +47,10 @@ namespace eclipse::gui::cocos {
             tab->setContentHeight(0.f);
             tab->setVisible(false);
         }
-        int amount = 9;
+        constexpr int amount = 9;
         auto newTabs = utils::gradualPaginate<CCMenuItemSpriteExtra*>(m_tabs, amount, m_currentPage);
         m_upArrow->setVisible(m_currentPage != 0 && m_tabs.size() > 10);
-        m_downArrow->setVisible(m_tabs.size() > 10 && (int)(m_tabs.size() / 4) != m_currentPage);
+        m_downArrow->setVisible(m_tabs.size() > 10 && m_currentPage < (m_tabs.size() - amount));
         for (auto const& tab : newTabs) {
             tab->setContentHeight(28.f);
             tab->setVisible(true);
@@ -124,14 +124,58 @@ namespace eclipse::gui::cocos {
         return true;
     }
 
+    inline TranslatedLabel* mapWithIcon(std::string_view name) {
+        auto label = TranslatedLabel::create(name);
+
+        static const std::unordered_map<std::string_view, std::string_view> icons = {
+            {"tab.global", "🌐 "},
+            {"tab.level", "⭐ "},
+            {"tab.bypass", "🔓 "},
+            {"tab.player", "🎮 "},
+            {"tab.bot", "🤖 "},
+            {"tab.creator", "🛠️ "},
+            {"tab.labels", "🏷️ "},
+            {"tab.shortcuts", "🔗 "},
+            {"tab.keybinds", "⌨️ "},
+            {"tab.interface", "⚙️ "},
+            {"tab.recorder", "📹 "},
+            {"BetterInfo", "🇮 "},
+        };
+
+        static const Label::EmojiMap emojis = {
+            {U"🌐", "tab_global.png"_spr},
+            {U"⭐", "tab_level.png"_spr},
+            {U"🔓", "tab_bypass.png"_spr},
+            {U"🎮", "tab_player.png"_spr},
+            {U"🤖", "tab_bot.png"_spr},
+            {U"🛠️", "tab_creator.png"_spr},
+            {U"🏷️", "tab_labels.png"_spr},
+            {U"🔗", "tab_shortcuts.png"_spr},
+            {U"⌨️", "tab_keybinds.png"_spr},
+            {U"⚙️", "tab_interface.png"_spr},
+            {U"📹", "tab_recorder.png"_spr},
+            {U"🇮", "tab_betterinfo.png"_spr},
+        };
+
+        std::string_view icon = "";
+        if (auto it = icons.find(name); it != icons.end()) {
+            icon = it->second;
+        }
+
+        label->enableEmojis("UISheet.png"_spr, &emojis);
+        label->enableEmojiColors(true);
+        label->setString(fmt::format("{}{}", icon, label->getString()));
+        label->limitLabelWidth(100, 1.f, .2f);
+        return label;
+    }
+
     bool TabButton::init(std::string name, cocos2d::CCSize size) {
         if (!CCNode::init()) return false;
         this->setScale(0.9F);
         this->setID(fmt::format("tab-button-{}"_spr, name));
         this->setContentSize(size);
 
-        m_label = TranslatedLabel::create(name);
-        m_label->limitLabelWidth(100, 1.f, .2f);
+        m_label = mapWithIcon(name);
         m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0.0f, 0.0f, 80.0f, 80.0f});
         m_bgSprite->setContentSize({size.width, size.height + 8.F}); // minimum 36
         m_bgSprite->setScaleY(.75F);

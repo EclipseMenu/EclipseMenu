@@ -280,6 +280,25 @@ namespace eclipse::gui {
         auto tab = std::make_shared<MenuTab>(std::string(name), false);
         m_tabs.push_back(tab);
 
+        // Make sure built-in tabs are sorted in a specific way and come first
+        static constexpr std::array<std::string_view, 11> builtInTabs = {
+            "tab.global", "tab.level", "tab.bypass", "tab.player", "tab.bot", "tab.creator",
+            "tab.labels", "tab.shortcuts", "tab.keybinds", "tab.interface", "tab.recorder"
+        };
+
+        std::ranges::sort(m_tabs, [](const auto& a, const auto& b) {
+            auto aIt = std::ranges::find(builtInTabs, a->getTitle());
+            auto bIt = std::ranges::find(builtInTabs, b->getTitle());
+            if (aIt != builtInTabs.end() && bIt != builtInTabs.end()) {
+                return aIt - builtInTabs.begin() < bIt - builtInTabs.begin();
+            }
+
+            if (aIt != builtInTabs.end()) return true;
+            if (bIt != builtInTabs.end()) return false;
+
+            return a->getTitle() < b->getTitle();
+        });
+
         // tell the renderer to update the tabs if we're past the initialization stage
         if (m_initialized && m_renderer) m_renderer->updateTabs();
 
