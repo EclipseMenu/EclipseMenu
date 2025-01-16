@@ -11,6 +11,7 @@
 #include <modules/gui/cocos/components/InputIntComponent.hpp>
 #include <modules/gui/cocos/components/InputTextComponent.hpp>
 #include <modules/gui/cocos/components/KeybindComponent.hpp>
+#include <modules/gui/cocos/components/LabelSettingsComponent.hpp>
 #include <modules/gui/cocos/components/RadioButtonMenuComponent.hpp>
 #include <modules/gui/cocos/components/ToggleComponent.hpp>
 
@@ -123,6 +124,27 @@ namespace eclipse::gui::cocos {
                         radioComponent = peekComponent<ComponentType::RadioButton>(tab->getComponents(), ++i + 1);
                     }
                     layer->addChild(RadioButtonsMenuNode::create(radioComponents, size.width));
+                } break;
+                case ComponentType::LabelSettings: {
+                    auto list = cocos2d::CCNode::create();
+                    list->addChild(LabelSettingsComponentNode::create(component, size.width));
+                    auto label2 = peekComponent<ComponentType::LabelSettings>(tab->getComponents(), i + 1);
+                    size_t count = 1;
+                    while (label2) {
+                        list->addChild(LabelSettingsComponentNode::create(*label2, size.width));
+                        label2 = peekComponent<ComponentType::LabelSettings>(tab->getComponents(), ++i + 1);
+                        ++count;
+                    }
+                    list->setContentHeight(count * 37.5f);
+                    list->setLayout(
+                        geode::ColumnLayout::create()
+                            ->setAutoScale(false)
+                            ->setAxisReverse(true)
+                            ->setAutoGrowAxis(std::nullopt)
+                            ->setAxisAlignment(geode::AxisAlignment::Start)
+                            ->setGap(1.5f)
+                    );
+                    layer->addChild(list);
                 } break;
                 case ComponentType::Color: {
                     layer->addChild(ColorComponentNode::create(component, size.width));
