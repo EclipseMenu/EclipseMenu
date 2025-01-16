@@ -30,7 +30,7 @@ namespace eclipse::gui::cocos {
         }
 
         void openDescriptionPopup() {
-            Popup::create(
+            eclipse::Popup::create(
                 i18n::get_(m_component->getTitle()),
                 i18n::get_(m_component->getDescription())
             );
