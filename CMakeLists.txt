@@ -42,7 +42,9 @@ if (WIN32)
   target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
 
   # Export all symbols for better debugging
-  set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+  # UPD: this bloats the binary size, so it's disabled for now
+  # (also it doesn't work for every crashlog anyways)
+  # set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 # macOS specific settings

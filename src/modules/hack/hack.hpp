@@ -147,8 +147,6 @@ static void onModify(auto& self) {\
 
 namespace eclipse::hack {
     /// @brief Base class for all hacks.
-    /// @tparam V Hack class type. Used for some preprocessor magic.
-    template <typename V>
     class Hack {
     public:
         virtual ~Hack() = default;
@@ -170,14 +168,10 @@ namespace eclipse::hack {
 
         /// @brief Get hack's position priority (used for sorting)
         [[nodiscard]] virtual int32_t getPriority() const { return 0; }
-
-        static constexpr bool HAS_IS_CHEATING = !std::is_same_v<decltype(&V::isCheating), decltype(&Hack::isCheating)>;
-        static constexpr bool HAS_UPDATE = !std::is_same_v<decltype(&V::update), decltype(&Hack::update)>;
     };
 
-    using BaseHack = Hack<void>;
-    using HackPtr = std::shared_ptr<BaseHack>;
-    using WeakHackPtr = std::weak_ptr<BaseHack>;
+    using HackPtr = std::shared_ptr<Hack>;
+    using WeakHackPtr = std::weak_ptr<Hack>;
 
     /// @brief Finds a hack by its ID.
     [[nodiscard]] WeakHackPtr find(std::string_view id);
@@ -204,21 +198,20 @@ namespace eclipse::hack {
     void registerHack() {
         auto& hacks = getHacks();
         auto hack = std::make_shared<T>();
-        auto ptr = std::reinterpret_pointer_cast<BaseHack>(hack);
-        hacks.push_back(ptr);
+        hacks.push_back(hack);
         if (isLateInit()) {
             hack->init();
         }
 
-        if constexpr (T::HAS_UPDATE) {
-            getUpdatedHacks().push_back(ptr);
+        if constexpr (!std::is_same_v<decltype(&T::update), decltype(&Hack::update)>) {
+            getUpdatedHacks().push_back(hack);
         }
-        if constexpr (T::HAS_IS_CHEATING) {
-            getCheatingHacks().push_back(ptr);
+        if constexpr (!std::is_same_v<decltype(&T::isCheating), decltype(&Hack::isCheating)>) {
+            getCheatingHacks().push_back(hack);
         }
     }
 
     #define REGISTER_HACK(hackClass) $execute { eclipse::hack::registerHack<hackClass>(); }
 
-    #define $hack(name) dummy_##name##_hack; struct ECLIPSE_DLL name : eclipse::hack::Hack<name>
+    #define $hack(name) dummy_##name##_hack; struct ECLIPSE_DLL name : eclipse::hack::Hack
 }
