@@ -43,6 +43,7 @@ namespace eclipse {
         [[nodiscard]] const PopupCallback& getCallback() const { return m_callback; }
 
         [[nodiscard]] std::string& getPromptValue() { return m_promptValue; }
+        [[nodiscard]] const std::string& getPromptValue() const { return m_promptValue; }
         [[nodiscard]] const PromptCallback& getPromptCallback() const { return m_promptCallback; }
 
     private:

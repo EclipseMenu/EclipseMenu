@@ -162,6 +162,14 @@ namespace eclipse::hacks::Shortcuts {
             geode::utils::file::openFolder(path);
         }
 
+    #ifdef GEODE_IS_ANDROID
+        static void openDevtools() {
+            // simple hack that will call onMoreGames, which should open devtools
+            // calling it on CCScene just to make sure hook will not actually crash on nullptr in case someone else hooked it
+            reinterpret_cast<MenuLayer*>(utils::get<cocos2d::CCScene>())->onMoreGames(nullptr);
+        }
+    #endif
+
         void init() override {
             config::setIfEmpty("shortcut.p1jump", keybinds::Keys::None);
             config::setIfEmpty("shortcut.p2jump", keybinds::Keys::None);
@@ -179,6 +187,12 @@ namespace eclipse::hacks::Shortcuts {
                 tab->addButton("shortcuts.inject-dll")->setDescription()->callback(injectDll)->handleKeybinds();
             )
             tab->addButton("shortcuts.save-folder")->setDescription()->callback(openSaveFolder)->handleKeybinds();
+            GEODE_ANDROID(
+                static auto devtools = geode::Loader::get()->getLoadedMod("geode.devtools");
+                if (devtools) {
+                    tab->addButton("shortcuts.devtools")->setDescription()->callback(openDevtools)->handleKeybinds();
+                }
+            )
 
             auto manager = keybinds::Manager::get();
             manager->addListener("shortcut.p1jump", [](bool down) {

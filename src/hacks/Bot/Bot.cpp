@@ -2,6 +2,7 @@
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
 #include <modules/gui/popup.hpp>
+#include <modules/gui/cocos/cocos.hpp>
 #include <modules/gui/components/button.hpp>
 #include <modules/gui/components/filesystem-combo.hpp>
 #include <modules/gui/components/radio.hpp>
@@ -28,6 +29,10 @@ namespace eclipse::hacks::Bot {
 
                 s_bot.save(Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
                 config::set("bot.selectedreplay", Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
+
+                // refresh cocos ui page
+                if (auto cocos = gui::cocos::CocosRenderer::get())
+                    cocos->refreshPage();
             },
             i18n::get_("common.create"),
             i18n::get_("common.cancel"),
@@ -137,6 +142,10 @@ namespace eclipse::hacks::Bot {
                     std::filesystem::remove(replayPath);
                     // apparently i cannot put the Popup below here otherwise some memory corruption happens, WHY? its not even a pointer!!
                     config::set("bot.selectedreplay", "");
+
+                    // refresh cocos ui page
+                    if (auto cocos = gui::cocos::CocosRenderer::get())
+                        cocos->refreshPage();
                 }
             }
         );

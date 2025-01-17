@@ -35,13 +35,9 @@ namespace eclipse::gui::cocos {
     }
 
     void CocosRenderer::shutdown(bool noCleanup) {
-        for (auto popup : m_optionsPopups)
+        for (auto popup : m_extraPopups)
             popup->removeFromParentAndCleanup(true);
-        m_optionsPopups.clear();
-
-        for (auto modal : m_modals)
-            modal->removeFromParentAndCleanup(true);
-        m_modals.clear();
+        m_extraPopups.clear();
 
         if (!m_popup) return;
 
@@ -65,7 +61,7 @@ namespace eclipse::gui::cocos {
     void CocosRenderer::showPopup(const eclipse::Popup& popup) {
         auto modal = ModalPopup::create(popup);
         modal->show();
-        m_modals.push_back(modal);
+        m_extraPopups.push_back(modal);
     }
 
     void CocosRenderer::refreshPage() const {

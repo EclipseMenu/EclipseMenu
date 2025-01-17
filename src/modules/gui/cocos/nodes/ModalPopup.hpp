@@ -10,6 +10,9 @@ namespace eclipse::gui::cocos {
         cocos2d::CCNode* createButtonSprite(std::string const& text) const;
         void keyBackClicked() override;
 
+        void onBtn1(cocos2d::CCObject* sender);
+        void onBtn2(cocos2d::CCObject* sender);
+
         bool m_cancelable = true;
         eclipse::Popup m_settings;
     public:

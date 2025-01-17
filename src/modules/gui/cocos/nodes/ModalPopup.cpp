@@ -31,30 +31,37 @@ namespace eclipse::gui::cocos {
         auto message = TranslatedLabel::createWrappedRaw(settings.getMessage(), m_size.width - 30.f, 0.8f);
         message->setID("message"_spr);
         message->setAlignment(BMFontAlignment::Center);
-        m_mainLayer->addChildAtPosition(message, geode::Anchor::Center, { 0.f, 10.f });
+
+        if (m_settings.isPrompt()) {
+            auto textBox = geode::TextInput::create(m_size.width - 30.f, settings.getPromptValue(), "font_default.fnt"_spr);
+            textBox->setID("textbox"_spr);
+            textBox->setAnchorPoint({ 0.5f, 0.5f });
+            textBox->setString(settings.getPromptValue());
+            textBox->setCallback([this](const std::string& text) {
+                m_settings.getPromptValue() = text;
+            });
+            m_mainLayer->addChildAtPosition(textBox, geode::Anchor::Center, { 0.f, -10.f });
+            m_mainLayer->addChildAtPosition(message, geode::Anchor::Center, { 0.f, 25.f });
+        } else {
+            m_mainLayer->addChildAtPosition(message, geode::Anchor::Center, { 0.f, 10.f });
+        }
 
         auto buttonsMenu = cocos2d::CCMenu::create();
         buttonsMenu->setID("buttons-menu"_spr);
         buttonsMenu->setContentSize({ 200.f, 28.f });
         buttonsMenu->setAnchorPoint({ 0.5f, 0.5f });
-        auto btn1 = geode::cocos::CCMenuItemExt::createSpriteExtra(
+        auto btn1 = CCMenuItemSpriteExtra::create(
             createButtonSprite(settings.getButton1()),
-            [this](auto) {
-                m_settings.getCallback()(true);
-                this->onClose(nullptr);
-            }
+            this, menu_selector(ModalPopup::onBtn1)
         );
         btn1->setID("button1"_spr);
         buttonsMenu->addChild(btn1);
 
         if (!settings.getButton2().empty()) {
             m_cancelable = false;
-            auto btn2 = geode::cocos::CCMenuItemExt::createSpriteExtra(
+            auto btn2 = CCMenuItemSpriteExtra::create(
                 createButtonSprite(settings.getButton2()),
-                [this](auto) {
-                    m_settings.getCallback()(false);
-                    this->onClose(nullptr);
-                }
+                this, menu_selector(ModalPopup::onBtn2)
             );
             btn2->setID("button2"_spr);
             buttonsMenu->addChild(btn2);
@@ -88,5 +95,23 @@ namespace eclipse::gui::cocos {
             Popup::keyBackClicked();
             m_settings.getCallback()(true);
         }
+    }
+
+    void ModalPopup::onBtn1(cocos2d::CCObject* sender) {
+        if (m_settings.isPrompt()) {
+            m_settings.getPromptCallback()(true, m_settings.getPromptValue());
+        } else {
+            m_settings.getCallback()(true);
+        }
+        this->onClose(nullptr);
+    }
+
+    void ModalPopup::onBtn2(cocos2d::CCObject* sender) {
+        if (m_settings.isPrompt()) {
+            m_settings.getPromptCallback()(false, m_settings.getPromptValue());
+        } else {
+            m_settings.getCallback()(false);
+        }
+        this->onClose(nullptr);
     }
 }

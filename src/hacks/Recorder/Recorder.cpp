@@ -147,6 +147,7 @@ namespace eclipse::hacks::Recorder {
 
             // check if ffmpeg-api is 1.2.0 or higher
             if (ffmpeg->getVersion() < geode::VersionInfo(1, 2, 0)) {
+                geode::log::warn("Internal Recorder requires ffmpeg-api 1.2.0 or higher. (Current: {})", ffmpeg->getVersion());
                 return;
             }
 

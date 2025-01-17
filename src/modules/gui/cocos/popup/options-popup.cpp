@@ -47,14 +47,14 @@ namespace eclipse::gui::cocos {
         m_mainLayer->addChild(m_contentView, 1);
 
         // Register the popup with the engine for cleanup
-        CocosRenderer::get()->registerOptionsPopup(this);
+        CocosRenderer::get()->registerModal(this);
 
         return true;
     }
 
     void OptionsPopup::onExit() {
         Popup::onExit();
-        CocosRenderer::get()->unregisterOptionsPopup(this);
+        CocosRenderer::get()->unregisterModal(this);
     }
 
     OptionsPopup* OptionsPopup::create(std::shared_ptr<MenuTab> const& tab) {

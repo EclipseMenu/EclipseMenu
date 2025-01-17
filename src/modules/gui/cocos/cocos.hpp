@@ -37,15 +37,14 @@ namespace eclipse::gui::cocos {
         /// @brief Get the selected tab in the popup. If popup is not open, returns an empty string.
         [[nodiscard]] std::string_view getSelectedTab() const;
 
-        void registerOptionsPopup(OptionsPopup* popup) { m_optionsPopups.push_back(popup); }
-        void unregisterOptionsPopup(OptionsPopup* popup) { std::erase(m_optionsPopups, popup); }
-        void registerModal(ModalPopup* modal) { m_modals.push_back(modal); }
-        void unregisterModal(ModalPopup* modal) { std::erase(m_modals, modal); }
+        /// @brief Will queue the node to be closed after the main popup closes.
+        void registerModal(cocos2d::CCNode* modal) { if (m_popup) m_extraPopups.push_back(modal); }
+        /// @brief Will remove the node from the queue to be closed after the main popup closes.
+        void unregisterModal(cocos2d::CCNode* modal) { std::erase(m_extraPopups, modal); }
 
     private:
         Popup* m_popup = nullptr;
-        std::vector<OptionsPopup*> m_optionsPopups;
-        std::vector<ModalPopup*> m_modals;
+        std::vector<cocos2d::CCNode*> m_extraPopups;
     };
 
 }

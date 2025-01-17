@@ -39,6 +39,8 @@ namespace eclipse::gui::cocos {
         bool init(float width) override {
             if (!CCMenu::init()) return false;
 
+            m_component->onUpdate();
+
             this->setID(fmt::format("filesystem-combo-{}"_spr, m_component->getId()));
             this->setContentSize({ width, 28.f });
 
