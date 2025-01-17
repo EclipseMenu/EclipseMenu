@@ -10,7 +10,6 @@
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/ShaderLayer.hpp>
 
-#include <regex>
 #include <modules/i18n/translations.hpp>
 #include <modules/recorder/DSPRecorder.hpp>
 
@@ -85,6 +84,12 @@ namespace eclipse::hacks::Recorder {
         }
     }
 
+    inline void trimString(std::string& str) {
+        str.erase(std::ranges::unique(str, [](char a, char b) {
+            return std::isspace(a) && std::isspace(b);
+        }).begin(), str.end());
+    }
+
     void start() {
         if (!utils::get<PlayLayer>()) return;
 
@@ -100,7 +105,8 @@ namespace eclipse::hacks::Recorder {
         std::string trimmedLevelName = lvl->m_levelName;
         std::erase(trimmedLevelName, '/');
         std::erase(trimmedLevelName, '\\');
-        trimmedLevelName = std::regex_replace(trimmedLevelName, std::regex("\\s+"), " ");
+        trimString(trimmedLevelName);
+
         std::filesystem::path renderDirectory = geode::Mod::get()->getSaveDir() / "renders" / STR(trimmedLevelName);
 
         if (!std::filesystem::exists(renderDirectory))

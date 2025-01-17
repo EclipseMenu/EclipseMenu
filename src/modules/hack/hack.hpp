@@ -194,24 +194,20 @@ namespace eclipse::hack {
     /// @brief Late initializes all hacks.
     void lateInitializeHacks();
 
-    template <typename T>
-    void registerHack() {
-        auto& hacks = getHacks();
-        auto hack = std::make_shared<T>();
-        hacks.push_back(hack);
-        if (isLateInit()) {
-            hack->init();
-        }
-
-        if constexpr (!std::is_same_v<decltype(&T::update), decltype(&Hack::update)>) {
-            getUpdatedHacks().push_back(hack);
-        }
-        if constexpr (!std::is_same_v<decltype(&T::isCheating), decltype(&Hack::isCheating)>) {
-            getCheatingHacks().push_back(hack);
-        }
+    #define REGISTER_HACK(hackClass) $execute {\
+        auto& hacks = eclipse::hack::getHacks();\
+        auto hack = std::make_shared<hackClass>();\
+        hacks.push_back(hack);\
+        if (eclipse::hack::isLateInit()) {\
+            hack->init();\
+        }\
+        if constexpr (!std::is_same_v<decltype(&hackClass::update), decltype(&eclipse::hack::Hack::update)>) {\
+            eclipse::hack::getUpdatedHacks().push_back(hack);\
+        }\
+        if constexpr (!std::is_same_v<decltype(&hackClass::isCheating), decltype(&eclipse::hack::Hack::isCheating)>) {\
+            eclipse::hack::getCheatingHacks().push_back(hack);\
+        }\
     }
-
-    #define REGISTER_HACK(hackClass) $execute { eclipse::hack::registerHack<hackClass>(); }
 
     #define $hack(name) dummy_##name##_hack; struct ECLIPSE_DLL name : eclipse::hack::Hack
 }

@@ -11,7 +11,7 @@ namespace eclipse::gui::cocos {
             m_component->triggerCallback();
         }
 
-        bool init(float width) override {
+        bool init(float width) {
             const auto tm = ThemeManager::get();
 
             auto label = TranslatedLabel::create(m_component->getTitle());

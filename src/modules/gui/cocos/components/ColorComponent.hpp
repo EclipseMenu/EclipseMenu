@@ -20,7 +20,7 @@ namespace eclipse::gui::cocos {
         }
 
     public:
-        bool init(float width) override {
+        bool init(float width) {
             if (!CCMenu::init()) return false;
 
             this->setID(fmt::format("color-{}"_spr, m_component->getId()));

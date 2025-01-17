@@ -16,12 +16,10 @@ namespace eclipse::gui::cocos {
     protected:
         std::shared_ptr<U> m_component;
     public:
-        virtual bool init(Args... args) = 0;
-
         static S* create(const std::shared_ptr<Component>& component, Args... args) {
             auto ret = new S;
             ret->m_component = std::static_pointer_cast<U>(component);
-            if (ret->init(args...)) {
+            if (ret->S::init(args...)) {
                 ret->autorelease();
                 return ret;
             }

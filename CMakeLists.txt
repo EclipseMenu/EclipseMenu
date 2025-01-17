@@ -22,6 +22,7 @@ if (DEFINED ENV{GITHUB_ACTIONS})
   set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
   target_compile_definitions(${PROJECT_NAME} PRIVATE GITHUB_ACTIONS)
   message(STATUS "GitHub Actions build detected")
+  set(ECLIPSE_DISABLE_INCREMENTAL_LINK ON)
 endif()
 
 # Make sure we can include headers from src
@@ -45,6 +46,18 @@ if (WIN32)
   # UPD: this bloats the binary size, so it's disabled for now
   # (also it doesn't work for every crashlog anyways)
   # set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+  # Disable incremental linking if requested
+  if (DEFINED ECLIPSE_DISABLE_INCREMENTAL_LINK)
+    message(STATUS "Disabling incremental linking")
+    if (MSVC)
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /INCREMENTAL:NO")
+      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /INCREMENTAL:NO")
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-incremental:no")
+      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-incremental:no")
+    endif()
+  endif()
 endif()
 
 # macOS specific settings

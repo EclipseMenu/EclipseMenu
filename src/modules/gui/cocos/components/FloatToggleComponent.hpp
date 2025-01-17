@@ -13,7 +13,7 @@ namespace eclipse::gui::cocos {
         geode::TextInput* m_textInput = nullptr;
 
     public:
-        bool init(float width) override {
+        bool init(float width) {
             if (!CCMenu::init()) return false;
             const auto tm = ThemeManager::get();
 

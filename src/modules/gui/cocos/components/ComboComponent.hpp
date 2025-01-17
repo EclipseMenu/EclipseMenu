@@ -36,7 +36,7 @@ namespace eclipse::gui::cocos {
             updateLabel();
         }
 
-        bool init(float width) override {
+        bool init(float width) {
             if (!CCMenu::init()) return false;
             const auto tm = ThemeManager::get();
 

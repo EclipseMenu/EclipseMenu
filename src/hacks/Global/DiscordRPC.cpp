@@ -214,9 +214,7 @@ namespace eclipse::hacks::Global {
                 config::setIfEmpty<std::string_view>("global.discordrpc.level.largeimage", "circle");
                 config::setIfEmpty<std::string_view>("global.discordrpc.level.largeimage.text", "Geometry Dash ({username})");
                 config::setIfEmpty<std::string_view>("global.discordrpc.level.smallimage", "{difficultyKey}");
-                config::setIfEmpty<std::string_view>(
-                    "global.discordrpc.level.smallimage.text", "{levelStars}{starEmoji} (ID: {levelID})"
-                );
+                config::setIfEmpty<std::string_view>("global.discordrpc.level.smallimage.text", "{levelStars}{starEmoji} (ID: {levelID})");
 
                 // Platformer level
                 config::setIfEmpty<std::string_view>("global.discordrpc.plat.details", "{levelName} by {author}");

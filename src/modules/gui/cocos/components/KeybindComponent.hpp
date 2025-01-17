@@ -75,7 +75,7 @@ namespace eclipse::gui::cocos {
         TranslatedLabel* m_keyName{};
 
     public:
-        bool init(float width) override {
+        bool init(float width) {
             if (!CCMenu::init()) return false;
 
             this->setID(fmt::format("keybind-{}"_spr, m_component->getId()));
