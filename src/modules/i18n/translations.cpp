@@ -237,8 +237,18 @@ namespace eclipse::i18n {
     void downloadLanguages() {
         auto lastCheck = geode::Mod::get()->getSavedValue<int64_t>("language-check", ECLIPSE_TRANSLATION_TIMESTAMP);
 
-        // our build timestamp is newer than the last check (no need to check)
-        if (lastCheck <= ECLIPSE_TRANSLATION_TIMESTAMP) return;
+        // our build timestamp is newer than the last check
+        if (lastCheck <= ECLIPSE_TRANSLATION_TIMESTAMP) {
+            // remove local languages (since they are outdated)
+            static auto langsPath = geode::Mod::get()->getSaveDir() / "languages";
+            std::error_code ec;
+            std::filesystem::remove_all(langsPath, ec);
+            if (ec) {
+                geode::log::warn("Failed to remove languages directory: {}", ec.message().c_str());
+            }
+            geode::Mod::get()->setSavedValue("language-check", std::chrono::system_clock::now().time_since_epoch().count());
+            return;
+        }
 
         // perform a check once per day
         auto now = std::chrono::system_clock::now().time_since_epoch().count();
