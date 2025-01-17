@@ -40,17 +40,17 @@ namespace eclipse::hacks::Player {
         ADD_HOOKS_DELEGATE("player.customwavetrail")
 
         void updateStroke(float dt) {
-            if (config::get<bool>("player.customwavetrail.rainbow", false)) {
-                auto speed = config::get<float>("player.customwavetrail.speed", 0.5f);
-                auto saturation = config::get<float>("player.customwavetrail.saturation", 100.f);
-                auto value = config::get<float>("player.customwavetrail.value", 100.f);
+            if (config::get<"player.customwavetrail.rainbow", bool>(false)) {
+                auto speed = config::get<"player.customwavetrail.speed", float>(0.5f);
+                auto saturation = config::get<"player.customwavetrail.saturation", float>(100.f);
+                auto value = config::get<"player.customwavetrail.value", float>(100.f);
                 this->setColor(utils::getRainbowColor(speed / 10.f, saturation / 100.f, value / 100.f).toCCColor3B());
-            } else if (config::get<bool>("player.customwavetrail.customcolor", false)) {
-                auto color = config::get<gui::Color>("player.customwavetrail.color", gui::Color::WHITE);
+            } else if (config::get<"player.customwavetrail.customcolor", bool>(false)) {
+                auto color = config::get<"player.customwavetrail.color", gui::Color>(gui::Color::WHITE);
                 this->setColor(color.toCCColor3B());
             }
 
-            this->m_pulseSize = config::get<float>("player.customwavetrail.scale", 2.f);
+            this->m_pulseSize = config::get<"player.customwavetrail.scale", float>(2.f);
 
             HardStreak::updateStroke(dt);
         }

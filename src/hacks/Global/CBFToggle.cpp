@@ -28,8 +28,9 @@ namespace eclipse::hacks::Global {
                 labels::VariableManager::get().setVariable("cbf", !v);
             }, cbf);
 
-            config::setTemp("syzzi.click_between_frames.toggle", !cbf->getSettingValue<bool>("soft-toggle"));
-            labels::VariableManager::get().setVariable("cbf", cbf->getSettingValue<bool>("soft-toggle"));
+            bool isCBF = !cbf->getSettingValue<bool>("soft-toggle");
+            config::setTemp("syzzi.click_between_frames.toggle", isCBF);
+            labels::VariableManager::get().setVariable("cbf", isCBF);
         }
 
         [[nodiscard]] const char* getId() const override { return "Click Between Frames"; }

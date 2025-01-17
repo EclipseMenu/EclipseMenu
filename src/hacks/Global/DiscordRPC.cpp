@@ -304,8 +304,8 @@ namespace eclipse::hacks::Global {
         }
 
         void update() override {
-            if (!config::get<bool>("global.discordrpc", false)) return;
-            auto interval = config::get<float>("global.discordrpc.interval", 200.0f);
+            if (!config::get<"global.discordrpc", bool>(false)) return;
+            auto interval = config::get<"global.discordrpc.interval", float>(200.0f);
             auto now = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - s_lastDiscordUpdate).count();
             if (static_cast<float>(elapsed) >= interval) {

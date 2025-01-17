@@ -33,7 +33,7 @@ namespace eclipse::hacks::Global {
         ADD_HOOKS_DELEGATE("level.accuratepercentage")
 
         float customGetProgress() {
-            if (config::get<bool>("level.accuratepercent.bugfix", true))
+            if (config::get<"level.accuratepercent.bugfix", bool>(true))
                 return utils::getActualProgress(this);
             return this->getCurrentPercent();
         }
@@ -43,16 +43,16 @@ namespace eclipse::hacks::Global {
             if (m_percentageLabel == nullptr) return;
 
             if (m_level->isPlatformer()) {
-                if (!config::get<bool>("level.accuratepercent.show_minutes", true)) return;
+                if (!config::get<"level.accuratepercent.show_minutes", bool>(true)) return;
                 auto time = utils::formatTime(m_timePlayed);
                 m_percentageLabel->setString(time.c_str());
-            } else if (config::get<bool>("level.accuratepercent.normal_mode", true)) {
+            } else if (config::get<"level.accuratepercent.normal_mode", bool>(true)) {
                 float percent = customGetProgress();
                 auto numDigits = config::get<int>("level.accuratepercent.amount", 4);
                 m_percentageLabel->setString(fmt::format("{:.{}f}%", percent, numDigits).c_str());
 
                 // If bugfix is active, also fix the progress bar
-                if (!config::get<bool>("level.accuratepercent.bugfix", true)) return;
+                if (!config::get<"level.accuratepercent.bugfix", bool>(true)) return;
                 m_progressFill->setTextureRect({
                     0, 0,
                     (m_progressBar->getTextureRect().getMaxX() - 5) * percent / 100.f,

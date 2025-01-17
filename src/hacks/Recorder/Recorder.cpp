@@ -251,13 +251,13 @@ namespace eclipse::hacks::Recorder {
 
         void update(float dt) {
             if (s_recorder.isRecording()) {
-                float framerate = config::get<float>("recorder.fps", 60.f);
+                float framerate = config::get<"recorder.fps", float>(60.f);
 
                 if (framerate < 1)
                     framerate = 1;
 
-                float tps = eclipse::config::get<bool>("global.tpsbypass.toggle", false)
-                                ? eclipse::config::get<float>("global.tpsbypass", 240.f)
+                float tps = eclipse::config::get<"global.tpsbypass.toggle", bool>(false)
+                                ? eclipse::config::get<"global.tpsbypass", float>(240.f)
                                 : 240.f;
 
                 dt = 1.f / framerate;
@@ -282,7 +282,7 @@ namespace eclipse::hacks::Recorder {
         void update(float dt) {
             if (!s_recorder.isRecording() || m_gameState.m_currentProgress <= 0) return GJBaseGameLayer::update(dt);
 
-            float endscreen = config::get<float>("recorder.endscreen", 5.f);
+            float endscreen = config::get<"recorder.endscreen", float>(5.f);
             eclipse::config::set<bool>("global.tpsbypass.toggle", true);
 
             if (levelDone) {
@@ -298,7 +298,7 @@ namespace eclipse::hacks::Recorder {
             if (!s_recorder.isRecording())
                 return GJBaseGameLayer::update(dt);
 
-            float fps = config::get<float>("recorder.fps", 60.f);
+            float fps = config::get<"recorder.fps", float>(60.f);
             float timewarp = m_gameState.m_timeWarp;
 
             totalTime += dt;

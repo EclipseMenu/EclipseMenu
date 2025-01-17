@@ -110,8 +110,8 @@ namespace eclipse::hacks::Level {
     };
 
     inline bool shouldDrawHitboxes() {
-        return config::get<bool>("level.showhitboxes", false)
-            || (s_isDead && config::get<bool>("level.showhitboxes.ondeath", false));
+        return config::get<"level.showhitboxes", bool>()
+            || (s_isDead && config::get<"level.showhitboxes.ondeath", bool>());
     }
 
     inline HitboxType getHitboxType(const gui::Color& color) {
@@ -159,41 +159,41 @@ namespace eclipse::hacks::Level {
         GJBaseGameLayer* bgl = utils::get<GJBaseGameLayer>();
 
         if (!bgl || drawNode != bgl->m_debugDrawNode) return;
-        if (!config::get<bool>("level.showhitboxes", false)) return;
+        if (!config::get<"level.showhitboxes", bool>(false)) return;
 
         bool hidePlayer = false;
 
-        bool customColors = config::get<bool>("level.showhitboxes.customcolors", false);
+        bool customColors = config::get<"level.showhitboxes.customcolors", bool>();
 
         switch (HitboxType type = getHitboxType(borderColor)) {
             case HitboxType::Solid:
                 borderColor = !customColors ? borderColor
-                    : config::get<gui::Color>("level.showhitboxes.solid_color", gui::Color(0, 0.247, 1));
+                    : config::get<"level.showhitboxes.solid_color", gui::Color>(gui::Color(0, 0.247, 1));
                 break;
             case HitboxType::Danger:
                 borderColor = !customColors ? borderColor
-                    : config::get<gui::Color>("level.showhitboxes.danger_color", gui::Color(1, 0, 0));
+                    : config::get<"level.showhitboxes.danger_color", gui::Color>(gui::Color(1, 0, 0));
                 break;
             case HitboxType::Player:
                 borderColor = !customColors ? borderColor
-                    : config::get<gui::Color>("level.showhitboxes.player_color_rotated", gui::Color(1, 1, 0));
-                hidePlayer = config::get<bool>("level.showhitboxes.hideplayer", false);
+                    : config::get<"level.showhitboxes.player_color_rotated", gui::Color>(gui::Color(1, 1, 0));
+                hidePlayer = config::get<"level.showhitboxes.hideplayer", bool>(false);
                 if (hidePlayer)
                     borderColor = gui::Color(0.f, 0.f, 0.f, 0.f);
                 break;
             case HitboxType::Other:
                 borderColor = !customColors ? borderColor
-                    : config::get<gui::Color>("level.showhitboxes.other_color", gui::Color(0, 1, 0));
+                    : config::get<"level.showhitboxes.other_color", gui::Color>(gui::Color(0, 1, 0));
                 break;
         }
 
-        borderSize = hidePlayer ? 0.f : config::get<float>("level.showhitboxes.bordersize", borderSize);
+        borderSize = hidePlayer ? 0.f : config::get<"level.showhitboxes.bordersize", float>(borderSize);
 
-        if (config::get<bool>("level.showhitboxes.fillalpha.toggle", false)) {
+        if (config::get<"level.showhitboxes.fillalpha.toggle", bool>()) {
             color.r = borderColor.r;
             color.g = borderColor.g;
             color.b = borderColor.b;
-            color.a = hidePlayer ? 0.f : config::get<float>("level.showhitboxes.fillalpha", 0.25f);
+            color.a = hidePlayer ? 0.f : config::get<"level.showhitboxes.fillalpha", float>(0.25f);
         }
     }
 
@@ -220,12 +220,12 @@ namespace eclipse::hacks::Level {
     };
 
     void forceDraw(GJBaseGameLayer* self, bool editor) {
-        if (editor && config::get<bool>("level.showhitboxes.editor", false)) return;
-        bool show = config::get<bool>("level.showhitboxes", false);
+        if (editor && !config::get<"level.showhitboxes.editor", bool>()) return;
+        bool show = config::get<"level.showhitboxes", bool>();
         bool robtopShow = editor || robtopHitboxCheck();
         self->m_debugDrawNode->setVisible(show || robtopShow);
 
-        bool onDeath = config::get<bool>("level.showhitboxes.ondeath", false);
+        bool onDeath = config::get<"level.showhitboxes.ondeath", bool>();
 
         if (!show) return;
         if (onDeath) {
@@ -233,20 +233,20 @@ namespace eclipse::hacks::Level {
             if (!s_isDead && !editor) return;
         }
 
-        if (!config::get<bool>("level.showhitboxes.hideplayer", false)) {
-            bool customColors = config::get<bool>("level.showhitboxes.customcolors", false);
+        if (!config::get<"level.showhitboxes.hideplayer", bool>()) {
+            bool customColors = config::get<"level.showhitboxes.customcolors", bool>();
 
-            auto borderSize = config::get<float>("level.showhitboxes.bordersize", 0.25f);
+            auto borderSize = config::get<"level.showhitboxes.bordersize", float>(0.25f);
 
-            float alpha = config::get<bool>("level.showhitboxes.fillalpha.toggle", false)
-                              ? config::get<float>("level.showhitboxes.fillalpha", 0.25f)
+            float alpha = config::get<"level.showhitboxes.fillalpha.toggle", bool>()
+                              ? config::get<"level.showhitboxes.fillalpha", float>(0.25f)
                               : 0.f;
 
             gui::Color playerColor = customColors
-                                         ? config::get<gui::Color>("level.showhitboxes.player_color", gui::Color(1, 1, 0))
+                                         ? config::get<"level.showhitboxes.player_color", gui::Color>(gui::Color(1, 1, 0))
                                          : gui::Color(1, 0, 0, alpha);
             gui::Color playerColorInner = customColors
-                                              ? config::get<gui::Color>("level.showhitboxes.player_color_inner", gui::Color(1, 1, 0))
+                                              ? config::get<"level.showhitboxes.player_color_inner", gui::Color>(gui::Color(1, 1, 0))
                                               : gui::Color(0, 1, 0, alpha);
             playerColor.a = alpha;
             playerColorInner.a = alpha;
@@ -330,7 +330,7 @@ namespace eclipse::hacks::Level {
         void processCommands(float dt) {
             GJBaseGameLayer::processCommands(dt);
 
-            if (s_isDead || !config::get<bool>("level.showhitboxes.traillength.toggle", false))
+            if (s_isDead || !config::get<"level.showhitboxes.traillength.toggle", bool>(false))
                 return;
 
             s_playerTrail1.emplace_back(
@@ -349,7 +349,7 @@ namespace eclipse::hacks::Level {
                 );
             }
 
-            auto max = static_cast<int>(config::get<float>("level.showhitboxes.traillength", 240.f));
+            auto max = static_cast<int>(config::get<"level.showhitboxes.traillength", float>(240.f));
 
             while (s_playerTrail1.size() > max)
                 s_playerTrail1.pop_front();
@@ -361,9 +361,10 @@ namespace eclipse::hacks::Level {
         void updateDebugDraw() override {
             auto ptr1 = reinterpret_cast<uintptr_t>(this);
             auto ptr2 = reinterpret_cast<uintptr_t>(utils::get<LevelEditorLayer>());
+
             // unlock hitboxes in editor even if they are disabled
-            if (ptr1 == ptr2 && config::get<bool>("level.showhitboxes.editor", false))
-                this->m_isDebugDrawEnabled |= config::get<bool>("level.showhitboxes", false);
+            if (ptr1 == ptr2 && config::get<"level.showhitboxes.editor", bool>(false))
+                this->m_isDebugDrawEnabled |= config::get<"level.showhitboxes", bool>(false);
 
             s_slopeHitboxFix = true;
             GJBaseGameLayer::updateDebugDraw();

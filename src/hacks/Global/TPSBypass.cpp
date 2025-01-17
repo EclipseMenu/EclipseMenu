@@ -63,7 +63,7 @@ namespace eclipse::hacks::Global {
         }
 
         float getModifiedDelta(float dt) {
-            return getCustomDelta(dt, config::get("global.tpsbypass", 240.f));
+            return getCustomDelta(dt, config::get<"global.tpsbypass", float>(240.f));
         }
 
         bool shouldContinue(const Fields* fields) const {
@@ -82,7 +82,7 @@ namespace eclipse::hacks::Global {
             // store current frame delta for later use in updateVisibility
             fields->m_realDelta = getCustomDelta(dt, 240.f, false);
 
-            auto newTPS = config::get("global.tpsbypass", 240.f);
+            auto newTPS = config::get<"global.tpsbypass", float>(240.f);
             auto newDelta = 1.0 / newTPS;
 
             if (fields->m_extraDelta >= newDelta) {
@@ -131,7 +131,7 @@ namespace eclipse::hacks::Global {
             auto timestamp = m_level->m_timestamp;
             auto currentProgress = m_gameState.m_currentProgress;
             // this is only an issue for 2.2+ levels (with TPS greater than 240)
-            if (timestamp > 0 && config::get("global.tpsbypass", 240.f) > 240.f) {
+            if (timestamp > 0 && config::get<"global.tpsbypass", float>(240.f) > 240.f) {
                 // recalculate m_currentProgress based on the actual time passed
                 auto progress = utils::getActualProgress(this);
                 m_gameState.m_currentProgress = timestamp * progress / 100.f;
@@ -155,7 +155,7 @@ namespace eclipse::hacks::Global {
             // levelComplete uses m_gameState.m_unkUint2 to store the timestamp
             // also we can't rely on m_level->m_timestamp, because it might not be updated yet
             auto oldTimestamp = m_gameState.m_unkUint2;
-            if (config::get("global.tpsbypass", 240.f) > 240.f) {
+            if (config::get<"global.tpsbypass", float>(240.f) > 240.f) {
                 auto ticks = static_cast<uint32_t>(std::round(m_gameState.m_levelTime * 240));
                 m_gameState.m_unkUint2 = ticks;
             }
