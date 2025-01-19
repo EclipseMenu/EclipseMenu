@@ -32,6 +32,11 @@ namespace eclipse::gui::cocos {
         message->setID("message"_spr);
         message->setAlignment(BMFontAlignment::Center);
 
+        // add extra height if the message is too tall
+        auto height = std::max(message->getContentSize().height, 85.f) - 85.f;
+        m_mainLayer->setContentSize({ m_size.width, m_size.height + height });
+        m_mainLayer->updateLayout();
+
         if (m_settings.isPrompt()) {
             auto textBox = geode::TextInput::create(m_size.width - 30.f, settings.getPromptValue(), "font_default.fnt"_spr);
             textBox->setID("textbox"_spr);

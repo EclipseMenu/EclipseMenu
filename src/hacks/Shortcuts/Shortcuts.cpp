@@ -187,12 +187,6 @@ namespace eclipse::hacks::Shortcuts {
                 tab->addButton("shortcuts.inject-dll")->setDescription()->callback(injectDll)->handleKeybinds();
             )
             tab->addButton("shortcuts.save-folder")->setDescription()->callback(openSaveFolder)->handleKeybinds();
-            GEODE_ANDROID(
-                static auto devtools = geode::Loader::get()->getLoadedMod("geode.devtools");
-                if (devtools) {
-                    tab->addButton("shortcuts.devtools")->setDescription()->callback(openDevtools)->handleKeybinds();
-                }
-            )
 
             auto manager = keybinds::Manager::get();
             manager->addListener("shortcut.p1jump", [](bool down) {
@@ -206,6 +200,13 @@ namespace eclipse::hacks::Shortcuts {
                 gameLayer->queueButton(1, down, true);
             });
         }
+
+        GEODE_ANDROID(void lateInit() override {
+            auto devtools = geode::Loader::get()->getLoadedMod("geode.devtools");
+            if (devtools) {
+                tab->addButton("shortcuts.devtools")->setDescription()->callback(openDevtools)->handleKeybinds();
+            }
+        })
 
         [[nodiscard]] const char* getId() const override { return "Shortcuts"; }
     };
