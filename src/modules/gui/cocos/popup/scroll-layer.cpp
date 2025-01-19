@@ -1,4 +1,6 @@
 #include "scroll-layer.hpp"
+#include "utils.hpp"
+
 #include <modules/utils/SingletonCache.hpp>
 // all thanks to https://github.com/CallocGD/GD-2.205-Decompiled
 // and also from https://github.com/geode-sdk/geode
@@ -139,8 +141,7 @@ namespace eclipse::gui::cocos {
         auto ret = new ScrollLayer(rect, scroll, vertical);
         ret->autorelease();
 
-        ret->setTouchPriority(utils::get<cocos2d::CCTouchDispatcher>()->getTargetPrio());
-        utils::get<cocos2d::CCTouchDispatcher>()->registerForcePrio(ret, 2);
+        eclipse::utils::incrementForcePrio(ret);
 
         return ret;
     }

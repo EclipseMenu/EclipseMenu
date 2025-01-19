@@ -188,7 +188,7 @@ namespace eclipse::gui {
     }
 
     void FloatingButton::registerWithTouchDispatcher() {
-        CCTouchDispatcher::get()->addTargetedDelegate(this, -1000, true);
+        eclipse::utils::get<CCTouchDispatcher>()->addTargetedDelegate(this, -1000, true);
     }
 
 #ifdef ECLIPSE_USE_FLOATING_BUTTON
