@@ -2,6 +2,7 @@
 #include "BaseComponentNode.hpp"
 
 #include <modules/gui/cocos/cocos.hpp>
+#include <modules/gui/cocos/popup/label-settings-popup.hpp>
 #include <modules/gui/components/label-settings.hpp>
 #include <modules/labels/setting.hpp>
 
@@ -59,7 +60,17 @@ namespace eclipse::gui::cocos {
 
             auto settingsButton = geode::cocos::CCMenuItemExt::createSpriteExtra(
                 createButton("settings.png"_spr, 0.5f), [this, settings](auto) {
-                // TODO: Open settings popup
+                LabelSettingsPopup::create(settings, [this](auto event) {
+                    switch (event) {
+                        default: break;
+                        case CallbackEvent::Update:
+                            this->m_component->triggerEditCallback();
+                            break;
+                        case CallbackEvent::Export:
+                            this->m_component->triggerExportCallback();
+                            break;
+                    }
+                })->show();
             });
             settingsButton->setID("settings-btn");
             this->addChildAtPosition(settingsButton, geode::Anchor::Right, { -54.f, 0.f });
