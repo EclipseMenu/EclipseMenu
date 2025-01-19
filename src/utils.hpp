@@ -117,6 +117,9 @@ namespace eclipse::utils {
     /// @brief Checks if a string matches another one (case-insensitive)
     bool matchesStringFuzzy(std::string_view haystack, std::string_view needle);
 
+    /// @brief Forces an increment of the touch priority for a layer (like FLALertLayer::incrementForcePrio)
+    void incrementForcePrio(cocos2d::CCLayer* layer);
+
     /// @brief Returns a specific page of items from a given Vector.
     /// @tparam T Type of item.
     /// @param array Vector to paginate.

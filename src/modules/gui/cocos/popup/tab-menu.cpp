@@ -118,8 +118,7 @@ namespace eclipse::gui::cocos {
 
         this->setActiveTab(0);
 
-        this->setTouchPriority(utils::get<cocos2d::CCTouchDispatcher>()->getTargetPrio());
-        utils::get<cocos2d::CCTouchDispatcher>()->registerForcePrio(this, 2);
+        eclipse::utils::incrementForcePrio(this);
 
         return true;
     }

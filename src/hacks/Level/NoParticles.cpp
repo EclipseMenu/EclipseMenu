@@ -4,6 +4,9 @@
 #include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
+#ifdef GEODE_IS_WINDOWS
+#include <Geode/modify/PlayerObject.hpp>
+#endif
 
 namespace eclipse::hacks::Level {
     void onHideParticles(bool state) {
@@ -18,6 +21,10 @@ namespace eclipse::hacks::Level {
         auto* gjbgl = utils::get<GJBaseGameLayer>();
 
         if (!gjbgl) return;
+
+        // ambient particles visible after entering a portal
+        if (gjbgl->m_unk3238)
+            gjbgl->m_unk3238->setVisible(miscParticlesEnabled);
 
         for (const auto& [name, array] : geode::cocos::CCDictionaryExt<gd::string, cocos2d::CCArray*>{gjbgl->m_particlesDict}) {
             for (const auto& particle : geode::cocos::CCArrayExt<cocos2d::CCParticleSystemQuad*>{array}) {
@@ -77,5 +84,38 @@ namespace eclipse::hacks::Level {
 
             return GJBaseGameLayer::spawnParticle(plist, zOrder, positionType, position);
         }
+
+#ifndef GEODE_IS_WINDOWS
+        void playSpeedParticle(float speed) {
+            auto gm = eclipse::utils::get<GameManager>();
+
+            bool noMiscParticles = config::get<bool>("level.noparticles", false) &&
+                config::get<bool>("level.noparticles.nomiscparticles", false);
+            bool original = gm->m_performanceMode;
+
+            gm->m_performanceMode = noMiscParticles || original;
+            GJBaseGameLayer::playSpeedParticle(speed);
+            gm->m_performanceMode = original;
+        }
+#endif
     };
+
+#ifdef GEODE_IS_WINDOWS
+    // GJBaseGameLayer::playSpeedParticle is inlined on windows :broken_heart:
+    class $modify(NoParticlesPOHook, PlayerObject) {
+        ENABLE_SAFE_HOOKS_ALL()
+
+        void updateTimeMod(float p0, bool p1) {
+            auto gm = eclipse::utils::get<GameManager>();
+
+            bool noMiscParticles = config::get<bool>("level.noparticles", false) &&
+                config::get<bool>("level.noparticles.nomiscparticles", false);
+            bool original = gm->m_performanceMode;
+
+            gm->m_performanceMode = noMiscParticles || original;
+            PlayerObject::updateTimeMod(p0, p1);
+            gm->m_performanceMode = original;
+        }
+    };
+#endif
 }
