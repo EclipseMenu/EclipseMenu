@@ -2,22 +2,15 @@
 #include "BaseComponentNode.hpp"
 
 #include <Geode/ui/ColorPickPopup.hpp>
+#include <modules/gui/cocos/nodes/color-picker.hpp>
 #include <modules/gui/components/color.hpp>
 
 namespace eclipse::gui::cocos {
-    class ColorComponentNode : public BaseComponentNode<ColorComponentNode, cocos2d::CCMenu, ColorComponent, float>, public geode::ColorPickPopupDelegate {
+    class ColorComponentNode : public BaseComponentNode<ColorComponentNode, cocos2d::CCMenu, ColorComponent, float> {
     protected:
-        ColorChannelSprite* m_colorSprite = nullptr;
-        CCMenuItemSpriteExtra* m_colorBtn = nullptr;
+        ColorPicker* m_colorBtn = nullptr;
         TranslatedLabel* m_label = nullptr;
         CCMenuItemSpriteExtra* m_infoButton = nullptr;
-
-        void updateColor(cocos2d::ccColor4B const& color) override {
-            auto colorValue = Color(color);
-            m_colorSprite->setColor(geode::cocos::to3B(color));
-            m_component->setValue(colorValue);
-            m_component->triggerCallback(colorValue);
-        }
 
     public:
         bool init(float width) {
@@ -26,22 +19,11 @@ namespace eclipse::gui::cocos {
             this->setID(fmt::format("color-{}"_spr, m_component->getId()));
             this->setContentSize({ width, 28.f });
 
-            // definitely not copied from geode
-            m_colorSprite = ColorChannelSprite::create();
-            m_colorSprite->setScale(0.65F);
-            m_colorBtn = geode::cocos::CCMenuItemExt::createSpriteExtra(m_colorSprite, [this](auto) {
-                geode::ColorPickPopup* popup;
-                if (m_component->hasOpacity()) {
-                    popup = geode::ColorPickPopup::create(static_cast<cocos2d::ccColor4B>(m_component->getValue()));
-                } else {
-                    popup = geode::ColorPickPopup::create(m_component->getValue().toCCColor3B());
-                }
-                popup->setDelegate(this);
-                popup->show();
+            m_colorBtn = ColorPicker::create(m_component->getValue(), m_component->hasOpacity(), [this](auto color) {
+                m_component->setValue(color);
+                m_component->triggerCallback(color);
             });
 
-            m_colorBtn->setAnchorPoint({ 0.5, 0.5f });
-            m_colorSprite->setColor(m_component->getValue().toCCColor3B());
             this->addChildAtPosition(m_colorBtn, geode::Anchor::Left, { 15.f, 0.f });
 
             auto labelSize = width - 35.f;
