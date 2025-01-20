@@ -74,6 +74,101 @@ namespace eclipse::gui::cocos {
         cocos2d::extension::CCScale9Sprite* m_background = nullptr;
     };
 
+    class FontPicker : public cocos2d::CCMenu {
+    public:
+        static FontPicker* create(std::string const& font, std::function<void(std::string const&)> const& callback) {
+            auto ret = new FontPicker();
+            if (ret->init(font, callback)) {
+                ret->autorelease();
+                return ret;
+            }
+            delete ret;
+            return nullptr;
+        }
+
+        void updatePreview() const {
+            m_preview->setString(labels::fontNames[m_page]);
+            m_preview->setFont(m_font);
+            m_preview->limitLabelWidth(getContentWidth() * 0.75f, 1.f, 0.1f);
+        }
+
+    protected:
+        bool init(std::string const& font, std::function<void(std::string const&)> const& callback) {
+            if (!CCMenu::init()) return false;
+
+            m_callback = callback;
+            m_font = font;
+            m_page = labels::getFontIndex(font);
+
+            m_preview = Label::create("", font);
+            this->addChildAtPosition(m_preview, geode::Anchor::Center);
+
+            this->updatePreview();
+
+            const auto createArrowBtn = [](bool flip) {
+                const auto tm = ThemeManager::get();
+                auto arrow = cocos2d::CCSprite::createWithSpriteFrameName("arrow.png"_spr);
+                arrow->setRotation(90);
+                if (flip) arrow->setFlipY(true);
+                arrow->setScale(0.5f);
+                arrow->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
+                return arrow;
+            };
+
+            auto left = CCMenuItemSpriteExtra::create(
+                createArrowBtn(true), this,
+                menu_selector(FontPicker::onPageButton)
+            );
+            left->setTag(0);
+
+            auto right = CCMenuItemSpriteExtra::create(
+                createArrowBtn(false), this,
+                menu_selector(FontPicker::onPageButton)
+            );
+            right->setTag(1);
+
+            this->addChildAtPosition(left, geode::Anchor::Left, { 5.f, 0.f });
+            this->addChildAtPosition(right, geode::Anchor::Right, { -5.f, 0.f });
+
+            return true;
+        }
+
+        void onPageButton(CCObject* sender) {
+            auto tag = sender->getTag();
+            if (tag == 0) {
+                scrollPage(-1);
+            } else {
+                scrollPage(1);
+            }
+        }
+
+        void scrollPage(int direction) {
+            int page = m_page + direction;
+
+            // wrap around
+            if (page < 0) page = labels::fontFiles.size() - 1;
+            else if (page >= labels::fontFiles.size()) page = 0;
+
+            pickFont(page);
+        }
+
+        void pickFont(size_t index) {
+            if (index >= labels::fontFiles.size()) return;
+
+            m_page = index;
+            m_font = labels::fontFiles[index];
+
+            updatePreview();
+            m_callback(labels::fontFiles[index]);
+        }
+
+    protected:
+        std::function<void(std::string const&)> m_callback;
+        Label* m_preview = nullptr;
+        std::string m_font;
+        size_t m_page = 0;
+    };
+
     bool LabelSettingsPopup::setup(labels::LabelSettings* settings, std::function<void(CallbackEvent)> const& callback) {
         const auto tm = ThemeManager::get();
 
@@ -374,8 +469,15 @@ namespace eclipse::gui::cocos {
         });
         column2->addChild(scaleInput);
 
-        // TODO: Implement font selection
-        column2->addChild(createLabel("<Insert Font Picker Here>"));
+        auto picker = FontPicker::create(m_settings->font, [this](std::string const& font) {
+            m_settings->font = font;
+            m_callback(CallbackEvent::Update);
+        });
+        picker->setID("font-picker"_spr);
+        picker->setContentSize({ 120.f, 28.f });
+        picker->updateLayout();
+        picker->updatePreview();
+        column2->addChild(picker);
 
         auto absolutePosToggle = geode::cocos::CCMenuItemExt::createToggler(
             createToggle("checkmark.png"_spr), createToggle(nullptr), [this](auto) {

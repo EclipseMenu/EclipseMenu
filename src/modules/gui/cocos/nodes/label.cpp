@@ -462,7 +462,7 @@ void Label::setAlignment(BMFontAlignment alignment) {
 
 void Label::limitLabelWidth(float width, float defaultScale, float minScale) {
     auto originalWidth = m_obContentSize.width;
-    auto scale = this->m_fScaleX;
+    auto scale = 1.f;
     if (originalWidth > width && width > 0.0f) {
         scale = width / originalWidth;
     }

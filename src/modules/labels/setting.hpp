@@ -35,7 +35,7 @@ namespace eclipse::labels {
         "gjFont46.fnt", "gjFont47.fnt", "gjFont48.fnt", "gjFont49.fnt",
         "gjFont50.fnt", "gjFont51.fnt", "gjFont52.fnt", "gjFont53.fnt",
         "gjFont54.fnt", "gjFont55.fnt", "gjFont56.fnt", "gjFont57.fnt",
-        "gjFont58.fnt", "gjFont59.fnt",
+        "gjFont58.fnt", "gjFont59.fnt", "font_default.fnt"_spr
     };
 
     constexpr std::array fontNames = {
@@ -54,7 +54,7 @@ namespace eclipse::labels {
         "Foul Fiend", "Nandaka Western", "Evil Empire", "Comical Cartoon",
         "Carton Six", "aAssassinNinja", "Public Pixel", "New Walt Disney UI",
         "Random 5", "Crafting Lesson", "Game Of Squids", "Monster Game",
-        "Lo-Sumires", "Gewtymol",
+        "Lo-Sumires", "Gewtymol", "Rubik"
     };
 
     inline int32_t getFontIndex(const std::string& font) {
