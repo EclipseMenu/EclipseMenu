@@ -85,9 +85,15 @@ namespace eclipse::utils {
 
     template <typename D>
     time_t getTimestamp() {
-        return std::chrono::duration_cast<D>(
-            std::chrono::high_resolution_clock::now().time_since_epoch()
-        ).count();
+        if constexpr (std::is_same_v<D, std::chrono::seconds>) {
+            return std::chrono::duration_cast<D>(
+                std::chrono::system_clock::now().time_since_epoch()
+            ).count();
+        } else {
+            return std::chrono::duration_cast<D>(
+                std::chrono::high_resolution_clock::now().time_since_epoch()
+            ).count();
+        }
     }
 
     template time_t getTimestamp<std::chrono::milliseconds>();

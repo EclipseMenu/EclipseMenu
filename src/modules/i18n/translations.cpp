@@ -119,8 +119,8 @@ namespace eclipse::i18n {
         return geode::Mod::get()->getSavedValue<int64_t>("last-language-check", ECLIPSE_TRANSLATION_TIMESTAMP);
     }
 
-    inline void setLastCheckTimestamp(time_t timestamp) {
-        geode::Mod::get()->setSavedValue("last-language-check", timestamp);
+    inline void setLastCheckTimestamp(time_t timestamp = utils::getTimestamp<utils::seconds>()) {
+        geode::Mod::get()->setSavedValue<int64_t>("last-language-check", timestamp);
     }
 
     std::string getCurrentLanguage() {
@@ -232,8 +232,7 @@ namespace eclipse::i18n {
             downloadLanguage(code);
         }
 
-        auto now = utils::getTimestamp<utils::seconds>();
-        setLastCheckTimestamp(now);
+        setLastCheckTimestamp();
         return geode::Ok();
     }
 
@@ -250,7 +249,7 @@ namespace eclipse::i18n {
             if (ec) {
                 geode::log::warn("Failed to remove languages directory: {}", ec.message().c_str());
             }
-            setLastCheckTimestamp(utils::getTimestamp<utils::seconds>());
+            setLastCheckTimestamp();
             return;
         }
 
