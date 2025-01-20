@@ -204,7 +204,11 @@ namespace eclipse::hacks::Shortcuts {
         GEODE_ANDROID(void lateInit() override {
             auto devtools = geode::Loader::get()->getLoadedMod("geode.devtools");
             if (devtools) {
-                tab->addButton("shortcuts.devtools")->setDescription()->callback(openDevtools)->handleKeybinds();
+                gui::MenuTab::find("tab.shortcuts")
+                    ->addButton("shortcuts.devtools")
+                    ->setDescription()
+                    ->callback(openDevtools)
+                    ->handleKeybinds();
             }
         })
 
