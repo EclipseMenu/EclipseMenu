@@ -89,7 +89,11 @@ namespace eclipse::utils {
     /// @brief Get month name from its number. (0-11)
     const char* getMonthName(int month);
 
+    using millis = std::chrono::milliseconds;
+    using seconds = std::chrono::seconds;
+
     /// @brief Get the current timestamp.
+    template <typename D = millis>
     time_t getTimestamp();
 
     /// @brief Get a rainbow color for specific parameters

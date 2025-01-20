@@ -83,11 +83,15 @@ namespace eclipse::utils {
         return months.at(month);
     }
 
+    template <typename D>
     time_t getTimestamp() {
-        return std::chrono::duration_cast<std::chrono::milliseconds>(
+        return std::chrono::duration_cast<D>(
             std::chrono::high_resolution_clock::now().time_since_epoch()
         ).count();
     }
+
+    template time_t getTimestamp<std::chrono::milliseconds>();
+    template time_t getTimestamp<std::chrono::seconds>();
 
     gui::Color getRainbowColor(float speed, float saturation, float value, float offset) {
         time_t ms = getTimestamp();

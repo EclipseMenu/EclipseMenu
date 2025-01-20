@@ -1,9 +1,10 @@
 #include "translations.hpp"
 
 #include <Geode/utils/web.hpp>
-#include <nlohmann/json.hpp>
 #include <modules/config/config.hpp>
 #include <modules/labels/setting.hpp>
+#include <nlohmann/json.hpp>
+#include <utils.hpp>
 
 namespace eclipse::i18n {
     nlohmann::json g_fallback = {
@@ -114,6 +115,14 @@ namespace eclipse::i18n {
         downloadLanguages();
     }
 
+    inline time_t getLastCheckTimestamp() {
+        return geode::Mod::get()->getSavedValue<int64_t>("last-language-check", ECLIPSE_TRANSLATION_TIMESTAMP);
+    }
+
+    inline void setLastCheckTimestamp(time_t timestamp) {
+        geode::Mod::get()->setSavedValue("last-language-check", timestamp);
+    }
+
     std::string getCurrentLanguage() {
         if (!g_translations.contains("language-code")) {
             return DEFAULT_LANGUAGE;
@@ -182,10 +191,9 @@ namespace eclipse::i18n {
         static auto langsPath = geode::Mod::get()->getSaveDir() / "languages";
 
         using namespace geode::utils;
-        static geode::EventListener<web::WebTask> s_listener;
-
-        s_listener.bind([code](web::WebTask::Event* e) {
-            if (web::WebResponse* value = e->getValue()) {
+        web::WebRequest()
+            .get(fmt::format("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/main/translations/{}.lang.json", code))
+            .listen([code](web::WebResponse* value) {
                 if (!value->ok()) {
                     return;
                 }
@@ -208,16 +216,11 @@ namespace eclipse::i18n {
                 file << content;
                 file.close();
                 geode::log::debug("Downloaded language file: {}", code);
-            }
-        });
-
-        s_listener.setFilter(web::WebRequest().get(
-            fmt::format("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/main/translations/{}.lang.json", code)
-        ));
+            });
     }
 
     geode::Result<> handleLanguageMetadata(matjson::Value metadata) {
-        auto lastCheck = geode::Mod::get()->getSavedValue<int64_t>("language-check", ECLIPSE_TRANSLATION_TIMESTAMP);
+        auto lastCheck = getLastCheckTimestamp();
 
         GEODE_UNWRAP_INTO(auto metadataTimestamp, metadata["timestamp"].asUInt());
         if (metadataTimestamp <= lastCheck) return geode::Ok();
@@ -229,39 +232,39 @@ namespace eclipse::i18n {
             downloadLanguage(code);
         }
 
-        auto now = std::chrono::system_clock::now().time_since_epoch().count();
-        geode::Mod::get()->setSavedValue("language-check", now);
+        auto now = utils::getTimestamp<utils::seconds>();
+        setLastCheckTimestamp(now);
         return geode::Ok();
     }
 
     void downloadLanguages() {
-        auto lastCheck = geode::Mod::get()->getSavedValue<int64_t>("language-check", ECLIPSE_TRANSLATION_TIMESTAMP);
+        auto lastCheck = getLastCheckTimestamp();
 
         // our build timestamp is newer than the last check
         if (lastCheck <= ECLIPSE_TRANSLATION_TIMESTAMP) {
             // remove local languages (since they are outdated)
+            geode::log::info("Removing outdated languages...");
             static auto langsPath = geode::Mod::get()->getSaveDir() / "languages";
             std::error_code ec;
             std::filesystem::remove_all(langsPath, ec);
             if (ec) {
                 geode::log::warn("Failed to remove languages directory: {}", ec.message().c_str());
             }
-            geode::Mod::get()->setSavedValue("language-check", std::chrono::system_clock::now().time_since_epoch().count());
+            setLastCheckTimestamp(utils::getTimestamp<utils::seconds>());
             return;
         }
 
         // perform a check once per day
-        auto now = std::chrono::system_clock::now().time_since_epoch().count();
+        auto now = utils::getTimestamp<utils::seconds>();
         constexpr auto day = 24 * 60 * 60;
         if (now - lastCheck < day) return;
 
         geode::log::info("Checking for language updates...");
 
         using namespace geode::utils;
-        static geode::EventListener<web::WebTask> s_listener;
-
-        s_listener.bind([](web::WebTask::Event* e) {
-            if (web::WebResponse* value = e->getValue()) {
+        web::WebRequest()
+            .get("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/metadata/metadata.json")
+            .listen([](web::WebResponse* value) {
                 if (!value->ok()) {
                     return;
                 }
@@ -273,12 +276,7 @@ namespace eclipse::i18n {
                 }
 
                 (void) handleLanguageMetadata(*res);
-            }
-        });
-
-        s_listener.setFilter(web::WebRequest().get(
-            "https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/metadata/metadata.json"
-        ));
+            });
     }
 
     size_t getLanguageIndex() {
