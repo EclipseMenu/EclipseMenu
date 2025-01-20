@@ -467,14 +467,23 @@ namespace eclipse::keybinds {
     }
 
     void Manager::update() {
-        for (auto& [key, state] : m_keyStates) m_lastKeyStates.insert_or_assign(key, state);
+        for (auto& [key, state] : m_keyStates) {
+            m_lastKeyStates.insert_or_assign(key, state);
+        }
     }
 
     void Manager::setKeybindState(std::string_view id, bool state) {
         for (auto& keybind : m_keybinds) {
             if (keybind.getId() == id) {
                 keybind.setInitialized(state);
-                config::set(fmt::format("keybind.{}.active", id), state);
+                if (!state) {
+                    config::erase(fmt::format("keybind.{}.active", id));
+                } else {
+                    config::set(fmt::format("keybind.{}.active", id), state);
+                }
+
+                // do not update GUI on mobile
+                #ifndef GEODE_IS_MOBILE
                 if (keybind.isInternal()) return;
 
                 auto idStr = std::string(id);
@@ -495,7 +504,7 @@ namespace eclipse::keybinds {
                                     auto& keybindRef = keybind->get();
 
                                     if (key == Keys::None) {
-                                        config::set(fmt::format("keybind.{}.active", idStr), false);
+                                        config::erase(fmt::format("keybind.{}.active", idStr));
                                         keybindRef.setInitialized(false);
                                         gui::Engine::queueAfterDrawing(
                                             [tab, keybindComponent] {
@@ -512,7 +521,7 @@ namespace eclipse::keybinds {
                             s_keybindComponents[idStr] = keybindComponent;
                         } else {
                             // Reset the keybind to None
-                            config::set(fmt::format("keybind.{}.key", idStr), Keys::None);
+                            config::erase(fmt::format("keybind.{}.key", idStr));
 
                             // Remove the keybind from the GUI
                             if (auto keybindComponent = s_keybindComponents[idStr]; keybindComponent) {
@@ -524,8 +533,8 @@ namespace eclipse::keybinds {
                     }
                 );
 
-
                 return;
+                #endif
             }
         }
 
@@ -534,10 +543,12 @@ namespace eclipse::keybinds {
 
     inline bool shouldIgnoreInputs() {
         // Ignore if imgui is capturing inputs or if the keyboard is being used
-        if (gui::imgui::ImGuiRenderer::get() && ImGui::GetIO().WantTextInput) return true;
+        if (gui::imgui::ImGuiRenderer::get() && ImGui::GetIO().WantTextInput)
+            return true;
 
         // Ignore if the keyboard is being used
-        if (utils::get<CCIMEDispatcher>()->hasDelegate()) return true;
+        if (utils::get<CCIMEDispatcher>()->hasDelegate())
+            return true;
 
         return false;
     }
@@ -599,7 +610,8 @@ namespace eclipse::keybinds {
     bool isKeyPressed(Keys key) {
         auto manager = Manager::get();
 
-        if (manager->m_keyStates[key] ^ manager->m_lastKeyStates[key]) return manager->m_keyStates[key];
+        if (manager->m_keyStates[key] ^ manager->m_lastKeyStates[key])
+            return manager->m_keyStates[key];
 
         return false;
     }
@@ -607,12 +619,15 @@ namespace eclipse::keybinds {
     bool isKeyReleased(Keys key) {
         auto manager = Manager::get();
 
-        if (manager->m_keyStates[key] ^ manager->m_lastKeyStates[key]) return !manager->m_keyStates[key];
+        if (manager->m_keyStates[key] ^ manager->m_lastKeyStates[key])
+            return !manager->m_keyStates[key];
 
         return false;
     }
 
     void Manager::setupTab() {
+        // for now, we only support keybinds tab on desktop
+        #ifndef GEODE_IS_MOBILE
         auto tab = gui::MenuTab::find("tab.keybinds");
 
         tab->addKeybind("keybinds.open-menu", "menu.toggleKey")->callback(
@@ -624,8 +639,7 @@ namespace eclipse::keybinds {
                 }
 
                 if (auto keybind = Manager::get()->getKeybind("menu.toggle"); keybind.has_value())
-                    keybind->get().
-                             setKey(key);
+                    keybind->get().setKey(key);
             }
         );
 
@@ -634,5 +648,6 @@ namespace eclipse::keybinds {
 
         s_hintLabel = tab->addLabel("");
         updateHintLabel();
+        #endif
     }
 }

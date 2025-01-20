@@ -71,6 +71,10 @@ namespace eclipse::config {
     template<typename T>
     void set(std::string_view key, const T& value);
 
+    /// @brief Erase a key from the configuration.
+    /// @param key Key to erase.
+    void erase(std::string_view key);
+
     /// @brief Get the type of value by key in the configuration.
     /// @param key Key to get the type of.
     /// @return Type of the value.

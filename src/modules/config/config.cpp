@@ -163,6 +163,10 @@ namespace eclipse::config {
         return getStorage().contains(key);
     }
 
+    void erase(std::string_view key) {
+        getStorage().erase(key);
+    }
+
     nlohmann::detail::value_t getType(std::string_view key) {
         if (!has(key)) return nlohmann::detail::value_t::null;
         return getStorage().at(key).type();
