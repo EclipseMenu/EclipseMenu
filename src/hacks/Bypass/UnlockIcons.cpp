@@ -27,13 +27,13 @@ namespace eclipse::hacks::Bypass {
         bool isColorUnlocked(int key, UnlockType type) {
             if (GameManager::isColorUnlocked(key, type)) return true;
 
-            return config::get<bool>("bypass.unlockicons", false);
+            return config::get<"bypass.unlockicons", bool>(false);
         }
 
         bool isIconUnlocked(int key, IconType type) {
             if (GameManager::isIconUnlocked(key, type)) return true;
 
-            return config::get<bool>("bypass.unlockicons", false);
+            return config::get<"bypass.unlockicons", bool>(false);
         }
     };
 
@@ -43,7 +43,10 @@ namespace eclipse::hacks::Bypass {
         bool isItemUnlocked(UnlockType type, int key) {
             if (GameStatsManager::isItemUnlocked(type, key)) return true;
 
-            return config::get<bool>("bypass.unlockicons", false);
+            if (config::get<"bypass.unlockicons", bool>(false))
+                return type == UnlockType::GJItem && (key >= 18 && key <= 20);
+
+            return false;
         }
     };
 }

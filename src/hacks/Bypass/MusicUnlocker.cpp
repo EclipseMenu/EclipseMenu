@@ -9,6 +9,7 @@ namespace eclipse::hacks::Cosmetic {
     class $hack(PracticeMusic) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.bypass");
+
             tab->addToggle("bypass.practicemusic")
                 ->handleKeybinds()
                 ->setDescription()
@@ -44,11 +45,11 @@ namespace eclipse::hacks::Cosmetic {
         bool isItemUnlocked(UnlockType type, int key) {
             if (GameStatsManager::isItemUnlocked(type, key)) return true;
 
-            if (config::get<bool>("bypass.practicemusic", false))
-                return type == UnlockType::GJItem && key == 17;
+            if (type == UnlockType::GJItem && key == 17)
+                return config::get<"bypass.practicemusic", bool>(false);
 
-            if (config::get<bool>("bypass.musiccustomizer", false))
-                return type == UnlockType::GJItem && key == 16;
+            if (type == UnlockType::GJItem && key == 16)
+                return config::get<"bypass.musiccustomizer", bool>(false);
 
             return false;
         }
