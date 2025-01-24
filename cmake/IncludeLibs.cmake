@@ -22,9 +22,9 @@ endif()
 CPMAddPackage("gh:matcool/gd-imgui-cocos#fbd4103")
 CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
 set(RIFT_INCLUDE_MATJSON ON)
-CPMAddPackage("gh:EclipseMenu/rift#5f68961")
+CPMAddPackage("gh:EclipseMenu/rift#c8d983d")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
-CPMAddPackage("gh:simdutf/simdutf@6.0.0")
+CPMAddPackage("gh:simdutf/simdutf@6.1.0")
 CPMAddPackage(
     NAME nlohmann_json
     GITHUB_REPOSITORY nlohmann/json

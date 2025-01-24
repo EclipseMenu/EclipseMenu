@@ -512,12 +512,14 @@ namespace eclipse::hacks::Labels {
             tab->addCombo("labels.presets", presets, 0)
                ->callback([this](int value) {
                    if (value < 0 || value >= DEFAULT_LABELS.size()) return;
-                   auto preset = DEFAULT_LABELS[value];
-                   preset.visible = true;
-                   s_labels.push_back(std::move(preset));
-                   config::set("labels", s_labels);
-                   updateLabels(true);
-                   createLabelComponent();
+                   gui::Engine::queueAfterDrawing([this, value] {
+                       auto preset = DEFAULT_LABELS[value];
+                       preset.visible = true;
+                       s_labels.push_back(std::move(preset));
+                       config::set("labels", s_labels);
+                       updateLabels(true);
+                       createLabelComponent();
+                   });
                });
             createLabelComponent();
         }

@@ -313,7 +313,7 @@ $on_mod(Loaded) {
                     tab->setSearchedFor(hasFoundComponent);
                 }
             }
-        })->disableSaving();
+        })->disableSaving()->setFlags(ComponentFlags::DisableCocos);
     }
 
     // Schedule hack updates
