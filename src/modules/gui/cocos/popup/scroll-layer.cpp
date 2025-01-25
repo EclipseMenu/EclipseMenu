@@ -120,8 +120,16 @@ namespace eclipse::gui::cocos {
     }
 
     void ScrollLayer::visit() {
+        int previousRect[4];
+        bool previousScissor = glIsEnabled(GL_SCISSOR_TEST);
+
         if (m_cutContent && this->isVisible()) {
-            glEnable(GL_SCISSOR_TEST);
+            if (previousScissor) {
+                glGetIntegerv(GL_SCISSOR_BOX, previousRect);
+            }
+            else {
+                glEnable(GL_SCISSOR_TEST);
+            }
                 
             if (this->getParent()) {
                 auto const bottomLeft = this->convertToWorldSpace(ccp(0, 0));
@@ -135,7 +143,12 @@ namespace eclipse::gui::cocos {
         CCNode::visit();
 
         if (m_cutContent && this->isVisible()) {
-            glDisable(GL_SCISSOR_TEST);
+            if (previousScissor) {
+                glScissor(previousRect[0], previousRect[1], previousRect[2], previousRect[3]);
+            }
+            else {
+                glDisable(GL_SCISSOR_TEST);
+            }
         }
     }
 
@@ -162,5 +175,9 @@ namespace eclipse::gui::cocos {
         }
         m_touchStartPosition2 = m_touchPosition2;
         m_touchMoved = false;
+    }
+
+    void ScrollLayer::registerWithTouchDispatcher() {
+        utils::get<cocos2d::CCDirector>()->getTouchDispatcher()->addPrioTargetedDelegate(this, -500, false);
     }
 }

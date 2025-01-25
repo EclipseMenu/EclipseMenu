@@ -26,6 +26,82 @@ namespace eclipse::gui::cocos {
             }
         }
 
+        void generateSelector() {
+            const auto tm = ThemeManager::get();
+
+            auto const scrollHeight = std::min<float>(m_component->getItems().size(), 3.5f) * 80.f;
+            m_scrollLayer = ScrollLayer::create({365.f * 0.3f, scrollHeight * 0.3f});
+            m_scrollLayer->setID("scrollLayer");
+            m_scrollLayer->setZOrder(2);
+            m_scrollLayer->ignoreAnchorPointForPosition(false);
+            m_scrollLayer->m_contentLayer->setLayout(
+                geode::ColumnLayout::create()
+                    ->setAutoScale(false)
+                    ->setAxisReverse(true)
+                    ->setAutoGrowAxis(m_scrollLayer->getContentHeight())
+                    ->setAxisAlignment(geode::AxisAlignment::End)
+                    ->setGap(0),
+                false
+            );
+
+            auto scrollBlock = cocos2d::CCMenu::create();
+            scrollBlock->setScale(0.3f);
+            scrollBlock->setContentSize({365.f, scrollHeight});
+            scrollBlock->setZOrder(-100);
+            scrollBlock->registerWithTouchDispatcher();
+            
+            auto scrollBlockButton = CCMenuItemSpriteExtra::create(
+                cocos2d::CCSprite::createWithSpriteFrameName("GJ_button_01.png"),
+                nullptr,
+                nullptr
+            );
+            scrollBlockButton->setContentSize({365.f, scrollHeight});
+            scrollBlockButton->setZOrder(1);
+            scrollBlockButton->setAnchorPoint({0.5f, 0.5f});
+            scrollBlockButton->setOpacity(0);
+            scrollBlockButton->m_scaleMultiplier = 1.f;
+            scrollBlock->addChildAtPosition(scrollBlockButton, geode::Anchor::Center);
+            m_scrollLayer->addChildAtPosition(scrollBlock, geode::Anchor::Center);
+
+            auto scrollBackground = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+            scrollBackground->setID("scrollBackground");
+            scrollBackground->setScale(0.3f);
+            scrollBackground->setContentSize({365.f, scrollHeight});
+            scrollBackground->setColor(tm->getFrameBackground().toCCColor3B());
+            scrollBackground->setZOrder(-2);
+            m_scrollLayer->addChildAtPosition(scrollBackground, geode::Anchor::Center);
+            
+            for (size_t i = 0; auto const& component : m_component->getItems()) {
+                auto menu = cocos2d::CCMenu::create();
+                // menu->registerWithTouchDispatcher();
+                menu->setContentSize({365.f * 0.3f, 80.f * 0.3f});
+
+                auto label = TranslatedLabel::createRaw(component);
+                label->setAnchorPoint({0.5f, 0.5f});
+                label->limitLabelWidth(menu->getContentSize().width - 20.f, 0.75f, 0.25f);
+                if (m_component->getValue() == i) {
+                    label->setColor(tm->getButtonActivatedForeground().toCCColor3B());
+                } else {
+                    label->setColor(tm->getButtonDisabledForeground().toCCColor3B());
+                }
+                m_labels.push_back(label);
+
+                auto item = CCMenuItemSpriteExtra::create(label, this, menu_selector(ComboComponentNode::selectItem));
+                item->setTag(i);
+                item->setAnchorPoint({0.5f, 0.5f});
+                item->setZOrder(1);
+                item->m_scaleMultiplier = 1.1f;
+                menu->addChildAtPosition(item, geode::Anchor::Center);
+
+                m_scrollLayer->m_contentLayer->addChild(menu);
+
+                ++i;
+            }
+
+            m_scrollLayer->m_contentLayer->updateLayout();
+            m_scrollLayer->scrollToTop();
+        }
+
         void updateLabel() const {
             int index = m_component->getValue();
             if (index < 0 || index >= m_component->getItems().size()) {
@@ -34,19 +110,6 @@ namespace eclipse::gui::cocos {
             }
             m_valueLabel->setString(m_component->getItems()[index]);
             m_valueLabel->limitLabelWidth(70.f, 1.5f, 0.25f);
-        }
-
-        void scroll(CCObject* sender) {
-            if (m_component->getItems().size() == 0) return;
-
-            int tag = sender->getTag();
-            int currentIndex = m_component->getValue();
-            int value = currentIndex + tag;
-            if (value < 0) value = std::max<int>(m_component->getItems().size() - 1, 0);
-            if (value >= m_component->getItems().size()) value = 0;
-            m_component->setValue(value);
-            m_component->triggerCallback(value);
-            updateLabel();
         }
 
         void openSelector(CCObject* sender) {
@@ -58,6 +121,10 @@ namespace eclipse::gui::cocos {
             m_arrowButton->setRotation(270.f);
             m_arrowButton->setTarget(this, menu_selector(ComboComponentNode::closeSelector));
 
+            if (!m_scrollLayer) {
+                this->generateSelector();
+            }
+
             if (s_activeCombo) {
                 s_activeCombo->closeSelector(nullptr);
             } 
@@ -65,15 +132,25 @@ namespace eclipse::gui::cocos {
 
             if (globalBottom.y > m_scrollLayer->getContentHeight() + 20.f) {
                 m_scrollLayer->setAnchorPoint({0.5f, 1.f});
-                this->addChildAtPosition(m_scrollLayer, geode::Anchor::Right, {-70.f, -backgroundBox.getMidY()});
+                auto const targetPos = ccp(this->getContentWidth() - 70.f, this->getContentHeight() / 2.f - backgroundBox.getMidY());
+                if (auto parent = this->getParent(); parent) {
+                    auto const parentPos = parent->convertToNodeSpace(this->convertToWorldSpace(targetPos));
+                    parent->addChild(m_scrollLayer, 10);
+                    m_scrollLayer->setPosition(parentPos);
+                }
             } else {
                 m_scrollLayer->setAnchorPoint({0.5f, 0.f});
-                this->addChildAtPosition(m_scrollLayer, geode::Anchor::Right, {-70.f, backgroundBox.getMidY()});
+                auto const targetPos = ccp(this->getContentWidth() - 70.f, this->getContentHeight() / 2.f + backgroundBox.getMidY());
+                if (auto parent = this->getParent(); parent) {
+                    auto const parentPos = parent->convertToNodeSpace(this->convertToWorldSpace(targetPos));
+                    parent->addChild(m_scrollLayer, 10);
+                    m_scrollLayer->setPosition(parentPos);
+                }
             }
         }
 
         void closeSelector(CCObject* sender) {
-            m_scrollLayer->removeFromParentAndCleanup(false);
+            if (m_scrollLayer) m_scrollLayer->removeFromParent();
             m_arrowButton->setRotation(90.f);
             m_arrowButton->setTarget(this, menu_selector(ComboComponentNode::openSelector));
             s_activeCombo = nullptr;
@@ -89,7 +166,7 @@ namespace eclipse::gui::cocos {
                 if (i == index) {
                     label->setColor(ThemeManager::get()->getButtonActivatedForeground().toCCColor3B());
                 } else {
-                    label->setColor(ThemeManager::get()->getForegroundColor().toCCColor3B());
+                    label->setColor(ThemeManager::get()->getButtonDisabledForeground().toCCColor3B());
                 }
                 ++i;
             }
@@ -130,59 +207,6 @@ namespace eclipse::gui::cocos {
             m_background->setColor(tm->getButtonBackgroundColor().toCCColor3B());
             m_background->setZOrder(-1);
             this->addChildAtPosition(m_background, geode::Anchor::Right, { -70.f, 0.f });
-
-            auto const scrollHeight = std::min<float>(m_component->getItems().size(), 3.5f) * 80.f;
-            m_scrollLayer = ScrollLayer::create({365.f * 0.3f, scrollHeight * 0.3f});
-            m_scrollLayer->setID("scrollLayer");
-            m_scrollLayer->setZOrder(2);
-            m_scrollLayer->ignoreAnchorPointForPosition(false);
-            m_scrollLayer->m_contentLayer->setLayout(
-                geode::ColumnLayout::create()
-                    ->setAutoScale(false)
-                    ->setAxisReverse(true)
-                    ->setAutoGrowAxis(m_scrollLayer->getContentHeight())
-                    ->setAxisAlignment(geode::AxisAlignment::End)
-                    ->setGap(0),
-                false
-            );
-
-            auto scrollBackground = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
-            scrollBackground->setID("scrollBackground");
-            scrollBackground->setScale(0.3f);
-            scrollBackground->setContentSize({365.f, scrollHeight});
-            scrollBackground->setColor(tm->getFrameBackground().toCCColor3B());
-            scrollBackground->setZOrder(-2);
-            m_scrollLayer->addChildAtPosition(scrollBackground, geode::Anchor::Center);
-
-            
-            for (size_t i = 0; auto const& component : m_component->getItems()) {
-                auto menu = cocos2d::CCMenu::create();
-                menu->setContentSize({365.f * 0.3f, 80.f * 0.3f});
-
-                auto label = TranslatedLabel::createRaw(component);
-                label->setAnchorPoint({0.5f, 0.5f});
-                label->limitLabelWidth(menu->getContentSize().width - 20.f, 0.75f, 0.25f);
-                if (m_component->getValue() == i) {
-                    label->setColor(tm->getButtonActivatedForeground().toCCColor3B());
-                } else {
-                    label->setColor(tm->getButtonDisabledForeground().toCCColor3B());
-                }
-                m_labels.push_back(label);
-
-                auto item = CCMenuItemSpriteExtra::create(label, this, menu_selector(ComboComponentNode::selectItem));
-                item->setTag(i);
-                item->setAnchorPoint({0.5f, 0.5f});
-                item->setZOrder(1);
-                item->m_scaleMultiplier = 1.1f;
-                menu->addChildAtPosition(item, geode::Anchor::Center);
-
-                m_scrollLayer->m_contentLayer->addChild(menu);
-
-                ++i;
-            }
-
-            m_scrollLayer->m_contentLayer->updateLayout();
-            m_scrollLayer->scrollToTop();
 
             auto spr = cocos2d::CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
             spr->setScale(0.6f);

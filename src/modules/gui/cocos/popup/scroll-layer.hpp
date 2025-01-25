@@ -25,6 +25,7 @@ namespace eclipse::gui::cocos {
         void ccTouchCancelled(cocos2d::CCTouch*, cocos2d::CCEvent*) override;
         void scrollWheel(float, float) override;
         void visit() override;
+        void registerWithTouchDispatcher() override;
         CCMenuItemSpriteExtra* itemForTouch(cocos2d::CCTouch*);
 
         ScrollLayer(cocos2d::CCRect const& rect, bool scrollWheelEnabled, bool vertical);
