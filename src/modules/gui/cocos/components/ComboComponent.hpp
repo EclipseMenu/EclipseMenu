@@ -51,7 +51,7 @@ namespace eclipse::gui::cocos {
             scrollBlock->registerWithTouchDispatcher();
             
             auto scrollBlockButton = CCMenuItemSpriteExtra::create(
-                cocos2d::CCSprite::createWithSpriteFrameName("GJ_button_01.png"),
+                cocos2d::CCSprite::create("GJ_button_01.png"),
                 nullptr,
                 nullptr
             );
