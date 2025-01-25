@@ -53,6 +53,8 @@ namespace eclipse::gui {
 
         void registerWithTouchDispatcher() override;
 
+        ~FloatingButton() override;
+
     };
 
 

@@ -111,6 +111,12 @@ namespace eclipse::gui::cocos {
 
         this->setMouseEnabled(true);
         this->setTouchEnabled(true);
+
+        utils::get<cocos2d::CCTouchDispatcher>()->registerForcePrio(this, 2);
+    }
+
+    ScrollLayer::~ScrollLayer() {
+        utils::get<cocos2d::CCTouchDispatcher>()->unregisterForcePrio(this);
     }
 
     void ScrollLayer::visit() {
@@ -140,8 +146,6 @@ namespace eclipse::gui::cocos {
     ScrollLayer* ScrollLayer::create(cocos2d::CCRect const& rect, bool scroll, bool vertical) {
         auto ret = new ScrollLayer(rect, scroll, vertical);
         ret->autorelease();
-
-        eclipse::utils::incrementForcePrio(ret);
 
         return ret;
     }

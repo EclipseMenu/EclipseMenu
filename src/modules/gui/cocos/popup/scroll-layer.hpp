@@ -28,6 +28,7 @@ namespace eclipse::gui::cocos {
         CCMenuItemSpriteExtra* itemForTouch(cocos2d::CCTouch*);
 
         ScrollLayer(cocos2d::CCRect const& rect, bool scrollWheelEnabled, bool vertical);
+        ~ScrollLayer() override;
 
     public:
         void scrollToTop();

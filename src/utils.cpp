@@ -188,9 +188,4 @@ namespace eclipse::utils {
 
         return (it != haystack.end());
     }
-
-    void incrementForcePrio(cocos2d::CCLayer* layer) {
-        layer->setTouchPriority(utils::get<cocos2d::CCTouchDispatcher>()->getTargetPrio());
-        utils::get<cocos2d::CCTouchDispatcher>()->registerForcePrio(layer, 2);
-    }
 }

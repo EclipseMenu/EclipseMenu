@@ -14,6 +14,8 @@ namespace eclipse::gui::cocos {
         int m_currentPage = 0;
         bool m_hasActivatedTab = false;
 
+        ~TabMenu();
+
     public:
         static TabMenu* create(Tabs const& tabs, std::function<void(int)> const& callback);
         void setActiveTab(int idx);
