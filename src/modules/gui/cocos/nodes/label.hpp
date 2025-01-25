@@ -44,23 +44,23 @@ protected:
     bool initWithContents(std::string const& contents, std::string const& fntFile);
 
 private:
-    bool parseInfoArguments(std::istringstream& line);
-    bool parseImageFileName(std::istringstream& line, std::string const& fntFile);
-    bool parseCommonArguments(std::istringstream& line);
-    bool parseCharacterDefinition(std::istringstream& line);
-    bool parseKerningEntry(std::istringstream& line);
+    geode::Result<> parseInfoArguments(std::istringstream& line);
+    geode::Result<> parseImageFileName(std::istringstream& line, std::string const& fntFile);
+    geode::Result<> parseCommonArguments(std::istringstream& line);
+    geode::Result<> parseCharacterDefinition(std::istringstream& line);
+    geode::Result<> parseKerningEntry(std::istringstream& line);
 
 public:
     std::unordered_map<uint32_t, BMFontDef> const& getFontDefDictionary() const { return m_fontDefDictionary; }
-    std::unordered_map<BMKerningPair, int> const& getKerningDictionary() const { return m_kerningDictionary; }
-    int getCommonHeight() const { return m_commonHeight; }
+    std::unordered_map<BMKerningPair, float> const& getKerningDictionary() const { return m_kerningDictionary; }
+    float getCommonHeight() const { return m_commonHeight; }
     BMFontPadding const& getPadding() const { return m_padding; }
     std::string const& getAtlasName() const { return m_atlasName; }
 
 protected:
     std::unordered_map<uint32_t, BMFontDef> m_fontDefDictionary;
-    std::unordered_map<BMKerningPair, int> m_kerningDictionary;
-    int m_commonHeight = 0;
+    std::unordered_map<BMKerningPair, float> m_kerningDictionary;
+    float m_commonHeight = 0;
     BMFontPadding m_padding;
     std::string m_atlasName;
 };
@@ -105,6 +105,7 @@ public:
 
 public:
     using EmojiMap = std::unordered_map<std::u32string_view, const char*>;
+    using CustomNodeMap = std::unordered_map<std::u32string_view, std::function<CCNode*(std::u32string_view, uint32_t&)>>;
 
     /// @brief Set the contents of the label.
     void setString(std::string_view text);
@@ -116,6 +117,8 @@ public:
     void addFont(std::string_view font, std::optional<float> scale = std::nullopt);
     /// @brief Activate support for emojis in the label.
     void enableEmojis(std::string_view sheetFileName, const EmojiMap* frameNames);
+    /// @brief Activate support for custom nodes in the label.
+    void enableCustomNodes(const CustomNodeMap* nodes);
     /// @brief Enable or disable line wrapping.
     void setWrapEnabled(bool enabled);
     /// @brief Set the wrap width of the label.
@@ -132,6 +135,15 @@ public:
     void setAlignment(BMFontAlignment alignment);
     /// @brief Resize the label to fit the width.
     void limitLabelWidth(float width, float defaultScale, float minScale);
+
+    /// @brief Get extra kerning
+    [[nodiscard]] float getExtraKerning() const { return m_extraKerning; }
+    /// @brief Set extra kerning
+    void setExtraKerning(float kerning) { m_extraKerning = kerning; }
+    /// @brief Get the extra line spacing
+    [[nodiscard]] float getExtraLineSpacing() const { return m_extraLineSpacing; }
+    /// @brief Set the extra line spacing
+    void setExtraLineSpacing(float spacing) { m_extraLineSpacing = spacing; }
 
 protected:
     struct CachedBatch {
@@ -152,10 +164,10 @@ protected:
         }
     };
 
-    static int kerningAmountForChars(uint32_t first, uint32_t second, const BMFontConfiguration* config);
+    static float kerningAmountForChars(uint32_t first, uint32_t second, const BMFontConfiguration* config);
 
     /// @brief Hide all characters of the label.
-    void hideAllChars() const;
+    void hideAllChars();
 
     /// @brief Update the characters of the label when it is not left-aligned.
     void updateAlignment() const;
@@ -179,8 +191,8 @@ protected:
     /// @brief Check for an emoji character and add it to the label if found. [Internal]
     void checkForEmoji(
         std::u32string_view text, uint32_t& index,
-        float scaleFactor, int& nextX, int nextY, int commonHeight,
-        int& longestLine, std::vector<cocos2d::CCSprite*>& currentLine,
+        float scaleFactor, float& nextX, float nextY, float commonHeight,
+        float& longestLine, std::vector<CCNode*>& currentLine,
         size_t& emojiIndex
     );
 
@@ -190,6 +202,7 @@ protected:
         float scale, cocos2d::CCRect const& rect
     ) const;
 
+public:
     /// @brief Update the characters of the label when it is not wrapped.
     /// Automatically calculates the line breaks and updates the characters accordingly.
     void updateChars();
@@ -250,7 +263,8 @@ protected:
     bool m_useWrap = false;                              // enable line wrapping
     bool m_useEmojiColors = false;                       // enable emoji colorization
     float m_wrapWidth = 0.f;                             // maximum scaled content width before wrapping
-    int m_extraKerning = 0.f;                            // additional kerning between characters
+    float m_extraLineSpacing = 0.f;                      // additional spacing between lines
+    float m_extraKerning = 0.f;                            // additional kerning between characters
 
     // Children
     struct FontCfg {
@@ -262,7 +276,7 @@ protected:
     CachedBatch m_mainBatch;            // Primary font batch
     CachedBatch m_spriteSheetBatch;     // Sprite sheet batch for emoji characters
     std::vector<FontCfg> m_fontBatches; // Font batches for alternate fonts
-    //  std::vector<cocos2d::CCSprite*> m_sprites;            // Classic sprites
+    std::vector<CCNode*> m_customNodes; // Custom nodes to be added to the label
 
     // Internal properties
     //  struct Chunk {
@@ -273,8 +287,10 @@ protected:
     //      cocos2d::CCSprite* sprite = nullptr;
     //  };
 
-    const EmojiMap* m_emojiMap = nullptr;                 // emoji map (MAP SHOULD BE GLOBAL AND NEVER DESTROYED)
-    std::vector<std::vector<cocos2d::CCSprite*>> m_lines; // lines of characters
-    //  std::vector<Chunk> m_chunks;                      // chunks containing metadata
-    //  bool m_useChunks = false;                         // whether to use chunks instead of raw text
+    const EmojiMap* m_emojiMap = nullptr;            // emoji map (MAP SHOULD BE GLOBAL AND NEVER DESTROYED)
+    const CustomNodeMap* m_customNodeMap = nullptr;  // custom node map (MAP SHOULD BE GLOBAL AND NEVER DESTROYED)
+    std::vector<std::vector<CCNode*>> m_lines;       // lines of characters
+    std::vector<cocos2d::CCSprite*> m_sprites;       // all sprites in the label (for faster access)
+    //  std::vector<Chunk> m_chunks;                 // chunks containing metadata
+    //  bool m_useChunks = false;                    // whether to use chunks instead of raw text
 };

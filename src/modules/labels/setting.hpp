@@ -86,7 +86,7 @@ namespace eclipse::labels {
         size_t id = instanceCount++;
 
         Event::EventState processEvents() const;
-        bool hasEvents() const { return !events.empty(); }
+        bool hasEvents() const;
 
         void promptSave() const;
     };

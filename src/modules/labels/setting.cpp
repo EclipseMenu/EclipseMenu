@@ -64,6 +64,10 @@ namespace eclipse::labels {
         return std::move(state);
     }
 
+    bool LabelSettings::hasEvents() const {
+        return !events.empty() && std::ranges::any_of(events, [](auto e) { return e.enabled; });
+    }
+
     void LabelSettings::promptSave() const {
         using FileEvent = geode::Task<geode::Result<std::filesystem::path>>;
         static geode::EventListener<FileEvent> s_listener;

@@ -24,17 +24,29 @@ BMFontConfiguration* BMFontConfiguration::create(std::string_view fntFile) {
 
 bool BMFontConfiguration::initWithFNTfile(std::string_view fntFile) {
     std::string fntFileStr(fntFile);
-    std::string fullPath = eclipse::utils::get<cocos2d::CCFileUtils>()->fullPathForFilename(fntFileStr.c_str(), false);
-
-    auto contents = geode::utils::file::readString(fullPath).unwrapOrDefault();
-    if (contents.empty()) {
+    #ifdef GEODE_IS_ANDROID
+    // on android, accessing internal assets manually won't work,
+    // so we're just going to use cocos functions as intended
+    auto ccString = cocos2d::CCString::createWithContentsOfFile(fntFileStr.c_str());
+    if (!ccString) {
+        geode::log::error("Failed to read file '{}'", fntFileStr);
         return false;
     }
+    auto contents = ccString->getCString();
+    #else
+    // for non-android, we can speed up reading by doing it manually
+    std::string fullPath = eclipse::utils::get<cocos2d::CCFileUtils>()->fullPathForFilename(fntFileStr.c_str(), false);
+    auto contents = geode::utils::file::readString(fullPath).unwrapOrDefault();
+    if (contents.empty()) {
+        geode::log::error("Failed to read file '{}'", fullPath);
+        return false;
+    }
+    #endif
 
     return initWithContents(contents, fntFileStr);
 }
 
-#define WRAP_PARSE(expr) if (!(expr)) return false
+#define WRAP_PARSE(expr) if (auto res = (expr); res.isErr()) { geode::log::error("{}", res.unwrapErr()); return false; }
 
 bool BMFontConfiguration::initWithContents(std::string const& contents, std::string const& fntFile) {
     std::istringstream stream(contents);
@@ -70,7 +82,7 @@ T fastParse(std::string_view str) {
     return geode::utils::numFromString<T>(str).unwrapOrDefault();
 }
 
-bool BMFontConfiguration::parseInfoArguments(std::istringstream& line) {
+geode::Result<> BMFontConfiguration::parseInfoArguments(std::istringstream& line) {
     std::string keypair;
 
     while (line >> keypair) {
@@ -85,15 +97,14 @@ bool BMFontConfiguration::parseInfoArguments(std::istringstream& line) {
         if (key == "padding") {
             std::istringstream paddingStream(value);
             char comma;
-            paddingStream >> m_padding.left >> comma >> m_padding.top >> comma >> m_padding.right >> comma >> m_padding.
-                    bottom;
+            paddingStream >> m_padding.left >> comma >> m_padding.top >> comma >> m_padding.right >> comma >> m_padding.bottom;
         }
     }
 
-    return true;
+    return geode::Ok();
 }
 
-bool BMFontConfiguration::parseImageFileName(std::istringstream& line, std::string const& fntFile) {
+geode::Result<> BMFontConfiguration::parseImageFileName(std::istringstream& line, std::string const& fntFile) {
     std::string keypair;
 
     while (line >> keypair) {
@@ -114,13 +125,13 @@ bool BMFontConfiguration::parseImageFileName(std::istringstream& line, std::stri
     }
 
     if (m_atlasName.empty()) {
-        return false;
+        return geode::Err("Failed to parse image file name");
     }
 
-    return true;
+    return geode::Ok();
 }
 
-bool BMFontConfiguration::parseCommonArguments(std::istringstream& line) {
+geode::Result<> BMFontConfiguration::parseCommonArguments(std::istringstream& line) {
     std::string keypair;
 
     while (line >> keypair) {
@@ -133,22 +144,22 @@ bool BMFontConfiguration::parseCommonArguments(std::istringstream& line) {
         auto value = keypair.substr(eqPos + 1);
 
         if (key == "lineHeight") {
-            m_commonHeight = fastParse<int>(value);
+            m_commonHeight = fastParse<float>(value);
         } else if (key == "scaleW" || key == "scaleH") {
             if (fastParse<int>(value) > eclipse::utils::get<cocos2d::CCConfiguration>()->m_nMaxTextureSize) {
-                return false;
+                return geode::Err("Font size exceeds max texture size");
             }
         } else if (key == "pages") {
             if (fastParse<int>(value) != 1) {
-                return false;
+                return geode::Err("Font must have exactly one page");
             }
         }
     }
 
-    return true;
+    return geode::Ok();
 }
 
-bool BMFontConfiguration::parseCharacterDefinition(std::istringstream& line) {
+geode::Result<> BMFontConfiguration::parseCharacterDefinition(std::istringstream& line) {
     BMFontDef def;
     std::string keypair;
 
@@ -183,10 +194,10 @@ bool BMFontConfiguration::parseCharacterDefinition(std::istringstream& line) {
     m_fontDefDictionary[def.charID] = def;
     // m_characterSet.insert(def.charID);
 
-    return true;
+    return geode::Ok();
 }
 
-bool BMFontConfiguration::parseKerningEntry(std::istringstream& line) {
+geode::Result<> BMFontConfiguration::parseKerningEntry(std::istringstream& line) {
     std::string keypair;
 
     while (line >> keypair) {
@@ -203,22 +214,22 @@ bool BMFontConfiguration::parseKerningEntry(std::istringstream& line) {
             line >> keypair;
             eqPos = keypair.find('=');
             if (eqPos == std::string::npos) {
-                return false;
+                return geode::Err("Failed to parse kerning entry first");
             }
 
             auto second = fastParse<uint32_t>(keypair.substr(eqPos + 1));
             line >> keypair;
             eqPos = keypair.find('=');
             if (eqPos == std::string::npos) {
-                return false;
+                return geode::Err("Failed to parse kerning entry second");
             }
 
-            auto amount = fastParse<int>(keypair.substr(eqPos + 1));
+            auto amount = fastParse<float>(keypair.substr(eqPos + 1));
             m_kerningDictionary[{first, second}] = amount;
         }
     }
 
-    return true;
+    return geode::Ok();
 }
 
 #undef WRAP_PARSE
@@ -244,13 +255,14 @@ constexpr bool isRegionalIndicator(char32_t c) {
 constexpr static bool isEmoji(char32_t c) {
     return (c >= 0x1F300 && c <= 0x1F6FF)    // Emoticons, transport, weather
            || (c >= 0x2600 && c <= 0x27BF)   // Miscellaneous Symbols and Dingbats
-           || (c >= 0x2300 && c <= 0x23FF)   // Miscellaneous Technical
+           || (c >= 0x2000 && c <= 0x23FF)   // General Punctuation, Super/subscripts, Diacritical marks, etc.
            || (c >= 0x2B50 && c <= 0x2B55)   // Star emojis
            || (c >= 0x1F900 && c <= 0x1F9FF) // Supplemental Symbols and Pictographs
            || (c >= 0x1F700 && c <= 0x1F7FF) // Alchemical Symbols
            || (c >= 0x1FA00 && c <= 0x1FAFF) // Symbols and Pictographs Extended-A
            || (c >= 0x1F000 && c <= 0x1F02F) // Mahjong, Domino
            || (c >= 0xE0020 && c <= 0xE007F) // Tags for flags
+           || (c >= 0x1C000 && c <= 0x1CFFF) // Custom range for special emojis
            || c == 0x20E3;                   // Combining enclosing keycap
 }
 
@@ -273,6 +285,33 @@ constexpr static bool isDigit(char32_t c) {
 constexpr static bool shouldParseDigitRegionalIndicator(std::u32string_view text) {
     return isDigit(text[0]) && text.size() > 2 && text[2] == 0x20E3 && isVariationSelector(text[1]);
 }
+
+// Custom math stuff
+
+struct Vector {
+    union {
+        struct { float x, y; };
+        struct { float width, height; };
+    };
+    constexpr Vector() noexcept : x(0.f), y(0.f) {}
+    constexpr Vector(float x_, float y_) noexcept : x(x_), y(y_) {}
+    constexpr operator cocos2d::CCPoint() const { return cocos2d::CCPoint { x, y }; }
+    constexpr operator cocos2d::CCSize() const { return cocos2d::CCSize { x, y }; }
+};
+
+struct Rect {
+    Vector origin;
+    Vector size;
+    constexpr Rect() noexcept = default;
+    constexpr Rect(float x, float y, float w, float h) noexcept : origin(x, y), size(w, h) {}
+    constexpr operator cocos2d::CCRect() const { return cocos2d::CCRect { origin, size }; }
+    constexpr void setRect(float x, float y, float width, float height) {
+        origin.x = x;
+        origin.y = y;
+        size.width = width;
+        size.height = height;
+    }
+};
 
 Label* Label::create(std::string_view text, std::string_view font) {
     auto ret = new Label();
@@ -378,7 +417,7 @@ void Label::setFont(std::string_view font) {
         return;
     }
 
-    m_fontConfig = std::move(newConfig);
+    m_fontConfig = newConfig;
     m_font = font;
 
     m_mainBatch->setTexture(
@@ -420,6 +459,10 @@ void Label::enableEmojis(std::string_view sheetFileName, const EmojiMap* frameNa
         this->addChild(m_spriteSheetBatch.node, 0, -1);
     }
     m_emojiMap = frameNames;
+}
+
+void Label::enableCustomNodes(const CustomNodeMap* nodes) {
+    m_customNodeMap = nodes;
 }
 
 void Label::setWrapEnabled(bool enabled) {
@@ -475,7 +518,7 @@ void Label::limitLabelWidth(float width, float defaultScale, float minScale) {
     this->setScale(scale);
 }
 
-int Label::kerningAmountForChars(uint32_t first, uint32_t second, const BMFontConfiguration* config) {
+float Label::kerningAmountForChars(uint32_t first, uint32_t second, const BMFontConfiguration* config) {
     auto& kerningDict = config->getKerningDictionary();
     auto it = kerningDict.find({first, second});
     if (it == kerningDict.end()) {
@@ -484,13 +527,16 @@ int Label::kerningAmountForChars(uint32_t first, uint32_t second, const BMFontCo
     return it->second;
 }
 
-void Label::hideAllChars() const {
-    for (auto& line : m_lines) {
-        for (auto& charSprite : line) {
-            charSprite->m_bVisible = false;
-            charSprite->m_bDirty = true;
-        }
+void Label::hideAllChars() {
+    for (auto sprite : m_sprites) {
+        sprite->m_bVisible = false;
+        sprite->m_bDirty = true;
     }
+
+    for (auto custom : m_customNodes) {
+        custom->removeFromParent();
+    }
+    m_customNodes.clear();
 }
 
 void Label::updateAlignment() const {
@@ -508,13 +554,13 @@ void Label::updateAlignment() const {
         float offset = 0;
         if (m_alignment == BMFontAlignment::Right) {
             auto last = line.back();
-            offset = contentWidth - last->m_obPosition.x - last->m_obContentSize.width * last->m_fScaleX * 0.5;
+            offset = contentWidth - last->m_obPosition.x - last->m_obContentSize.width * last->m_fScaleX * 0.5f;
         } else if (m_alignment == BMFontAlignment::Center) {
             auto first = line.front();
             auto last = line.back();
-            auto endPos = last->m_obPosition.x + last->m_obContentSize.width * last->m_fScaleX * 0.5;
-            auto startPos = first->m_obPosition.x - first->m_obContentSize.width * first->m_fScaleX * 0.5;
-            offset = (contentWidth - endPos + startPos) * 0.5;
+            auto endPos = last->m_obPosition.x + last->m_obContentSize.width * last->m_fScaleX * 0.5f;
+            auto startPos = first->m_obPosition.x - first->m_obContentSize.width * first->m_fScaleX * 0.5f;
+            offset = (contentWidth - endPos + startPos) * 0.5f;
         } else if (m_alignment == BMFontAlignment::Justify) {
             // TODO: justify
         }
@@ -542,7 +588,7 @@ float Label::getWordWidth(std::vector<cocos2d::CCSprite*> const& word) {
     auto firstSize = first->getScaledContentWidth();
     auto lastSize = last->getScaledContentWidth();
 
-    return lastPos - firstPos + lastSize * 0.5 + firstSize * 0.5;
+    return lastPos - firstPos + lastSize * 0.5f + firstSize * 0.5f;
 }
 
 void Label::updateCharsWrapped() {
@@ -569,21 +615,24 @@ void Label::updateCharsWrapped() {
             words.clear();
         }
     }
-    if (words.size() > 0) {
+    if (!words.empty()) {
         lines.push_back(std::move(words));
     }
 
     m_lines.clear();
+    m_sprites.clear();
+    m_sprites.reserve(stringLen);
 
     auto& mainCharset = m_fontConfig->getFontDefDictionary();
     auto commonHeight = m_fontConfig->getCommonHeight();
+    auto lineHeight = commonHeight + m_extraLineSpacing;
 
     BMFontConfiguration* currentConfig = m_fontConfig;
     const BMFontDef* fontDef = nullptr;
     char32_t prevChar;
-    int kerningAmount = 0;
-    int nextX = 0;
-    int longestLine = 0;
+    float kerningAmount = 0;
+    float nextX = 0;
+    float longestLine = 0;
     auto scaleFactor = eclipse::utils::get<cocos2d::CCDirector>()->m_fContentScaleFactor;
 
     auto& spaceDef = mainCharset.at(' ');
@@ -593,10 +642,10 @@ void Label::updateCharsWrapped() {
     size_t emojiIndex = 0;
 
     struct Word {
-        std::vector<cocos2d::CCSprite*> sprites;
+        std::vector<CCNode*> sprites;
         float xOffset = 0.f;
-        int fromX = 0;
-        int toX = 0;
+        float fromX = 0;
+        float toX = 0;
     };
 
     std::vector<std::vector<Word>> spriteLines;
@@ -604,12 +653,9 @@ void Label::updateCharsWrapped() {
     Word currentSpriteWord;
 
     // iterate over all words and get the width of each word
-    for (size_t i = 0; i < lines.size(); ++i) {
-        auto& line = lines[i];
-
+    for (auto& line : lines) {
         // build the words
-        for (size_t j = 0; j < line.size(); ++j) {
-            auto& word = line[j];
+        for (auto& word : line) {
             auto wordLen = word.size();
             prevChar = -1;
 
@@ -617,7 +663,7 @@ void Label::updateCharsWrapped() {
 
             // iterate over all characters in the word
             for (uint32_t k = 0; k < wordLen; ++k) {
-                int nextY = 0;
+                float nextY = 0;
                 auto c = word[k];
                 if (c == ' ') {
                     continue;
@@ -656,7 +702,7 @@ void Label::updateCharsWrapped() {
                 auto& index = indices[fontIndex];
                 kerningAmount = kerningAmountForChars(prevChar, c, currentConfig) * scale;
 
-                cocos2d::CCRect rect = {
+                Rect rect = {
                     fontDef->rect.origin.x / scaleFactor, fontDef->rect.origin.y / scaleFactor,
                     fontDef->rect.size.width / scaleFactor, fontDef->rect.size.height / scaleFactor
                 };
@@ -664,18 +710,19 @@ void Label::updateCharsWrapped() {
                 // Re-using existing sprites for performance reasons
                 auto fontChar = getSpriteForChar(*currentBatch, index, scale, rect);
                 currentSpriteWord.sprites.push_back(fontChar);
+                m_sprites.push_back(fontChar);
 
                 rect.size.width *= scale;
                 rect.size.height *= scale;
 
-                int yOffset = commonHeight - fontDef->yOffset * scale;
+                float yOffset = commonHeight - fontDef->yOffset * scale;
 
                 auto& pos = fontChar->m_obPosition;
                 pos.x = (
-                    static_cast<float>(nextX) + fontDef->xOffset * scale + fontDef->rect.size.width * 0.5f * scale + kerningAmount
+                    nextX + fontDef->xOffset * scale + fontDef->rect.size.width * 0.5f * scale + kerningAmount
                 ) / scaleFactor;
                 pos.y = (
-                    static_cast<float>(nextY) + yOffset - rect.size.height * 0.5f * scaleFactor
+                    nextY + yOffset - rect.size.height * 0.5f * scaleFactor
                 ) / scaleFactor;
 
                 // update kerning
@@ -700,7 +747,7 @@ void Label::updateCharsWrapped() {
     }
 
     // start wrapping the lines
-    std::vector<cocos2d::CCSprite*> currentLine;
+    std::vector<CCNode*> currentLine;
     nextX = 0;
     auto maxWidth = m_wrapWidth / getScale();
     for (auto& spriteLine : spriteLines) {
@@ -738,8 +785,8 @@ void Label::updateCharsWrapped() {
     }
 
     // recalculate Y positions
-    int commonHeightScaled = commonHeight / scaleFactor;
-    int nextY = commonHeightScaled * m_lines.size() - commonHeightScaled;
+    float commonHeightScaled = (m_lines.size() <= 1 ? commonHeight : lineHeight) / scaleFactor;
+    float nextY = commonHeightScaled * m_lines.size() - commonHeightScaled;
     for (auto& line : m_lines) {
         for (auto& sprite : line) {
             sprite->m_obPosition.y += nextY;
@@ -763,7 +810,7 @@ void Label::updateCharsWrapped() {
     // }
     /// ===========
 
-    this->setContentSize({maxWidth, commonHeight * m_lines.size() / scaleFactor});
+    this->setContentSize({maxWidth, lineHeight * m_lines.size() / scaleFactor});
 
     this->updateAlignment();
 }
@@ -797,7 +844,7 @@ const BMFontDef* Label::getFontDefForChar(
                 outScale = scale.value();
             } else {
                 // auto calculated scale
-                outScale = m_fontConfig->getCommonHeight() / static_cast<float>(config->getCommonHeight());
+                outScale = m_fontConfig->getCommonHeight() / config->getCommonHeight();
             }
             outIndex = i + 1;
             outBatch = &batch;
@@ -850,8 +897,8 @@ std::u32string_view Label::parseEmoji(std::u32string_view text, uint32_t& index)
 }
 
 void Label::checkForEmoji(
-    std::u32string_view text, uint32_t& index, float scaleFactor, int& nextX, int nextY, int commonHeight,
-    int& longestLine, std::vector<cocos2d::CCSprite*>& currentLine, size_t& emojiIndex
+    std::u32string_view text, uint32_t& index, float scaleFactor, float& nextX, float nextY, float commonHeight,
+    float& longestLine, std::vector<CCNode*>& currentLine, size_t& emojiIndex
 ) {
     if (!m_spriteSheetBatch) {
         return;
@@ -902,7 +949,42 @@ void Label::checkForEmoji(
         }
 
         currentLine.push_back(sprite);
+        m_sprites.push_back(sprite);
         ++emojiIndex;
+    } else if (m_customNodeMap) {
+        auto it = m_customNodeMap->find(decodedEmoji);
+        if (it == m_customNodeMap->end()) { return; }
+
+        auto node = it->second(text.substr(index), index);
+        if (!node) { return; }
+
+        // calculate size
+        auto size = node->getContentSize();
+        auto sizeInPixels = cocos2d::CCSize{
+            size.width * scaleFactor,
+            size.height * scaleFactor
+        };
+
+        // rescale to fit font height
+        auto sprScale = commonHeight / sizeInPixels.height;
+        node->setScale(sprScale);
+        sizeInPixels.width *= sprScale;
+
+        // update position
+        node->setPosition({
+            (nextX + sizeInPixels.width * .5f) / scaleFactor,
+            (nextY + commonHeight * .5f) / scaleFactor
+        });
+        nextX += sizeInPixels.width + m_extraKerning;
+
+        // update longest line
+        if (longestLine < nextX) {
+            longestLine = nextX;
+        }
+
+        this->addChild(node, 0, m_customNodes.size());
+        currentLine.push_back(node);
+        m_customNodes.push_back(node);
     }
 }
 
@@ -960,18 +1042,22 @@ void Label::updateChars() {
     m_lines.clear();
     m_lines.reserve(lines);
 
+    m_sprites.clear();
+    m_sprites.reserve(stringLen);
+
     auto commonHeight = m_fontConfig->getCommonHeight();
+    auto lineHeight = commonHeight + m_extraLineSpacing;
 
     BMFontConfiguration* currentConfig = m_fontConfig;
     const BMFontDef* fontDef = nullptr;
     char32_t prevChar = -1;
-    int kerningAmount = 0;
-    int nextX = 0;
-    int nextY = commonHeight * lines - commonHeight;
-    int longestLine = 0;
+    float kerningAmount = 0;
+    float nextX = 0;
+    float nextY = lineHeight * lines - lineHeight;
+    float longestLine = 0;
     auto scaleFactor = eclipse::utils::get<cocos2d::CCDirector>()->getContentScaleFactor();
 
-    std::vector<cocos2d::CCSprite*> currentLine;
+    std::vector<CCNode*> currentLine;
     std::vector<size_t> indices(m_fontBatches.size() + 1, 0);
     size_t emojiIndex = 0;
 
@@ -980,7 +1066,7 @@ void Label::updateChars() {
 
         if (c == '\n') {
             nextX = 0;
-            nextY -= commonHeight;
+            nextY -= lineHeight;
             m_lines.push_back(std::move(currentLine));
             currentLine.clear();
             continue;
@@ -1013,7 +1099,7 @@ void Label::updateChars() {
         auto& index = indices[fontIndex];
         kerningAmount = kerningAmountForChars(prevChar, c, currentConfig) * scale;
 
-        cocos2d::CCRect rect = {
+        Rect rect = {
             fontDef->rect.origin.x / scaleFactor, fontDef->rect.origin.y / scaleFactor,
             fontDef->rect.size.width / scaleFactor, fontDef->rect.size.height / scaleFactor
         };
@@ -1021,14 +1107,15 @@ void Label::updateChars() {
         // Re-using existing sprites for performance reasons
         auto fontChar = getSpriteForChar(*batch, index, scale, rect);
         currentLine.push_back(fontChar);
+        m_sprites.push_back(fontChar);
 
         rect.size.width *= scale;
         rect.size.height *= scale;
 
-        int yOffset = commonHeight - fontDef->yOffset * scale;
-        cocos2d::CCPoint fontPos = {
-            static_cast<float>(nextX) + fontDef->xOffset * scale + fontDef->rect.size.width * 0.5f * scale + kerningAmount,
-            static_cast<float>(nextY) + yOffset - rect.size.height * 0.5f * scaleFactor
+        float yOffset = commonHeight - fontDef->yOffset * scale;
+        Vector fontPos = {
+            nextX + fontDef->xOffset * scale + fontDef->rect.size.width * 0.5f * scale + kerningAmount,
+            nextY + yOffset - rect.size.height * 0.5f * scaleFactor
         };
         fontChar->setPosition({
             fontPos.x / scaleFactor,
@@ -1051,34 +1138,30 @@ void Label::updateChars() {
 
     this->setContentSize({
         width / scaleFactor,
-        commonHeight * lines / scaleFactor
+        (commonHeight * lines + m_extraLineSpacing * (lines - 1)) / scaleFactor
     });
 
     this->updateAlignment();
 }
 
 void Label::updateColors() const {
-    for (auto& line : m_lines) {
-        for (auto& charSprite : line) {
-            if (m_useEmojiColors) {
-                charSprite->updateDisplayedColor(m_color);
-                continue;
-            }
+    for (auto sprite : m_sprites) {
+        if (m_useEmojiColors) {
+            sprite->updateDisplayedColor(m_color);
+            continue;
+        }
 
-            if (charSprite->m_pParent == m_spriteSheetBatch.node) {
-                charSprite->updateDisplayedColor(cocos2d::ccc3(255, 255, 255));
-            } else {
-                charSprite->updateDisplayedColor(m_color);
-            }
+        if (sprite->m_pParent == m_spriteSheetBatch.node) {
+            sprite->updateDisplayedColor(cocos2d::ccc3(255, 255, 255));
+        } else {
+            sprite->updateDisplayedColor(m_color);
         }
     }
 }
 
 void Label::updateOpacity() const {
-    for (auto& line : m_lines) {
-        for (auto& charSprite : line) {
-            charSprite->updateDisplayedOpacity(m_opacity);
-        }
+    for (auto sprite : m_sprites) {
+        sprite->updateDisplayedOpacity(m_opacity);
     }
 }
 

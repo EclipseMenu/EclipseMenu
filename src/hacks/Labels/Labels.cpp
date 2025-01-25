@@ -205,6 +205,10 @@ namespace eclipse::hacks::Labels {
             // Add the cheat indicator
             {
                 auto* cheatIndicator = SmartLabel::create(".", "bigFont.fnt");
+                if (!cheatIndicator) {
+                    geode::log::error("Failed to create cheat indicator label");
+                    return;
+                }
                 cheatIndicator->setHeightMultiplier(0.37f);
                 cheatIndicator->setID("cheat-indicator"_spr);
                 auto* container = fields->m_containers[config::get<int>("labels.cheat-indicator.alignment", 0)];
