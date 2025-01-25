@@ -51,14 +51,15 @@ namespace eclipse::gui::cocos {
         }
         constexpr int amount = 9;
         auto newTabs = utils::gradualPaginate<CCMenuItemSpriteExtra*>(m_tabs, amount, m_currentPage);
-        m_upArrow->setVisible(m_currentPage != 0 && m_tabs.size() > 10);
-        m_downArrow->setVisible(m_tabs.size() > 10 && m_currentPage < (m_tabs.size() - amount));
+        m_upArrow->setVisible(m_currentPage != 0 && m_tabs.size() > amount);
+        m_downArrow->setVisible(m_tabs.size() > amount && m_currentPage < (m_tabs.size() - amount));
         for (auto const& tab : newTabs) {
             tab->setContentHeight(28.f);
             tab->setVisible(true);
         }
         this->updateLayout();
     }
+
     bool TabMenu::init(Tabs const& tabs, std::function<void(int)> const& callback) {
         if (!CCMenu::init()) return false;
         this->setID("tab-menu"_spr);
@@ -123,49 +124,28 @@ namespace eclipse::gui::cocos {
         return true;
     }
 
-    inline TranslatedLabel* mapWithIcon(std::string_view name) {
-        auto label = TranslatedLabel::create(name);
-
-        static const std::unordered_map<std::string_view, std::string_view> icons = {
-            {"tab.global", "🌐 "},
-            {"tab.level", "⭐ "},
-            {"tab.bypass", "🔓 "},
-            {"tab.player", "🎮 "},
-            {"tab.bot", "🤖 "},
-            {"tab.creator", "🛠️ "},
-            {"tab.labels", "🏷️ "},
-            {"tab.shortcuts", "🔗 "},
-            {"tab.keybinds", "⌨️ "},
-            {"tab.interface", "⚙️ "},
-            {"tab.recorder", "📹 "},
-            {"BetterInfo", "🇮 "},
-        };
-
-        static const Label::EmojiMap emojis = {
-            {U"🌐", "tab_global.png"_spr},
-            {U"⭐", "tab_level.png"_spr},
-            {U"🔓", "tab_bypass.png"_spr},
-            {U"🎮", "tab_player.png"_spr},
-            {U"🤖", "tab_bot.png"_spr},
-            {U"🛠️", "tab_creator.png"_spr},
-            {U"🏷️", "tab_labels.png"_spr},
-            {U"🔗", "tab_shortcuts.png"_spr},
-            {U"⌨️", "tab_keybinds.png"_spr},
-            {U"⚙️", "tab_interface.png"_spr},
-            {U"📹", "tab_recorder.png"_spr},
-            {U"🇮", "tab_betterinfo.png"_spr},
+    inline cocos2d::CCSprite* getTabIcon(std::string_view name) {
+        static const std::unordered_map<std::string_view, const char*> emojis = {
+            {"tab.global", "tab_global.png"_spr},
+            {"tab.level", "tab_level.png"_spr},
+            {"tab.bypass", "tab_bypass.png"_spr},
+            {"tab.player", "tab_player.png"_spr},
+            {"tab.bot", "tab_bot.png"_spr},
+            {"tab.creator", "tab_creator.png"_spr},
+            {"tab.labels", "tab_labels.png"_spr},
+            {"tab.shortcuts", "tab_shortcuts.png"_spr},
+            {"tab.keybinds", "tab_keybinds.png"_spr},
+            {"tab.interface", "tab_interface.png"_spr},
+            {"tab.recorder", "tab_recorder.png"_spr},
+            {"BetterInfo", "tab_betterinfo.png"_spr},
         };
 
         std::string_view icon = "";
-        if (auto it = icons.find(name); it != icons.end()) {
-            icon = it->second;
+        if (auto it = emojis.find(name); it != emojis.end()) {
+            return cocos2d::CCSprite::createWithSpriteFrameName(it->second);
         }
 
-        label->enableEmojis("UISheet.png"_spr, &emojis);
-        label->enableEmojiColors(true);
-        label->setString(fmt::format("{}{}", icon, label->getString()));
-        label->limitLabelWidth(100, 1.f, .2f);
-        return label;
+        return nullptr;
     }
 
     bool TabButton::init(std::string name, cocos2d::CCSize size) {
@@ -174,12 +154,22 @@ namespace eclipse::gui::cocos {
         this->setID(fmt::format("tab-button-{}"_spr, name));
         this->setContentSize(size);
 
-        m_label = mapWithIcon(name);
+        auto icon = getTabIcon(name);
+        if (icon) {
+            icon->setScale(0.6f);
+            icon->setZOrder(1);
+            this->addChildAtPosition(icon, geode::Anchor::Left, {15.f, 0.f});
+        }
+
+        m_label = TranslatedLabel::create(name);
+        m_label->limitLabelWidth(icon ? 75 : 100, 1.f, .2f);
+
         m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0.0f, 0.0f, 80.0f, 80.0f});
         m_bgSprite->setContentSize({size.width, size.height + 8.F}); // minimum 36
         m_bgSprite->setScaleY(.75F);
+
         this->addChildAtPosition(m_bgSprite, geode::Anchor::Center);
-        this->addChildAtPosition(m_label, geode::Anchor::Center);
+        this->addChildAtPosition(m_label, geode::Anchor::Center, { icon ? 12.5f : 0.f, 0.f });
         return true;
     }
 
