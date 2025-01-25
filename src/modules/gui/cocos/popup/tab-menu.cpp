@@ -26,6 +26,10 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
+    TabMenu::~TabMenu() {
+        utils::get<cocos2d::CCTouchDispatcher>()->unregisterForcePrio(this);
+    }
+
     void TabMenu::setActiveTab(int idx) {
         if (idx < 0 || idx >= m_tabs.size()) return;
 
@@ -118,7 +122,7 @@ namespace eclipse::gui::cocos {
 
         this->setActiveTab(0);
 
-        eclipse::utils::incrementForcePrio(this);
+        utils::get<cocos2d::CCTouchDispatcher>()->registerForcePrio(this, 2);
 
         return true;
     }

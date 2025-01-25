@@ -77,6 +77,9 @@ namespace eclipse::gui {
         CCScene::get()->addChild(this);
         geode::SceneManager::get()->keepAcrossScenes(this);
 
+        // im mostly sure this will override the next priorities, so i guess this should not be a force prio
+        // utils::get<cocos2d::CCTouchDispatcher>()->registerForcePrio(this, 2);
+
         return true;
     }
 
@@ -189,6 +192,10 @@ namespace eclipse::gui {
 
     void FloatingButton::registerWithTouchDispatcher() {
         eclipse::utils::get<CCTouchDispatcher>()->addTargetedDelegate(this, -1000, true);
+    }
+
+    FloatingButton::~FloatingButton() {
+        // utils::get<cocos2d::CCTouchDispatcher>()->unregisterForcePrio(this);
     }
 
 #ifdef ECLIPSE_USE_FLOATING_BUTTON
