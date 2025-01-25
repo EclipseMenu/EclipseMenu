@@ -20,6 +20,12 @@ namespace eclipse::gui::cocos {
         std::vector<TranslatedLabel*> m_labels;
 
     public:
+        ~ComboComponentNode() {
+            if (s_activeCombo == this) {
+                s_activeCombo = nullptr;
+            }
+        }
+
         void updateLabel() const {
             int index = m_component->getValue();
             if (index < 0 || index >= m_component->getItems().size()) {
