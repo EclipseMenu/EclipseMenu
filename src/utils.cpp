@@ -161,8 +161,8 @@ namespace eclipse::utils {
     }
 
     float getTPS() {
-        if (!config::get("global.tpsbypass.toggle", false)) return 240;
-        return config::get("global.tpsbypass", 240.f);
+        return config::get<"global.tpsbypass.toggle", bool>(false)
+            ? config::get<"global.tpsbypass", float>(240.f) : 240.f;
     }
 
     cocos2d::CCMenu* getEclipseUILayer() {

@@ -38,16 +38,15 @@ namespace eclipse::hacks::Recorder {
     cocos2d::CCSize newScreenScale;
 
     void callback(std::string const& error) {
-        Popup::create(
-            i18n::get_("common.error"),
-            error
-        );
+        geode::queueInMainThread([error] {
+            Popup::create(i18n::get_("common.error"), error);
+        });
     }
 
     void endPopup() {
         Popup::create(
             i18n::get_("common.info"),
-            i18n::get_("recorder.finished"),
+            i18n::format("recorder.finished", s_recorder.getRecordingDuration()),
             i18n::get_("common.ok"),
             i18n::get_("recorder.open-folder"),
             [](bool result) {
@@ -256,9 +255,7 @@ namespace eclipse::hacks::Recorder {
                 if (framerate < 1)
                     framerate = 1;
 
-                float tps = eclipse::config::get<"global.tpsbypass.toggle", bool>(false)
-                                ? eclipse::config::get<"global.tpsbypass", float>(240.f)
-                                : 240.f;
+                float tps = utils::getTPS();
 
                 dt = 1.f / framerate;
                 dt *= framerate / tps;

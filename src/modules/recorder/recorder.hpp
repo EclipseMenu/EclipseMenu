@@ -15,6 +15,7 @@ namespace eclipse::recorder {
         void captureFrame();
 
         bool isRecording() const { return m_recording; }
+        std::string getRecordingDuration() const;
 
         void setCallback(const std::function<void(std::string const&)>& callback) { m_callback = callback; }
 
@@ -31,7 +32,9 @@ namespace eclipse::recorder {
         bool m_frameHasData = false;
         std::vector<uint8_t> m_currentFrame;
         std::mutex m_lock;
+        std::condition_variable m_cv;
         RenderTexture m_renderTexture{};
+        uint64_t m_recordingDuration = 0;
 
         std::function<void(std::string const&)> m_callback;
     };
