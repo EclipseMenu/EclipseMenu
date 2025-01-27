@@ -30,6 +30,8 @@ void DSPRecorder::stop() {
     m_masterGroup->removeDSP(m_dsp);
     std::lock_guard lock(m_lock);
     m_recording = false;
+
+    m_masterGroup->setPaused(false);
 }
 
 std::vector<float> DSPRecorder::getData() {
@@ -70,7 +72,7 @@ void DSPRecorder::init() {
     system->getMasterChannelGroup(&m_masterGroup);
 }
 
-void DSPRecorder::tryUnpause(float time) {
+void DSPRecorder::tryUnpause(float time) const {
     auto system = eclipse::utils::get<FMODAudioEngine>()->m_system;
     int sampleRate;
     int channels;
