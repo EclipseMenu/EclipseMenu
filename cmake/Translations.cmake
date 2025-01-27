@@ -7,6 +7,12 @@ if (DEFINED ENV{ECLIPSE_TRANSLATIONS_REPO_PATH})
     )
     set(TRANSLATIONS_PATH $ENV{ECLIPSE_TRANSLATIONS_REPO_PATH})
 else()
+    if (DEFINED ENV{GITHUB_ACTIONS})
+        # Delete CPM cache for the translations package to force a re-download
+        # This is necessary because github actions keeps the cache between runs (and we don't want that)
+        file(REMOVE_RECURSE ${CMAKE_CURRENT_SOURCE_DIR}/cpm-cache/eclipse-translations)
+    endif()
+
     CPMAddPackage(
         NAME eclipse-translations
         GITHUB_REPOSITORY EclipseMenu/translations
