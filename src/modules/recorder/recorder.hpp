@@ -3,8 +3,7 @@
 #include "ffmpeg-api/events.hpp"
 
 #include "rendertexture.hpp"
-
-#include <mutex>
+#include "spinlock.hpp"
 
 namespace eclipse::recorder {
     class Recorder {
@@ -29,10 +28,8 @@ namespace eclipse::recorder {
 
     private:
         bool m_recording = false;
-        bool m_frameHasData = false;
+        utils::spinlock m_frameReady;
         std::vector<uint8_t> m_currentFrame;
-        std::mutex m_lock;
-        std::condition_variable m_cv;
         RenderTexture m_renderTexture{};
         uint64_t m_recordingDuration = 0;
 

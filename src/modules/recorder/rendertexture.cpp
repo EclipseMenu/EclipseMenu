@@ -56,7 +56,7 @@ namespace eclipse::recorder {
         if (m_fbo) glDeleteFramebuffers(1, &m_fbo);
     }
 
-    void RenderTexture::capture(cocos2d::CCNode* node, std::span<uint8_t> buffer, std::mutex& lock, std::condition_variable& cv, volatile bool& hasDataFlag) {
+    void RenderTexture::capture(cocos2d::CCNode* node, std::span<uint8_t> buffer, utils::spinlock& frameReady) {
         glViewport(0, 0, m_width, m_height);
 
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_oldFBO);
@@ -68,12 +68,9 @@ namespace eclipse::recorder {
         director->setProjection(cocos2d::kCCDirectorProjection2D);
 
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
-        {
-            std::unique_lock l(lock);
-            glReadPixels(0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data());
-            hasDataFlag = true;
-        }
-        cv.notify_one(); // calling notify_one() outside of the lock, to avoid locking the mutex twice
+        glReadPixels(0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data());
+
+        frameReady.set(true);
 
         glBindFramebuffer(GL_FRAMEBUFFER, m_oldFBO);
         director->setViewport();

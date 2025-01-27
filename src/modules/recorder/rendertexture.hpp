@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cocos2d.h>
+#include "spinlock.hpp"
 
 namespace eclipse::recorder {
     class RenderTexture {
@@ -18,6 +19,6 @@ namespace eclipse::recorder {
         void begin();
         void end() const;
 
-        void capture(cocos2d::CCNode* node, std::span<uint8_t> buffer, std::mutex& lock, std::condition_variable& cv, volatile bool& hasDataFlag);
+        void capture(cocos2d::CCNode* node, std::span<uint8_t> buffer, utils::spinlock& frameReady);
     };
 }

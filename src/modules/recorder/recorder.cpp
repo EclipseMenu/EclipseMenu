@@ -81,7 +81,6 @@ namespace eclipse::recorder {
         m_renderTexture.begin();
 
         m_recording = true;
-        m_frameHasData = false;
 
         DSPRecorder::get()->start();
 
@@ -93,7 +92,9 @@ namespace eclipse::recorder {
         if (!m_recording) return;
 
         m_recording = false;
-        m_cv.notify_one();
+
+        // make sure to let the recording thread know that we're stopping
+        m_frameReady.set(true);
 
         m_renderTexture.end();
 
@@ -107,16 +108,13 @@ namespace eclipse::recorder {
     }
 
     void Recorder::captureFrame() {
-        {
-            // wait until the previous frame is processed
-            std::unique_lock lock(m_lock);
-            m_cv.wait(lock, [this] { return !m_frameHasData; });
-        }
+        // wait until the previous frame is processed
+        m_frameReady.wait_for(false);
 
         // don't capture if we're not recording
         if (!m_recording) return;
 
-        m_renderTexture.capture(utils::get<PlayLayer>(), m_currentFrame, m_lock, m_cv, m_frameHasData);
+        m_renderTexture.capture(utils::get<PlayLayer>(), m_currentFrame, m_frameReady);
     }
 
     std::string Recorder::getRecordingDuration() const {
@@ -144,39 +142,28 @@ namespace eclipse::recorder {
             return;
         }
 
+        // wait for the first frame
+        m_frameReady.set(false);
+        m_frameReady.wait_for(true);
 
         {
             // record the time it took to record the video (to show in the end)
             debug::Timer timer("Recording", &m_recordingDuration);
 
-            while (m_recording || m_frameHasData) {
-                if (m_frameHasData) {
-                    m_lock.lock();
-                    m_frameHasData = false;
+            while (m_recording) {
+                res = ffmpegRecorder.writeFrame(m_currentFrame);
+                if (res.isErr()) {
+                    m_callback(res.unwrapErr());
 
-                    res = ffmpegRecorder.writeFrame(m_currentFrame);
-                    if (res.isErr()) {
-                        m_callback(res.unwrapErr());
-
-                        // stop recording if an error occurred
-                        m_lock.unlock();
-                        this->stop();
-                        break;
-                    }
-
-                    m_lock.unlock();
-
-                    // notify the captureFrame method that we're done with the frame
-                    m_cv.notify_one();
-                    {
-                        // wait for the next frame
-                        std::unique_lock lock(m_lock);
-                        m_cv.wait(lock, [this] { return m_frameHasData || !m_recording; });
-                    }
+                    // stop recording if an error occurred
+                    this->stop();
+                    break;
                 }
+
+                m_frameReady.set(false);
+                m_frameReady.wait_for(true);
             }
         }
-
 
         geode::log::debug("Recorder thread stopped.");
 
