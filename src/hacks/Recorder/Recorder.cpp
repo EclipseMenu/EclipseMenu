@@ -83,6 +83,25 @@ namespace eclipse::hacks::Recorder {
         }
     }
 
+    // UI trigger will offset some objects, which may cause issues if we record in a different resolution
+    // this function will first revert the objects to their original position, then call positionUIObjects again
+    // to update the positions according to the new resolution
+    void fixUIObjects() {
+        auto pl = utils::get<PlayLayer>();
+
+        // reset ui object start positions
+        for (auto obj : geode::cocos::CCArrayExt<GameObject*>(pl->m_objects)) {
+            auto it = pl->m_umapIntCCPoint.find(obj->m_uniqueID);
+            if (it == pl->m_umapIntCCPoint.end()) continue;
+
+            // revert the object to its original position
+            obj->setStartPos(it->second);
+        }
+
+        // refresh the ui objects
+        pl->positionUIObjects();
+    }
+
     inline void trimString(std::string& str) {
         str.erase(std::ranges::unique(str, [](char a, char b) {
             return std::isspace(a) && std::isspace(b);
@@ -133,8 +152,10 @@ namespace eclipse::hacks::Recorder {
             static_cast<float>(s_recorder.m_renderSettings.m_height) / newDesignResolution.height
         );
 
-        if(oldDesignResolution != newDesignResolution)
+        if(oldDesignResolution != newDesignResolution) {
             applyWinSize();
+            fixUIObjects();
+        }
 
         s_recorder.start();
     }
@@ -276,7 +297,7 @@ namespace eclipse::hacks::Recorder {
             SAFE_SET_PRIO("GJBaseGameLayer::update", SAFE_HOOK_PRIORITY + 1);
         }
 
-        void update(float dt) {
+        void update(float dt) override {
             if (!s_recorder.isRecording() || m_gameState.m_currentProgress <= 0) return GJBaseGameLayer::update(dt);
 
             float endscreen = config::get<"recorder.endscreen", float>(5.f);
