@@ -9,6 +9,7 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/ShaderLayer.hpp>
+#include <modules/gui/cocos/components/ToggleComponent.hpp>
 
 #include <modules/i18n/translations.hpp>
 #include <modules/recorder/DSPRecorder.hpp>
@@ -25,6 +26,7 @@ namespace eclipse::hacks::Recorder {
 
     bool levelDone = false;
     bool popupShown = false;
+    bool capturing = false;
 
     float totalTime = 0.f;
     float afterEndTimer = 0.f;
@@ -206,6 +208,7 @@ namespace eclipse::hacks::Recorder {
             tab->addInputFloat("recorder.bitrate", 1.f, 1000.f, "%.0fmbps");
             tab->addInputInt("recorder.res-x", "recorder.resolution.x", 1, 15360);
             tab->addInputInt("recorder.res-y", "recorder.resolution.y", 1, 8640);
+            tab->addToggle("recorder.hide-preview")->setDescription();
 
             config::setIfEmpty("recorder.codecIdx", codecIdx);
 
@@ -295,6 +298,7 @@ namespace eclipse::hacks::Recorder {
     class $modify(InternalRecorderBGLHook, GJBaseGameLayer) {
         static void onModify(auto& self) {
             SAFE_SET_PRIO("GJBaseGameLayer::update", SAFE_HOOK_PRIORITY + 1);
+            HOOKS_TOGGLE("recorder.hide-preview", GJBaseGameLayer, "visit");
         }
 
         void update(float dt) override {
@@ -330,10 +334,17 @@ namespace eclipse::hacks::Recorder {
                 extraTime = time - frameDt;
                 lastFrameTime = totalTime;
 
+                capturing = true;
                 s_recorder.captureFrame();
+                capturing = false;
             }
 
             GJBaseGameLayer::update(dt);
+        }
+
+        void visit() override {
+            if (s_recorder.isRecording() && !capturing) return;
+            GJBaseGameLayer::visit();
         }
     };
 
