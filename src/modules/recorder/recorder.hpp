@@ -27,7 +27,7 @@ namespace eclipse::recorder {
         void recordThread();
 
     private:
-        bool m_recording = false;
+        volatile bool m_recording = false;
         utils::spinlock m_frameReady;
         std::vector<uint8_t> m_currentFrame;
         RenderTexture m_renderTexture{};

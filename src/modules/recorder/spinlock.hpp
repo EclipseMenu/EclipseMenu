@@ -21,6 +21,13 @@ namespace eclipse::utils {
             #endif
         }
 
+        /// @brief Checks the flag's state without locking the thread.
+        [[nodiscard]] bool read() const {
+            return m_flag.test(std::memory_order_acquire);
+        }
+
+        [[nodiscard]] operator bool() const { return read(); }
+
         /// @brief Sets the flag to the desired state and notifies any waiting threads.
         void set(bool state) {
             if (state) m_flag.test_and_set(std::memory_order_release);

@@ -160,6 +160,9 @@ namespace eclipse::recorder {
                     break;
                 }
 
+                // break if we're not recording anymore (to avoid waiting forever)
+                if (!m_recording) break;
+
                 m_frameReady.set(false);
                 m_frameReady.wait_for(true);
             }
