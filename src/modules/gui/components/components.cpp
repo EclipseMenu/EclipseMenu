@@ -83,9 +83,17 @@ namespace eclipse::gui {
         return this;
     }
 
-    bool Component::isSearchedFor() const { return m_isSearchedFor; }
-    void Component::setSearchedFor(bool state) { m_isSearchedFor = state; }
     ComponentFlags Component::getFlags() const { return m_flags; }
+    Component* Component::addFlag(ComponentFlags flag) {
+        m_flags = static_cast<ComponentFlags>(static_cast<uint8_t>(m_flags) | static_cast<uint8_t>(flag));
+        return this;
+    }
+    Component* Component::removeFlag(ComponentFlags flag) {
+        if (m_flags & flag) {
+            m_flags = static_cast<ComponentFlags>(static_cast<uint8_t>(m_flags) & ~static_cast<uint8_t>(flag));
+        }
+        return this;
+    }
     Component* Component::setFlags(ComponentFlags flags) { m_flags = flags; return this; }
 
     #pragma endregion BaseComponent

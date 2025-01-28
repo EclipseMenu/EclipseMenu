@@ -20,6 +20,8 @@ namespace eclipse::gui {
         DisablePanel = 1 << 2, // Hide the component in panel layout (imgui)
         DisableSidebar = 1 << 3, // Hide the component in sidebar layout (imgui)
 
+        SearchedFor = 1 << 4, // The compoenent is being searched for
+
         OnlyTabbed = DisablePanel | DisableSidebar | DisableCocos, // Display exclusively in tabbed layout (imgui)
         OnlyPanel = DisableTabbed | DisableSidebar | DisableCocos, // Display exclusively in panel layout (imgui)
         OnlySidebar = DisableTabbed | DisablePanel | DisableCocos, // Display exclusively in sidebar layout (imgui)
@@ -69,14 +71,14 @@ namespace eclipse::gui {
         /// @brief Set the component's description.
         virtual Component* setDescription(std::string description);
 
-        /// @brief Whether the component is being searched for or not
-        bool isSearchedFor() const;;
-
-        /// @brief Sets the component's search state
-        void setSearchedFor(bool state);;
-
         /// @brief Get the component's flags
         [[nodiscard]] ComponentFlags getFlags() const;
+
+        /// @brief Adds a flag to the component
+        Component* addFlag(ComponentFlags flag);
+
+        /// @brief Removes a flag from the component
+        Component* removeFlag(ComponentFlags flag);
 
         /// @brief Set the component's flags
         Component* setFlags(ComponentFlags flags);
@@ -86,7 +88,6 @@ namespace eclipse::gui {
         size_t m_uid;
         ComponentType m_type = ComponentType::Unknown;
         bool m_noSave = false;
-        bool m_isSearchedFor = false;
         ComponentFlags m_flags = ComponentFlags::None;
         std::string m_description;
     };

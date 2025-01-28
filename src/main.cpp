@@ -292,22 +292,22 @@ $on_mod(Loaded) {
                         tab->setSearchedFor(false);
 
                         for (auto& component : tab->getComponents())
-                            component->setSearchedFor(false);
+                            component->removeFlag(ComponentFlags::SearchedFor);
                     }
-
+                    
                     hasSearched = false;
                 }
             } else {
                 hasSearched = true;
-
+                
                 for (auto& tab : Engine::get()->getTabs()) {
                     bool hasFoundComponent = false;
-
+                    
                     for (auto& component : tab->getComponents()) {
                         if (utils::matchesStringFuzzy(i18n::get(component->getTitle()), input)) {
-                            component->setSearchedFor(true);
+                            component->addFlag(ComponentFlags::SearchedFor);
                             hasFoundComponent = true;
-                        } else component->setSearchedFor(false);
+                        } else component->removeFlag(ComponentFlags::SearchedFor);
                     }
 
                     tab->setSearchedFor(hasFoundComponent);

@@ -199,7 +199,7 @@ namespace eclipse::gui::imgui {
 
     void Theme::visitLabel(const std::shared_ptr<LabelComponent>& label) const {
         if (label->getTitle().empty()) return; // skip empty labels
-        if (label->isSearchedFor())
+        if (label->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
         else
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getForegroundColor()));
@@ -215,7 +215,7 @@ namespace eclipse::gui::imgui {
         auto title = i18n::get_(toggle->getTitle());
 
         if (auto options = toggle->getOptions().lock()) {
-            toggled = this->checkboxWithSettings(title, value, toggle->isSearchedFor(), [this, options] {
+            toggled = this->checkboxWithSettings(title, value, toggle->getFlags() & ComponentFlags::SearchedFor, [this, options] {
                 for (auto& comp : options->getComponents())
                     this->visit(comp);
             }, [toggle] {
@@ -224,7 +224,7 @@ namespace eclipse::gui::imgui {
                     handleKeybindMenu(toggle->getId());
             });
         } else {
-            toggled = this->checkbox(title, value, toggle->isSearchedFor(), [toggle] {
+            toggled = this->checkbox(title, value, toggle->getFlags() & ComponentFlags::SearchedFor, [toggle] {
                 handleTooltip(toggle->getDescription());
                 if (toggle->hasKeybind())
                     handleKeybindMenu(toggle->getId());
@@ -240,7 +240,7 @@ namespace eclipse::gui::imgui {
     void Theme::visitRadioButton(const std::shared_ptr<RadioButtonComponent>& radio) const {
         int value = radio->getValue();
 
-        if (radio->isSearchedFor())
+        if (radio->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         ImGui::PushStyleColor(ImGuiCol_CheckMark, static_cast<ImVec4>(ThemeManager::get()->getCheckboxCheckmarkColor()));
@@ -250,7 +250,7 @@ namespace eclipse::gui::imgui {
         }
         ImGui::PopStyleColor();
 
-        if (radio->isSearchedFor())
+        if (radio->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PopStyleColor();
 
         handleTooltip(radio->getDescription());
@@ -283,12 +283,12 @@ namespace eclipse::gui::imgui {
         ImGui::SetNextItemWidth(5.f);
         ImGui::SameLine();
 
-        if (combo->isSearchedFor())
+        if (combo->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         ImGui::TextWrapped("%s", title.data());
 
-        if (combo->isSearchedFor())
+        if (combo->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PopStyleColor();
     }
 
@@ -319,19 +319,19 @@ namespace eclipse::gui::imgui {
         ImGui::SetNextItemWidth(5.f);
         ImGui::SameLine();
 
-        if (combo->isSearchedFor())
+        if (combo->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         ImGui::TextWrapped("%s", title.data());
 
-        if (combo->isSearchedFor())
+        if (combo->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PopStyleColor();
     }
 
     void Theme::visitSlider(const std::shared_ptr<SliderComponent>& slider) const {
         auto value = slider->getValue();
 
-        if (slider->isSearchedFor())
+        if (slider->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
@@ -340,7 +340,7 @@ namespace eclipse::gui::imgui {
             slider->triggerCallback(value);
         }
 
-        if (slider->isSearchedFor())
+        if (slider->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PopStyleColor();
 
         handleTooltip(slider->getDescription());
@@ -360,12 +360,12 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine();
 
-        if (inputFloat->isSearchedFor())
+        if (inputFloat->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         ImGui::TextWrapped("%s", title.data());
 
-        if (inputFloat->isSearchedFor())
+        if (inputFloat->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PopStyleColor();
 
         handleTooltip(inputFloat->getDescription());
@@ -385,12 +385,12 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine();
 
-        if (inputInt->isSearchedFor())
+        if (inputInt->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         ImGui::TextWrapped("%s", title.data());
 
-        if (inputInt->isSearchedFor())
+        if (inputInt->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PopStyleColor();
 
         handleTooltip(inputInt->getDescription());
@@ -413,7 +413,7 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine(0, 1);
 
-        if (this->checkbox(title, state, intToggle->isSearchedFor(), [intToggle] {
+        if (this->checkbox(title, state, intToggle->getFlags() & ComponentFlags::SearchedFor, [intToggle] {
             handleTooltip(intToggle->getDescription());
             if (intToggle->hasKeybind())
                 handleKeybindMenu(intToggle->getId());
@@ -439,7 +439,7 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine(0, 1);
 
-        if (this->checkbox(title, state, floatToggle->isSearchedFor(), [floatToggle] {
+        if (this->checkbox(title, state, floatToggle->getFlags() & ComponentFlags::SearchedFor, [floatToggle] {
             handleTooltip(floatToggle->getDescription());
             if (floatToggle->hasKeybind())
                 handleKeybindMenu(floatToggle->getId());
@@ -462,14 +462,14 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine();
 
-        if (inputText->isSearchedFor())
+        if (inputText->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         // ImGui::PushTextWrapPos(0.0f);
         ImGui::Text("%s", title.data());
         // ImGui::PopTextWrapPos();
 
-        if (inputText->isSearchedFor())
+        if (inputText->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PopStyleColor();
 
         handleTooltip(inputText->getDescription());
@@ -488,12 +488,12 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine();
 
-        if (color->isSearchedFor())
+        if (color->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         ImGui::TextWrapped("%s", title.data());
 
-        if (color->isSearchedFor())
+        if (color->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PopStyleColor();
 
         if (changed) {
@@ -504,7 +504,7 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitButton(const std::shared_ptr<ButtonComponent>& button) const {
-        if (this->button(i18n::get_(button->getTitle()), button->isSearchedFor())) {
+        if (this->button(i18n::get_(button->getTitle()), button->getFlags() & ComponentFlags::SearchedFor)) {
             button->triggerCallback();
         }
 
@@ -525,7 +525,7 @@ namespace eclipse::gui::imgui {
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 
-        if (keybind->isSearchedFor())
+        if (keybind->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
 
         auto availWidth = ImGui::GetContentRegionAvail().x;
@@ -541,7 +541,7 @@ namespace eclipse::gui::imgui {
 
         ImGui::SameLine(0, 2);
 
-        ImGui::PopStyleColor(keybind->isSearchedFor() ? 4 : 3);
+        ImGui::PopStyleColor(keybind->getFlags() & ComponentFlags::SearchedFor ? 4 : 3);
         ImGui::PopStyleVar(2);
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0.25f));
@@ -605,7 +605,7 @@ namespace eclipse::gui::imgui {
     void Theme::visitLabelSettings(const std::shared_ptr<LabelSettingsComponent>& labelSettings) const {
         auto* settings = labelSettings->getSettings();
 
-        if (this->checkboxWithSettings(settings->name, settings->visible, labelSettings->isSearchedFor(), [this, settings, labelSettings] {
+        if (this->checkboxWithSettings(settings->name, settings->visible, labelSettings->getFlags() & ComponentFlags::SearchedFor, [this, settings, labelSettings] {
             auto& name = settings->name;
             if (ImGui::InputText(i18n::get("labels.name").data(), &name)) {
                 settings->name = name;
