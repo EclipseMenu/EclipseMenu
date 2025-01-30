@@ -40,11 +40,20 @@ namespace eclipse::hacks::Global {
         }
 
         #ifdef REQUIRE_PATCH
+        template <typename T>
+        [[nodiscard]] std::vector<uint8_t> TPStoBytes() {
+            if constexpr (std::is_same_v<T, float>) {
+                return geode::toBytes(1.f / config::get<"global.tpsbypass", float>(240.f));
+            } else if constexpr (std::is_same_v<T, double>) {
+                return geode::toBytes<double>(1.0 / config::get<"global.tpsbypass", float>(240.f));
+            }
+        }
+
         geode::Result<> setupPatches() {
             auto base = reinterpret_cast<uint8_t*>(geode::base::get());
             auto moduleSize = utils::getBaseSize();
-            geode::log::info("TPSBypass: base = 0x{:X}", (uintptr_t)base);
-            geode::log::info("TPSBypass: moduleSize = 0x{:X}", moduleSize);
+            geode::log::debug("TPSBypass: base = 0x{:X}", (uintptr_t)base);
+            geode::log::debug("TPSBypass: moduleSize = 0x{:X}", moduleSize);
 
             using namespace sinaps::mask;
 
@@ -58,18 +67,15 @@ namespace eclipse::hacks::Global {
                 return geode::Err(fmt::format("failed to find addresses: float = 0x{:X}, double = 0x{:X}", floatAddr, doubleAddr));
             }
 
-            auto patch1Res = geode::Mod::get()->patch(
-                reinterpret_cast<void*>(floatAddr + base),
-                geode::toBytes(config::get<"global.tpsbypass", float>(240.f))
-            );
+            geode::log::debug("TPSBypass: floatAddr = 0x{:X}", floatAddr);
+            geode::log::debug("TPSBypass: doubleAddr = 0x{:X}", doubleAddr);
+
+            auto patch1Res = geode::Mod::get()->patch(reinterpret_cast<void*>(floatAddr + base), TPStoBytes<float>());
             if (!patch1Res) return geode::Err(fmt::format("failed to patch float address: {}", patch1Res.unwrapErr()));
             auto patch1 = patch1Res.unwrap();
             (void) patch1->disable();
 
-            auto patch2Res = geode::Mod::get()->patch(
-                reinterpret_cast<void*>(doubleAddr + base),
-                geode::toBytes<double>(config::get<"global.tpsbypass", float>(240.f))
-            );
+            auto patch2Res = geode::Mod::get()->patch(reinterpret_cast<void*>(doubleAddr + base), TPStoBytes<double>());
             if (!patch2Res) return geode::Err(fmt::format("failed to patch double address: {}", patch2Res.unwrapErr()));
             auto patch2 = patch2Res.unwrap();
             (void) patch2->disable();
@@ -84,9 +90,9 @@ namespace eclipse::hacks::Global {
                 }
             };
 
-            const auto setValue = [patch1, patch2](float value) {
-                (void) patch1->updateBytes(geode::toBytes(value));
-                (void) patch2->updateBytes(geode::toBytes<double>(value));
+            const auto setValue = [patch1, patch2]() {
+                (void) patch1->updateBytes(TPStoBytes<float>());
+                (void) patch2->updateBytes(TPStoBytes<double>());
             };
             #elif defined(GEODE_IS_ARM_MAC)
             // on ARM, it's a bit tricky, since the value is not stored as a constant.
@@ -105,9 +111,7 @@ namespace eclipse::hacks::Global {
             #endif
 
             // update bytes on value change
-            config::addDelegate("global.tpsbypass", [setValue] {
-                setValue(config::get<"global.tpsbypass", float>(240.f));
-            });
+            config::addDelegate("global.tpsbypass", [setValue] { setValue(); });
 
             // update patches on enable/disable
             config::addDelegate("global.tpsbypass.toggle", [setState] {
