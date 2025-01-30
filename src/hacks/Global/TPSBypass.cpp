@@ -28,6 +28,11 @@ namespace eclipse::hacks::Global {
             if (!res) {
                 geode::log::error("TPSBypass: {}", res.unwrapErr());
                 config::set("global.tpsbypass.toggle", false);
+                // add a safeguard to disable tps bypass if it gets enabled
+                config::addDelegate("global.tpsbypass.toggle", []() {
+                    if (config::get<"global.tpsbypass.toggle", bool>(false))
+                        config::set("global.tpsbypass.toggle", false);
+                });
                 return;
             }
             #endif
@@ -173,6 +178,7 @@ namespace eclipse::hacks::Global {
             bool m_shouldHide = false;
             bool m_isEditor = utils::get<LevelEditorLayer>() != nullptr;
             bool m_shouldBreak = false;
+            bool m_postRestart = false;
         };
 
         float getCustomDelta(float dt, float tps, bool applyExtraDelta = true) {
@@ -207,6 +213,14 @@ namespace eclipse::hacks::Global {
 
         void update(float dt) override {
             auto fields = m_fields.self();
+
+            // to prevent the lag after restarting the level, we will call just skip this iteration (and reset the spillover delta)
+            if (fields->m_postRestart) {
+                fields->m_postRestart = false;
+                fields->m_extraDelta = 0.0;
+                return;
+            }
+
             fields->m_extraDelta += dt;
             fields->m_shouldBreak = false;
 
@@ -255,6 +269,12 @@ namespace eclipse::hacks::Global {
             auto fields = getFields(this);
             if (fields->m_shouldHide) return;
             PlayLayer::postUpdate(fields->m_realDelta);
+        }
+
+        void resetLevel() {
+            auto fields = getFields(this);
+            fields->m_postRestart = true;
+            PlayLayer::resetLevel();
         }
 
         // we also would like to fix the percentage calculation, which uses constant 240 TPS to determine the progress

@@ -208,7 +208,11 @@ namespace eclipse::hacks::Bot {
 
                 config::set<bool>("level.checkpointdelay", true);
                 config::set<bool>("global.tpsbypass.toggle", true);
-                config::set<float>("global.tpsbypass", s_bot.getFramerate());
+                if (s_bot.getState() == bot::State::RECORD) {
+                    s_bot.setFramerate(utils::getTPS());
+                } else {
+                    config::set<float>("global.tpsbypass", s_bot.getFramerate());
+                }
             }
 
             if (s_bot.getState() == bot::State::RECORD) {
