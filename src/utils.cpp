@@ -220,23 +220,10 @@ namespace eclipse::utils {
 
             #elif defined(GEODE_IS_MACOS)
 
-            uint32_t imageCount = _dyld_image_count();
-            for (uint32_t i = 0; i < imageCount; ++i) {
-                const mach_header* header = (const mach_header*)_dyld_get_image_header(i);
-                if (!header) continue;
-
-                // Check if this is the main executable
-                if (header->filetype == MH_EXECUTE) {
-                    const segment_command* seg = (const segment_command*)((uintptr_t)header + sizeof(mach_header));
-                    for (uint32_t j = 0; j < header->ncmds; ++j) {
-                        if (seg->cmd == LC_SEGMENT) {
-                            return seg->vmaddr + seg->vmsize - (size_t)header;
-                        }
-                        seg = (const segment_command*)((uintptr_t)seg + seg->cmdsize);
-                    }
-                }
-            }
-            return 0;
+            // i have no idea how to do this on macOS,
+            // so for now just hardcode some arbitrary value within the range of the base size :fire:
+            return GEODE_INTEL_MAC(0x980000)
+                   GEODE_ARM_MAC(0x8B0000);
 
             #elif defined(GEODE_IS_ANDROID)
 
