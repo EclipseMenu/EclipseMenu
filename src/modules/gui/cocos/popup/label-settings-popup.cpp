@@ -4,6 +4,7 @@
 #include <modules/gui/cocos/cocos.hpp>
 #include <modules/gui/cocos/nodes/color-picker.hpp>
 #include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
+#include <modules/gui/cocos/nodes/oneof-picker.hpp>
 #include <modules/gui/theming/manager.hpp>
 #include <modules/i18n/translations.hpp>
 #include <modules/labels/setting.hpp>
@@ -234,18 +235,21 @@ namespace eclipse::gui::cocos {
 
         tabsMenu->setLayout(geode::RowLayout::create()->setAxisAlignment(geode::AxisAlignment::Even));
         m_mainLayer->addChildAtPosition(tabsMenu, geode::Anchor::Top, { 0.f, -16.f });
-        
+
         this->selectTab(0);
-        
+
         // Register the popup with the engine for cleanup
-        CocosRenderer::get()->registerModal(this);
+        if (auto cocos = CocosRenderer::get()) {
+            cocos->registerModal(this);
+        }
 
         return true;
     }
 
-    void LabelSettingsPopup::onExit() {
-        Popup::onExit();
-        CocosRenderer::get()->unregisterModal(this);
+    LabelSettingsPopup::~LabelSettingsPopup() {
+        if (auto cocos = CocosRenderer::get()) {
+            cocos->unregisterModal(this);
+        }
     }
 
     cocos2d::CCSprite* createButton(cocos2d::CCSprite* inner, float scale = 0.4f) {
@@ -570,7 +574,32 @@ namespace eclipse::gui::cocos {
         return std::max((CARD_HEIGHT + 2.5f) * count + 42.f, 200.f);
     }
 
-    cocos2d::CCNode* createEventCard(labels::LabelEvent& event, labels::LabelSettings* settings, std::function<void(CallbackEvent)> const& callback) {
+    cocos2d::CCNode* createEventCard(labels::LabelEvent& event, std::function<void(CallbackEvent)> const& callback, std::function<void()> const& removeCallback);
+
+    cocos2d::CCNode* createEventAddButton(labels::LabelSettings* settings, cocos2d::CCNode* contentLayer, std::function<void(CallbackEvent)> const& callback, std::function<void(size_t)> const& removeCallback) {
+        auto addEventBtn = createLabelButton("labels.events.add", 120.f, [settings, contentLayer, callback, removeCallback](auto) {
+            settings->events.emplace_back();
+            callback(CallbackEvent::Update);
+
+            auto index = settings->events.size() - 1;
+
+            // Add a new card
+            contentLayer->addChild(createEventCard(settings->events.back(), callback, [removeCallback, index] {
+                removeCallback(index);
+            }));
+            contentLayer->setContentSize({ 385.f, getEventContainerHeight(settings->events.size()) });
+            contentLayer->updateLayout();
+        });
+        addEventBtn->setID("add-event-btn"_spr);
+
+        auto menu = cocos2d::CCMenu::create();
+        menu->setContentSize({ 385.f, 36.f });
+        menu->addChildAtPosition(addEventBtn, geode::Anchor::Center);
+        menu->setZOrder(5); // make sure the button is always last
+        return menu;
+    }
+
+    cocos2d::CCNode* createEventCard(labels::LabelEvent& event, std::function<void(CallbackEvent)> const& callback, std::function<void()> const& removeCallback) {
         auto menu = cocos2d::CCMenu::create();
         menu->setContentSize({ CARD_WIDTH, CARD_HEIGHT });
         menu->setID("event-card"_spr);
@@ -603,8 +632,37 @@ namespace eclipse::gui::cocos {
         fontPicker->updatePreview();
         menu->addChildAtPosition(fontPicker, geode::Anchor::TopLeft, { 137.5f, -102.f });
 
+        auto conditionPicker = OneOfPicker::create(
+            labels::eventNames,
+            [&, callback](int index) {
+                event.type = static_cast<labels::LabelEvent::Type>(index);
+                callback(CallbackEvent::Update);
+            },
+            static_cast<size_t>(event.type)
+        );
+        conditionPicker->setID("condition-picker"_spr);
+        conditionPicker->setScale(0.9f);
+        conditionPicker->setContentSize({ 100.f, 28.f });
+        conditionPicker->updateLayout();
+        menu->addChildAtPosition(conditionPicker, geode::Anchor::TopLeft, { 137.5f, -16.f });
+
+        auto visibilityPicker = OneOfPicker::create(
+            labels::visibleNames,
+            [&, callback](int index) {
+                if (index == 0) event.visible.reset();
+                else event.visible = index == 1;
+                callback(CallbackEvent::Update);
+            },
+            event.visible.has_value() ? (event.visible.value() ? 1 : 2) : 0
+        );
+        visibilityPicker->setID("visibility-picker"_spr);
+        visibilityPicker->setScale(0.9f);
+        visibilityPicker->setContentSize({ 100.f, 28.f });
+        visibilityPicker->updateLayout();
+        menu->addChildAtPosition(visibilityPicker, geode::Anchor::TopLeft, { 137.5f, -44.f });
+
         // Inputs
-        auto customConditionInput = geode::TextInput::create(200.f, "progress >= bestPercent", "font_default.fnt"_spr);
+        auto customConditionInput = geode::TextInput::create(165.f, "progress >= bestPercent", "font_default.fnt"_spr);
         customConditionInput->setCommonFilter(geode::CommonFilter::Any);
         customConditionInput->setString(event.condition);
         customConditionInput->setScale(0.9f);
@@ -613,11 +671,11 @@ namespace eclipse::gui::cocos {
             callback(CallbackEvent::Update);
         });
         customConditionInput->setID("custom-condition-input"_spr);
-        menu->addChildAtPosition(customConditionInput, geode::Anchor::TopLeft, { 277.5f, -16.f });
+        menu->addChildAtPosition(customConditionInput, geode::Anchor::TopLeft, { 260.f, -16.f });
 
         auto durationInput = geode::TextInput::create(100.f, "1.0", "font_default.fnt"_spr);
         durationInput->setCommonFilter(geode::CommonFilter::Float);
-        durationInput->setString(std::to_string(event.duration));
+        durationInput->setString(fmt::to_string(event.duration));
         durationInput->setScale(0.9f);
         durationInput->setCallback([&, callback](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
@@ -630,7 +688,7 @@ namespace eclipse::gui::cocos {
 
         auto modifyScaleInput = geode::TextInput::create(100.f, "1.0", "font_default.fnt"_spr);
         modifyScaleInput->setCommonFilter(geode::CommonFilter::Float);
-        modifyScaleInput->setString(std::to_string(event.scale.value_or(1.f)));
+        modifyScaleInput->setString(fmt::to_string(event.scale.value_or(1.f)));
         modifyScaleInput->setScale(0.9f);
         modifyScaleInput->setCallback([&, callback](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
@@ -644,7 +702,7 @@ namespace eclipse::gui::cocos {
 
         auto modifyOpacityInput = geode::TextInput::create(100.f, "1.0", "font_default.fnt"_spr);
         modifyOpacityInput->setCommonFilter(geode::CommonFilter::Float);
-        modifyOpacityInput->setString(std::to_string(event.opacity.value_or(1.f)));
+        modifyOpacityInput->setString(fmt::to_string(event.opacity.value_or(1.f)));
         modifyOpacityInput->setScale(0.9f);
         modifyOpacityInput->setCallback([&, callback](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
@@ -658,7 +716,7 @@ namespace eclipse::gui::cocos {
 
         auto delayInput = geode::TextInput::create(100.f, "0.0", "font_default.fnt"_spr);
         delayInput->setCommonFilter(geode::CommonFilter::Float);
-        delayInput->setString(std::to_string(event.delay));
+        delayInput->setString(fmt::to_string(event.delay));
         delayInput->setScale(0.9f);
         delayInput->setCallback([&, callback](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
@@ -671,7 +729,7 @@ namespace eclipse::gui::cocos {
 
         auto easingInput = geode::TextInput::create(100.f, "0.0", "font_default.fnt"_spr);
         easingInput->setCommonFilter(geode::CommonFilter::Float);
-        easingInput->setString(std::to_string(event.easing));
+        easingInput->setString(fmt::to_string(event.easing));
         easingInput->setScale(0.9f);
         easingInput->setCallback([&, callback](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
@@ -680,7 +738,7 @@ namespace eclipse::gui::cocos {
             callback(CallbackEvent::Update);
         });
         easingInput->setID("easing-input"_spr);
-        menu->addChildAtPosition(easingInput, geode::Anchor::TopLeft, { 290.f, -132.f });
+        menu->addChildAtPosition(easingInput, geode::Anchor::TopLeft, { 322.5f, -132.f });
 
         // Toggles
         auto enableToggle = geode::cocos::CCMenuItemExt::createToggler(
@@ -720,7 +778,7 @@ namespace eclipse::gui::cocos {
             createToggle("checkmark.png"_spr), createToggle(nullptr), [&, callback, modifyScaleInput](auto) {
             if (!event.scale.has_value()) event.scale = 1.f;
             else event.scale.reset();
-            modifyScaleInput->setString(std::to_string(event.scale.value_or(1.f)));
+            modifyScaleInput->setString(fmt::to_string(event.scale.value_or(1.f)));
             modifyScaleInput->setVisible(event.scale.has_value());
             callback(CallbackEvent::Update);
         });
@@ -732,7 +790,7 @@ namespace eclipse::gui::cocos {
             createToggle("checkmark.png"_spr), createToggle(nullptr), [&, callback, modifyOpacityInput](auto) {
             if (!event.opacity.has_value()) event.opacity = 1.f;
             else event.opacity.reset();
-            modifyOpacityInput->setString(std::to_string(event.opacity.value_or(1.f)));
+            modifyOpacityInput->setString(fmt::to_string(event.opacity.value_or(1.f)));
             modifyOpacityInput->setVisible(event.opacity.has_value());
             callback(CallbackEvent::Update);
         });
@@ -759,30 +817,20 @@ namespace eclipse::gui::cocos {
         createLabel("labels.events.scale", 55, 215, -44)->setID("scale-label"_spr);
         createLabel("labels.events.opacity", 55, 215, -73)->setID("opacity-label"_spr);
         createLabel("labels.events.delay", 64, 188, -102)->setID("delay-label"_spr);
-        createLabel("labels.events.easing", 48, 188, -132)->setID("easing-label"_spr);
+        createLabel("labels.events.easing", 64, 188, -132)->setID("easing-label"_spr);
 
         // Delete button
         auto deleteBtn = geode::cocos::CCMenuItemExt::createSpriteExtra(
             createButtonSprite("trashbin.png"_spr, 0.35f),
-            [&, menu, settings, callback](auto) {
-            auto& events = settings->events;
-            auto index = &event - &events[0];
-            events.erase(events.begin() + index);
-            callback(CallbackEvent::Update);
-
-            auto contentLayer = menu->getParent();
-            menu->removeFromParent();
-
-            contentLayer->setContentSize({ 385.f, getEventContainerHeight(events.size()) });
-            contentLayer->updateLayout();
-        });
+            [removeCallback](auto) { removeCallback(); }
+        );
         deleteBtn->setID("delete-btn"_spr);
-        menu->addChildAtPosition(deleteBtn, geode::Anchor::TopLeft, { 352.5f, -132.f });
+        menu->addChildAtPosition(deleteBtn, geode::Anchor::TopLeft, { 352.5f, -16.f });
 
         return menu;
     }
 
-    cocos2d::CCLayer* LabelSettingsPopup::createEventsTab() const {
+    cocos2d::CCLayer* LabelSettingsPopup::createEventsTab() {
         auto layer = CCLayer::create();
 
         auto scrollLayer = ScrollLayer::create({ 385.f, 200.f });
@@ -791,25 +839,19 @@ namespace eclipse::gui::cocos {
 
         const auto contentLayer = scrollLayer->m_contentLayer;
         for (auto& event : m_settings->events) {
-            contentLayer->addChild(createEventCard(event, m_settings, m_callback));
+            size_t index = &event - &m_settings->events.front();
+            contentLayer->addChild(createEventCard(event, m_callback, [this, index] {
+                m_settings->events.erase(m_settings->events.begin() + index);
+                m_callback(CallbackEvent::Update);
+                this->selectTab(2);
+            }));
         }
 
-        auto addEventBtn = createLabelButton("labels.events.add", 120.f, [this, contentLayer](auto) {
-            m_settings->events.emplace_back();
+        contentLayer->addChild(createEventAddButton(m_settings, contentLayer, m_callback, [this](size_t index) {
+            m_settings->events.erase(m_settings->events.begin() + index);
             m_callback(CallbackEvent::Update);
-
-            // Add a new card
-            contentLayer->addChild(createEventCard(m_settings->events.back(), m_settings, m_callback));
-            contentLayer->setContentSize({ 385.f, getEventContainerHeight(m_settings->events.size()) });
-            contentLayer->updateLayout();
-        });
-        addEventBtn->setID("add-event-btn"_spr);
-
-        auto menu = cocos2d::CCMenu::create();
-        menu->setContentSize({ 385.f, 36.f });
-        menu->addChildAtPosition(addEventBtn, geode::Anchor::Center);
-        menu->setZOrder(5); // make sure the button is always last
-        contentLayer->addChild(menu);
+            this->selectTab(2);
+        }));
 
         contentLayer->setContentSize({ 385.f, getEventContainerHeight(m_settings->events.size()) });
         contentLayer->setLayout(

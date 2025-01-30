@@ -14,11 +14,10 @@ namespace eclipse::gui::cocos {
     class LabelSettingsPopup : public geode::Popup<labels::LabelSettings*, std::function<void(CallbackEvent)> const&> {
     protected:
         bool setup(labels::LabelSettings* settings, std::function<void(CallbackEvent)> const& callback) override;
-        void onExit() override;
 
         CCLayer* createSettingsTab();
         CCLayer* createTextTab() const;
-        CCLayer* createEventsTab() const;
+        CCLayer* createEventsTab();
         CCLayer* createPreviewTab();
 
         void updatePreview(float dt);
@@ -26,6 +25,8 @@ namespace eclipse::gui::cocos {
     public:
         static LabelSettingsPopup* create(labels::LabelSettings* settings, std::function<void(CallbackEvent)> const& callback);
         void selectTab(size_t index);
+
+        ~LabelSettingsPopup() override;
 
     private:
         labels::LabelSettings* m_settings{};
