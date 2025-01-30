@@ -28,6 +28,7 @@ namespace eclipse::hacks::Global {
             auto res = setupPatches();
             if (!res) {
                 geode::log::error("TPSBypass: {}", res.unwrapErr());
+                config::set("global.tpsbypass.toggle", false);
                 return;
             }
             #endif
@@ -58,7 +59,7 @@ namespace eclipse::hacks::Global {
             }
 
             auto patch1Res = geode::Mod::get()->patch(
-                reinterpret_cast<void*>(floatAddr),
+                reinterpret_cast<void*>(floatAddr + base),
                 geode::toBytes(config::get<"global.tpsbypass", float>(240.f))
             );
             if (!patch1Res) return geode::Err(fmt::format("failed to patch float address: {}", patch1Res.unwrapErr()));
@@ -66,7 +67,7 @@ namespace eclipse::hacks::Global {
             (void) patch1->disable();
 
             auto patch2Res = geode::Mod::get()->patch(
-                reinterpret_cast<void*>(doubleAddr),
+                reinterpret_cast<void*>(doubleAddr + base),
                 geode::toBytes<double>(config::get<"global.tpsbypass", float>(240.f))
             );
             if (!patch2Res) return geode::Err(fmt::format("failed to patch double address: {}", patch2Res.unwrapErr()));
