@@ -2,14 +2,13 @@
 #include <modules/gui/gui.hpp>
 #include <modules/gui/components/float-toggle.hpp>
 #include <modules/hack/hack.hpp>
+#include <modules/utils/assembler.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 
 #include <sinaps.hpp>
-
-#ifndef GEODE_IS_ARM_MAC
 
 constexpr float MIN_TPS = 0.f;
 constexpr float MAX_TPS = 100000.f;
@@ -40,14 +39,39 @@ namespace eclipse::hacks::Global {
         }
 
         #ifdef REQUIRE_PATCH
+
+        // function to quickly get the bytes for the patch
+        #ifdef GEODE_IS_INTEL_MAC
         template <typename T>
         [[nodiscard]] static std::vector<uint8_t> TPStoBytes() {
             if constexpr (std::is_same_v<T, float>) {
                 return geode::toBytes(1.f / config::get<"global.tpsbypass", float>(240.f));
             } else if constexpr (std::is_same_v<T, double>) {
                 return geode::toBytes<double>(1.0 / config::get<"global.tpsbypass", float>(240.f));
+            } else {
+                static_assert(alwaysFalse<T>, "TPStoBytes only supports float and double");
             }
         }
+        #elif defined(GEODE_IS_ARM_MAC)
+        template <typename T>
+        [[nodiscard]] static std::vector<uint8_t> TPStoBytes() {
+            if constexpr (std::is_same_v<T, float>) {
+                auto bytes = assembler::arm64::mov_float(
+                    assembler::arm64::Register::w9,
+                    1.f / config::get<"global.tpsbypass", float>(240.f)
+                );
+                return std::vector(bytes.begin(), bytes.end());
+            } else if constexpr (std::is_same_v<T, double>) {
+                auto bytes = assembler::arm64::mov_double(
+                    assembler::arm64::Register::x9,
+                    1.0 / config::get<"global.tpsbypass", float>(240.f)
+                );
+                return std::vector(bytes.begin(), bytes.end());
+            } else {
+                static_assert(alwaysFalse<T>, "TPStoBytes only supports float and double");
+            }
+        }
+        #endif
 
         geode::Result<> setupPatches() {
             auto base = reinterpret_cast<uint8_t*>(geode::base::get());
@@ -60,8 +84,26 @@ namespace eclipse::hacks::Global {
             #ifdef GEODE_IS_INTEL_MAC
             // on x86, we need to replace two values that are used in GJBaseGameLayer::getModifiedDelta
             // pretty simple, just find original values and replace them with raw bytes
+
             auto floatAddr = sinaps::find<dword<0x3B888889>>(base, moduleSize);
             auto doubleAddr = sinaps::find<qword<0x3F71111120000000>>(base, moduleSize);
+            #elif defined(GEODE_IS_ARM_MAC)
+            // on ARM, it's a bit tricky, since the value is not stored as a constant.
+            //
+            // assembly in question:
+            // ; Load 0.0041667f
+            // 29 11 91 52        movz w9, #0x8889
+            // 09 71 A7 72        movk w9, #0x3b88, lsl #16
+            // ...
+            // ; Load 0.00416666688
+            // 09 00 A4 D2        movz x9, #0x2000, lsl #16
+            // 29 22 C2 F2        movk x9, #0x1111, lsl #32
+            // 29 EE E7 F2        movk x9, #0x3f71, lsl #48
+            // note that double value only stores upper 48 bits, so we're losing some precision here :(
+
+            auto floatAddr = sinaps::find<"29 11 91 52 09 71 A7 72">(base, moduleSize);
+            auto doubleAddr = sinaps::find<"09 00 A4 D2 29 22 C2 F2 29 EE E7 F2">(base, moduleSize);
+            #endif
 
             if (floatAddr == -1 || doubleAddr == -1) {
                 return geode::Err(fmt::format("failed to find addresses: float = 0x{:X}, double = 0x{:X}", floatAddr, doubleAddr));
@@ -70,12 +112,12 @@ namespace eclipse::hacks::Global {
             geode::log::debug("TPSBypass: floatAddr = 0x{:X}", floatAddr);
             geode::log::debug("TPSBypass: doubleAddr = 0x{:X}", doubleAddr);
 
-            auto patch1Res = geode::Mod::get()->patch(reinterpret_cast<void*>(floatAddr + base), TPStoBytes<float>());
+            auto patch1Res = geode::Mod::get()->patch(floatAddr + base, TPStoBytes<float>());
             if (!patch1Res) return geode::Err(fmt::format("failed to patch float address: {}", patch1Res.unwrapErr()));
             auto patch1 = patch1Res.unwrap();
             (void) patch1->disable();
 
-            auto patch2Res = geode::Mod::get()->patch(reinterpret_cast<void*>(doubleAddr + base), TPStoBytes<double>());
+            auto patch2Res = geode::Mod::get()->patch(doubleAddr + base, TPStoBytes<double>());
             if (!patch2Res) return geode::Err(fmt::format("failed to patch double address: {}", patch2Res.unwrapErr()));
             auto patch2 = patch2Res.unwrap();
             (void) patch2->disable();
@@ -94,21 +136,6 @@ namespace eclipse::hacks::Global {
                 (void) patch1->updateBytes(TPStoBytes<float>());
                 (void) patch2->updateBytes(TPStoBytes<double>());
             };
-            #elif defined(GEODE_IS_ARM_MAC)
-            // on ARM, it's a bit tricky, since the value is not stored as a constant.
-            //
-            // assembly in question:
-            // ; Load 0.0041667f
-            // 29 11 91 52        movz w9, #0x8889
-            // 09 71 A7 72        movk w9, #0x3b88, lsl #16
-            // ...
-            // ; Load 0.00416666688
-            // 09 00 A4 D2        movz x9, #0x2000, lsl #16
-            // 29 22 C2 F2        movk x9, #0x1111, lsl #32
-            // 29 EE E7 F2        movk x9, #0x3f71, lsl #48
-
-            // TODO: implement ARM patching
-            #endif
 
             // update bytes on value change
             config::addDelegate("global.tpsbypass", [setValue] { setValue(); });
@@ -283,4 +310,3 @@ namespace eclipse::hacks::Global {
         }
     };
 }
-#endif
