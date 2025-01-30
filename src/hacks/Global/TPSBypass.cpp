@@ -41,7 +41,7 @@ namespace eclipse::hacks::Global {
 
         #ifdef REQUIRE_PATCH
         template <typename T>
-        [[nodiscard]] std::vector<uint8_t> TPStoBytes() {
+        [[nodiscard]] static std::vector<uint8_t> TPStoBytes() {
             if constexpr (std::is_same_v<T, float>) {
                 return geode::toBytes(1.f / config::get<"global.tpsbypass", float>(240.f));
             } else if constexpr (std::is_same_v<T, double>) {
