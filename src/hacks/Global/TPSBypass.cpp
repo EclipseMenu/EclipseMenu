@@ -42,7 +42,7 @@ namespace eclipse::hacks::Global {
         geode::Result<> setupPatches() {
             auto base = reinterpret_cast<uint8_t*>(geode::base::get());
             auto moduleSize = utils::getBaseSize();
-            geode::log::info("TPSBypass: base = 0x{:X}", base);
+            geode::log::info("TPSBypass: base = 0x{:X}", (uintptr_t)base);
             geode::log::info("TPSBypass: moduleSize = 0x{:X}", moduleSize);
 
             using namespace sinaps::mask;
