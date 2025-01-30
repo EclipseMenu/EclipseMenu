@@ -116,6 +116,8 @@ namespace eclipse::hacks::Global {
 
             // apply initial state
             setState(config::get<"global.tpsbypass.toggle", bool>());
+
+            return geode::Ok();
         }
         #endif
 
