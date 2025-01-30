@@ -153,4 +153,7 @@ namespace eclipse::utils {
         // result.insert(result.end(), array.begin() + startIndex, array.begin() + endIndex);
         return {const_cast<T*>(array.data()) + startIndex, static_cast<size_t>(endIndex - startIndex)};
     }
+
+    /// @brief Get the module size of the game.
+    size_t getBaseSize();
 }

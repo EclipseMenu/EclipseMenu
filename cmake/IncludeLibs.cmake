@@ -25,6 +25,7 @@ set(RIFT_INCLUDE_MATJSON ON)
 CPMAddPackage("gh:EclipseMenu/rift#d6dd2bd")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
 CPMAddPackage("gh:simdutf/simdutf@6.1.0")
+CPMAddPackage("gh:prevter/sinaps#1663e86")
 CPMAddPackage(
     NAME nlohmann_json
     GITHUB_REPOSITORY nlohmann/json
@@ -46,6 +47,7 @@ target_link_libraries(third_party INTERFACE
     nlohmann_json::nlohmann_json
     rift
     simdutf
+    sinaps
 )
 
 if (NOT ANDROID)

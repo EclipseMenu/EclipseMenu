@@ -11,6 +11,22 @@
 #include <modules/gui/color.hpp>
 #include <modules/utils/SingletonCache.hpp>
 
+// headers for getBaseSize()
+#ifdef GEODE_IS_WINDOWS
+    #include <psapi.h>
+#elif defined(GEODE_IS_MACOS)
+    #include <mach-o/dyld.h>
+    #include <mach-o/getsect.h>
+    #include <mach-o/loader.h>
+#elif defined(GEODE_IS_ANDROID)
+    #include <unistd.h>
+    #include <sys/mman.h>
+    #include <elf.h>
+    #include <fcntl.h>
+    #include <link.h>
+    #include <cstring>
+#endif
+
 namespace eclipse::utils {
     std::random_device& getRng() {
         static std::random_device rng;
@@ -187,5 +203,65 @@ namespace eclipse::utils {
         ).begin();
 
         return (it != haystack.end());
+    }
+
+    size_t getBaseSize() {
+        static size_t baseSize = [] -> size_t {
+            #ifdef GEODE_IS_WINDOWS
+
+            auto handle = GetModuleHandle(nullptr);
+            if (!handle) return 0;
+
+            MODULEINFO info;
+            if (!GetModuleInformation(GetCurrentProcess(), handle, &info, sizeof(info)))
+                return 0;
+
+            return info.SizeOfImage;
+
+            #elif defined(GEODE_IS_MACOS)
+
+            uint32_t imageCount = _dyld_image_count();
+            for (uint32_t i = 0; i < imageCount; ++i) {
+                const mach_header* header = (const mach_header*)_dyld_get_image_header(i);
+                if (!header) continue;
+
+                // Check if this is the main executable
+                if (header->filetype == MH_EXECUTE) {
+                    const segment_command* seg = (const segment_command*)((uintptr_t)header + sizeof(mach_header));
+                    for (uint32_t j = 0; j < header->ncmds; ++j) {
+                        if (seg->cmd == LC_SEGMENT) {
+                            return seg->vmaddr + seg->vmsize - (size_t)header;
+                        }
+                        seg = (const segment_command*)((uintptr_t)seg + seg->cmdsize);
+                    }
+                }
+            }
+            return 0;
+
+            #elif defined(GEODE_IS_ANDROID)
+
+            struct dl_phdr_info info;
+            if (dl_iterate_phdr([](struct dl_phdr_info *info, size_t, void *data) {
+                if (info->dlpi_name[0] == '\0') { // Main executable
+                    *reinterpret_cast<size_t*>(data) = info->dlpi_phnum > 0
+                        ? info->dlpi_phdr[info->dlpi_phnum - 1].p_vaddr + info->dlpi_phdr[info->dlpi_phnum - 1].p_memsz
+                        : 0;
+                    return 1;
+                }
+                return 0;
+            }, &info) == 1) {
+                return info.dlpi_phnum > 0
+                    ? info.dlpi_phdr[info.dlpi_phnum - 1].p_vaddr + info.dlpi_phdr[info.dlpi_phnum - 1].p_memsz
+                    : 0;
+            }
+            return 0;
+
+            #else
+
+            static_assert(false, "getBaseSize() is not implemented for this platform");
+
+            #endif
+        }();
+        return baseSize;
     }
 }
