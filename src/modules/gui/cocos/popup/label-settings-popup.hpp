@@ -18,7 +18,7 @@ namespace eclipse::gui::cocos {
 
         CCLayer* createSettingsTab();
         CCLayer* createTextTab() const;
-        CCLayer* createEventsTab();
+        CCLayer* createEventsTab() const;
         CCLayer* createPreviewTab();
 
         void updatePreview(float dt);

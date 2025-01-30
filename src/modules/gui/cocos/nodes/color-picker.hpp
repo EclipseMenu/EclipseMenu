@@ -14,10 +14,15 @@ namespace eclipse::gui::cocos {
             return nullptr;
         }
 
+        void setColor(gui::Color const& color) {
+            m_color = color;
+            m_colorSprite->setColor(color.toCCColor3B());
+        }
+
     protected:
         bool init(gui::Color const& original, bool useAlpha, std::function<void(gui::Color const&)> const& callback);
-        void updateColor(cocos2d::ccColor4B const& color) override;
         void onClicked(CCObject*);
+        void updateColor(cocos2d::ccColor4B const& color) override;
 
     protected:
         cocos2d::CCSprite* m_colorSprite = nullptr;

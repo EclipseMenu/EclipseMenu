@@ -8,6 +8,8 @@
 #include <modules/i18n/translations.hpp>
 #include <modules/labels/setting.hpp>
 
+#include "scroll-layer.hpp"
+
 namespace eclipse::gui::cocos {
     constexpr GLuint DISABLED_OPACITY = 255 * 0.3f;
 
@@ -89,7 +91,13 @@ namespace eclipse::gui::cocos {
         void updatePreview() const {
             m_preview->setString(labels::fontNames[m_page]);
             m_preview->setFont(m_font);
-            m_preview->limitLabelWidth(getContentWidth() * 0.75f, 1.f, 0.1f);
+            m_preview->limitLabelWidth(getContentWidth() * 0.66f, 1.f, 0.1f);
+        }
+
+        void setFont(std::string const& font) {
+            m_font = font;
+            m_page = labels::getFontIndex(font);
+            updatePreview();
         }
 
     protected:
@@ -111,7 +119,7 @@ namespace eclipse::gui::cocos {
                 arrow->setRotation(90);
                 if (flip) arrow->setFlipY(true);
                 arrow->setScale(0.5f);
-                arrow->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
+                arrow->setColor(tm->getButtonActivatedForeground().toCCColor3B());
                 return arrow;
             };
 
@@ -363,6 +371,20 @@ namespace eclipse::gui::cocos {
         return label;
     }
 
+    auto createLabelButton(const char* text, float width, std::function<void(CCMenuItemSpriteExtra*)> const& callback) {
+        const auto tm = ThemeManager::get();
+        auto label = TranslatedLabel::create(text);
+        label->limitLabelWidth(width * 0.8f, 1.f, 0.1f);
+        label->setColor(tm->getButtonForegroundColor().toCCColor3B());
+        auto bg = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        bg->setContentSize({ width, 36.f });
+        bg->setColor(tm->getButtonBackgroundColor().toCCColor3B());
+        bg->addChildAtPosition(label, geode::Anchor::Center);
+        bg->setScale(0.65f);
+        auto button = geode::cocos::CCMenuItemExt::createSpriteExtra(bg, callback);
+        return button;
+    }
+
     cocos2d::CCLayer* LabelSettingsPopup::createSettingsTab() {
         auto layer = CCLayer::create();
 
@@ -388,7 +410,7 @@ namespace eclipse::gui::cocos {
         m_alignButtons = std::move(alignSprites);
         m_alignButtons[static_cast<size_t>(m_settings->alignment)]->setOpacity(255);
         alignMenu->setID("align-menu"_spr);
-        layer->addChildAtPosition(alignMenu, geode::Anchor::Center, { 124.f, 28.f });
+        layer->addChildAtPosition(alignMenu, geode::Anchor::Center, { 132.f, 42.f });
 
         auto [fontAlignMenu, fontAlignSprites] = createCompactMenu(
             100.f, [this](auto item) {
@@ -406,7 +428,7 @@ namespace eclipse::gui::cocos {
         m_fontAlignButtons = std::move(fontAlignSprites);
         m_fontAlignButtons[static_cast<size_t>(m_settings->fontAlignment)]->setOpacity(255);
         fontAlignMenu->setID("font-align-menu"_spr);
-        layer->addChildAtPosition(fontAlignMenu, geode::Anchor::Center, { 124.f, -52.f });
+        layer->addChildAtPosition(fontAlignMenu, geode::Anchor::Center, { 132.f, -32.f });
 
         auto column1 = CCNode::create();
 
@@ -511,6 +533,14 @@ namespace eclipse::gui::cocos {
         );
         layer->addChildAtPosition(column2, geode::Anchor::Center, { -55.f, 0.f });
 
+        auto exportBtn = createLabelButton("labels.export", 120.f, [this](auto) {
+            m_callback(CallbackEvent::Export);
+        });
+        exportBtn->setID("export-btn"_spr);
+        auto menu = cocos2d::CCMenu::create();
+        menu->addChildAtPosition(exportBtn, geode::Anchor::Center, { 132.f, -72.f });
+        layer->addChild(menu);
+
         return layer;
     }
 
@@ -533,9 +563,264 @@ namespace eclipse::gui::cocos {
         return layer;
     }
 
-    cocos2d::CCLayer* LabelSettingsPopup::createEventsTab() {
+    constexpr auto CARD_WIDTH = 370.f;
+    constexpr auto CARD_HEIGHT = 150.f;
+
+    constexpr float getEventContainerHeight(size_t count) {
+        return std::max((CARD_HEIGHT + 2.5f) * count + 42.f, 200.f);
+    }
+
+    cocos2d::CCNode* createEventCard(labels::LabelEvent& event, labels::LabelSettings* settings, std::function<void(CallbackEvent)> const& callback) {
+        auto menu = cocos2d::CCMenu::create();
+        menu->setContentSize({ CARD_WIDTH, CARD_HEIGHT });
+        menu->setID("event-card"_spr);
+
+        auto cardBackground = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        cardBackground->setContentSize({ CARD_WIDTH, CARD_HEIGHT });
+        cardBackground->setColor(ThemeManager::get()->getButtonActivatedBackground().toCCColor3B());
+        cardBackground->setOpacity(32);
+        cardBackground->setID("event-card-bg"_spr);
+        menu->addChildAtPosition(cardBackground, geode::Anchor::Center);
+
+        // Pickers
+        auto colorPicker = ColorPicker::create(event.color.value_or(gui::Color{1.f, 1.f, 1.f}), false, [&, callback](gui::Color const& color) {
+            event.color = color;
+            callback(CallbackEvent::Update);
+        });
+        colorPicker->setID("color-picker"_spr);
+        colorPicker->setVisible(event.color.has_value());
+        menu->addChildAtPosition(colorPicker, geode::Anchor::TopLeft, { 137.5f, -73.f });
+
+        auto fontPicker = FontPicker::create(event.font.value_or("bigFont.fnt"), [&, callback](std::string const& font) {
+            event.font = font;
+            callback(CallbackEvent::Update);
+        });
+        fontPicker->setID("font-picker"_spr);
+        fontPicker->setVisible(event.font.has_value());
+        fontPicker->setScale(0.75f);
+        fontPicker->setContentSize({ 120.f, 28.f });
+        fontPicker->updateLayout();
+        fontPicker->updatePreview();
+        menu->addChildAtPosition(fontPicker, geode::Anchor::TopLeft, { 137.5f, -102.f });
+
+        // Inputs
+        auto customConditionInput = geode::TextInput::create(200.f, "progress >= bestPercent", "font_default.fnt"_spr);
+        customConditionInput->setCommonFilter(geode::CommonFilter::Any);
+        customConditionInput->setString(event.condition);
+        customConditionInput->setScale(0.9f);
+        customConditionInput->setCallback([&, callback](std::string const& text) {
+            event.condition = text;
+            callback(CallbackEvent::Update);
+        });
+        customConditionInput->setID("custom-condition-input"_spr);
+        menu->addChildAtPosition(customConditionInput, geode::Anchor::TopLeft, { 277.5f, -16.f });
+
+        auto durationInput = geode::TextInput::create(100.f, "1.0", "font_default.fnt"_spr);
+        durationInput->setCommonFilter(geode::CommonFilter::Float);
+        durationInput->setString(std::to_string(event.duration));
+        durationInput->setScale(0.9f);
+        durationInput->setCallback([&, callback](std::string const& text) {
+            auto res = geode::utils::numFromString<float>(text);
+            if (!res) { return; }
+            event.duration = res.unwrap();
+            callback(CallbackEvent::Update);
+        });
+        durationInput->setID("duration-input"_spr);
+        menu->addChildAtPosition(durationInput, geode::Anchor::TopLeft, { 137.5f, -132.f });
+
+        auto modifyScaleInput = geode::TextInput::create(100.f, "1.0", "font_default.fnt"_spr);
+        modifyScaleInput->setCommonFilter(geode::CommonFilter::Float);
+        modifyScaleInput->setString(std::to_string(event.scale.value_or(1.f)));
+        modifyScaleInput->setScale(0.9f);
+        modifyScaleInput->setCallback([&, callback](std::string const& text) {
+            auto res = geode::utils::numFromString<float>(text);
+            if (!res) { return; }
+            event.scale = res.unwrap();
+            callback(CallbackEvent::Update);
+        });
+        modifyScaleInput->setID("modify-scale-input"_spr);
+        modifyScaleInput->setVisible(event.scale.has_value());
+        menu->addChildAtPosition(modifyScaleInput, geode::Anchor::TopLeft, { 322.5f, -44.f });
+
+        auto modifyOpacityInput = geode::TextInput::create(100.f, "1.0", "font_default.fnt"_spr);
+        modifyOpacityInput->setCommonFilter(geode::CommonFilter::Float);
+        modifyOpacityInput->setString(std::to_string(event.opacity.value_or(1.f)));
+        modifyOpacityInput->setScale(0.9f);
+        modifyOpacityInput->setCallback([&, callback](std::string const& text) {
+            auto res = geode::utils::numFromString<float>(text);
+            if (!res) { return; }
+            event.opacity = res.unwrap();
+            callback(CallbackEvent::Update);
+        });
+        modifyOpacityInput->setID("modify-opacity-input"_spr);
+        modifyOpacityInput->setVisible(event.opacity.has_value());
+        menu->addChildAtPosition(modifyOpacityInput, geode::Anchor::TopLeft, { 322.5f, -73.f });
+
+        auto delayInput = geode::TextInput::create(100.f, "0.0", "font_default.fnt"_spr);
+        delayInput->setCommonFilter(geode::CommonFilter::Float);
+        delayInput->setString(std::to_string(event.delay));
+        delayInput->setScale(0.9f);
+        delayInput->setCallback([&, callback](std::string const& text) {
+            auto res = geode::utils::numFromString<float>(text);
+            if (!res) { return; }
+            event.delay = res.unwrap();
+            callback(CallbackEvent::Update);
+        });
+        delayInput->setID("delay-input"_spr);
+        menu->addChildAtPosition(delayInput, geode::Anchor::TopLeft, { 322.5f, -102.f });
+
+        auto easingInput = geode::TextInput::create(100.f, "0.0", "font_default.fnt"_spr);
+        easingInput->setCommonFilter(geode::CommonFilter::Float);
+        easingInput->setString(std::to_string(event.easing));
+        easingInput->setScale(0.9f);
+        easingInput->setCallback([&, callback](std::string const& text) {
+            auto res = geode::utils::numFromString<float>(text);
+            if (!res) { return; }
+            event.easing = res.unwrap();
+            callback(CallbackEvent::Update);
+        });
+        easingInput->setID("easing-input"_spr);
+        menu->addChildAtPosition(easingInput, geode::Anchor::TopLeft, { 290.f, -132.f });
+
+        // Toggles
+        auto enableToggle = geode::cocos::CCMenuItemExt::createToggler(
+        createToggle("checkmark.png"_spr), createToggle(nullptr), [&, callback](auto) {
+            event.enabled = !event.enabled;
+            callback(CallbackEvent::Update);
+        });
+        enableToggle->toggle(event.enabled);
+        enableToggle->setID("enable-toggle"_spr);
+        menu->addChildAtPosition(enableToggle, geode::Anchor::TopLeft, { 16.f, -16.f });
+
+        auto modifyColorToggle = geode::cocos::CCMenuItemExt::createToggler(
+            createToggle("checkmark.png"_spr), createToggle(nullptr), [&, callback, colorPicker](auto) {
+            if (!event.color.has_value()) event.color = {1.f, 1.f, 1.f};
+            else event.color.reset();
+            colorPicker->setVisible(event.color.has_value());
+            colorPicker->setColor(event.color.value_or(gui::Color{1.f, 1.f, 1.f}));
+            callback(CallbackEvent::Update);
+        });
+        modifyColorToggle->toggle(event.color.has_value());
+        modifyColorToggle->setID("modify-color-toggle"_spr);
+        menu->addChildAtPosition(modifyColorToggle, geode::Anchor::TopLeft, { 16.f, -73.f });
+
+        auto modifyFontToggle = geode::cocos::CCMenuItemExt::createToggler(
+            createToggle("checkmark.png"_spr), createToggle(nullptr), [&, callback, fontPicker](auto) {
+            if (!event.font.has_value()) event.font = "bigFont.fnt";
+            else event.font.reset();
+            fontPicker->setVisible(event.font.has_value());
+            fontPicker->setFont(event.font.value_or("bigFont.fnt"));
+            callback(CallbackEvent::Update);
+        });
+        modifyFontToggle->toggle(event.font.has_value());
+        modifyFontToggle->setID("modify-font-toggle"_spr);
+        menu->addChildAtPosition(modifyFontToggle, geode::Anchor::TopLeft, { 16.f, -102.f });
+
+        auto modifyScaleToggle = geode::cocos::CCMenuItemExt::createToggler(
+            createToggle("checkmark.png"_spr), createToggle(nullptr), [&, callback, modifyScaleInput](auto) {
+            if (!event.scale.has_value()) event.scale = 1.f;
+            else event.scale.reset();
+            modifyScaleInput->setString(std::to_string(event.scale.value_or(1.f)));
+            modifyScaleInput->setVisible(event.scale.has_value());
+            callback(CallbackEvent::Update);
+        });
+        modifyScaleToggle->toggle(event.scale.has_value());
+        modifyScaleToggle->setID("modify-scale-toggle"_spr);
+        menu->addChildAtPosition(modifyScaleToggle, geode::Anchor::TopLeft, { 198.5f, -44.f });
+
+        auto modifyOpacityToggle = geode::cocos::CCMenuItemExt::createToggler(
+            createToggle("checkmark.png"_spr), createToggle(nullptr), [&, callback, modifyOpacityInput](auto) {
+            if (!event.opacity.has_value()) event.opacity = 1.f;
+            else event.opacity.reset();
+            modifyOpacityInput->setString(std::to_string(event.opacity.value_or(1.f)));
+            modifyOpacityInput->setVisible(event.opacity.has_value());
+            callback(CallbackEvent::Update);
+        });
+        modifyOpacityToggle->toggle(event.opacity.has_value());
+        modifyOpacityToggle->setID("modify-opacity-toggle"_spr);
+        menu->addChildAtPosition(modifyOpacityToggle, geode::Anchor::TopLeft, { 198.5f, -73.f });
+
+        // Labels
+        const auto createLabel = [menu](const char* text, float width, float x, float y) {
+            auto label = TranslatedLabel::create(text);
+            label->setAnchorPoint({0, 0.5f});
+            label->limitLabelWidth(width, 1.f, 0.1f);
+            label->setColor(ThemeManager::get()->getButtonActivatedForeground().toCCColor3B());
+            menu->addChildAtPosition(label, geode::Anchor::TopLeft, { x, y });
+            return label;
+        };
+
+        createLabel("labels.events.enabled", 55, 32, -16)->setID("enable-label"_spr);
+        createLabel("labels.events.visible", 64, 6, -44)->setID("visibility-label"_spr);
+        createLabel("labels.events.color", 55, 32, -73)->setID("color-label"_spr);
+        createLabel("labels.events.font", 55, 32, -102)->setID("font-label"_spr);
+        createLabel("labels.events.duration", 64, 6, -132)->setID("duration-label"_spr);
+
+        createLabel("labels.events.scale", 55, 215, -44)->setID("scale-label"_spr);
+        createLabel("labels.events.opacity", 55, 215, -73)->setID("opacity-label"_spr);
+        createLabel("labels.events.delay", 64, 188, -102)->setID("delay-label"_spr);
+        createLabel("labels.events.easing", 48, 188, -132)->setID("easing-label"_spr);
+
+        // Delete button
+        auto deleteBtn = geode::cocos::CCMenuItemExt::createSpriteExtra(
+            createButtonSprite("trashbin.png"_spr, 0.35f),
+            [&, menu, settings, callback](auto) {
+            auto& events = settings->events;
+            auto index = &event - &events[0];
+            events.erase(events.begin() + index);
+            callback(CallbackEvent::Update);
+
+            auto contentLayer = menu->getParent();
+            menu->removeFromParent();
+
+            contentLayer->setContentSize({ 385.f, getEventContainerHeight(events.size()) });
+            contentLayer->updateLayout();
+        });
+        deleteBtn->setID("delete-btn"_spr);
+        menu->addChildAtPosition(deleteBtn, geode::Anchor::TopLeft, { 352.5f, -132.f });
+
+        return menu;
+    }
+
+    cocos2d::CCLayer* LabelSettingsPopup::createEventsTab() const {
         auto layer = CCLayer::create();
 
+        auto scrollLayer = ScrollLayer::create({ 385.f, 200.f });
+        scrollLayer->setID("events-scroll"_spr);
+        layer->addChildAtPosition(scrollLayer, geode::Anchor::Center, { -385.f / 2, -200.f / 2 });
+
+        const auto contentLayer = scrollLayer->m_contentLayer;
+        for (auto& event : m_settings->events) {
+            contentLayer->addChild(createEventCard(event, m_settings, m_callback));
+        }
+
+        auto addEventBtn = createLabelButton("labels.events.add", 120.f, [this, contentLayer](auto) {
+            m_settings->events.emplace_back();
+            m_callback(CallbackEvent::Update);
+
+            // Add a new card
+            contentLayer->addChild(createEventCard(m_settings->events.back(), m_settings, m_callback));
+            contentLayer->setContentSize({ 385.f, getEventContainerHeight(m_settings->events.size()) });
+            contentLayer->updateLayout();
+        });
+        addEventBtn->setID("add-event-btn"_spr);
+
+        auto menu = cocos2d::CCMenu::create();
+        menu->setContentSize({ 385.f, 36.f });
+        menu->addChildAtPosition(addEventBtn, geode::Anchor::Center);
+        menu->setZOrder(5); // make sure the button is always last
+        contentLayer->addChild(menu);
+
+        contentLayer->setContentSize({ 385.f, getEventContainerHeight(m_settings->events.size()) });
+        contentLayer->setLayout(
+            geode::ColumnLayout::create()
+                ->setAxisReverse(true)
+                ->setAxisAlignment(geode::AxisAlignment::Center)
+                ->setCrossAxisAlignment(geode::AxisAlignment::Center)
+                ->setCrossAxisLineAlignment(geode::AxisAlignment::Center)
+                ->setGap(2.5f)
+                ->setAutoScale(false)
+        );
 
         return layer;
     }

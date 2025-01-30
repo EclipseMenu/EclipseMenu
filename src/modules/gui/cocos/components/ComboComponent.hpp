@@ -20,7 +20,7 @@ namespace eclipse::gui::cocos {
         std::vector<TranslatedLabel*> m_labels;
 
     public:
-        ~ComboComponentNode() {
+        ~ComboComponentNode() override {
             if (s_activeCombo == this) {
                 s_activeCombo = nullptr;
             }
