@@ -97,6 +97,7 @@ namespace eclipse::recorder {
         m_frameReady.set(true);
 
         m_renderTexture.end();
+        DSPRecorder::get()->stop();
 
         auto director = utils::get<cocos2d::CCDirector>();
         if (auto& delegate = utils::get<cocos2d::CCDirector>()->m_pProjectionDelegate) {
@@ -131,6 +132,7 @@ namespace eclipse::recorder {
         if (!ffmpegRecorder.isValid()) {
             stop();
             m_callback("Failed to initialize ffmpeg recorder.");
+            geode::log::debug("Recorder thread stopped.");
             return;
         }
 
@@ -139,6 +141,8 @@ namespace eclipse::recorder {
             stop();
             m_callback(res.unwrapErr());
             ffmpegRecorder.stop();
+            m_frameReady.set(false); // unlock the main thread if it's waiting
+            geode::log::debug("Recorder thread stopped.");
             return;
         }
 
@@ -178,15 +182,15 @@ namespace eclipse::recorder {
         std::filesystem::path tempPath = m_renderSettings.m_outputFile.parent_path() / "music.mp4";
 
         res = ffmpeg::AudioMixer::mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath);
-        if (res.isErr()) m_callback(res.unwrapErr());
+        if (res.isErr()) return m_callback(res.unwrapErr());
 
         std::error_code ec;
         std::filesystem::remove(m_renderSettings.m_outputFile, ec);
-        if (ec) m_callback("Failed to remove old video file.");
+        if (ec) return m_callback("Failed to remove old video file.");
 
         ec = {};
         std::filesystem::rename(tempPath, m_renderSettings.m_outputFile, ec);
-        if (ec) m_callback("Failed to rename temporary video file.");
+        if (ec) return m_callback("Failed to rename temporary video file.");
     }
 
     std::vector<std::string> Recorder::getAvailableCodecs() {
