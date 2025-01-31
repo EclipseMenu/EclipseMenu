@@ -1,5 +1,49 @@
 # Eclipse Menu
 
+## v1.0.0
+**Fixes:**
+* <cg>Fixed</c> a crash in editor when using <co>Physics Bypass</c>
+* <cg>Fixed</c> percentage calculation with <co>Physics Bypass</c>
+* <cg>Fixed</c> slowed down animations with <co>Physics Bypass</c>
+* <cg>Fixed</c> <co>"Formatted Timer"</c> in <co>Accurate Percentage</c> not accounting for checkpoints.
+* <cg>Fixed</c> a memory leak with <co>Show Trajectory</c>
+* <cg>Fixed</c> "Show Labels" toggle not realigning labels when switched
+* Greatly <cg>improved performance</c> of Labels
+* <cg>Fixed</c> a random crash on <cb>ARM macOS</c> when entering any level
+* <cg>Fixed</c> some <co>Practice Fix</c> crashes
+* <cg>Fixed</c> <co>Audio Speed</c>/<co>Sync with Speedhack</c> not working sometimes
+* <cg>Optimized</c> <co>Show Trajectory</c> a bit
+* <cg>Fixed</c> a crash that could happen when using <co>Blur</c>
+* <cg>Fixed</c> <co>Click Between Frames</c> toggle resetting on game launch
+* <cg>Resolved</c> some issues with <co>replays</c> when using <co>Physics Bypass</c> (some old macros might stop working due to this)
+* General performance improvements
+
+**Additions**:
+* <cg>Android</c> support featuring <cl>custom made UI</c> for mobile devices
+* <cg>Labels</c> revamp:
+  * <cg>Emojis support</c>
+  * <cg>Added</c> keybind support for <co>Labels</c>
+  * <cg>Events</c> to customize colors/fonts/etc. based on certain conditions
+  * <cg>Added</c> **a lot** of new RIFT variables and functions
+  * <cg>Added</c> font alignment options
+  * <cg>Added</c> absolute positioning for labels
+  * <cg>Added</c> Import/Export options for labels, so you can share them with others.
+  * <cg>Added</c> "Only Cheating" option for cheat indicator, which will hide the indicator if no cheats are active
+* <cg>Internal Recorder</c> revamp:
+  * <co>FFmpeg API</c> is not a requirement to run Eclipse anymore (you still need it to use the recorder)
+  * <cg>Improved performance</c> during recording
+  * <cg>Implemented</c> "one-pass" audio rendering (no need to play the level twice to record audio)
+  * <cg>Added</c> "Hide Preview" option to not render the game twice during recording
+* <cg>Added</c> Translations (check the [translations repository](https://github.com/EclipseMenu/translations) on how to contribute)
+* <cg>Added</c> search bar for hacks
+* <cg>Added</c> customization settings for menu open/close animations (tabbed layout)
+* Added <cg>No Level Kick</c>
+* Added <cg>Checkpoint Delay</c>
+* Added <cg>All Passable</c>
+* Added <cg>Unlock Paths</c>
+* Added <cg>Physics Bypass</c> for <cl>macOS</c>
+* Added <cg>Custom Modules API</c> for other mods to use Eclipse's cheat indicator system
+
 ## v1.0.0-beta.4
 **<cg>Geometry Dash v2.2074</c> support**  
 No Android support yet, but we're working on it!
