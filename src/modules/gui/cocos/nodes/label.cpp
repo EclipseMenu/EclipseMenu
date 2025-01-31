@@ -1004,8 +1004,8 @@ cocos2d::CCSprite* Label::getSpriteForChar(
         fontChar->setOpacityModifyRGB(m_isOpacityModifyRGB);
 
         // Color MUST be set before opacity, since opacity might change color if OpacityModifyRGB is on
-        fontChar->updateDisplayedColor(m_color);
-        fontChar->updateDisplayedOpacity(m_opacity);
+        fontChar->setColor(m_color);
+        fontChar->setOpacity(m_opacity);
     } else {
         // reusing existing sprite
         fontChar->m_bVisible = true;
@@ -1147,21 +1147,21 @@ void Label::updateChars() {
 void Label::updateColors() const {
     for (auto sprite : m_sprites) {
         if (m_useEmojiColors) {
-            sprite->updateDisplayedColor(m_color);
+            sprite->setColor(m_color);
             continue;
         }
 
         if (sprite->m_pParent == m_spriteSheetBatch.node) {
-            sprite->updateDisplayedColor(cocos2d::ccc3(255, 255, 255));
+            sprite->setColor(cocos2d::ccc3(255, 255, 255));
         } else {
-            sprite->updateDisplayedColor(m_color);
+            sprite->setColor(m_color);
         }
     }
 }
 
 void Label::updateOpacity() const {
     for (auto sprite : m_sprites) {
-        sprite->updateDisplayedOpacity(m_opacity);
+        sprite->setOpacity(m_opacity);
     }
 }
 
