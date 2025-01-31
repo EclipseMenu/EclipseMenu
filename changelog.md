@@ -1,23 +1,6 @@
 # Eclipse Menu
 
 ## v1.0.0
-**Fixes:**
-* <cg>Fixed</c> a crash in editor when using <co>Physics Bypass</c>
-* <cg>Fixed</c> percentage calculation with <co>Physics Bypass</c>
-* <cg>Fixed</c> slowed down animations with <co>Physics Bypass</c>
-* <cg>Fixed</c> <co>"Formatted Timer"</c> in <co>Accurate Percentage</c> not accounting for checkpoints.
-* <cg>Fixed</c> a memory leak with <co>Show Trajectory</c>
-* <cg>Fixed</c> "Show Labels" toggle not realigning labels when switched
-* Greatly <cg>improved performance</c> of Labels
-* <cg>Fixed</c> a random crash on <cb>ARM macOS</c> when entering any level
-* <cg>Fixed</c> some <co>Practice Fix</c> crashes
-* <cg>Fixed</c> <co>Audio Speed</c>/<co>Sync with Speedhack</c> not working sometimes
-* <cg>Optimized</c> <co>Show Trajectory</c> a bit
-* <cg>Fixed</c> a crash that could happen when using <co>Blur</c>
-* <cg>Fixed</c> <co>Click Between Frames</c> toggle resetting on game launch
-* <cg>Resolved</c> some issues with <co>replays</c> when using <co>Physics Bypass</c> (some old macros might stop working due to this)
-* General performance improvements
-
 **Additions**:
 * <cg>Android</c> support featuring <cl>custom made UI</c> for mobile devices
 * <cg>Labels</c> revamp:
@@ -43,6 +26,23 @@
 * Added <cg>Unlock Paths</c>
 * Added <cg>Physics Bypass</c> for <cl>macOS</c>
 * Added <cg>Custom Modules API</c> for other mods to use Eclipse's cheat indicator system
+
+**Fixes:**
+* <cg>Fixed</c> a crash in editor when using <co>Physics Bypass</c>
+* <cg>Fixed</c> percentage calculation with <co>Physics Bypass</c>
+* <cg>Fixed</c> slowed down animations with <co>Physics Bypass</c>
+* <cg>Fixed</c> <co>"Formatted Timer"</c> in <co>Accurate Percentage</c> not accounting for checkpoints.
+* <cg>Fixed</c> a memory leak with <co>Show Trajectory</c>
+* <cg>Fixed</c> "Show Labels" toggle not realigning labels when switched
+* Greatly <cg>improved performance</c> of Labels
+* <cg>Fixed</c> a random crash on <cb>ARM macOS</c> when entering any level
+* <cg>Fixed</c> some <co>Practice Fix</c> crashes
+* <cg>Fixed</c> <co>Audio Speed</c>/<co>Sync with Speedhack</c> not working sometimes
+* <cg>Optimized</c> <co>Show Trajectory</c> a bit
+* <cg>Fixed</c> a crash that could happen when using <co>Blur</c>
+* <cg>Fixed</c> <co>Click Between Frames</c> toggle resetting on game launch
+* <cg>Resolved</c> some issues with <co>replays</c> when using <co>Physics Bypass</c> (some old macros might stop working due to this)
+* General performance improvements
 
 ## v1.0.0-beta.4
 **<cg>Geometry Dash v2.2074</c> support**  

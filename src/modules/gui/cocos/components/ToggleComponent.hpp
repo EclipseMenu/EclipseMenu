@@ -44,7 +44,7 @@ namespace eclipse::gui::cocos {
             }
 
             if (!m_component->getDescription().empty()) {
-                m_infoButton = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 0.5f, [this](auto) {
+                m_infoButton = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName("info.png"_spr, 0.35f, [this](auto) {
                     this->openDescriptionPopup();
                 });
                 m_infoButton->setAnchorPoint({ 0.5, 0.5f });
