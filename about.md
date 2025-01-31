@@ -2,7 +2,7 @@
 A **next-generation** mod menu for Geometry Dash.
 
 ## How to use 
-1. On PC, press `TAB` to open and close the mod menu.
+1. On PC, press `TAB` to open and close the mod menu. For mobile, you should see a ball, click on that to open or close the menu!
 2. Set or toggle any hack / mod you want to use.
 3. For any questions or general support, join our [Support Discord Server](https://discord.gg/NnpwFRDMND)!
 4. Have fun using our mod!
@@ -38,6 +38,7 @@ Additionally, thank you to our testers, contributors, and supporters for improvi
 - [doki](https://www.youtube.com/@dokitachi) - Tester
 - [Prometheus](https://github.com/Prometheus-03) - Tester
 - [Catto](https://github.com/CattoDev/GatoBot/) - ShaderLayer fix for renderer
+- [arvFlash](https://github.com/arvFlash) - Catppuccin Macchiato theme
 
 ## License
 **Eclipse Menu** is created under the **[Eclipse Public License v2.0](https://choosealicense.com/licenses/epl-2.0/)**, read more by clicking on the highlighted name.

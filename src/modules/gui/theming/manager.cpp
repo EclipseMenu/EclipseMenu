@@ -16,7 +16,11 @@ namespace eclipse::gui {
     };
 
     int getDefaultThemeIndex(std::vector<ThemeMeta> const& themes) {
+        #ifdef GEODE_IS_DESKTOP
         static auto defaultPath = geode::Mod::get()->getResourcesDir() / "megaoverlay.json";
+        #else
+        static auto defaultPath = geode::Mod::get()->getResourcesDir() / "catppuccinmacchiato.json";
+        #endif
         for (auto i = 0; i < themes.size(); i++) {
             if (themes[i].path == defaultPath) return i;
         }

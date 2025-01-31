@@ -1,0 +1,53 @@
+{
+    "details": {
+        "author": "arvflash",
+        "name": "Catppuccin Macchiato",
+        "description": "",
+        "layout": 0,
+        "renderer": 0,
+        "schema": 1,
+        "style": 1
+    },
+    "blur": {
+        "blurEnabled": false,
+        "blurRadius": 1.0,
+        "blurSpeed": 0.30
+    },
+    "colors": {
+        "backgroundColor": "24273aff",
+        "borderColor": "1e2030ff",
+        "buttonActivatedColor": "cad3f5ff",
+        "buttonActiveForeground": "000000FF",
+        "buttonBackgroundColor": "363a4fff",
+        "buttonDisabledColor": "5b6078ff",
+        "buttonDisabledForeground": "5b6078ff",
+        "buttonForegroundColor": "cad3f5ff",
+        "buttonHoveredColor": "8aadf4ff",
+        "buttonHoveredForeground": "000000FF",
+        "checkboxBackgroundColor": "363a4fff",
+        "checkboxCheckmarkColor": "cad3f5ff",
+        "checkboxForegroundColor": "cad3f5ff",
+        "disabledColor": "5b6078ff",
+        "foregroundColor": "cad3f5ff",
+        "searchedColor": "1e2030ff",
+        "frameBackground": "363a4fff",
+        "titleBackgroundColor": "1e2030ff",
+        "titleForegroundColor": "cad3f5ff"
+    },
+    "other": {
+        "borderSize": 0.5,
+        "font": "Poppins",
+        "fontSize": 18.0,
+        "framePadding": 3.0,
+        "frameRounding": 4.0,
+        "horizontalInnerSpacing": 8.0,
+        "horizontalSpacing": 12.0,
+        "indentSpacing": 25.0,
+        "uiScale": 1.0,
+        "verticalInnerSpacing": 6.0,
+        "verticalSpacing": 2.0,
+        "windowMargin": 4.0,
+        "windowPadding": 4.0,
+        "windowRounding": 5.0
+    }
+}
