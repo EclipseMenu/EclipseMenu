@@ -9,6 +9,7 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/ShaderLayer.hpp>
+#include <modules/gui/cocos/components/ToggleComponent.hpp>
 
 #include <modules/i18n/translations.hpp>
 #include <modules/recorder/DSPRecorder.hpp>
@@ -25,6 +26,7 @@ namespace eclipse::hacks::Recorder {
 
     bool levelDone = false;
     bool popupShown = false;
+    bool capturing = false;
 
     float totalTime = 0.f;
     float afterEndTimer = 0.f;
@@ -38,16 +40,15 @@ namespace eclipse::hacks::Recorder {
     cocos2d::CCSize newScreenScale;
 
     void callback(std::string const& error) {
-        Popup::create(
-            i18n::get_("common.error"),
-            error
-        );
+        geode::queueInMainThread([error] {
+            Popup::create(i18n::get_("common.error"), error);
+        });
     }
 
     void endPopup() {
         Popup::create(
             i18n::get_("common.info"),
-            i18n::get_("recorder.finished"),
+            i18n::format("recorder.finished", s_recorder.getRecordingDuration()),
             i18n::get_("common.ok"),
             i18n::get_("recorder.open-folder"),
             [](bool result) {
@@ -82,6 +83,25 @@ namespace eclipse::hacks::Recorder {
             view->m_fScaleX = originalScreenScale.width;
             view->m_fScaleY = originalScreenScale.height;
         }
+    }
+
+    // UI trigger will offset some objects, which may cause issues if we record in a different resolution
+    // this function will first revert the objects to their original position, then call positionUIObjects again
+    // to update the positions according to the new resolution
+    void fixUIObjects() {
+        auto pl = utils::get<PlayLayer>();
+
+        // reset ui object start positions
+        for (auto obj : geode::cocos::CCArrayExt<GameObject*>(pl->m_objects)) {
+            auto it = pl->m_umapIntCCPoint.find(obj->m_uniqueID);
+            if (it == pl->m_umapIntCCPoint.end()) continue;
+
+            // revert the object to its original position
+            obj->setStartPos(it->second);
+        }
+
+        // refresh the ui objects
+        pl->positionUIObjects();
     }
 
     inline void trimString(std::string& str) {
@@ -134,8 +154,10 @@ namespace eclipse::hacks::Recorder {
             static_cast<float>(s_recorder.m_renderSettings.m_height) / newDesignResolution.height
         );
 
-        if(oldDesignResolution != newDesignResolution)
+        if(oldDesignResolution != newDesignResolution) {
             applyWinSize();
+            fixUIObjects();
+        }
 
         s_recorder.start();
     }
@@ -186,6 +208,7 @@ namespace eclipse::hacks::Recorder {
             tab->addInputFloat("recorder.bitrate", 1.f, 1000.f, "%.0fmbps");
             tab->addInputInt("recorder.res-x", "recorder.resolution.x", 1, 15360);
             tab->addInputInt("recorder.res-y", "recorder.resolution.y", 1, 8640);
+            tab->addToggle("recorder.hide-preview")->setDescription();
 
             config::setIfEmpty("recorder.codecIdx", codecIdx);
 
@@ -256,9 +279,7 @@ namespace eclipse::hacks::Recorder {
                 if (framerate < 1)
                     framerate = 1;
 
-                float tps = eclipse::config::get<"global.tpsbypass.toggle", bool>(false)
-                                ? eclipse::config::get<"global.tpsbypass", float>(240.f)
-                                : 240.f;
+                float tps = utils::getTPS();
 
                 dt = 1.f / framerate;
                 dt *= framerate / tps;
@@ -277,9 +298,10 @@ namespace eclipse::hacks::Recorder {
     class $modify(InternalRecorderBGLHook, GJBaseGameLayer) {
         static void onModify(auto& self) {
             SAFE_SET_PRIO("GJBaseGameLayer::update", SAFE_HOOK_PRIORITY + 1);
+            HOOKS_TOGGLE("recorder.hide-preview", GJBaseGameLayer, "visit");
         }
 
-        void update(float dt) {
+        void update(float dt) override {
             if (!s_recorder.isRecording() || m_gameState.m_currentProgress <= 0) return GJBaseGameLayer::update(dt);
 
             float endscreen = config::get<"recorder.endscreen", float>(5.f);
@@ -312,10 +334,17 @@ namespace eclipse::hacks::Recorder {
                 extraTime = time - frameDt;
                 lastFrameTime = totalTime;
 
+                capturing = true;
                 s_recorder.captureFrame();
+                capturing = false;
             }
 
             GJBaseGameLayer::update(dt);
+        }
+
+        void visit() override {
+            if (s_recorder.isRecording() && !capturing) return;
+            GJBaseGameLayer::visit();
         }
     };
 

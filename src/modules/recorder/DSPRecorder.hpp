@@ -16,7 +16,7 @@ public:
 
     [[nodiscard]] bool isRecording() const { return m_recording; }
 
-    void tryUnpause(float time);
+    void tryUnpause(float time) const;
 
 private:
     void init();

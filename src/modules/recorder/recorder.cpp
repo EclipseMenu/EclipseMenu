@@ -6,8 +6,10 @@
 #include <Geode/binding/FMODAudioEngine.hpp>
 #include <Geode/loader/Log.hpp>
 #include <Geode/utils/general.hpp>
+#include <modules/debug/benchmark.hpp>
 #include <modules/recorder/DSPRecorder.hpp>
 #include <modules/utils/SingletonCache.hpp>
+#include <utils.hpp>
 
 namespace km {
 
@@ -75,12 +77,10 @@ namespace eclipse::recorder {
 
     void Recorder::start() {
         m_currentFrame.resize(m_renderSettings.m_width * m_renderSettings.m_height * 4, 0);
-        m_renderTexture.m_width = m_renderSettings.m_width;
-        m_renderTexture.m_height = m_renderSettings.m_height;
+        m_renderTexture = RenderTexture(m_renderSettings.m_width, m_renderSettings.m_height);
         m_renderTexture.begin();
 
         m_recording = true;
-        m_frameHasData = false;
 
         DSPRecorder::get()->start();
 
@@ -89,26 +89,50 @@ namespace eclipse::recorder {
     }
 
     void Recorder::stop() {
+        if (!m_recording) return;
+
         m_recording = false;
 
-        m_renderTexture.end();
+        // make sure to let the recording thread know that we're stopping
+        m_frameReady.set(true);
 
-        delete utils::get<cocos2d::CCDirector>()->m_pProjectionDelegate;
-        utils::get<cocos2d::CCDirector>()->setProjection(cocos2d::ccDirectorProjection::kCCDirectorProjection2D);
+        m_renderTexture.end();
+        DSPRecorder::get()->stop();
+
+        auto director = utils::get<cocos2d::CCDirector>();
+        if (auto& delegate = utils::get<cocos2d::CCDirector>()->m_pProjectionDelegate) {
+            delete delegate;
+            delegate = nullptr;
+        }
+
+        director->setProjection(cocos2d::ccDirectorProjection::kCCDirectorProjection2D);
     }
 
     void Recorder::captureFrame() {
-        while (m_frameHasData) {}
+        // wait until the previous frame is processed
+        m_frameReady.wait_for(false);
 
-        m_renderTexture.capture(m_lock, m_currentFrame, m_frameHasData);
+        // don't capture if we're not recording
+        if (!m_recording) return;
+
+        m_renderTexture.capture(utils::get<PlayLayer>(), m_currentFrame, m_frameReady);
+    }
+
+    std::string Recorder::getRecordingDuration() const {
+        // m_recordingDuration is in nanoseconds
+        double inSeconds = m_recordingDuration / 1'000'000'000.0;
+        return utils::formatTime(inSeconds);
     }
 
     void Recorder::recordThread() {
         geode::utils::thread::setName("Eclipse Recorder Thread");
+        geode::log::debug("Recorder thread started.");
+
         ffmpeg::Recorder ffmpegRecorder;
         if (!ffmpegRecorder.isValid()) {
             stop();
             m_callback("Failed to initialize ffmpeg recorder.");
+            geode::log::debug("Recorder thread stopped.");
             return;
         }
 
@@ -117,22 +141,38 @@ namespace eclipse::recorder {
             stop();
             m_callback(res.unwrapErr());
             ffmpegRecorder.stop();
+            m_frameReady.set(false); // unlock the main thread if it's waiting
+            geode::log::debug("Recorder thread stopped.");
             return;
         }
 
-        while (m_recording || m_frameHasData) {
-            if (m_frameHasData) {
-                m_lock.lock();
-                m_frameHasData = false;
+        // wait for the first frame
+        m_frameReady.set(false);
+        m_frameReady.wait_for(true);
 
+        {
+            // record the time it took to record the video (to show in the end)
+            debug::Timer timer("Recording", &m_recordingDuration);
+
+            while (m_recording) {
                 res = ffmpegRecorder.writeFrame(m_currentFrame);
                 if (res.isErr()) {
                     m_callback(res.unwrapErr());
+
+                    // stop recording if an error occurred
+                    this->stop();
+                    break;
                 }
 
-                m_lock.unlock();
+                // break if we're not recording anymore (to avoid waiting forever)
+                if (!m_recording) break;
+
+                m_frameReady.set(false);
+                m_frameReady.wait_for(true);
             }
         }
+
+        geode::log::debug("Recorder thread stopped.");
 
         ffmpegRecorder.stop();
 
@@ -142,10 +182,15 @@ namespace eclipse::recorder {
         std::filesystem::path tempPath = m_renderSettings.m_outputFile.parent_path() / "music.mp4";
 
         res = ffmpeg::AudioMixer::mixVideoRaw(m_renderSettings.m_outputFile, data, tempPath);
-        if (res.isErr()) m_callback(res.unwrapErr());
+        if (res.isErr()) return m_callback(res.unwrapErr());
 
-        std::filesystem::remove(m_renderSettings.m_outputFile);
-        std::filesystem::rename(tempPath, m_renderSettings.m_outputFile);
+        std::error_code ec;
+        std::filesystem::remove(m_renderSettings.m_outputFile, ec);
+        if (ec) return m_callback("Failed to remove old video file.");
+
+        ec = {};
+        std::filesystem::rename(tempPath, m_renderSettings.m_outputFile, ec);
+        if (ec) return m_callback("Failed to rename temporary video file.");
     }
 
     std::vector<std::string> Recorder::getAvailableCodecs() {
