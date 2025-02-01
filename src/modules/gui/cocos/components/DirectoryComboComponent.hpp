@@ -38,6 +38,7 @@ namespace eclipse::gui::cocos {
 
         bool init(float width) {
             if (!CCMenu::init()) return false;
+            const auto tm = ThemeManager::get();
 
             m_component->onUpdate();
 
@@ -51,12 +52,14 @@ namespace eclipse::gui::cocos {
                     this->openDescriptionPopup();
                 });
                 m_infoButton->setAnchorPoint({ 0.5, 0.5f });
+                m_infoButton->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
                 this->addChildAtPosition(m_infoButton, geode::Anchor::Right, { -10.f, 0.f });
                 labelSize -= 15.f;
             }
 
             m_label = TranslatedLabel::create(m_component->getTitle());
             m_label->setAnchorPoint({0, 0.5f});
+            m_label->setColor(tm->getForegroundColor().toCCColor3B());
             m_label->limitLabelWidth(labelSize, 1.f, 0.25f);
             this->addChildAtPosition(m_label, geode::Anchor::Left, { 15.f, 0.f });
 
@@ -65,7 +68,7 @@ namespace eclipse::gui::cocos {
             m_background->setAnchorPoint({ 0.5f, 0.5f });
             m_background->setScale(0.3f);
             m_background->setContentSize({365.f, 80.f});
-            m_background->setColor(cocos2d::ccColor3B{50, 50, 50});
+            m_background->setColor(tm->getFrameBackground().toCCColor3B());
             m_background->setZOrder(-1);
             this->addChildAtPosition(m_background, geode::Anchor::Right, { -70.f, 0.f });
 
@@ -81,6 +84,7 @@ namespace eclipse::gui::cocos {
             this->addChildAtPosition(arrowBtn2, geode::Anchor::Right, { -115.f, 0.f });
 
             m_valueLabel = TranslatedLabel::createRaw(m_component->getValue().filename().string());
+            m_valueLabel->setColor(tm->getForegroundColor().toCCColor3B());
             this->addChildAtPosition(m_valueLabel, geode::Anchor::Right, { -70.f, 0.f });
 
             auto& items = m_component->getItems();

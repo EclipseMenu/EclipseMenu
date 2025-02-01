@@ -30,6 +30,7 @@ namespace eclipse::gui::cocos {
     protected:
         cocos2d::extension::CCScale9Sprite* m_bgSprite{};
         TranslatedLabel* m_label{};
+        cocos2d::CCSprite* m_icon{};
 
     public:
         void setState(bool active) const;

@@ -26,6 +26,7 @@ namespace eclipse::gui::cocos {
                     )->show();
                 });
                 m_infoButton->setAnchorPoint({ 0.5, 0.5f });
+                m_infoButton->setColor(ThemeManager::get()->getCheckboxCheckmarkColor().toCCColor3B());
                 this->addChildAtPosition(m_infoButton, geode::Anchor::Right, { -10.f, 0.f });
                 labelSize -= 15.f;
             }

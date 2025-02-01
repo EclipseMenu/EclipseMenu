@@ -27,7 +27,8 @@ namespace eclipse::gui::cocos {
         }
 
         void setState(bool active) {
-            m_background->setOpacity(active ? 255 : DISABLED_OPACITY);
+            const auto tm = ThemeManager::get();
+            m_background->setColor(active ? tm->getButtonActivatedBackground().toCCColor3B() : tm->getButtonActivatedBackground().darken(0.1F).toCCColor3B());
             setEnabled(!active);
         }
 
@@ -120,7 +121,7 @@ namespace eclipse::gui::cocos {
                 arrow->setRotation(90);
                 if (flip) arrow->setFlipY(true);
                 arrow->setScale(0.5f);
-                arrow->setColor(tm->getButtonActivatedForeground().toCCColor3B());
+                arrow->setColor(tm->getButtonForegroundColor().toCCColor3B());
                 return arrow;
             };
 

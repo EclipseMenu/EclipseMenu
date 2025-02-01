@@ -80,7 +80,7 @@ namespace eclipse::gui::cocos {
                 label->setAnchorPoint({0.5f, 0.5f});
                 label->limitLabelWidth(menu->getContentSize().width - 20.f, 0.75f, 0.25f);
                 if (m_component->getValue() == i) {
-                    label->setColor(tm->getButtonActivatedForeground().toCCColor3B());
+                    label->setColor(tm->getButtonForegroundColor().toCCColor3B());
                 } else {
                     label->setColor(tm->getButtonDisabledForeground().toCCColor3B());
                 }
@@ -164,7 +164,7 @@ namespace eclipse::gui::cocos {
 
             for (size_t i = 0; auto label : m_labels) {
                 if (i == index) {
-                    label->setColor(ThemeManager::get()->getButtonActivatedForeground().toCCColor3B());
+                    label->setColor(ThemeManager::get()->getButtonForegroundColor().toCCColor3B());
                 } else {
                     label->setColor(ThemeManager::get()->getButtonDisabledForeground().toCCColor3B());
                 }
@@ -189,6 +189,7 @@ namespace eclipse::gui::cocos {
                     this->openDescriptionPopup();
                 });
                 m_infoButton->setAnchorPoint({ 0.5, 0.5f });
+                m_infoButton->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
                 this->addChildAtPosition(m_infoButton, geode::Anchor::Right, { -10.f, 0.f });
                 labelSize -= 15.f;
             }

@@ -22,7 +22,7 @@ namespace eclipse::gui::cocos {
 
             bg->setContentSize({width, 28.f});
             bg->setColor(tm->getButtonBackgroundColor().toCCColor3B());
-            label->setColor(tm->getButtonActivatedForeground().toCCColor3B());
+            label->setColor(tm->getButtonForegroundColor().toCCColor3B());
             // label->setScale(0.5F);
             bg->addChildAtPosition(label, geode::Anchor::Center);
             if (!CCMenuItemSpriteExtra::init(

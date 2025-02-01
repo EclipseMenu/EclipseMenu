@@ -154,22 +154,22 @@ namespace eclipse::gui::cocos {
         this->setID(fmt::format("tab-button-{}"_spr, name));
         this->setContentSize(size);
 
-        auto icon = getTabIcon(name);
-        if (icon) {
-            icon->setScale(0.6f);
-            icon->setZOrder(1);
-            this->addChildAtPosition(icon, geode::Anchor::Left, {15.f, 0.f});
+        m_icon = getTabIcon(name);
+        if (m_icon) {
+            m_icon->setScale(0.6f);
+            m_icon->setZOrder(1);
+            this->addChildAtPosition(m_icon, geode::Anchor::Left, {15.f, 0.f});
         }
 
         m_label = TranslatedLabel::create(name);
-        m_label->limitLabelWidth(icon ? 75 : 100, 1.f, .2f);
+        m_label->limitLabelWidth(m_icon ? 75 : 100, 1.f, .2f);
 
         m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0.0f, 0.0f, 80.0f, 80.0f});
         m_bgSprite->setContentSize({size.width, size.height + 8.F}); // minimum 36
         m_bgSprite->setScaleY(.75F);
 
         this->addChildAtPosition(m_bgSprite, geode::Anchor::Center);
-        this->addChildAtPosition(m_label, geode::Anchor::Center, { icon ? 12.5f : 0.f, 0.f });
+        this->addChildAtPosition(m_label, geode::Anchor::Center, { m_icon ? 12.5f : 0.f, 0.f });
         return true;
     }
 
@@ -181,5 +181,6 @@ namespace eclipse::gui::cocos {
         auto colorBG = (!active) ? tm->getButtonBackgroundColor() : tm->getButtonActivatedBackground();
         m_bgSprite->setColor(colorBG.toCCColor3B());
         m_label->setColor(colorLbl.toCCColor3B());
+        m_icon->setColor(colorLbl.toCCColor3B());
     }
 }
