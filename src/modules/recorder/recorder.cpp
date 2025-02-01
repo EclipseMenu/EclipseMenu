@@ -22,7 +22,7 @@ namespace km {
 
 #define DEFINE_ADDRESS(name, address, ...) \
     using func_t = decltype(&name); \
-    auto func = reinterpret_cast<func_t>(address);\
+    auto func = reinterpret_cast<func_t>(geode::base::get() + address);\
     static_assert(GEODE_COMP_GD_VERSION == BINDINGS_VERSION, "Address for " #name " is outdated"); \
     return func(__VA_ARGS__)
 

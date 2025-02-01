@@ -175,8 +175,10 @@ namespace eclipse::hacks::Shortcuts {
             config::setIfEmpty("shortcut.p2jump", keybinds::Keys::None);
 
             auto tab = gui::MenuTab::find("tab.shortcuts");
+            #ifdef GEODE_IS_DESKTOP
             tab->addKeybind("shortcuts.p1jump", "shortcut.p1jump", true)->setInternal();
             tab->addKeybind("shortcuts.p2jump", "shortcut.p2jump", true)->setInternal();
+            #endif
             tab->addButton("shortcuts.options")->setDescription()->callback(openSettings)->handleKeybinds();
             tab->addButton("shortcuts.uncomplete-level")->setDescription()->callback(uncompleteLevel)->handleKeybinds();
             tab->addButton("shortcuts.restart-level")->setDescription()->callback(restartLevel)->handleKeybinds();

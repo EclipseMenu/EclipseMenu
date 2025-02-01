@@ -234,6 +234,7 @@ namespace eclipse::hacks::Recorder {
 
             tab->addInputText("recorder.colorspace-args", "recorder.colorspace");
 
+            #ifdef GEODE_IS_DESKTOP
             tab->addLabel("recorder.presets");
             tab->addButton("recorder.preset.cpu")->callback([] {
                 config::set<std::string>("recorder.codecString", "libx264");
@@ -248,6 +249,7 @@ namespace eclipse::hacks::Recorder {
                 config::set<std::string>("recorder.codecString", "h264_amf");
                 config::set<int>("recorder.hwType", static_cast<int>(ffmpeg::HardwareAccelerationType::D3D11VA));
             });
+            #endif
         }
 
         [[nodiscard]] const char* getId() const override { return "Internal Recorder"; }
