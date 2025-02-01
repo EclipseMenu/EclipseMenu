@@ -20,6 +20,7 @@
 * <cg>Added</c> Translations (check the [translations repository](https://github.com/EclipseMenu/translations) on how to contribute)
 * <cg>Added</c> search bar for hacks
 * <cg>Added</c> customization settings for menu open/close animations (tabbed layout)
+* Added <cg>Catppuccin Macchiato</c> theme as one of the default ones (thanks to [arvFlash](https://github.com/arvFlash))
 * Added <cg>No Level Kick</c>
 * Added <cg>Checkpoint Delay</c>
 * Added <cg>All Passable</c>
