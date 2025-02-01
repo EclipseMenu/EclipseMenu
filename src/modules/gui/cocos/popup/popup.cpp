@@ -84,6 +84,10 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
+    Popup::~Popup() {
+        CocosRenderer::get()->shutdown(true);
+    }
+
     void Popup::setActiveTab(int idx) const {
         auto tabs = Engine::get()->getTabs();
         if (idx < 0 || idx >= tabs.size()) return;
@@ -105,10 +109,5 @@ namespace eclipse::gui::cocos {
         }
 
         return false;
-    }
-
-    void Popup::onExit() {
-        geode::Popup<Tabs const&>::onExit();
-        CocosRenderer::get()->shutdown(true);
     }
 }
