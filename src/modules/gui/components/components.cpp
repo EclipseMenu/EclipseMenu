@@ -384,6 +384,9 @@ namespace eclipse::gui {
     float InputFloatComponent::getMin() const { return m_min; }
     float InputFloatComponent::getMax() const { return m_max; }
     const std::string& InputFloatComponent::getFormat() const { return m_format; }
+    void InputFloatComponent::setMin(float min) { m_min = min; }
+    void InputFloatComponent::setMax(float max) { m_max = max; }
+    void InputFloatComponent::setFormat(std::string format) { m_format = std::move(format); }
 
     float InputFloatComponent::getValue() const {
         return get_value(m_id, 0.f, m_noSave);

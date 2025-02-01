@@ -6,6 +6,7 @@
 #include <modules/gui/components/button.hpp>
 #include <modules/gui/components/label.hpp>
 #include <modules/gui/components/toggle.hpp>
+#include <modules/gui/components/input-float.hpp>
 
 #include "mods.hpp"
 
@@ -111,6 +112,32 @@ $execute {
             std::invoke(callback);
         });
         e->setUniqueID(button->getUID());
+        return ListenerResult::Stop;
+    });
+    new EventListener<EventFilter<events::AddInputFloatEvent>>(+[](events::AddInputFloatEvent* e) {
+        auto tab = gui::MenuTab::find(e->getTabName());
+        auto input = tab->addInputFloat(e->getTitle(), e->getID());
+        input->callback([callback = std::get<0>(e->getCallbacks())](float value) {
+            std::invoke(callback, value);
+        });
+        e->setUniqueID(input->getUID());
+        return ListenerResult::Stop;
+    });
+
+    /* Special Components */
+    new EventListener<EventFilter<events::SetLabelTextEvent>>(+[](events::SetLabelTextEvent* e) {
+        auto label = gui::Component::find(e->getID());
+        if (!label || label->getType() != gui::ComponentType::Label) return ListenerResult::Stop;
+        static_pointer_cast<gui::LabelComponent>(label)->setText(e->getText());
+        return ListenerResult::Stop;
+    });
+    new EventListener<EventFilter<events::SetInputFloatParamsEvent>>(+[](events::SetInputFloatParamsEvent* e) {
+        auto input = gui::Component::find(e->getID());
+        if (!input || input->getType() != gui::ComponentType::InputFloat) return ListenerResult::Stop;
+        auto inputFloat = static_pointer_cast<gui::InputFloatComponent>(input);
+        if (e->getMin()) inputFloat->setMin(e->getMin().value());
+        if (e->getMax()) inputFloat->setMax(e->getMax().value());
+        if (e->getFormat()) inputFloat->setFormat(e->getFormat().value());
         return ListenerResult::Stop;
     });
 

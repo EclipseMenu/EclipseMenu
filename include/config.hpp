@@ -2,23 +2,20 @@
 #ifndef ECLIPSE_CONFIG_HPP
 #define ECLIPSE_CONFIG_HPP
 
-#include <string>
 #include <concepts>
+#include <string>
 #include <utility>
 #include <Geode/loader/Event.hpp>
 
 namespace eclipse::config {
-
     /// @brief Concept for supported types in the config system (bool, int, float, std::string)
     template <typename T>
     concept SupportedType = requires(T a) {
         std::same_as<T, bool> || std::same_as<T, int> || std::same_as<T, float> || std::same_as<T, std::string>;
     };
-
 }
 
 namespace eclipse::events {
-
     template <config::SupportedType T>
     class RequestConfigValueEvent : public geode::Event {
     public:

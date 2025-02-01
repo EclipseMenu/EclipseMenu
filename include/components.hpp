@@ -13,7 +13,7 @@
 
 namespace eclipse::components {
     enum class ComponentType {
-        Label, Toggle
+        Label, Toggle, Button, InputFloat
     };
 
     template <ComponentType T>
@@ -22,27 +22,49 @@ namespace eclipse::components {
         constexpr ComponentType getType() const { return T; }
         size_t getUniqueID() const { return m_uniqueID; }
         explicit Component(size_t id) : m_uniqueID(id) {}
-    private:
+    protected:
+        void setDescriptionImpl(const std::string& description) const;
         size_t m_uniqueID = 0;
     };
 
-    using Label = Component<ComponentType::Label>;
+    class Label final : public Component<ComponentType::Label> {
+    public:
+        explicit Label(size_t uid) : Component(uid) {}
+        Label& setText(const std::string& text);
+        Label const& setText(const std::string& text) const;
+    };
+
     class Toggle final : public Component<ComponentType::Toggle> {
     public:
         Toggle(size_t uid, std::string id) : Component(uid), m_id(std::move(id)) {}
         const std::string& getID() const { return m_id; }
-        Toggle& setDescription(const std::string& description);
-        // Toggle& addOptions(const std::function<void()>& options);
+        Toggle& setDescription(const std::string& description) { setDescriptionImpl(description); return *this; }
+
+        bool getValue() const;
     private:
         std::string m_id;
     };
-    class Button final : public Component<ComponentType::Label> {
+
+    class Button final : public Component<ComponentType::Button> {
     public:
         explicit Button(size_t uid) : Component(uid) {}
-        Button& setDescription(const std::string& description);
-        // Button& setText(const std::string& text);
+        Button& setDescription(const std::string& description) { setDescriptionImpl(description); return *this; }
     };
 
+    class InputFloat final : public Component<ComponentType::InputFloat> {
+    public:
+        InputFloat(size_t uid, std::string id) : Component(uid), m_id(std::move(id)) {}
+        const std::string& getID() const { return m_id; }
+        InputFloat& setDescription(const std::string& description) { setDescriptionImpl(description); return *this; }
+
+        float getValue() const;
+
+        InputFloat& setMinValue(float value);
+        InputFloat& setMaxValue(float value);
+        InputFloat& setFormat(const std::string& format);
+    private:
+        std::string m_id;
+    };
 }
 
 namespace eclipse {
@@ -54,6 +76,7 @@ namespace eclipse {
         components::Toggle addToggle(const std::string& id, const std::string& title, const std::function<void(bool)> &callback) const;
         components::Toggle addModSettingToggle(std::shared_ptr<geode::Setting> const& setting) const;
         components::Button addButton(const std::string& title, const std::function<void()>& callback) const;
+        components::InputFloat addInputFloat(const std::string& id, const std::string& title, const std::function<void(float)>& callback) const;
 
         const std::string& getName() const { return m_name; }
     private:
@@ -96,6 +119,7 @@ namespace eclipse::events {
     using AddLabelEvent = AddComponentEvent<>;
     using AddToggleEvent = AddComponentEvent<std::function<void(bool)>>;
     using AddButtonEvent = AddComponentEvent<std::function<void()>>;
+    using AddInputFloatEvent = AddComponentEvent<std::function<void(float)>>;
 
     class SetComponentDescriptionEvent : public geode::Event {
     public:
@@ -106,6 +130,32 @@ namespace eclipse::events {
     private:
         size_t m_id;
         std::string m_description;
+    };
+
+    class SetLabelTextEvent : public geode::Event {
+    public:
+        SetLabelTextEvent(size_t id, std::string text)
+            : m_id(id), m_text(std::move(text)) {}
+        size_t getID() const { return m_id; }
+        const std::string& getText() const { return m_text; }
+    private:
+        size_t m_id;
+        std::string m_text;
+    };
+
+    class SetInputFloatParamsEvent : public geode::Event {
+    public:
+        SetInputFloatParamsEvent(size_t id, std::optional<float> min, std::optional<float> max, std::optional<std::string> format)
+            : m_id(id), m_min(min), m_max(max), m_format(std::move(format)) {}
+        size_t getID() const { return m_id; }
+        std::optional<float> getMin() const { return m_min; }
+        std::optional<float> getMax() const { return m_max; }
+        const std::optional<std::string>& getFormat() const { return m_format; }
+    private:
+        size_t m_id;
+        std::optional<float> m_min;
+        std::optional<float> m_max;
+        std::optional<std::string> m_format;
     };
 }
 
@@ -169,21 +219,68 @@ namespace eclipse {
         return components::Button(event.getUniqueID());
     }
 
+    /// @brief Add an input float to the tab.
+    /// @param id The ID of the input float.
+    /// @param title The title of the input float.
+    /// @param callback The callback function to call when the input float is changed.
+    inline components::InputFloat MenuTab::addInputFloat(const std::string& id, const std::string& title, const std::function<void(float)>& callback) const {
+        events::AddInputFloatEvent event(this, id, title, callback);
+        event.post();
+        return components::InputFloat(event.getUniqueID(), id);
+    }
+
     namespace components {
-        /// @brief Set the description of the toggle.
+        /// @brief Set the description of the component.
         /// @param description The description to set.
-        inline Toggle& Toggle::setDescription(const std::string& description) {
+        template <ComponentType T>
+        void Component<T>::setDescriptionImpl(const std::string& description) const {
             events::SetComponentDescriptionEvent(getUniqueID(), description).post();
+        }
+
+        /// @brief Set the text of the label.
+        /// @param text The text to set.
+        inline Label& Label::setText(const std::string& text) {
+            events::SetLabelTextEvent(getUniqueID(), text).post();
             return *this;
         }
 
-        /// @brief Set the description of the button.
-        /// @param description The description to set.
-        inline Button& Button::setDescription(const std::string& description) {
-            events::SetComponentDescriptionEvent(getUniqueID(), description).post();
+        /// @brief Set the text of the label.
+        /// @param text The text to set.
+        inline Label const& Label::setText(const std::string& text) const {
+            events::SetLabelTextEvent(getUniqueID(), text).post();
             return *this;
         }
 
+        /// @brief Get the value of the toggle.
+        inline bool Toggle::getValue() const {
+            return config::get<bool>(m_id, false);
+        }
+
+        /// @brief Get the value of the input float.
+        inline float InputFloat::getValue() const {
+            return config::get<float>(m_id, 0.f);
+        }
+
+        /// @brief Set the minimum allowed value of the input float.
+        /// @param value The value to set.
+        inline InputFloat& InputFloat::setMinValue(float value) {
+            events::SetInputFloatParamsEvent(getUniqueID(), value, std::nullopt, std::nullopt).post();
+            return *this;
+        }
+
+        /// @brief Set the maximum allowed value of the input float.
+        /// @param value The value to set.
+        inline InputFloat& InputFloat::setMaxValue(float value) {
+            events::SetInputFloatParamsEvent(getUniqueID(), std::nullopt, value, std::nullopt).post();
+            return *this;
+        }
+
+        /// @brief Set the format string of the input float.
+        /// @param format The format string to set. (e.g. "%.2f")
+        inline InputFloat& InputFloat::setFormat(const std::string& format) {
+            events::SetInputFloatParamsEvent(getUniqueID(), std::nullopt, std::nullopt, format).post();
+            return *this;
+        }
     }
 }
 

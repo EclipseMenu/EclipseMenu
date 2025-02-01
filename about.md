@@ -8,14 +8,17 @@ A **next-generation** mod menu for Geometry Dash.
 4. Have fun using our mod!
 
 ## Features
-- 90+ hacks
-- Startpos Switcher (with Smart Smartpos!)
+- 100+ hacks
+- StartPos Switcher (with Smart SmartPos!)
 - Fully Customizable Labels
 - Show Trajectory
 - Internal Recorder
 - Replay Bot
 - Keybinds
 - Theme Customizability (you can theme Eclipse Menu however you want!)
+- Crossplatform support (Windows, macOS, Android)
+- Community Translations (check the [translations repository](https://github.com/EclipseMenu/translations) on how to contribute)
+- An API for other mods to interact with Eclipse
 
 ## Credits
 This mod menu would not be possible without the developers from other mod menus teaming up together!

@@ -13,7 +13,7 @@
     </a>
     <img src="https://img.shields.io/github/downloads/EclipseMenu/EclipseMenu/total" alt="Total downloads">
     <img src="https://img.shields.io/github/downloads/EclipseMenu/EclipseMenu/latest/total" alt="Latest release downloads">
-    <a href="LICENSE">
+    <a href="LICENSE.md">
       <img src="https://img.shields.io/github/license/EclipseMenu/EclipseMenu" alt="License">
     </a>
     <a href="https://github.com/EclipseMenu/EclipseMenu/issues">
@@ -45,14 +45,17 @@
 4. Have fun using our mod!
 
 ## Features
-- 90+ hacks
-- Startpos Switcher (with Smart Smartpos!)
+- 100+ hacks
+- StartPos Switcher (with Smart SmartPos!)
 - Fully Customizable Labels
 - Show Trajectory
 - Internal Recorder
 - Replay Bot
 - Keybinds
 - Theme Customizability (you can theme Eclipse Menu however you want!)
+- Crossplatform support (Windows, macOS, Android)
+- Community Translations (check the [translations repository](https://github.com/EclipseMenu/translations) on how to contribute)
+- An API for other mods to interact with Eclipse
 
 ## Build Instructions
 1. You must have the following: `CMake`, `MSVC / Clang`, `Git`, `Geode CLI`, `Geode SDK`

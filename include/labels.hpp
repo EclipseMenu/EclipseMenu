@@ -61,7 +61,6 @@ namespace eclipse::events {
 }
 
 namespace eclipse::label {
-
     /// @brief Formats a string using the RIFT syntax and variables provided by Eclipse.
     /// @param fmt The format string to use. (see RIFT documentation)
     /// @return The formatted string.
@@ -88,7 +87,6 @@ namespace eclipse::label {
     void setVariable(std::string_view name, T value) {
         events::SetRiftVariableEvent<T>(name, value).post();
     }
-
 }
 
 #endif

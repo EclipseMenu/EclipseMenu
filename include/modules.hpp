@@ -8,7 +8,6 @@
 #include <utility>
 
 namespace eclipse::events {
-
     class RegisterCheatEvent final : public geode::Event {
     public:
         RegisterCheatEvent(std::string name, std::function<bool()> isCheatActive)
@@ -21,15 +20,15 @@ namespace eclipse::events {
         std::string m_name;
         std::function<bool()> m_isCheatActive;
     };
-
 }
 
 namespace eclipse::modules {
-
+    /// @brief Register a cheat with the given name and callback.
+    /// @param name The name of the cheat (how it will show up in cheat indicator list).
+    /// @param isCheatActive The callback to check if the cheat is active.
     inline void registerCheat(const std::string& name, const std::function<bool()>& isCheatActive) {
         events::RegisterCheatEvent(name, isCheatActive).post();
     }
-
 }
 
 #endif // ECLIPSE_MODULES_HPP

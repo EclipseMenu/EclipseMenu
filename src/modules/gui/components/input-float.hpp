@@ -23,6 +23,10 @@ namespace eclipse::gui {
         [[nodiscard]] float getMax() const;
         [[nodiscard]] const std::string& getFormat() const;
 
+        void setMin(float min);
+        void setMax(float max);
+        void setFormat(std::string format);
+
         [[nodiscard]] float getValue() const;
         void setValue(float value) const;
 
