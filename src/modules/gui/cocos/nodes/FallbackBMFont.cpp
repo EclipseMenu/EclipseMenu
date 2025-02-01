@@ -57,11 +57,15 @@ namespace eclipse::gui::cocos {
 
     static const Label::EmojiMap g_emojis = {
         // Twemoji emojis
-        U"👽"_emoji, U"👶"_emoji, U"💔"_emoji, U"🐱"_emoji,
-        U"🐶"_emoji, U"🤯"_emoji, U"🔥"_emoji,  U"👻"_emoji,
-        U"❤️"_emoji, U"🤓"_emoji, U"🧖"_emoji, U"❓"_emoji,
-        U"🤖"_emoji, U"💀"_emoji, U"❄️"_emoji, U"😭"_emoji,
-        U"🗣️"_emoji, U"🛌"_emoji,
+        U"💯"_emoji, U"🤫"_emoji, U"🐻"_emoji, U"💔"_emoji, U"🐱"_emoji,
+        U"🐶"_emoji, U"🦊"_emoji, U"🔫"_emoji, U"🤨"_emoji, U"🗿"_emoji,
+        U"🔥"_emoji, U"🤓"_emoji, U"😱"_emoji, U"💀"_emoji, U"😈"_emoji,
+        U"🗣️"_emoji, U"😭"_emoji, U"🤡"_emoji, U"👽"_emoji, U"👶"_emoji,
+        U"🤖"_emoji, U"❤️"_emoji, U"👻"_emoji, U"🤯"_emoji, U"❄️"_emoji,
+        U"🛌"_emoji, U"🧖"_emoji, U"🐟"_emoji, U"✨"_emoji, U"🎉"_emoji,
+        U"🐷"_emoji, U"🌚"_emoji, U"🌞"_emoji, U"🌝"_emoji, U"🐵"_emoji,
+        U"🙈"_emoji, U"🙉"_emoji, U"🙊"_emoji, U"👑"_emoji, U"🙏"_emoji,
+        U"❓"_emoji, U"😎"_emoji, U"😍"_emoji,
         U"🇦"_emoji, U"🇧"_emoji, U"🇨"_emoji, U"🇩"_emoji,
         U"🇪"_emoji, U"🇫"_emoji, U"🇬"_emoji, U"🇭"_emoji,
         U"🇮"_emoji, U"🇯"_emoji, U"🇰"_emoji, U"🇱"_emoji,

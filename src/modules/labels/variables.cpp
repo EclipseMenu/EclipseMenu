@@ -94,6 +94,31 @@ namespace eclipse::labels {
         m_variables["diamondShardsEmoji"] = "💠";
         m_variables["geodeEmoji"] = "🪩";
         m_variables["orbsEmoji"] = "🔹";
+        m_variables["emoji100"] = "💯";
+        m_variables["shushingFaceEmoji"] = "🤫";
+        m_variables["bearEmoji"] = "🐻";
+        m_variables["foxEmoji"] = "🦊";
+        m_variables["gunEmoji"] = "🔫";
+        m_variables["faceWithRaisedEyebrowEmoji"] = "🤨";
+        m_variables["moyaiEmoji"] = "🗿";
+        m_variables["screamEmoji"] = "😱";
+        m_variables["sunglassesEmoji"] = "😎";
+        m_variables["heartEyesEmoji"] = "😍";
+        m_variables["smilingImpEmoji"] = "😈";
+        m_variables["clownEmoji"] = "🤡";
+        m_variables["fishEmoji"] = "🐟";
+        m_variables["sparklesEmoji"] = "✨";
+        m_variables["partyPopperEmoji"] = "🎉";
+        m_variables["pigEmoji"] = "🐷";
+        m_variables["moonWithFaceEmoji"] = "🌚";
+        m_variables["fullMoonFaceEmoji"] = "🌝";
+        m_variables["sunWithFaceEmoji"] = "🌞";
+        m_variables["monkeyEmoji"] = "🐵";
+        m_variables["seeNoEvilMonkey"] = "🙈";
+        m_variables["hearNoEvilMonkey"] = "🙉";
+        m_variables["speakNoEvilMonkey"] = "🙊";
+        m_variables["crownEmoji"] = "👑";
+        m_variables["prayEmoji"] = "🙏";
 
         // special emojis
         m_variables["emojis"] = rift::Object{
