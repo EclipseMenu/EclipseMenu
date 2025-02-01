@@ -254,6 +254,33 @@ namespace eclipse::hacks::Bot {
     };
 
     class $modify(BotBGLHook, GJBaseGameLayer) {
+        void simulateClick(PlayerButton button, bool down, bool player2) {
+            auto performButton = down ? &PlayerObject::pushButton : &PlayerObject::releaseButton;
+
+            // in two player mode, only one player should be controlled
+            if (m_levelSettings->m_twoPlayerMode) {
+                PlayerObject* player = player2 ? m_player2 : m_player1;
+                (player->*performButton)(button);
+            } else {
+                // otherwise, click both players (if dual mode is enabled)
+                (m_player1->*performButton)(button);
+                if (m_gameState.m_isDualMode)
+                    (m_player2->*performButton)(button);
+            }
+
+            // register the click for touch triggers
+            m_effectManager->playerButton(down, !player2);
+
+            // increment click count
+            if (down) {
+                m_clicks++;
+                if (button == PlayerButton::Jump) {
+                    // not sure what this does, but this is how it is in original handleButton
+                    m_bUnk30b8 = true;
+                }
+            }
+        }
+
         void processCommands(float dt) {
             GJBaseGameLayer::processCommands(dt);
 
@@ -263,16 +290,7 @@ namespace eclipse::hacks::Bot {
             std::optional<gdr::Input> input = std::nullopt;
 
             while ((input = s_bot.poll(m_gameState.m_currentProgress)) != std::nullopt) {
-                auto performButton = input->down ? &PlayerObject::pushButton : &PlayerObject::releaseButton;
-                if(m_levelSettings->m_twoPlayerMode) {
-                    PlayerObject* player = input->player2 ? m_player2 : m_player1;
-                    (player->*performButton)((PlayerButton)input->button);
-                    continue;
-                }
-
-                (m_player1->*performButton)((PlayerButton)input->button);
-                if(m_gameState.m_isDualMode)
-                    (m_player2->*performButton)((PlayerButton)input->button);
+                this->simulateClick((PlayerButton) input->button, input->down, input->player2);
             }
         }
 
@@ -282,8 +300,7 @@ namespace eclipse::hacks::Bot {
             if (s_bot.getState() != bot::State::RECORD)
                 return;
 
-            bool realPlayer1 = m_levelSettings->m_twoPlayerMode ? player1 : player1 || !m_gameState.m_isDualMode;
-            s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !realPlayer1, down);
+            s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !player1, down);
         }
     };
 }
