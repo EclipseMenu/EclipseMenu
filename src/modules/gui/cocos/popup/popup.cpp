@@ -85,7 +85,8 @@ namespace eclipse::gui::cocos {
     }
 
     Popup::~Popup() {
-        CocosRenderer::get()->shutdown(true);
+        if (auto cocos = CocosRenderer::get())
+            cocos->shutdown(true);
     }
 
     void Popup::setActiveTab(int idx) const {

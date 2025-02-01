@@ -278,7 +278,7 @@ namespace eclipse::labels {
 
         auto& stats = variables["stats"];
         for (int i = 0; i < STAT_NAMES_1.size(); i++) {
-            stats[STAT_NAMES_1[i]] = getStatFromDictionary(playerStats, std::to_string(i + 1));
+            stats[STAT_NAMES_1[i]] = getStatFromDictionary(playerStats, fmt::to_string(i + 1));
         }
 
         auto& stats2 = const_cast<rift::Object&>(stats.getObject()); // FIXME: add this api to rift
@@ -296,12 +296,12 @@ namespace eclipse::labels {
             int index = i - 16;
             if (i > 22) index -= 2;
 
-            shards[PATH_NAMES[index]] = getStatFromDictionary(playerStats, std::to_string(i));
+            shards[PATH_NAMES[index]] = getStatFromDictionary(playerStats, fmt::to_string(i));
         }
 
         auto& paths = variables["paths"];
         for (int i = 0; i <= PATH_NAMES.size(); i++) {
-            paths[PATH_NAMES[i]] = getStatFromDictionary(playerStats, std::to_string(i + FIRST_PATH));
+            paths[PATH_NAMES[i]] = getStatFromDictionary(playerStats, fmt::to_string(i + FIRST_PATH));
         }
     }
 
@@ -445,7 +445,7 @@ namespace eclipse::labels {
             currencyScores = gsm->m_timelyCurrencyScores;
         }
 
-        auto& str = currencyScores->valueForKey(std::to_string(dailyId))->m_sString;
+        auto& str = currencyScores->valueForKey(fmt::to_string(dailyId))->m_sString;
         if (str.empty()) return 0;
         if (auto res = geode::utils::numFromString<int>(str)) {
             auto resValue = res.unwrap();
@@ -596,7 +596,7 @@ namespace eclipse::labels {
                 continue;
             }
 
-            auto pickedUp = gameLayer->m_collectedItems->objectForKey(std::to_string(i + 1)) != nullptr;
+            auto pickedUp = gameLayer->m_collectedItems->objectForKey(fmt::to_string(i + 1)) != nullptr;
             coinsArr.push_back(pickedUp ? 1 : 0);
         }
         m_variables["coins"] = coinsArr;

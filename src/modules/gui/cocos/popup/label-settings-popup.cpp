@@ -187,7 +187,7 @@ namespace eclipse::gui::cocos {
 
         // The behind background for the entire popup to get the outline
         auto bgBehind = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
-        bgBehind->setContentSize(m_mainLayer->getContentSize() * tm->getBorderSize());
+        bgBehind->setContentSize(m_mainLayer->getContentSize() * std::clamp(tm->getBorderSize(), 0.F, 1.F));
         m_bgSprite->setColor(tm->getBorderColor().toCCColor3B());
         bgBehind->setID("bg-behind"_spr);
         m_mainLayer->addChildAtPosition(bgBehind, geode::Anchor::Center);
@@ -445,7 +445,7 @@ namespace eclipse::gui::cocos {
 
         auto absoluteX = geode::TextInput::create(120.f, "0", "font_default.fnt"_spr);
         absoluteX->setCommonFilter(geode::CommonFilter::Float);
-        absoluteX->setString(std::to_string(m_settings->offset.x));
+        absoluteX->setString(fmt::to_string(m_settings->offset.x));
         absoluteX->setCallback([this](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
@@ -476,7 +476,7 @@ namespace eclipse::gui::cocos {
 
         auto opacityInput = geode::TextInput::create(120.f, "0.750000", "font_default.fnt"_spr);
         opacityInput->setCommonFilter(geode::CommonFilter::Float);
-        opacityInput->setString(std::to_string(m_settings->color.a));
+        opacityInput->setString(fmt::to_string(m_settings->color.a));
         opacityInput->setCallback([this](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
@@ -487,7 +487,7 @@ namespace eclipse::gui::cocos {
 
         auto scaleInput = geode::TextInput::create(120.f, "0.300000", "font_default.fnt"_spr);
         scaleInput->setCommonFilter(geode::CommonFilter::Float);
-        scaleInput->setString(std::to_string(m_settings->scale));
+        scaleInput->setString(fmt::to_string(m_settings->scale));
         scaleInput->setCallback([this](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
@@ -516,7 +516,7 @@ namespace eclipse::gui::cocos {
 
         auto absoluteY = geode::TextInput::create(120.f, "0", "font_default.fnt"_spr);
         absoluteY->setCommonFilter(geode::CommonFilter::Float);
-        absoluteY->setString(std::to_string(m_settings->offset.y));
+        absoluteY->setString(fmt::to_string(m_settings->offset.y));
         absoluteY->setCallback([this](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
@@ -607,7 +607,7 @@ namespace eclipse::gui::cocos {
 
         auto cardBackground = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
         cardBackground->setContentSize({ CARD_WIDTH, CARD_HEIGHT });
-        cardBackground->setColor(ThemeManager::get()->getButtonActivatedBackground().toCCColor3B());
+        cardBackground->setColor(ThemeManager::get()->getBackgroundColor().lighten(0.25f).toCCColor3B());
         cardBackground->setOpacity(32);
         cardBackground->setID("event-card-bg"_spr);
         menu->addChildAtPosition(cardBackground, geode::Anchor::Center);
@@ -804,7 +804,7 @@ namespace eclipse::gui::cocos {
             auto label = TranslatedLabel::create(text);
             label->setAnchorPoint({0, 0.5f});
             label->limitLabelWidth(width, 1.f, 0.1f);
-            label->setColor(ThemeManager::get()->getButtonActivatedForeground().toCCColor3B());
+            label->setColor(ThemeManager::get()->getCheckboxForegroundColor().toCCColor3B());
             menu->addChildAtPosition(label, geode::Anchor::TopLeft, { x, y });
             return label;
         };

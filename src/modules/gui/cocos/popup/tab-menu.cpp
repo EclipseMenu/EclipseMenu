@@ -140,7 +140,6 @@ namespace eclipse::gui::cocos {
             {"BetterInfo", "tab_betterinfo.png"_spr},
         };
 
-        std::string_view icon = "";
         if (auto it = emojis.find(name); it != emojis.end()) {
             return cocos2d::CCSprite::createWithSpriteFrameName(it->second);
         }
@@ -181,6 +180,6 @@ namespace eclipse::gui::cocos {
         auto colorBG = (!active) ? tm->getButtonBackgroundColor() : tm->getButtonActivatedBackground();
         m_bgSprite->setColor(colorBG.toCCColor3B());
         m_label->setColor(colorLbl.toCCColor3B());
-        m_icon->setColor(colorLbl.toCCColor3B());
+        if (m_icon) m_icon->setColor(colorLbl.toCCColor3B());
     }
 }

@@ -38,7 +38,7 @@ namespace eclipse::gui::cocos {
             m_textInput->setAnchorPoint({ 0.5f, 0.5f });
             m_textInput->getInputNode()->setAllowedChars(".0123456789");
             m_textInput->setDelegate(this);
-            m_textInput->setString(std::to_string(m_component->getValue()));
+            m_textInput->setString(fmt::to_string(m_component->getValue()));
             m_textInput->setScale(0.85f);
             this->addChildAtPosition(m_textInput, geode::Anchor::Right, { -70.f, 0.f });
 
@@ -57,7 +57,7 @@ namespace eclipse::gui::cocos {
         }
 
         void textInputClosed(CCTextInputNode* input) override {
-            m_textInput->setString(std::to_string(m_component->getValue()));
+            m_textInput->setString(fmt::to_string(m_component->getValue()));
         }
     };
 }

@@ -45,7 +45,7 @@ namespace eclipse::hacks::Level {
         bool init() override {
             if (!CCLayerColor::initWithColor(ccc4(50, 50, 50, 100))) return false;
             m_totaldt = config::get<float>("level.pausecount.time", 3.f);
-            m_countdown = CCLabelBMFont::create(std::to_string(static_cast<int>(m_totaldt)).c_str(), "goldFont.fnt");
+            m_countdown = CCLabelBMFont::create(fmt::to_string(static_cast<int>(m_totaldt)).c_str(), "goldFont.fnt");
             m_countdown->setScale(1.5);
             m_countdown->setPosition(utils::get<CCDirector>()->getWinSize() / 2);
             addChild(m_countdown, 100);
@@ -58,7 +58,7 @@ namespace eclipse::hacks::Level {
         void updateTimer(float dt) {
             m_totaldt -= dt;
             if (m_totaldt <= 0.5f) this->removeFromParent();
-            m_countdown->setString(std::to_string(static_cast<int>(m_totaldt) + 1).c_str());
+            m_countdown->setString(fmt::to_string(static_cast<int>(m_totaldt) + 1).c_str());
         }
     };
 
