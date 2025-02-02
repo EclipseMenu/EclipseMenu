@@ -22,9 +22,9 @@ namespace eclipse::hacks::Level {
 
         void onPracticeMode(cocos2d::CCObject* sender) {
             geode::createQuickPopup(
-                "Title",            // title
-                "Say hi to mom?",   // content
-                "Nah", "Yeah",      // buttons
+                "Did I cook?",            // title
+                "ahh commit?",   // content
+                "Nuh uh", "Yuh huh",      // buttons
                 [](auto, bool btn2) {
                     if (btn2) {
                         PauseLayer::onPracticeMode(sender);
