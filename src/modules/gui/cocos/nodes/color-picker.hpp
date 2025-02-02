@@ -1,5 +1,7 @@
 #pragma once
+#include <memory>
 #include <modules/gui/color.hpp>
+#include <modules/gui/cocos/cocos.hpp>
 
 namespace eclipse::gui::cocos {
     class ColorPicker : public CCMenuItemSpriteExtra, geode::ColorPickPopupDelegate {
@@ -29,5 +31,29 @@ namespace eclipse::gui::cocos {
         std::function<void(gui::Color const&)> m_callback;
         gui::Color m_color;
         bool m_useAlpha = false;
+        geode::ColorPickPopup* m_popup = nullptr;
+    };
+
+    // smhing
+    class ColorPopup : public geode::ColorPickPopup {
+        ~ColorPopup() { // this is so dumb!
+            CocosRenderer::get()->unregisterModal(this); // dumb crash!
+        }
+        public:
+            static ColorPopup* create(cocos2d::ccColor4B const& color, bool isRGBA) {
+                auto ret = new ColorPopup();
+                if (ret->initAnchored(400.f, (isRGBA ? 290.f : 240.f), color, isRGBA)) {
+                    ret->autorelease();
+                    return ret;
+                }
+                delete ret;
+                return nullptr;
+            }
+            static ColorPopup* create(cocos2d::ccColor3B const& color) {
+                return ColorPopup::create(geode::cocos::to4B(color), true);
+            }
+            static ColorPopup* create(cocos2d::ccColor4B const& color) {
+                return ColorPopup::create(color, true);
+            }
     };
 }

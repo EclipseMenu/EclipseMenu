@@ -37,13 +37,12 @@ namespace eclipse::gui::cocos {
     void CocosRenderer::shutdown(bool noCleanup) {
         // user closed the popup, but keybind wasn't triggerred, meaning we need to save the config here
         if (noCleanup) config::save();
-
-        for (auto popup : m_extraPopups)
-            popup->removeFromParentAndCleanup(true);
+        for (auto popup : m_extraPopups) {
+            if (popup)
+                popup->removeFromParentAndCleanup(true);
+        }
         m_extraPopups.clear();
-
         if (!m_popup) return;
-
         if (!noCleanup)
             m_popup->removeFromParentAndCleanup(true);
         m_popup = nullptr;

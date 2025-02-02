@@ -1,7 +1,5 @@
 #include "color-picker.hpp"
 
-#include <modules/gui/cocos/cocos.hpp>
-
 namespace eclipse::gui::cocos {
     bool ColorPicker::init(gui::Color const& original, bool useAlpha, std::function<void(gui::Color const&)> const& callback) {
         m_useAlpha = useAlpha;
@@ -23,19 +21,17 @@ namespace eclipse::gui::cocos {
     }
 
     void ColorPicker::onClicked(CCObject*) {
-        geode::ColorPickPopup* popup;
-
         if (m_useAlpha) {
-            popup = geode::ColorPickPopup::create(static_cast<cocos2d::ccColor4B>(m_color));
+            m_popup = ColorPopup::create(static_cast<cocos2d::ccColor4B>(m_color));
         } else {
-            popup = geode::ColorPickPopup::create(m_color.toCCColor3B());
+            m_popup = ColorPopup::create(m_color.toCCColor3B());
         }
 
-        popup->setDelegate(this);
-        popup->show();
+        m_popup->setDelegate(this);
+        m_popup->show();
 
         if (auto cocos = CocosRenderer::get()) {
-            cocos->registerModal(popup);
+            cocos->registerModal(m_popup);
         }
     }
 }
