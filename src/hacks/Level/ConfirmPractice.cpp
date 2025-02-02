@@ -53,10 +53,9 @@ namespace eclipse::hacks::Level {
             );
         }
 
-        ADD_HOOKS_DELEGATE("level.confirmpractice.confirmexitpractice")
-
         void onNormalMode(cocos2d::CCObject* sender) {
-            if (m_fields->m_isExitPopupVisible) {
+            if (m_fields->m_isExitPopupVisible || 
+            !config::get<bool>("level.confirmpractice.confirmexitpractice", false)) {
                 PauseLayer::onNormalMode(sender);
                 return;
             }
