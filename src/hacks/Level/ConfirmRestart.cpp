@@ -22,13 +22,14 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(ConfirmRestart)
 
     class $modify(ConfirmRestartPauseLayerHook, PauseLayer) {	
+        ADD_HOOKS_DELEGATE("level.confirmrestart")
+
 	    struct Fields {
                 bool m_isPopupVisible = false;
 	    };
 
 	    void onRestart(cocos2d::CCObject* sender) {
-            if (m_fields->m_isPopupVisible || 
-            !config::get<bool>("level.confirmrestart", false)) {
+            if (m_fields->m_isPopupVisible) {
                 PauseLayer::onRestart(sender);
                 return;
 		    }
