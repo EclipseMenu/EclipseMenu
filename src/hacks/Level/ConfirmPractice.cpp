@@ -25,15 +25,16 @@ namespace eclipse::hacks::Level {
 
     REGISTER_HACK(ConfirmPractice)
 
-    class $modify(ConfirmPracticePauseLayerHook, PauseLayer) {	
+    class $modify(ConfirmPracticePauseLayerHook, PauseLayer) {
+        ADD_HOOKS_DELEGATE("level.confirmpractice")
+
 	    struct Fields {
                 bool m_isEnterPopupVisible = false;
                 bool m_isExitPopupVisible = false;
 	    };
 
 	    void onPracticeMode(cocos2d::CCObject* sender) {
-            if (m_fields->m_isEnterPopupVisible || 
-            !config::get<bool>("level.confirmpractice", false)) {
+            if (m_fields->m_isEnterPopupVisible) {
                 PauseLayer::onPracticeMode(sender);
                 return;
 		    }
@@ -52,10 +53,10 @@ namespace eclipse::hacks::Level {
             );
         }
 
+        ADD_HOOKS_DELEGATE("level.confirmpractice.confirmexitpractice")
+
         void onNormalMode(cocos2d::CCObject* sender) {
-            if (m_fields->m_isExitPopupVisible || 
-            !config::get<bool>("level.confirmpractice", false) || 
-            !config::get<bool>("level.confirmpractice.confirmexitpractice", false)) {
+            if (m_fields->m_isExitPopupVisible) {
                 PauseLayer::onNormalMode(sender);
                 return;
             }
