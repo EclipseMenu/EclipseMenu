@@ -13,9 +13,10 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.confirmpractice", false);
             config::setIfEmpty("level.confirmpractice.confirmexitpractice", true);
 
-            tab->addToggle("level.confirmpractice")->handleKeybinds()->setDescription()
+            tab->addToggle("Confirm Practice", "level.confirmpractice")
+               ->handleKeybinds()->setDescription("Adds an extra confirmation window when entering Practice Mode. (Implemented by Cynthebnuy)")
                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                   options->addToggle("level.confirmpractice.confirmexitpractice")->setDescription();
+                   options->addToggle("Confirm Exit Practice", "level.confirmpractice.confirmexitpractice")->setDescription("Toggle the confirmation window for when you exit Practice Mode.");
                });
         }
 
@@ -25,23 +26,22 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(ConfirmPractice)
 
     class $modify(ConfirmPracticePauseLayerHook, PauseLayer) {	
-        // ADD_HOOKS_DELEGATE("level.confirmpractice")
-
 	    struct Fields {
                 bool m_isEnterPopupVisible = false;
                 bool m_isExitPopupVisible = false;
 	    };
 
 	    void onPracticeMode(cocos2d::CCObject* sender) {
-            if (m_fields->m_isEnterPopupVisible) {
+            if (m_fields->m_isEnterPopupVisible || 
+            !config::get<bool>("level.confirmpractice", false)) {
                 PauseLayer::onPracticeMode(sender);
                 return;
 		    }
 
             geode::createQuickPopup(
-                "Did I cook?",          // title
-                "ahh commit",			// content
-                "Nuh uh", "Yuh huh",    // buttons
+                "Enter Practice",                                   // title
+                "Are you sure you want to\n<cr>enter</c> <cg>Practice Mode</c>?",			// content
+                "Cancel", "Enter",                                  // buttons
                 [this, sender](auto, bool btn2) {
                     if (btn2) {
                         m_fields->m_isEnterPopupVisible = true;
@@ -53,15 +53,17 @@ namespace eclipse::hacks::Level {
         }
 
         void onNormalMode(cocos2d::CCObject* sender) {
-            if (m_fields->m_isExitPopupVisible || !config::get<bool>("level.confirmpractice.confirmexitpractice", false)) {
+            if (m_fields->m_isExitPopupVisible || 
+            !config::get<bool>("level.confirmpractice", false) || 
+            !config::get<bool>("level.confirmpractice.confirmexitpractice", false)) {
                 PauseLayer::onNormalMode(sender);
                 return;
             }
 
             geode::createQuickPopup(
-                "Did I cook again?",    // title
-                "ahh commit",			// content
-                "Nuh uh", "Yuh huh",    // buttons
+                "Exit Practice",                                     // title
+                "Are you sure you want to\n<cr>exit</c> <cg>Practice Mode</c>?",			 // content
+                "Cancel", "Exit",                                    // buttons
                 [this, sender](auto, bool btn2) {
                     if (btn2) {
                         m_fields->m_isExitPopupVisible = true;
