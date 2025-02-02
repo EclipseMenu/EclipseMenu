@@ -19,9 +19,9 @@ namespace eclipse::hacks::Level {
         [[nodiscard]] const char* getId() const override { return "Confirm Full Reset"; }
     };
 
-    REGISTER_HACK(ConfirmRestart)
+    REGISTER_HACK(ConfirmFullReset)
 
-    class $modify(ConfirmRestartPauseLayerHook, PauseLayer) {	
+    class $modify(ConfirmFullResetPauseLayerHook, PauseLayer) {
 	    struct Fields {
                 bool m_isPopupVisible = false;
 	    };
