@@ -149,9 +149,10 @@ namespace eclipse::hacks::Recorder {
         newDesignResolution = cocos2d::CCSize(roundf(320.f * aspectRatio), 320.f);
 
         originalScreenScale = cocos2d::CCSize(view->m_fScaleX, view->m_fScaleY);
+        auto retinaRatio = geode::utils::getDisplayFactor();
         newScreenScale = cocos2d::CCSize(
-            static_cast<float>(s_recorder.m_renderSettings.m_width) / newDesignResolution.width,
-            static_cast<float>(s_recorder.m_renderSettings.m_height) / newDesignResolution.height
+            static_cast<float>(s_recorder.m_renderSettings.m_width) / newDesignResolution.width / retinaRatio,
+            static_cast<float>(s_recorder.m_renderSettings.m_height) / newDesignResolution.height / retinaRatio
         );
 
         if(oldDesignResolution != newDesignResolution) {
