@@ -321,18 +321,48 @@ This list will be split into categories, each having a separate table.
 | `username`    | Your current account name.              | String  |                             |
 
 ### Emojis
-> Note: In-game labels can't render emojis, these are expected to be used with Discord RPC settings
+> Note: Some emojis look different in-game than the ones shown on this page.
 
-| Name                | Value | Name                | Value |
-|---------------------|-------|---------------------|-------|
-| `starEmoji`         | ⭐    | `snowflakeEmoji`    | ❄️    |
-| `moonEmoji`         | 🌙    | `catEmoji`          | 🐱    |
-| `heartEmoji`        | ❤️    | `dogEmoji`          | 🐶    |
-| `checkEmoji`        | ✅    | `speakingHeadEmoji` | 🗣️    |
-| `crossEmoji`        | ❌    | `robotEmoji`        | 🤖    |
-| `exclamationEmoji`  | ❗    | `alienEmoji`        | 👽    |
-| `questionEmoji`     | ❓    | `ghostEmoji`        | 👻    |
-| `fireEmoji`         | 🔥    | `skullEmoji`        | 💀    |
+| Name                         | Value | Name                          | Value |
+|------------------------------|-------|-------------------------------|-------|
+| `starEmoji`                  | ⭐    | `snowflakeEmoji`              | ❄️    |
+| `moonEmoji`                  | 🌙    | `catEmoji`                    | 🐱    |
+| `heartEmoji`                 | ❤️    | `dogEmoji`                    | 🐶    |
+| `checkEmoji`                 | ✅    | `speakingHeadEmoji`           | 🗣️    |
+| `crossEmoji`                 | ❌    | `robotEmoji`                  | 🤖    |
+| `exclamationEmoji`           | ❗    | `alienEmoji`                  | 👽    |
+| `questionEmoji`              | ❓    | `ghostEmoji`                  | 👻    |
+| `fireEmoji`                  | 🔥    | `skullEmoji`                  | 💀    |
+| `brokenHeartEmoji`           | 💔    | `babyEmoji`                   | 👶    |
+| `likeEmoji`                  | 👍    | `dislikeEmoji`                | 👎    |
+| `personInSteamyRoomEmoji`    | 🧖    | `sleepingAccommodationEmoji`  | 🛌    |
+| `eclipseEmoji`               | 🌗    | `nerdEmoji`                   | 🤓    |
+| `sobEmoji`                   | 😭    | `explodingHeadEmoji`          | 🤯    |
+| `diamondEmoji`               | 💎    | `diamondShardsEmoji`          | 💠    |
+| `geodeEmoji`                 | <img src="resources/Emojis/1faa9.png" width=16 alt="geodeEmoji">    | `orbsEmoji`                   | 🔹    |
+| `emoji100`                   | 💯    | `shushingFaceEmoji`           | 🤫    |
+| `bearEmoji`                  | 🐻    | `foxEmoji`                    | 🦊    |
+| `faceWithRaisedEyebrowEmoji` | 🤨    | `gunEmoji`                    | 🔫    |
+| `moyaiEmoji`                 | 🗿    | `screamEmoji`                 | 😱    |
+| `sunglassesEmoji`            | 😎    | `heartEyesEmoji`              | 😍    |
+| `crownEmoji`                 | 👑    | `smilingImpEmoji`             | 😈    |
+| `clownEmoji`                 | 🤡    | `fishEmoji`                   | 🐟    |
+| `sparklesEmoji`              | ✨    | `partyPopperEmoji`            | 🎉    |
+| `pigEmoji`                   | 🐷    | `moonWithFaceEmoji`           | 🌚    |
+| `fullMoonFaceEmoji`          | 🌝    | `sunWithFaceEmoji`            | 🌞    |
+| `monkeyEmoji`                | 🐵    | `seeNoEvilMonkey`             | 🙈    |
+| `speakNoEvilMonkey`          | 🙊    | `prayEmoji`                   | 🙏    |
+
+### Special Emojis
+> Some can be arrays or values. If they are arrays, use [index] to select one of the emojis.
+> Example usage: `emojis.userCoin[1]` or `emojis.practice`
+
+| Name                         | Values |
+|------------------------------|--------|
+| `emojis.userCoin`            | <img src="resources/Emojis/1f6de.png" width=24 alt="emojis.userCoin[0]">,<img src="resources/Emojis/1f535.png" width=24 alt="emojis.userCoin[1]">      |
+| `emojis.secretCoin`          | <img src="resources/Emojis/1f6de.png" width=24 alt="emojis.secretCoin[0]">,<img src="resources/Emojis/1f7e1.png" width=24 alt="emojis.secretCoin[1]">    |
+| `emojis.startPos`            | <img src="resources/Emojis/1f9ff.png" width=24 alt="emojis.startPos">    |
+| `emojis.practice`            | <img src="resources/Emojis/2666.png" width=24 alt="emojis.practice">    |
 
 ### Time & Date
 
