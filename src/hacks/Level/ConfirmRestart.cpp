@@ -13,7 +13,7 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.confirmrestart", false);
 
             tab->addToggle("Confirm Restart", "level.confirmrestart")
-               ->handleKeybinds()->setDescription("Adds an extra confirmation window when restarting. (Implemented by Cynthebnuy)")
+               ->handleKeybinds()->setDescription("Adds an extra confirmation window when restarting. (Implemented by Cynthebnuy)");
         }
 
         [[nodiscard]] const char* getId() const override { return "Confirm Restart"; }

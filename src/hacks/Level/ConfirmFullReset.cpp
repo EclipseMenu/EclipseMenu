@@ -13,7 +13,7 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.confirmfullreset", false);
 
             tab->addToggle("Confirm Full Reset", "level.confirmfullreset")
-               ->handleKeybinds()->setDescription("Adds an extra confirmation window when fully resetting in Platformer mode. (Implemented by Cynthebnuy)")
+               ->handleKeybinds()->setDescription("Adds an extra confirmation window when fully resetting in Platformer mode. (Implemented by Cynthebnuy)");
         }
 
         [[nodiscard]] const char* getId() const override { return "Confirm Full Reset"; }
@@ -26,10 +26,10 @@ namespace eclipse::hacks::Level {
                 bool m_isPopupVisible = false;
 	    };
 
-	    void onRestart(cocos2d::CCObject* sender) {
+        void onRestartFull(cocos2d::CCObject* sender) {
             if (m_fields->m_isPopupVisible || 
             !config::get<bool>("level.confirmfullreset", false)) {
-                PauseLayer::onRestart(sender);
+                PauseLayer::onRestartFull(sender);
                 return;
 		    }
 
@@ -40,7 +40,7 @@ namespace eclipse::hacks::Level {
                 [this, sender](auto, bool btn2) {
                     if (btn2) {
                         m_fields->m_isPopupVisible = true;
-                        PauseLayer::onRestart(sender);
+                        PauseLayer::onRestartFull(sender);
                         m_fields->m_isPopupVisible = false;
                     }
                 }
