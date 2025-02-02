@@ -6,7 +6,7 @@
 #include <Geode/modify/PauseLayer.hpp>
 
 namespace eclipse::hacks::Level {
-    class $hack(ConfirmRestart) {
+    class $hack(ConfirmFullReset) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
 
