@@ -161,6 +161,20 @@ namespace eclipse::hacks::Shortcuts {
             auto path = geode::Mod::get()->getSaveDir();
             geode::utils::file::openFolder(path);
         }
+        static void resetBGVolume() {
+            auto fmod = FMODAudioEngine::sharedEngine();
+            fmod->setBackgroundMusicVolume(1.F);
+            auto backgroundVolume = fmod->getBackgroundMusicVolume();
+            fmod->setBackgroundMusicVolume(1.F);
+            if (backgroundVolume <= 0.0) {
+                if (auto GM = GameManager::sharedState()) {
+                    GM->playMenuMusic();
+                }
+            }
+        }
+        static void resetSFXVolume() {
+            FMODAudioEngine::sharedEngine()->setEffectsVolume(1.F);
+        }
 
     #ifdef GEODE_IS_ANDROID
         static void openDevtools() {
@@ -189,6 +203,8 @@ namespace eclipse::hacks::Shortcuts {
                 tab->addButton("shortcuts.inject-dll")->setDescription()->callback(injectDll)->handleKeybinds();
             )
             tab->addButton("shortcuts.save-folder")->setDescription()->callback(openSaveFolder)->handleKeybinds();
+            tab->addButton("shortcuts.reset-bg-volume")->setDescription()->callback(resetBGVolume)->handleKeybinds();
+            tab->addButton("shortcuts.reset-sfx-volume")->setDescription()->callback(resetSFXVolume)->handleKeybinds();
 
             auto manager = keybinds::Manager::get();
             manager->addListener("shortcut.p1jump", [](bool down) {

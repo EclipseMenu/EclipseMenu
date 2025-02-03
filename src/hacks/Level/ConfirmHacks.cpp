@@ -134,7 +134,7 @@ namespace eclipse::hacks::Level {
     class $modify(ConfirmFullResetPauseLayerHook, PauseLayer) {
         ADD_HOOKS_DELEGATE("level.confirmfullreset")
 
-            struct Fields {
+        struct Fields {
             bool m_isPopupVisible = false;
         };
 

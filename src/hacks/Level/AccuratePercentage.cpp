@@ -10,17 +10,17 @@ namespace eclipse::hacks::Global {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
 
-            config::setIfEmpty("level.accuratepercent.amount", 4);
-            config::setIfEmpty("level.accuratepercent.normal_mode", true);
-            config::setIfEmpty("level.accuratepercent.bugfix", true);
-            config::setIfEmpty("level.accuratepercent.show_minutes", true);
+            config::setIfEmpty("level.accuratepercentage.amount", 4);
+            config::setIfEmpty("level.accuratepercentage.normal_mode", true);
+            config::setIfEmpty("level.accuratepercentage.bugfix", true);
+            config::setIfEmpty("level.accuratepercentage.show_minutes", true);
 
             tab->addToggle("level.accuratepercentage")->setDescription()->handleKeybinds()
                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                   options->addToggle("level.accuratepercent.normal_mode");
-                   options->addInputInt("level.accuratepercent.amount", 0, 15);
-                   options->addToggle("level.accuratepercent.bugfix");
-                   options->addToggle("level.accuratepercent.show_minutes");
+                   options->addToggle("level.accuratepercentage.normal_mode");
+                   options->addInputInt("level.accuratepercentage.amount", 0, 15);
+                   options->addToggle("level.accuratepercentage.bugfix");
+                   options->addToggle("level.accuratepercentage.show_minutes");
                });
         }
 
@@ -33,7 +33,7 @@ namespace eclipse::hacks::Global {
         ADD_HOOKS_DELEGATE("level.accuratepercentage")
 
         float customGetProgress() {
-            if (config::get<"level.accuratepercent.bugfix", bool>(true))
+            if (config::get<"level.accuratepercentage.bugfix", bool>(true))
                 return utils::getActualProgress(this);
             return this->getCurrentPercent();
         }
@@ -43,16 +43,16 @@ namespace eclipse::hacks::Global {
             if (m_percentageLabel == nullptr) return;
 
             if (m_level->isPlatformer()) {
-                if (!config::get<"level.accuratepercent.show_minutes", bool>(true)) return;
+                if (!config::get<"level.accuratepercentage.show_minutes", bool>(true)) return;
                 auto time = utils::formatTime(m_timePlayed);
                 m_percentageLabel->setString(time.c_str());
-            } else if (config::get<"level.accuratepercent.normal_mode", bool>(true)) {
+            } else if (config::get<"level.accuratepercentage.normal_mode", bool>(true)) {
                 float percent = customGetProgress();
-                auto numDigits = config::get<int>("level.accuratepercent.amount", 4);
+                auto numDigits = config::get<int>("level.accuratepercentage.amount", 4);
                 m_percentageLabel->setString(fmt::format("{:.{}f}%", percent, numDigits).c_str());
 
                 // If bugfix is active, also fix the progress bar
-                if (!config::get<"level.accuratepercent.bugfix", bool>(true)) return;
+                if (!config::get<"level.accuratepercentage.bugfix", bool>(true)) return;
                 m_progressFill->setTextureRect({
                     0, 0,
                     (m_progressBar->getTextureRect().getMaxX() - 5) * percent / 100.f,
