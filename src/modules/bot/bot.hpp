@@ -1,6 +1,6 @@
 #pragma once
 
-#include <gdr/gdr.hpp>
+#include <gdr_convert.hpp>
 
 namespace eclipse::bot {
 
@@ -10,8 +10,8 @@ namespace eclipse::bot {
         PLAYBACK
     };
 
-    struct BotReplay : public gdr::Replay<BotReplay, gdr::Input> {
-        BotReplay() : Replay("Bot", "1.0") {}
+    struct BotReplay : gdr::Replay<BotReplay, gdr::Input<>> {
+        BotReplay() : Replay("EclipseBot", 1) {}
     };
 
     class Bot {
@@ -46,11 +46,11 @@ namespace eclipse::bot {
         /// @brief Get the next available input from the currently loaded replay.
         /// @param frame The current frame of the playback.
         /// @return The next input from the currently loaded replay, if available.
-        [[nodiscard]] std::optional<gdr::Input> poll(int frame);
+        [[nodiscard]] std::optional<gdr::Input<>> poll(int frame);
 
         /// @brief Saves the current replay.
         /// @param path Path to save the replay to.
-        void save(std::filesystem::path path);
+        geode::Result<> save(std::filesystem::path path);
 
         /// @brief Loads a replay from the given path.
         /// @param path Path to load the replay from.
@@ -60,7 +60,7 @@ namespace eclipse::bot {
         /// @param levelInfo The level info.
         void setLevelInfo(gdr::Level levelInfo);
 
-        [[nodiscard]] std::optional<gdr::Input> getPrevious(bool player1);
+        [[nodiscard]] std::optional<gdr::Input<>> getPrevious(bool player1);
 
     protected:
         State m_state = State::DISABLED;

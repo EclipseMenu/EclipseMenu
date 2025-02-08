@@ -1,3 +1,4 @@
+#include <Geode/Result.hpp>
 #include <modules/bot/bot.hpp>
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
@@ -27,8 +28,14 @@ namespace eclipse::hacks::Bot {
                 if (!result)
                     return;
 
-                s_bot.save(Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
-                config::set("bot.selectedreplay", Mod::get()->getSaveDir() / "replays" / (name + ".gdr"));
+                auto res = s_bot.save(Mod::get()->getSaveDir() / "replays" / (name + ".gdr2"));
+
+                if(res.isErr()) {
+                    Popup::create(i18n::get_("common.error"), res.unwrapErr());
+                    return;
+                }
+
+                config::set("bot.selectedreplay", Mod::get()->getSaveDir() / "replays" / (name + ".gdr2"));
 
                 // refresh cocos ui page
                 if (auto cocos = gui::cocos::CocosRenderer::get())
@@ -60,7 +67,13 @@ namespace eclipse::hacks::Bot {
 
                     auto confirmReplayDirectory = config::get<std::filesystem::path>("bot.selectedreplay", "temp");
 
-                    s_bot.save(confirmReplayDirectory);
+                    auto res = s_bot.save(confirmReplayDirectory);
+
+                    if(res.isErr()) {
+                        Popup::create(i18n::get_("common.error"), res.unwrapErr());
+                        return;
+                    }
+
                     Popup::create(
                         i18n::get_("bot.saved"),
                         i18n::format(
@@ -73,7 +86,11 @@ namespace eclipse::hacks::Bot {
             );
         }
 
-        s_bot.save(replayPath);
+        auto res = s_bot.save(replayPath);
+        if(res.isErr()) {
+            Popup::create(i18n::get_("common.error"), res.unwrapErr());
+            return;
+        }
         Popup::create(
             i18n::get_("bot.saved"),
             i18n::format("bot.saved.msg", replayPath.filename().stem().string(), s_bot.getInputCount())
@@ -258,7 +275,7 @@ namespace eclipse::hacks::Bot {
             auto performButton = down ? &PlayerObject::pushButton : &PlayerObject::releaseButton;
 
             // in two player mode, only one player should be controlled
-            if (m_levelSettings->m_twoPlayerMode) {
+            if (m_levelSettings->m_twoPlayerMode && m_gameState.m_isDualMode) {
                 PlayerObject* player = player2 ? m_player2 : m_player1;
                 (player->*performButton)(button);
             } else {
@@ -287,7 +304,7 @@ namespace eclipse::hacks::Bot {
             if (s_bot.getState() != bot::State::PLAYBACK)
                 return;
 
-            std::optional<gdr::Input> input = std::nullopt;
+            std::optional<gdr::Input<>> input = std::nullopt;
 
             while ((input = s_bot.poll(m_gameState.m_currentProgress)) != std::nullopt) {
                 this->simulateClick((PlayerButton) input->button, input->down, input->player2);

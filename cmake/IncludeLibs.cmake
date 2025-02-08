@@ -20,7 +20,7 @@ if (NOT ANDROID)
     CPMAddPackage("gh:EclipseMenu/discord-rpc#1259d3a")
 endif()
 CPMAddPackage("gh:matcool/gd-imgui-cocos#fbd4103")
-CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
+CPMAddPackage("gh:maxnut/GDR-converter#c569d25")
 set(RIFT_INCLUDE_MATJSON ON)
 CPMAddPackage("gh:EclipseMenu/rift#d6dd2bd")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
@@ -40,6 +40,7 @@ endif()
 
 # Link them to the project
 target_link_libraries(third_party INTERFACE
+    GDRconverter
     libGDR
     subprocess
     imgui
