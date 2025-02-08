@@ -86,7 +86,7 @@ namespace eclipse::bot {
 
         gdr::Result<BotReplay> res = gdr::Err<BotReplay>("");
 
-        if(std::equal(data.begin(), data.begin(), "GDR"))
+        if(std::equal(data.begin(), data.begin() + 3, "GDR"))
             res = BotReplay::importData(data);
         else
             res = gdr::convert<BotReplay, gdr::Input<>>(data);
