@@ -20,6 +20,12 @@ namespace eclipse::gui {
         m_sprite->setScale(scale);
     }
 
+    void FloatingButton::reloadSprite() {
+        this->removeChild(m_sprite, true);
+        m_sprite = createSprite();
+        this->addChild(m_sprite);
+    }
+
     FloatingButton* FloatingButton::create() {
         auto ret = new FloatingButton();
         if (ret->init()) {
@@ -28,6 +34,18 @@ namespace eclipse::gui {
         }
         delete ret;
         return nullptr;
+    }
+
+    cocos2d::CCSprite* FloatingButton::createSprite() const {
+        auto spr = CCSprite::create("ECLIPSE-android.png"_spr);
+        spr->setScale(config::get<float>("float-btn.scale", 0.25f));
+        spr->setOpacity(m_minOpacity * 255);
+        spr->setPosition({
+            config::get<float>("float-btn.x", 480.f),
+            config::get<float>("float-btn.y", 200.f)
+        });
+        spr->setID("main-sprite");
+        return spr;
     }
 
     bool FloatingButton::init() {
@@ -39,7 +57,6 @@ namespace eclipse::gui {
         m_minOpacity = config::get<float>("float-btn.min-opacity", 0.5f);
         m_showInLevel = config::get<bool>("float-btn.show-in-level", false);
         m_showInEditor = config::get<bool>("float-btn.show-in-editor", true);
-        auto scale = config::get<float>("float-btn.scale", 0.25f);
 
         // add delegates
         config::addDelegate("float-btn.max-opacity", [this] {
@@ -64,14 +81,7 @@ namespace eclipse::gui {
         this->setID("floating-button"_spr);
         this->scheduleUpdate();
 
-        m_sprite = CCSprite::create("ECLIPSE-android.png"_spr);
-        m_sprite->setScale(scale);
-        m_sprite->setOpacity(m_minOpacity * 255);
-        m_sprite->setPosition({
-            config::get<float>("float-btn.x", 480.f),
-            config::get<float>("float-btn.y", 200.f)
-        });
-        m_sprite->setID("main-sprite");
+        m_sprite = createSprite();
         this->addChild(m_sprite);
 
         CCScene::get()->addChild(this);

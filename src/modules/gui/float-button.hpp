@@ -34,8 +34,11 @@ namespace eclipse::gui {
 
         void setScale(float scale) override;
 
+        void reloadSprite();
+
     protected:
         static FloatingButton* create();
+        cocos2d::CCSprite* createSprite() const;
         bool init() override;
         void update(float) override;
 

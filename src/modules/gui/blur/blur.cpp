@@ -224,8 +224,8 @@ namespace eclipse::gui::blur {
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        auto vertexPath = std::string{ utils::get<cocos2d::CCFileUtils>()->fullPathForFilename("pp-vert.glsl"_spr, false) };
-        auto fragmentPath = std::string{ utils::get<cocos2d::CCFileUtils>()->fullPathForFilename("pp-frag.glsl"_spr, false) };
+        auto vertexPath = geode::Mod::get()->getResourcesDir() / "pp-vert.glsl";
+        auto fragmentPath = geode::Mod::get()->getResourcesDir() / "pp-frag.glsl";
 
         auto res = ppShader.compile(vertexPath, fragmentPath);
         if (!res) return geode::log::error("Failed to compile shader: {}", res.unwrapErr());

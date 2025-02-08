@@ -40,6 +40,8 @@ namespace eclipse::gui::imgui {
                 }
             }
         }
+
+        m_preloadStep = config::get("menu.animateWindows", true) ? 0 : 2;
     }
 
     bool TabbedLayout::shouldRender() const {
