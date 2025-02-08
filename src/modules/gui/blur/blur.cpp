@@ -405,6 +405,8 @@ namespace eclipse::gui::blur {
 
     void toggle(bool) {}
 
+    void cleanup() {}
+
 }
 
 #endif
