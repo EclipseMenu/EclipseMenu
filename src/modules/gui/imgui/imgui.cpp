@@ -195,6 +195,9 @@ namespace eclipse::gui::imgui {
                 auto& io = ImGui::GetIO();
                 auto& style = ImGui::GetStyle();
                 io.IniFilename = nullptr;
+                // disable error recovery tooltip and logs
+                io.ConfigErrorRecoveryEnableTooltip = false;
+                io.ConfigErrorRecoveryEnableDebugLog = false;
                 style.DisplaySafeAreaPadding = ImVec2(0, 0);
                 if (m_theme) m_theme->init();
                 m_fontManager.init();

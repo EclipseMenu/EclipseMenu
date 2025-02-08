@@ -37,6 +37,7 @@ struct std::hash<BMKerningPair> {
 class BMFontConfiguration {
 public:
     static BMFontConfiguration* create(std::string_view fntFile);
+    static void purgeCachedData();
     BMFontConfiguration() = default;
 
 protected:

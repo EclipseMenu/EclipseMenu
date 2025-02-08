@@ -19,7 +19,7 @@ if (NOT ANDROID)
     set(RAPIDJSONTEST OFF)
     CPMAddPackage("gh:EclipseMenu/discord-rpc#1259d3a")
 endif()
-CPMAddPackage("gh:matcool/gd-imgui-cocos#fbd4103")
+CPMAddPackage("gh:matcool/gd-imgui-cocos#d6fa518")
 CPMAddPackage("gh:maxnut/GDR-converter#c569d25")
 set(RIFT_INCLUDE_MATJSON ON)
 CPMAddPackage("gh:EclipseMenu/rift#d6dd2bd")
@@ -35,6 +35,7 @@ CPMAddPackage(
 # Fix debug build
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
     target_compile_definitions(discord-rpc PRIVATE _ITERATOR_DEBUG_LEVEL=0)
+    target_compile_definitions(simdutf PRIVATE _ITERATOR_DEBUG_LEVEL=0)
     target_compile_definitions(rift PRIVATE _HAS_ITERATOR_DEBUGGING=0)
 endif()
 

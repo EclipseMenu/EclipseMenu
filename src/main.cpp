@@ -1,6 +1,7 @@
 #include <Geode/loader/Setting.hpp>
 #include <Geode/modify/CCScheduler.hpp>
 #include <Geode/modify/MenuLayer.hpp>
+#include <Geode/modify/GameManager.hpp>
 
 #include <imgui-cocos.hpp>
 #include <modules/config/config.hpp>
@@ -11,6 +12,7 @@
 #include <modules/gui/blur/blur.hpp>
 
 #include <modules/gui/cocos/cocos.hpp>
+#include <modules/gui/cocos/nodes/label.hpp>
 #include <modules/gui/theming/manager.hpp>
 
 #include <modules/i18n/DownloadPopup.hpp>
@@ -34,6 +36,15 @@ static void toggleMenu(bool down = true) {
     config::save();
     gui::ThemeManager::get()->saveTheme();
 }
+
+class $modify(ClearCacheGMHook, GameManager) {
+    void reloadAllStep5() {
+        GameManager::reloadAllStep5();
+        utils::purgeAllSingletons();
+        gui::blur::cleanup();
+        BMFontConfiguration::purgeCachedData();
+    }
+};
 
 class $modify(EclipseButtonMLHook, MenuLayer) {
     bool init() override {

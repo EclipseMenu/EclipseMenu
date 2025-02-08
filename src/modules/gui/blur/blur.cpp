@@ -9,15 +9,12 @@
 
 #include <Geode/loader/Setting.hpp>
 #include <Geode/modify/CCEGLViewProtocol.hpp>
-#include <Geode/modify/GameManager.hpp>
-#include <Geode/modify/CCScheduler.hpp>
-#include <Geode/modify/CCNode.hpp>
 
-#include <modules/gui/cocos/cocos.hpp>
 #include <imgui-cocos.hpp>
-#include <utils.hpp>
-#include <numbers>
 #include <memory>
+#include <numbers>
+#include <utils.hpp>
+#include <modules/gui/cocos/cocos.hpp>
 
 namespace eclipse::gui::blur {
 
@@ -349,14 +346,6 @@ namespace eclipse::gui::blur {
         }
     };
 
-    class $modify(BlurGMHook, GameManager) {
-        void reloadAllStep5() {
-            GameManager::reloadAllStep5();
-            cleanupPostProcess();
-            setupPostProcess();
-        }
-    };
-
     void init() {
         geode::listenForSettingChanges<bool>("legacy-render", [](bool value) {
             geode::queueInMainThread([]() {
@@ -400,6 +389,10 @@ namespace eclipse::gui::blur {
         }
     }
 
+    void cleanup() {
+        cleanupPostProcess();
+        setupPostProcess();
+    }
 }
 
 #else

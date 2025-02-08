@@ -23,6 +23,17 @@ namespace eclipse::utils {
     template <typename T>
     concept NestedInstance = one_of_v<base_type<T>, EditorUI, UILayer>;
 
+    // types that can be purged at runtime (e.g. texture reload)
+    template <typename T>
+    concept PurgeableSingleton = one_of_v<
+        base_type<T>,
+        cocos2d::CCSpriteFrameCache,
+        cocos2d::CCTextureCache,
+        cocos2d::CCFileUtils,
+        BitmapFontCache,
+        ObjectManager
+    >;
+
     template <typename T>
     concept SupportedSingleton = HasSharedState<base_type<T>> || NestedInstance<T>;
 
@@ -45,6 +56,27 @@ namespace eclipse::utils {
         return nullptr;
     }
 
+    template <PurgeableSingleton T>
+    base_type<T>*& getPurgeable() {
+        static base_type<T>* ref = nullptr;
+        return ref;
+    }
+
+    /// @brief Cleans up internally stored singleton cache for a specific type.
+    template <PurgeableSingleton T>
+    void purgeSingleton() {
+        getPurgeable<T>() = nullptr;
+    }
+
+    /// @brief Cleans up internally stored singleton cache for types that require it.
+    inline void purgeAllSingletons() {
+        purgeSingleton<cocos2d::CCSpriteFrameCache>();
+        purgeSingleton<cocos2d::CCTextureCache>();
+        purgeSingleton<cocos2d::CCFileUtils>();
+        purgeSingleton<BitmapFontCache>();
+        purgeSingleton<ObjectManager>();
+    }
+
     /// @brief More optimized way to get singletons. Caches the pointer after first call.
     /// Regular sharedState() function calls have an overhead of 10-20% compared to this.
     template <SupportedSingleton T>
@@ -61,6 +93,13 @@ namespace eclipse::utils {
                 cocos2d::CCScene
             >;
             using refType = std::conditional_t<isStatic, type, type*>;
+
+            if constexpr (PurgeableSingleton<type>) {
+                auto& pref = getPurgeable<T>();
+                if (pref) return pref;
+                pref = type::get();
+                return pref;
+            }
 
             static refType* ref = nullptr;
             if (ref) {

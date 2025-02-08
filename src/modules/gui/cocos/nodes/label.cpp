@@ -4,8 +4,13 @@
 #include <sstream>
 #include <modules/utils/SingletonCache.hpp>
 
-BMFontConfiguration* BMFontConfiguration::create(std::string_view fntFile) {
+std::unordered_map<std::string, BMFontConfiguration>& getFontConfigs() {
     static std::unordered_map<std::string, BMFontConfiguration> s_fontConfigs;
+    return s_fontConfigs;
+}
+
+BMFontConfiguration* BMFontConfiguration::create(std::string_view fntFile) {
+    auto& s_fontConfigs = getFontConfigs();
 
     // check if the font config is already loaded
     std::string fntFileStr(fntFile);
@@ -22,11 +27,17 @@ BMFontConfiguration* BMFontConfiguration::create(std::string_view fntFile) {
     return &s_fontConfigs.emplace(fntFileStr, std::move(config)).first->second;
 }
 
+void BMFontConfiguration::purgeCachedData() {
+    geode::log::debug("Purging font cache with {} entries", getFontConfigs().size());
+    getFontConfigs().clear();
+}
+
 bool BMFontConfiguration::initWithFNTfile(std::string_view fntFile) {
     std::string fntFileStr(fntFile);
-    #ifdef GEODE_IS_ANDROID
+    #if defined(GEODE_IS_ANDROID) || !defined(NDEBUG)
     // on android, accessing internal assets manually won't work,
-    // so we're just going to use cocos functions as intended
+    // so we're just going to use cocos functions as intended.
+    // oh and fullPathForFilename apparently crashes in debug mode, so we're using this in that case as well
     auto ccString = cocos2d::CCString::createWithContentsOfFile(fntFileStr.c_str());
     if (!ccString) {
         geode::log::error("Failed to read file '{}'", fntFileStr);
@@ -911,6 +922,7 @@ void Label::checkForEmoji(
         if (!sprite) {
             // create new sprite
             sprite = cocos2d::CCSprite::createWithSpriteFrameName(emojiIt->second);
+            if (!sprite) { return geode::log::warn("Frame {} was not found (create)", emojiIt->second); }
             m_spriteSheetBatch.addChild(sprite, emojiIndex, emojiIndex);
 
             // modify opacity and color
@@ -920,8 +932,9 @@ void Label::checkForEmoji(
             sprite->setOpacity(m_opacity);
         } else {
             auto spriteFrame = eclipse::utils::get<cocos2d::CCSpriteFrameCache>()->spriteFrameByName(emojiIt->second);
+            if (!spriteFrame) { return geode::log::warn("Frame {} was not found (update)", emojiIt->second); }
             sprite->m_bVisible = true;
-            sprite->setTextureRect(spriteFrame->getRect(), spriteFrame->isRotated(), spriteFrame->getOriginalSize());
+            sprite->setDisplayFrame(spriteFrame);
         }
 
         // calculate size

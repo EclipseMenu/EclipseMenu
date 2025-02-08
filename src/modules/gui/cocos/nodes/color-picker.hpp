@@ -34,26 +34,29 @@ namespace eclipse::gui::cocos {
         geode::ColorPickPopup* m_popup = nullptr;
     };
 
-    // smhing
     class ColorPopup : public geode::ColorPickPopup {
-        ~ColorPopup() { // this is so dumb!
-            CocosRenderer::get()->unregisterModal(this); // dumb crash!
+        ~ColorPopup() override {
+            if (auto cocos = CocosRenderer::get())
+                cocos->unregisterModal(this);
         }
-        public:
-            static ColorPopup* create(cocos2d::ccColor4B const& color, bool isRGBA) {
-                auto ret = new ColorPopup();
-                if (ret->initAnchored(400.f, (isRGBA ? 290.f : 240.f), color, isRGBA)) {
-                    ret->autorelease();
-                    return ret;
-                }
-                delete ret;
-                return nullptr;
+
+    public:
+        static ColorPopup* create(cocos2d::ccColor4B const& color, bool isRGBA) {
+            auto ret = new ColorPopup();
+            if (ret->initAnchored(400.f, (isRGBA ? 290.f : 240.f), color, isRGBA)) {
+                ret->autorelease();
+                return ret;
             }
-            static ColorPopup* create(cocos2d::ccColor3B const& color) {
-                return ColorPopup::create(geode::cocos::to4B(color), true);
-            }
-            static ColorPopup* create(cocos2d::ccColor4B const& color) {
-                return ColorPopup::create(color, true);
-            }
+            delete ret;
+            return nullptr;
+        }
+
+        static ColorPopup* create(cocos2d::ccColor3B const& color) {
+            return ColorPopup::create(geode::cocos::to4B(color), true);
+        }
+
+        static ColorPopup* create(cocos2d::ccColor4B const& color) {
+            return ColorPopup::create(color, true);
+        }
     };
 }

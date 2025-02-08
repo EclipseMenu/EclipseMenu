@@ -206,7 +206,7 @@ namespace eclipse::utils {
     }
 
     size_t getBaseSize() {
-        static size_t baseSize = [] -> size_t {
+        static size_t baseSize = []() -> size_t {
             #ifdef GEODE_IS_WINDOWS
 
             auto handle = GetModuleHandle(nullptr);

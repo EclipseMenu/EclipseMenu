@@ -26,5 +26,6 @@ namespace eclipse::gui::blur {
     void init();
     void update(float dt);
     void toggle(bool enabled);
+    void cleanup(); // cleans up the shader and framebuffer objects (useful when reloading opengl context)
 }
 
