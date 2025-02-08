@@ -9,6 +9,7 @@
 
 #include <Geode/loader/Setting.hpp>
 #include <Geode/modify/CCEGLViewProtocol.hpp>
+#include <Geode/modify/CCEGLView.hpp>
 
 #include <imgui-cocos.hpp>
 #include <memory>
@@ -345,6 +346,16 @@ namespace eclipse::gui::blur {
             ppRt1.resize((GLsizei)width, (GLsizei)height);
         }
     };
+
+    #ifdef GEODE_IS_WINDOWS
+    class $modify(BlurCCEGLVHook, cocos2d::CCEGLView) {
+        void toggleFullScreen(bool value, bool borderless, bool fix) {
+            cleanupPostProcess();
+            CCEGLView::toggleFullScreen(value, borderless, fix);
+            setupPostProcess();
+        }
+    };
+    #endif
 
     void init() {
         geode::listenForSettingChanges<bool>("legacy-render", [](bool value) {
