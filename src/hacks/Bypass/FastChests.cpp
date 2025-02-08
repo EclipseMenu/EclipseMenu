@@ -119,7 +119,9 @@ namespace eclipse::hacks::Bypass {
             m_closeBtn->setSizeMult(1.6F);
             m_rewardBtn = CCMenuItemSpriteExtra::create(cocos2d::CCSprite::createWithSpriteFrameName("GJ_rewardBtn_001.png"), this, menu_selector(RewardUnlockLayer::onClose));
             m_rewardBtn->setSizeMult(1.6F);
-            m_buttonMenu = cocos2d::CCMenu::create(m_closeBtn,m_rewardBtn,0);
+            m_buttonMenu = cocos2d::CCMenu::create();
+            m_buttonMenu->addChild(m_closeBtn);
+            m_buttonMenu->addChild(m_rewardBtn);
             m_mainLayer->addChild(m_buttonMenu, 10);
             m_closeBtn->setEnabled(false);
             m_closeBtn->setVisible(false);
