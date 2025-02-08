@@ -5,12 +5,18 @@
 #include <modules/labels/variables.hpp>
 #include <vector>
 
-#ifndef GEODE_IS_DESKTOP
+#if !defined(GEODE_IS_DESKTOP) || defined(ECLIPSE_DEBUG_BUILD)
 
 #include <Geode/modify/CCTouchDispatcher.hpp>
 
 namespace eclipse::hacks::Global {
-    static std::vector<cocos2d::CCSprite*> touchNodes;
+
+    struct Touch {
+        cocos2d::CCSprite* node{};
+        cocos2d::CCTouch* touch{};
+    };
+
+    static std::vector<Touch> touchNodes;
     class $hack(ShowTaps) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
@@ -27,34 +33,34 @@ namespace eclipse::hacks::Global {
 
         void touches(cocos2d::CCSet* touches, cocos2d::CCEvent* event, unsigned int touchType) {
             if (auto scene = cocos2d::CCScene::get()) {
-                auto touch = touches->anyObject();
-                if (touch) {
-                    auto pos = static_cast<cocos2d::CCTouch*>(touch)->getLocation();
-                    switch (touchType) {
-                        case cocos2d::CCTOUCHBEGAN: {
-                            auto circle = cocos2d::CCSprite::createWithSpriteFrameName("circle.png"_spr);
-                            circle->setScale(0.3F);
-                            circle->setOpacity(175);
-                            circle->setPosition(pos);
-                            circle->setZOrder(scene->getHighestChildZ() + 1);
-                            touchNodes.push_back(circle);
-                            scene->addChild(circle);
-                        } break;
+                auto touch = static_cast<cocos2d::CCTouch*>(touches->anyObject());
+                switch (touchType) {
+                    case cocos2d::CCTOUCHBEGAN: {
+                        auto circle = cocos2d::CCSprite::createWithSpriteFrameName("circle.png"_spr);
+                        circle->setScale(0.3F);
+                        circle->setOpacity(175);
+                        circle->setPosition(touch->getLocation());
+                        circle->setZOrder(scene->getHighestChildZ() + 1);
+                        touchNodes.push_back({circle, touch});
+                        scene->addChild(circle);
+                    } break;
 
-                        case cocos2d::CCTOUCHENDED: { // case cocos2d::CCTOUCHCANCELLED:
-                            if (!touchNodes.empty()) {
-                                auto circle = touchNodes.at(0);
-                                if (circle->getPosition() == pos || touchNodes.size() == 1) {
-                                    circle->removeFromParentAndCleanup(true);
-                                    touchNodes.erase(touchNodes.begin());
+                    case cocos2d::CCTOUCHENDED: { // case cocos2d::CCTOUCHCANCELLED:
+                        for (auto& circle : touchNodes) {
+                            auto it = std::ranges::find_if(
+                                touchNodes, [&touch](Touch circle) {
+                                    return circle.touch == touch;
                                 }
-                            }
-                        } break;
-                        /*case cocos2d::CCTOUCHMOVED: {
+                            );
+                            if (it == touchNodes.end()) continue;
+                            (*it).node->removeFromParentAndCleanup(true);
+                            touchNodes.erase(it); // TODO: will this really free memory or leave a dangling pointer? 
+                        }
+                    } break;
+                    /*case cocos2d::CCTOUCHMOVED: {
 
-                        } break;*/
-                        default: break;
-                    }
+                    } break;*/
+                    default: break;
                 }
             }
             return cocos2d::CCTouchDispatcher::touches(touches, event, touchType);
