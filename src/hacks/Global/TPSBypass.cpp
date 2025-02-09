@@ -176,6 +176,7 @@ namespace eclipse::hacks::Global {
             double m_extraDelta = 0.0;
             float m_realDelta = 0.0;
             bool m_shouldHide = false;
+            bool m_shouldBufferPostUpdate = false;
             bool m_isEditor = utils::get<LevelEditorLayer>() != nullptr;
             bool m_shouldBreak = false;
             bool m_postRestart = false;
@@ -225,10 +226,14 @@ namespace eclipse::hacks::Global {
             fields->m_shouldBreak = false;
 
             // store current frame delta for later use in updateVisibility
-            fields->m_realDelta = getCustomDelta(dt, 240.f, false);
+            fields->m_realDelta = getCustomDelta(fields->m_extraDelta, 240.f, false);
 
             auto newTPS = config::get<"global.tpsbypass", float>(240.f);
-            auto newDelta = 1.0 / newTPS;
+
+            // extra divisor, to make the iterations smoother
+            auto divisor = std::max(1.0, newTPS / 240.0);
+
+            auto newDelta = 1.0 / newTPS / divisor;
 
             if (fields->m_extraDelta >= newDelta) {
                 // call original update several times, until the extra delta is less than the new delta
@@ -240,16 +245,27 @@ namespace eclipse::hacks::Global {
                 fields->m_shouldHide = true;
                 while (steps > 1 && shouldContinue(fields)) {
                     GJBaseGameLayer::update(newDelta);
-                    auto end = utils::getTimestamp();
-                    // if the update took too long, break out of the loop
-                    if (end - start > ms) break;
                     --steps;
+
+                    // if the update took too long, break out of the loop
+                    auto end = utils::getTimestamp();
+                    if (end - start > ms) {
+                        // re-add the remaining delta
+                        fields->m_extraDelta += steps * newDelta;
+                        fields->m_shouldHide = false;
+                        goto END; // don't feel like adding a bool to skip the last update
+                    }
                 }
                 fields->m_shouldHide = false;
 
                 if (shouldContinue(fields)) {
                     // call one last time with the remaining delta
                     GJBaseGameLayer::update(newDelta * steps);
+                }
+
+                END: if (fields->m_shouldBufferPostUpdate) {
+                    fields->m_shouldBufferPostUpdate = false;
+                    reinterpret_cast<PlayLayer*>(this)->postUpdate(fields->m_realDelta);
                 }
             }
         }
@@ -267,7 +283,12 @@ namespace eclipse::hacks::Global {
         // PlayLayer postUpdate handles practice mode checkpoints, labels and also calls updateVisibility
         void postUpdate(float dt) override {
             auto fields = getFields(this);
-            if (fields->m_shouldHide) return;
+            if (fields->m_shouldHide) {
+                fields->m_shouldBufferPostUpdate = true;
+                return;
+            }
+
+            fields->m_shouldBufferPostUpdate = false;
             PlayLayer::postUpdate(fields->m_realDelta);
         }
 
@@ -325,7 +346,7 @@ namespace eclipse::hacks::Global {
             if (fields->m_shouldHide && !m_player1->m_maybeIsColliding && !m_player2->m_maybeIsColliding) return;
             // m_maybeIsColliding will be reset in our inner update call next iteration,
             // so we need to store it here to check if we should break out of the loop
-            fields->m_shouldBreak = m_player1->m_maybeIsColliding;
+            fields->m_shouldBreak = m_player1->m_maybeIsColliding || m_player2->m_maybeIsColliding;
             LevelEditorLayer::postUpdate(fields->m_realDelta);
         }
     };
