@@ -15,6 +15,7 @@
 #include <memory>
 #include <numbers>
 #include <utils.hpp>
+#include <modules/utils/vmthooker.hpp>
 #include <modules/gui/cocos/cocos.hpp>
 
 namespace eclipse::gui::blur {
@@ -30,8 +31,6 @@ namespace eclipse::gui::blur {
 
     float blurTimer = 0.f;
     float blurProgress = 0.f;
-
-    geode::Patch* visitVtablePatch = nullptr;
 
     geode::Result<std::string> Shader::compile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath) {
         auto vertexSource = geode::utils::file::readString(vertexPath);
@@ -265,13 +264,13 @@ namespace eclipse::gui::blur {
 
     // hook time yippee
 
-    void CCSceneVisit(cocos2d::CCScene* self) {
+    void CCSceneVisit(auto& original, cocos2d::CCScene* self) {
         if (ppShader.program == 0 || blurProgress == 0.f)
-            return self->CCNode::visit();
+            return original(self);
 
         float blur = 0.05f * (1.f - std::cos(static_cast<float>(std::numbers::pi) * blurProgress)) * 0.5f;
         if (blur == 0.f)
-            return self->CCNode::visit();
+            return original(self);
 
         GLint drawFbo = 0;
         GLint readFbo = 0;
@@ -281,7 +280,7 @@ namespace eclipse::gui::blur {
         glBindFramebuffer(GL_FRAMEBUFFER, ppRt0.fbo);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        self->CCNode::visit();
+        original(self);
 
         glBindVertexArray(ppVao);
         cocos2d::ccGLUseProgram(ppShader.program);
@@ -303,36 +302,6 @@ namespace eclipse::gui::blur {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         glBindVertexArray(0);
-    }
-
-    template <typename T>
-    std::vector<uint8_t> toBytes(T value) {
-        std::vector<uint8_t> bytes(sizeof(T));
-        std::memcpy(bytes.data(), &value, sizeof(T));
-        return bytes;
-    }
-
-    void hookCCSceneVisit() {
-        auto virtualOffset = geode::addresser::getVirtualOffset(&cocos2d::CCScene::visit);
-
-        // find the vtable address
-        auto tmpScene = new cocos2d::CCScene();
-        auto vtable = *reinterpret_cast<uintptr_t*>(tmpScene);
-        delete tmpScene;
-
-        // find the visit function entry in the vtable
-        auto visitEntry = reinterpret_cast<uintptr_t*>(vtable + virtualOffset);
-        uintptr_t hookAddr = reinterpret_cast<uintptr_t>(&CCSceneVisit);
-        auto hookAddrBytes = toBytes(hookAddr);
-
-        // write the hook address to the vtable
-        auto res = geode::Mod::get()->patch(visitEntry, hookAddrBytes);
-        if (!res) {
-            geode::log::error("Failed to hook CCScene::visit: {}", res.unwrapErr());
-        } else {
-            visitVtablePatch = res.unwrap();
-            geode::log::debug("Enabled virtual cocos2d::CCScene::visit hook at 0x{:x} for " GEODE_MOD_ID, reinterpret_cast<uintptr_t>(visitEntry));
-        }
     }
 
     class $modify(BlurCCEGLVPHook, cocos2d::CCEGLViewProtocol) {
@@ -392,12 +361,8 @@ namespace eclipse::gui::blur {
     }
 
     void toggle(bool enabled) {
-        if (!visitVtablePatch) {
-            if (enabled) hookCCSceneVisit();
-        } else {
-            if (enabled) { (void) visitVtablePatch->enable(); }
-            else { (void) visitVtablePatch->disable(); }
-        }
+        utils::VMTHooker<cocos2d::CCScene, void, cocos2d::CCNode>::get(&cocos2d::CCNode::visit)
+            .toggleHook(CCSceneVisit, enabled);
     }
 
     void cleanup() {

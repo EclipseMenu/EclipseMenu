@@ -235,12 +235,14 @@ namespace eclipse::hacks::Global {
         void customSetup() override {
             EndLevelLayer::customSetup();
 
-            if (s_trippedLastAttempt) {
-                if (CCNode* chainlt = m_mainLayer->getChildByID("chain-left")) chainlt->setPositionX(chainlt->getPositionX() - 10.f);
-                else if (CCNode* chainlt = m_mainLayer->getChildByType<cocos2d::CCSprite*>(0)) chainlt->setPositionX(chainlt->getPositionX() - 10.f);
+            if (s_attemptCheats.contains("Bot")) {
+                CCNode* chainlt = m_mainLayer->getChildByID("chain-left");
+                if (!chainlt) chainlt = m_mainLayer->getChildByType<cocos2d::CCSprite*>(0);
+                if (chainlt) chainlt->setPositionX(chainlt->getPositionX() - 10.f);
 
-                if (CCNode* chainrt = m_mainLayer->getChildByID("chain-right")) chainrt->setPositionX(chainrt->getPositionX() + 10.f);
-                else if (CCNode* chainrt = m_mainLayer->getChildByType<cocos2d::CCSprite*>(1)) chainrt->setPositionX(chainrt->getPositionX() + 10.f);
+                CCNode* chainrt = m_mainLayer->getChildByID("chain-right");
+                if (!chainrt) chainrt = m_mainLayer->getChildByType<cocos2d::CCSprite*>(1);
+                if (chainrt) chainrt->setPositionX(chainrt->getPositionX() + 10.f);
             }
 
             if (!config::get<bool>("labels.cheat-indicator.endscreen", true))
