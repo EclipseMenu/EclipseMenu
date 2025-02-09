@@ -137,6 +137,7 @@ namespace eclipse::config {
         struct Key {
             char data[N];
             explicit(false) constexpr Key(const char* str) { std::copy_n(str, N, data); }
+            constexpr operator std::string_view() const { return {data, N}; }
         };
 
         template <size_t N>
@@ -146,18 +147,18 @@ namespace eclipse::config {
     /// @brief Cached version of get function to avoid multiple lookups.
     template <__impl::Key key, typename T>
     T get(const T& defaultValue = T{}) {
-        static T value = (addDelegate(key.data, [] {
-            value = get<T>(key.data, T{});
-        }), get<T>(key.data, defaultValue));
+        static T value = (addDelegate(key, [] {
+            value = get<T>(key, T{});
+        }), get<T>(key, defaultValue));
         return value;
     }
 
     /// @brief Cached version of getTemp function to avoid multiple lookups.
     template <__impl::Key key, typename T>
     T getTemp(const T& defaultValue = T{}) {
-        static T value = (addTempDelegate(key.data, [] {
-            value = getTemp<T>(key.data, T{});
-        }), getTemp<T>(key.data, defaultValue));
+        static T value = (addTempDelegate(key, [] {
+            value = getTemp<T>(key, T{});
+        }), getTemp<T>(key, defaultValue));
         return value;
     }
 }
