@@ -230,8 +230,19 @@ namespace eclipse::hacks::Global {
     };
 
     class $modify(SafeModeELLHook, EndLevelLayer) {
+        ENABLE_FIRST_HOOKS_ALL()
+
         void customSetup() override {
             EndLevelLayer::customSetup();
+
+            if (s_trippedLastAttempt) {
+                if (CCNode* chainlt = m_mainLayer->getChildByID("chain-left")) chainlt->setPositionX(chainlt->getPositionX() - 10.f);
+                else if (CCNode* chainlt = m_mainLayer->getChildByType<cocos2d::CCSprite*>(0)) chainlt->setPositionX(chainlt->getPositionX() - 10.f);
+
+                if (CCNode* chainrt = m_mainLayer->getChildByID("chain-right")) chainrt->setPositionX(chainrt->getPositionX() + 10.f);
+                else if (CCNode* chainrt = m_mainLayer->getChildByType<cocos2d::CCSprite*>(1)) chainrt->setPositionX(chainrt->getPositionX() + 10.f);
+            }
+
             if (!config::get<bool>("labels.cheat-indicator.endscreen", true))
                 return;
 
