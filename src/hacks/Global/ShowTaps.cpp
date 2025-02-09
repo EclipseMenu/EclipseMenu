@@ -4,23 +4,38 @@
 #include <modules/hack/hack.hpp>
 #include <modules/labels/variables.hpp>
 #include <vector>
+#include <modules/utils/vmthooker.hpp>
 
-#if !defined(GEODE_IS_DESKTOP) || defined(ECLIPSE_DEBUG_BUILD)
+#if defined(GEODE_IS_MOBILE) || defined(ECLIPSE_DEBUG_BUILD)
 
 #include <Geode/modify/CCTouchDispatcher.hpp>
 
 namespace eclipse::hacks::Global {
+    static std::vector<cocos2d::CCTouch*> touchNodes;
 
-    struct Touch {
-        cocos2d::CCSprite* node{};
-        cocos2d::CCTouch* touch{};
-    };
+    void ShowTapsCCSceneVisitHook(auto& original, cocos2d::CCScene* self) {
+        original(self);
+        if (touchNodes.empty()) return;
 
-    static std::vector<Touch> touchNodes;
+        cocos2d::ccDrawColor4B(255, 255, 255, 100);
+        cocos2d::ccGLBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        for (auto touch : touchNodes) {
+            cocos2d::ccDrawFilledCircle(touch->getLocation(), 8, 0, 16);
+        }
+    }
+
     class $hack(ShowTaps) {
+        static void activateHook() {
+            utils::VMTHooker<cocos2d::CCScene, void, cocos2d::CCNode>::get(&cocos2d::CCNode::visit)
+                .toggleHook(ShowTapsCCSceneVisitHook, config::get("global.show-taps", false));
+        }
+
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addToggle("global.show-taps")->setDescription()->handleKeybinds();
+
+            config::addDelegate("global.show-taps", activateHook);
+            activateHook();
         }
 
         [[nodiscard]] const char* getId() const override { return "Show Taps"; }
@@ -32,38 +47,17 @@ namespace eclipse::hacks::Global {
         ADD_HOOKS_DELEGATE("global.show-taps")
 
         void touches(cocos2d::CCSet* touches, cocos2d::CCEvent* event, unsigned int touchType) {
-            if (auto scene = cocos2d::CCScene::get()) {
-                auto touch = static_cast<cocos2d::CCTouch*>(touches->anyObject());
-                switch (touchType) {
-                    case cocos2d::CCTOUCHBEGAN: {
-                        auto circle = cocos2d::CCSprite::createWithSpriteFrameName("circle.png"_spr);
-                        circle->setScale(0.3F);
-                        circle->setOpacity(175);
-                        circle->setPosition(touch->getLocation());
-                        circle->setZOrder(scene->getHighestChildZ() + 1);
-                        touchNodes.push_back({circle, touch});
-                        scene->addChild(circle);
-                    } break;
-
-                    case cocos2d::CCTOUCHENDED: { // case cocos2d::CCTOUCHCANCELLED:
-                        for (auto& circle : touchNodes) {
-                            auto it = std::ranges::find_if(
-                                touchNodes, [&touch](Touch circle) {
-                                    return circle.touch == touch;
-                                }
-                            );
-                            if (it == touchNodes.end()) continue;
-                            (*it).node->removeFromParentAndCleanup(true);
-                            touchNodes.erase(it); // TODO: will this really free memory or leave a dangling pointer? 
-                        }
-                    } break;
-                    /*case cocos2d::CCTOUCHMOVED: {
-
-                    } break;*/
-                    default: break;
-                }
+            auto touch = static_cast<cocos2d::CCTouch*>(touches->anyObject());
+            switch (touchType) {
+                case cocos2d::CCTOUCHBEGAN: {
+                    touchNodes.push_back(touch);
+                } break;
+                case cocos2d::CCTOUCHENDED: {
+                    std::erase(touchNodes, touch);
+                } break;
+                default: break;
             }
-            return cocos2d::CCTouchDispatcher::touches(touches, event, touchType);
+            return CCTouchDispatcher::touches(touches, event, touchType);
         }
     };
 }
