@@ -52,6 +52,10 @@ namespace eclipse::bot {
         m_replay.levelInfo = levelInfo;
     }
 
+    void Bot::setPlatformer(bool platformer) {
+        m_replay.platformer = platformer;
+    }
+
     geode::Result<> Bot::save(std::filesystem::path path) {
         m_replay.author = utils::get<GJAccountManager>()->m_username;
         m_replay.duration = m_replay.inputs.size() > 0 ? m_replay.inputs[m_replay.inputs.size() - 1].frame / m_replay.framerate : 0;

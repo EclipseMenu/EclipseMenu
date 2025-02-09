@@ -212,6 +212,7 @@ namespace eclipse::hacks::Bot {
         bool init(GJGameLevel* gj, bool p1, bool p2) {
             bool result = PlayLayer::init(gj, p1, p2);
             s_bot.setLevelInfo(gdr::Level(gj->m_levelName, gj->m_levelID.value()));
+            s_bot.setPlatformer(gj->isPlatformer());
             return result;
         }
 

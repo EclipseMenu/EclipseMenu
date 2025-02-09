@@ -60,6 +60,10 @@ namespace eclipse::bot {
         /// @param levelInfo The level info.
         void setLevelInfo(gdr::Level levelInfo);
 
+        /// @brief Sets platformer.
+        /// @param platformer Platformer.
+        void setPlatformer(bool platformer);
+
         [[nodiscard]] std::optional<gdr::Input<>> getPrevious(bool player1);
 
     protected:
