@@ -1,9 +1,14 @@
 #pragma once
 
 namespace eclipse::utils {
+    // patching existing virtual table entries is only supported on desktop due to memory protection
+    #ifdef GEODE_IS_DESKTOP
+    /// @brief Trampoline function which executes the hook chain.
     template <typename T, typename R, typename C, typename... Args>
     R vmtTrampoline(C* self, Args... args);
 
+    /// @brief Utility class for replacing virtual table entries with custom functions.
+    /// Supports chaining multiple hooks.
     template <typename T, typename R, typename C, typename... Args>
     class VMTHooker {
     public:
@@ -62,17 +67,20 @@ namespace eclipse::utils {
             return hooker;
         }
 
+        /// @brief Adds a hook to the chain.
         void addHook(ReturnType (*hook)(VMTHooker&, TargetType*, Args...)) {
             if (std::find(m_hooks.begin(), m_hooks.end(), hook) != m_hooks.end()) return;
             m_hooks.push_back(hook);
             updatePatch();
         }
 
+        /// @brief Removes a hook from the chain.
         void removeHook(ReturnType (*hook)(VMTHooker&, TargetType*, Args...)) {
             m_hooks.erase(std::remove(m_hooks.begin(), m_hooks.end(), hook), m_hooks.end());
             updatePatch();
         }
 
+        /// @brief Toggles a hook in the chain.
         void toggleHook(ReturnType (*hook)(VMTHooker&, TargetType*, Args...), bool enable) {
             if (enable) {
                 addHook(hook);
@@ -81,6 +89,7 @@ namespace eclipse::utils {
             }
         }
 
+        /// @brief Invokes the hook chain. If no hooks are present, the original function is called.
         ReturnType invoke(TargetType* instance, Args... args) {
             if (m_callCount >= m_hooks.size()) {
                 return callOriginal(reinterpret_cast<ClassType*>(instance), args...);
@@ -101,4 +110,5 @@ namespace eclipse::utils {
         hooker.m_callCount = 0; // initiate chain
         return hooker.invoke(reinterpret_cast<T*>(self), args...);
     }
+    #endif
 }

@@ -8,40 +8,61 @@
 
 #if defined(GEODE_IS_MOBILE) || defined(ECLIPSE_DEBUG_BUILD)
 
+#include <Geode/modify/CCDirector.hpp>
+#include <Geode/modify/CCEGLView.hpp>
 #include <Geode/modify/CCTouchDispatcher.hpp>
 
 namespace eclipse::hacks::Global {
-    static std::vector<cocos2d::CCTouch*> touchNodes;
+    static std::vector<geode::WeakRef<cocos2d::CCTouch>> touchNodes;
 
-    void ShowTapsCCSceneVisitHook(auto& original, cocos2d::CCScene* self) {
-        original(self);
+    void renderTaps() {
         if (touchNodes.empty()) return;
 
         cocos2d::ccDrawColor4B(255, 255, 255, 100);
         cocos2d::ccGLBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        for (auto touch : touchNodes) {
-            cocos2d::ccDrawFilledCircle(touch->getLocation(), 8, 0, 16);
+        for (size_t i = 0; i < touchNodes.size();) {
+            if (auto touch = touchNodes[i].lock()) {
+                cocos2d::ccDrawFilledCircle(touch->getLocation(), 8, 0, 16);
+                i++;
+            } else {
+                std::swap(touchNodes[i], touchNodes.back());
+                touchNodes.pop_back();
+            }
         }
     }
 
     class $hack(ShowTaps) {
-        static void activateHook() {
-            utils::VMTHooker<cocos2d::CCScene, void, cocos2d::CCNode>::get(&cocos2d::CCNode::visit)
-                .toggleHook(ShowTapsCCSceneVisitHook, config::get("global.show-taps", false));
-        }
-
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addToggle("global.show-taps")->setDescription()->handleKeybinds();
 
-            config::addDelegate("global.show-taps", activateHook);
-            activateHook();
+            config::addDelegate("global.show-taps", []() {
+                touchNodes.clear();
+            });
         }
 
         [[nodiscard]] const char* getId() const override { return "Show Taps"; }
     };
 
     REGISTER_HACK(ShowTaps)
+
+    #ifdef GEODE_IS_WINDOWS
+    class $modify(ShowTapsCCEGLVHook, cocos2d::CCEGLView) {
+        ADD_HOOKS_DELEGATE("global.show-taps")
+        void swapBuffers() override {
+            renderTaps();
+            CCEGLView::swapBuffers();
+        }
+    };
+    #else
+    class $modify(ShowTapsCCDHook, cocos2d::CCDirector) {
+        ADD_HOOKS_DELEGATE("global.show-taps")
+        void drawScene() {
+            CCDirector::drawScene();
+            renderTaps();
+        }
+    };
+    #endif
 
     class $modify(ShowTapsTouchHook, cocos2d::CCTouchDispatcher) {
         ADD_HOOKS_DELEGATE("global.show-taps")
