@@ -161,10 +161,17 @@ namespace eclipse::i18n {
             for (auto& entry : std::filesystem::directory_iterator(path)) {
                 auto filename = entry.path().filename().string();
                 if (filename.size() < 10 || filename.substr(filename.size() - 10) != ".lang.json") continue;
+
                 auto code = filename.substr(0, filename.size() - 10);
                 auto name = getLanguageName(entry.path());
                 if (!name) continue;
-                result.push_back(*name);
+
+                // filter out duplicates
+                if (std::ranges::find_if(result, [&](auto const& lang) {
+                    return lang.code == code;
+                }) != result.end()) continue;
+
+                result.push_back(std::move(*name));
             }
         };
 
