@@ -4,7 +4,6 @@
 #include <modules/hack/hack.hpp>
 #include <modules/labels/variables.hpp>
 #include <vector>
-#include <modules/utils/vmthooker.hpp>
 
 #if defined(GEODE_IS_MOBILE) || defined(ECLIPSE_DEBUG_BUILD)
 

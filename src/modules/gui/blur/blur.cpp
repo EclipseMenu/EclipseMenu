@@ -15,7 +15,7 @@
 #include <memory>
 #include <numbers>
 #include <utils.hpp>
-#include <modules/utils/vmthooker.hpp>
+#include <modules/utils/VMTHooker.hpp>
 #include <modules/gui/cocos/cocos.hpp>
 
 namespace eclipse::gui::blur {
@@ -361,7 +361,7 @@ namespace eclipse::gui::blur {
     }
 
     void toggle(bool enabled) {
-        utils::VMTHooker<cocos2d::CCScene, void, cocos2d::CCNode>::get(&cocos2d::CCNode::visit)
+        utils::VMTHooker<&cocos2d::CCNode::visit, cocos2d::CCScene>::get()
             .toggleHook(CCSceneVisit, enabled);
     }
 
