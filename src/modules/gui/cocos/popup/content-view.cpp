@@ -106,10 +106,14 @@ namespace eclipse::gui::cocos {
                         btn2 = peekComponent<ComponentType::Button>(tab->getComponents(), ++i + 1);
                         ++count;
                     }
-                    menu->setContentHeight(count * 30.5f);
+                    menu->setContentSize({ size.width, count * 30.5f });
                     menu->setLayout(
                         geode::ColumnLayout::create()
                             ->setAxisReverse(true)
+                            ->setAutoScale(false)
+                            ->setAutoGrowAxis(false)
+                            ->setGrowCrossAxis(false)
+                            ->setCrossAxisOverflow(false)
                             ->setAxisAlignment(geode::AxisAlignment::Center)
                             ->setGap(2.5f)
                     );
