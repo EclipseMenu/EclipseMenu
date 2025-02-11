@@ -48,7 +48,7 @@ namespace eclipse::bot {
         return std::nullopt;
     }
 
-    void Bot::setLevelInfo(gdr::Level levelInfo) {
+    void Bot::setLevelInfo(const gdr::Level& levelInfo) {
         m_replay.levelInfo = levelInfo;
     }
 
@@ -56,7 +56,7 @@ namespace eclipse::bot {
         m_replay.platformer = platformer;
     }
 
-    geode::Result<> Bot::save(std::filesystem::path path) {
+    geode::Result<> Bot::save(const std::filesystem::path& path) {
         m_replay.author = utils::get<GJAccountManager>()->m_username;
         m_replay.duration = m_replay.inputs.size() > 0 ? m_replay.inputs[m_replay.inputs.size() - 1].frame / m_replay.framerate : 0;
 
@@ -72,7 +72,7 @@ namespace eclipse::bot {
         return geode::Ok();
     }
 
-    Result<> Bot::load(std::filesystem::path path) {
+    Result<> Bot::load(const std::filesystem::path& path) {
         std::ifstream f(path, std::ios::binary);
 
         if (!f) {

@@ -641,7 +641,7 @@ namespace eclipse::keybinds {
                 if (auto keybind = Manager::get()->getKeybind("menu.toggle"); keybind.has_value())
                     keybind->get().setKey(key);
             }
-        );
+        )->setDefaultKey(Keys::Tab);
 
         tab->addToggle("keybinds.in-game-only")
            ->setDescription();

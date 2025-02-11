@@ -1,5 +1,6 @@
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
+#include <modules/gui/components/keybind.hpp>
 #include <modules/gui/components/toggle.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
@@ -14,12 +15,12 @@ namespace eclipse::hacks::Player {
 
     class $hack(FrameStepper) {
         static bool isPressed() {
-            auto stepKey = config::get<keybinds::Keys>("player.framestepper.step_key", keybinds::Keys::C);
+            auto stepKey = config::get<"player.framestepper.step_key", keybinds::Keys>(keybinds::Keys::C);
             return s_frameStepperPressed || keybinds::isKeyPressed(stepKey);
         }
 
         static bool isDown() {
-            auto stepKey = config::get<keybinds::Keys>("player.framestepper.step_key", keybinds::Keys::C);
+            auto stepKey = config::get<"player.framestepper.step_key", keybinds::Keys>(keybinds::Keys::C);
             return s_frameStepperDown || keybinds::isKeyDown(stepKey);
         }
 
@@ -36,7 +37,8 @@ namespace eclipse::hacks::Player {
                ->setDescription()
                ->handleKeybinds()
                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                   options->addKeybind("player.framestepper.step_key", "player.framestepper.step_key");
+                   options->addKeybind("player.framestepper.step_key", "player.framestepper.step_key")
+                          ->setDefaultKey(keybinds::Keys::C);
                    options->addToggle("player.framestepper.hold");
                    options->addInputFloat("player.framestepper.hold_delay", 0.0f, FLT_MAX, "%.2f");
                    options->addInputInt("player.framestepper.hold_speed", 0);
@@ -148,6 +150,7 @@ namespace eclipse::hacks::Player {
                 return false;
 
             this->setPosition(0, 0);
+            this->setVisible(config::get<"player.framestepper", bool>());
 
             auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
             auto sprite = cocos2d::CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
@@ -168,7 +171,7 @@ namespace eclipse::hacks::Player {
         }
 
         void update(float dt) override {
-            this->setVisible(config::get<bool>("player.framestepper", false));
+            this->setVisible(config::get<"player.framestepper", bool>());
         }
 
     public:

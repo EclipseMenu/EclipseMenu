@@ -569,9 +569,15 @@ namespace eclipse::gui {
         return this;
     }
 
+    KeybindComponent* KeybindComponent::setDefaultKey(keybinds::Keys key) {
+        m_defaultKey = key;
+        return this;
+    }
+
     const std::string& KeybindComponent::getId() const { return m_id; }
     const std::string& KeybindComponent::getTitle() const { return m_title; }
     bool KeybindComponent::canDelete() const { return m_canDelete; }
+    keybinds::Keys KeybindComponent::getDefaultKey() const { return m_defaultKey; }
 
     KeybindComponent* KeybindComponent::setDescription(std::string description) {
         m_description = std::move(description);

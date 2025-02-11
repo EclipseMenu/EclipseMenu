@@ -32,8 +32,10 @@ namespace eclipse::hacks::Level {
             tab->addToggle("level.startpos_switcher")
                ->handleKeybinds()->setDescription()
                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                   options->addKeybind("level.startpos_switcher.previous", "level.startpos_switcher.previous")->setInternal();
-                   options->addKeybind("level.startpos_switcher.next", "level.startpos_switcher.next")->setInternal();
+                   options->addKeybind("level.startpos_switcher.previous", "level.startpos_switcher.previous")
+                          ->setInternal()->setDefaultKey(keybinds::Keys::Q);
+                   options->addKeybind("level.startpos_switcher.next", "level.startpos_switcher.next")
+                          ->setInternal()->setDefaultKey(keybinds::Keys::E);
                    options->addToggle("level.startpos_switcher.reset_camera");
                    options->addToggle("level.startpos_switcher.label")
                           ->addOptions([](std::shared_ptr<gui::MenuTab> options) {

@@ -50,15 +50,15 @@ namespace eclipse::bot {
 
         /// @brief Saves the current replay.
         /// @param path Path to save the replay to.
-        geode::Result<> save(std::filesystem::path path);
+        geode::Result<> save(const std::filesystem::path& path);
 
         /// @brief Loads a replay from the given path.
         /// @param path Path to load the replay from.
-        geode::Result<> load(std::filesystem::path path);
+        geode::Result<> load(const std::filesystem::path& path);
 
         /// @brief Sets the level info.
         /// @param levelInfo The level info.
-        void setLevelInfo(gdr::Level levelInfo);
+        void setLevelInfo(const gdr::Level& levelInfo);
 
         /// @brief Sets platformer.
         /// @param platformer Platformer.
