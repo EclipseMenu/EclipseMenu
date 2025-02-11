@@ -1,5 +1,28 @@
 # Eclipse Menu
 
+## v1.1.0
+**Additions**:
+* Added <cg>Confirm Hacks</c> (Confirm Practice, Restart, etc.) (#140)
+* Added <cg>Show Taps</c>
+* Added <cg>Reset BG & SFX Volume</c> shortcuts
+* Added <cg>Quick Chests</c>
+* Added <cg>Ball Rotation Bug</c>
+* Added <cg>Ignore Inputs</c> for <co>Bot</c>
+* <co>Bot</c> now uses <cg>GDR2</c> format (improved file size and read/write speed)
+* <co>Noclip</c> will trigger safe mode only if you die (allows 100% accuracy runs)
+
+**Fixes**:
+* <cg>Fixed</c> a crash on <cl>Android</c> with <co>color picker popups</c>
+* <cg>Fixed</c> translation issues with <co>Accurate Percentage</c>
+* <cg>Fixed</c> issues related to changing <co>texture quality</c> or switching <co>fullscreen</c> mode
+* <cg>Optimized</c> few things with <co>Physics Bypass</c>
+* <cg>Fixed</c> a rare crash with <co>Physics Bypass</c> if you die in editor with second player
+* <cg>Fixed</c> translations getting duplicated in the settings
+* <cg>Fixed</c> crashes with <co>Practice Fix</c> on <cl>Android</c>
+* <cg>Fixed</c> <co>Shortcuts</c> tab alignment issues on <cl>Android</c>
+* <cg>Fixed</c> <co>Labels</c> not showing up in <co>Editor</c>
+* Rebinding keys to mouse click on <cl>Android</c> no longer works
+
 ## v1.0.0
 **Additions**:
 * <cg>Android</c> support featuring <cl>custom made UI</c> for mobile devices

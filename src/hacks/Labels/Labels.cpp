@@ -349,7 +349,7 @@ namespace eclipse::hacks::Labels {
             auto showInEditor = config::get<"labels.show-in-editor", bool>();
 
             auto fields = m_fields.self();
-            bool actualVisibility = visible && (!showInEditor && !fields->m_isEditor);
+            bool actualVisibility = visible && (showInEditor || !fields->m_isEditor);
 
             if (actualVisibility) labels::VariableManager::get().refetch();
 
