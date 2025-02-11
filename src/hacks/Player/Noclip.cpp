@@ -39,7 +39,10 @@ namespace eclipse::hacks::Player {
                });
         }
 
-        [[nodiscard]] bool isCheating() const override { return config::get<"player.noclip", bool>(); }
+        [[nodiscard]] bool isCheating() const override {
+            return config::get<"player.noclip", bool>() &&
+                   config::getTemp<int>("noclipDeaths", 0) > 0;
+        }
         [[nodiscard]] const char* getId() const override { return "Noclip"; }
     };
 
