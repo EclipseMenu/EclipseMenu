@@ -115,13 +115,13 @@ namespace eclipse::utils {
             m_collidedLeftMaxX = player->m_collidedLeftMaxX;
             m_collidedRightMinX = player->m_collidedRightMinX;
             m_streakRelated4 = player->m_streakRelated4;
-            // m_canPlaceCheckpoint = player->m_canPlaceCheckpoint;
+            // m_canPlaceCheckpoint = player->m_canPlaceCheckpoint; (breaking)
             m_colorRelated = player->m_colorRelated;
             m_secondColorRelated = player->m_secondColorRelated;
             m_hasCustomGlowColor = player->m_hasCustomGlowColor;
             m_glowColor = player->m_glowColor;
             m_maybeIsColliding = player->m_maybeIsColliding;
-            // m_jumpBuffered = player->m_jumpBuffered;
+            // m_jumpBuffered = player->m_jumpBuffered; (breaking)
             m_stateRingJump = player->m_stateRingJump;
             m_wasJumpBuffered = player->m_wasJumpBuffered;
             m_wasRobotJump = player->m_wasRobotJump;
@@ -189,7 +189,6 @@ namespace eclipse::utils {
             m_swapColors = player->m_swapColors;
             m_gamevar0062 = player->m_gamevar0062;
             m_followRelated = player->m_followRelated;
-            m_playerFollowFloats = player->m_playerFollowFloats;
             m_unk838 = player->m_unk838;
             m_stateOnGround = player->m_stateOnGround;
             m_stateUnk = player->m_stateUnk;
@@ -232,13 +231,11 @@ namespace eclipse::utils {
             m_stateForce = player->m_stateForce;
             m_stateForceVector = player->m_stateForceVector;
             m_affectedByForces = player->m_affectedByForces;
-            m_jumpPadRelated = player->m_jumpPadRelated; // map<int, bool>
             m_somethingPlayerSpeedTime = player->m_somethingPlayerSpeedTime;
             m_playerSpeedAC = player->m_playerSpeedAC;
             m_fixRobotJump = player->m_fixRobotJump;
             // m_holdingButtons = player->m_holdingButtons; // map<int, bool>
             m_inputsLocked = player->m_inputsLocked;
-            m_currentRobotAnimation = player->m_currentRobotAnimation;
             m_gv0123 = player->m_gv0123;
             m_iconRequestID = player->m_iconRequestID;
             m_unkUnused = player->m_unkUnused;
@@ -251,18 +248,25 @@ namespace eclipse::utils {
             m_ignoreDamage = player->m_ignoreDamage;
             m_enable22Changes = player->m_enable22Changes;
 
-            for (int i = 0; i < player->m_touchingRings->count(); i++)
-                m_touchingRings.push_back(
-                    player->m_touchingRings->objectAtIndex(i)
-                );
-
             m_position = player->m_position;
             m_rotation = player->getRotation();
+
+            #ifndef GEODE_IS_ANDROID
 
             m_rotateObjectsRelated = player->m_rotateObjectsRelated;     // unordered_map<int, GJPointDouble>
             m_maybeRotatedObjectsMap = player->m_maybeRotatedObjectsMap; // unordered_map<int, GameObject*>
             m_ringRelatedSet = player->m_ringRelatedSet;                 // unordered_set<int>
             m_touchedRings = player->m_touchedRings;                     // unordered_set<int>
+
+            m_jumpPadRelated = player->m_jumpPadRelated;                 // map<int, bool>
+            m_playerFollowFloats = player->m_playerFollowFloats;         // vector<float>
+
+            m_currentRobotAnimation = player->m_currentRobotAnimation;
+
+            for (int i = 0; i < player->m_touchingRings->count(); i++)
+                m_touchingRings.push_back(player->m_touchingRings->objectAtIndex(i));
+
+            #endif
         }
 
         void apply(PlayerObject* player) {
@@ -374,13 +378,13 @@ namespace eclipse::utils {
             player->m_collidedLeftMaxX = m_collidedLeftMaxX;
             player->m_collidedRightMinX = m_collidedRightMinX;
             player->m_streakRelated4 = m_streakRelated4;
-            // player->m_canPlaceCheckpoint = m_canPlaceCheckpoint;
+            // player->m_canPlaceCheckpoint = m_canPlaceCheckpoint; (breaking)
             player->m_colorRelated = m_colorRelated;
             player->m_secondColorRelated = m_secondColorRelated;
             player->m_hasCustomGlowColor = m_hasCustomGlowColor;
             player->m_glowColor = m_glowColor;
             player->m_maybeIsColliding = m_maybeIsColliding;
-            // player->m_jumpBuffered = m_jumpBuffered;
+            // player->m_jumpBuffered = m_jumpBuffered; (breaking)
             player->m_stateRingJump = m_stateRingJump;
             player->m_wasJumpBuffered = m_wasJumpBuffered;
             player->m_wasRobotJump = m_wasRobotJump;
@@ -448,7 +452,6 @@ namespace eclipse::utils {
             player->m_swapColors = m_swapColors;
             player->m_gamevar0062 = m_gamevar0062;
             player->m_followRelated = m_followRelated;
-            player->m_playerFollowFloats = m_playerFollowFloats;
             player->m_unk838 = m_unk838;
             player->m_stateOnGround = m_stateOnGround;
             player->m_stateUnk = m_stateUnk;
@@ -491,12 +494,10 @@ namespace eclipse::utils {
             player->m_stateForce = m_stateForce;
             player->m_stateForceVector = m_stateForceVector;
             player->m_affectedByForces = m_affectedByForces;
-            player->m_jumpPadRelated = m_jumpPadRelated;
             player->m_somethingPlayerSpeedTime = m_somethingPlayerSpeedTime;
             player->m_playerSpeedAC = m_playerSpeedAC;
             player->m_fixRobotJump = m_fixRobotJump;
             player->m_inputsLocked = m_inputsLocked;
-            player->m_currentRobotAnimation = m_currentRobotAnimation;
             player->m_gv0123 = m_gv0123;
             player->m_iconRequestID = m_iconRequestID;
             player->m_unkUnused = m_unkUnused;
@@ -508,24 +509,32 @@ namespace eclipse::utils {
             player->m_item20 = m_item20;
             player->m_ignoreDamage = m_ignoreDamage;
             player->m_enable22Changes = m_enable22Changes;
-            player->m_touchingRings->removeAllObjects();
-
-            for(CCObject* obj : m_touchingRings)
-                player->m_touchingRings->addObject(obj);
 
             player->m_position = m_position;
             player->setPosition(m_position);
             player->setRotation(m_rotation);
 
+            #ifndef GEODE_IS_ANDROID
+
             player->m_rotateObjectsRelated = m_rotateObjectsRelated;
             player->m_maybeRotatedObjectsMap = m_maybeRotatedObjectsMap;
             player->m_ringRelatedSet = m_ringRelatedSet;
             player->m_touchedRings = m_touchedRings;
+
+            player->m_jumpPadRelated = m_jumpPadRelated;
+            player->m_playerFollowFloats = m_playerFollowFloats;
+
+            player->m_currentRobotAnimation = m_currentRobotAnimation;
+
+            player->m_touchingRings->removeAllObjects();
+            for (CCObject* obj : m_touchingRings)
+                player->m_touchingRings->addObject(obj);
+
+            #endif
         }
 
     private:
         cocos2d::CCPoint m_position;
-        std::vector<CCObject*> m_touchingRings;
         float m_rotation;
 
         bool m_wasTeleported;
@@ -570,8 +579,6 @@ namespace eclipse::utils {
         int m_collidingWithSlopeId;
         bool m_slopeFlipGravityRelated;
         float m_slopeAngleRadians;
-        gd::unordered_map<int, GJPointDouble> m_rotateObjectsRelated;
-        gd::unordered_map<int, GameObject*> m_maybeRotatedObjectsMap;
         float m_rotationSpeed;
         float m_rotateSpeed;
         bool m_isRotating;
@@ -611,7 +618,6 @@ namespace eclipse::utils {
         double m_accelerationOrSpeed;
         double m_snapDistance;
         bool m_ringJumpRelated;
-        gd::unordered_set<int> m_ringRelatedSet;
         GameObject* m_objectSnappedTo;
         CheckpointObject* m_pendingCheckpoint;
         int m_onFlyCheckpointTries;
@@ -637,13 +643,13 @@ namespace eclipse::utils {
         double m_collidedLeftMaxX;
         double m_collidedRightMinX;
         bool m_streakRelated4;
-        // bool m_canPlaceCheckpoint;
+        // bool m_canPlaceCheckpoint; (breaking)
         cocos2d::ccColor3B m_colorRelated;
         cocos2d::ccColor3B m_secondColorRelated;
         bool m_hasCustomGlowColor;
         cocos2d::ccColor3B m_glowColor;
         bool m_maybeIsColliding;
-        // bool m_jumpBuffered;
+        // bool m_jumpBuffered; (breaking)
         bool m_stateRingJump;
         bool m_wasJumpBuffered;
         bool m_wasRobotJump;
@@ -695,7 +701,6 @@ namespace eclipse::utils {
         bool m_isLocked;
         bool m_controlsDisabled;
         cocos2d::CCPoint m_lastGroundedPos;
-        gd::unordered_set<int> m_touchedRings;
         GameObject* m_lastActivatedPortal;
         bool m_hasEverJumped;
         bool m_ringOrStreakRelated;
@@ -712,7 +717,6 @@ namespace eclipse::utils {
         bool m_swapColors;
         bool m_gamevar0062;
         int m_followRelated;
-        gd::vector<float> m_playerFollowFloats;
         float m_unk838;
         int m_stateOnGround;
         unsigned char m_stateUnk;
@@ -755,13 +759,11 @@ namespace eclipse::utils {
         int m_stateForce;
         cocos2d::CCPoint m_stateForceVector;
         bool m_affectedByForces;
-        gd::map<int, bool> m_jumpPadRelated;
         float m_somethingPlayerSpeedTime;
         float m_playerSpeedAC;
         bool m_fixRobotJump;
-        // gd::map<int, bool> m_holdingButtons;
+        // gd::map<int, bool> m_holdingButtons; (breaking)
         bool m_inputsLocked;
-        gd::string m_currentRobotAnimation;
         bool m_gv0123;
         int m_iconRequestID;
         int m_unkUnused;
@@ -773,5 +775,18 @@ namespace eclipse::utils {
         bool m_item20;
         bool m_ignoreDamage;
         bool m_enable22Changes;
+
+        // these dont work well on android
+        // (P.S. robtop pls update NDK)
+        #ifndef GEODE_IS_ANDROID
+        std::unordered_map<int, GJPointDouble> m_rotateObjectsRelated;
+        std::unordered_map<int, GameObject*> m_maybeRotatedObjectsMap;
+        std::unordered_set<int> m_ringRelatedSet;
+        std::unordered_set<int> m_touchedRings;
+        std::map<int, bool> m_jumpPadRelated;
+        std::vector<float> m_playerFollowFloats;
+        std::vector<CCObject*> m_touchingRings;
+        std::string m_currentRobotAnimation;
+        #endif
     };
 }
