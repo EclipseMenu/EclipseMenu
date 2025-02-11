@@ -119,7 +119,7 @@ $execute {
         auto input = tab->addInputFloat(e->getTitle(), e->getID());
         input->callback([callback = std::get<0>(e->getCallbacks())](float value) {
             std::invoke(callback, value);
-        });
+        })->disableSaving();
         e->setUniqueID(input->getUID());
         return ListenerResult::Stop;
     });
