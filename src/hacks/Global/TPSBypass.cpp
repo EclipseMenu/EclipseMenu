@@ -40,7 +40,10 @@ namespace eclipse::hacks::Global {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addFloatToggle("global.tpsbypass", MIN_TPS, MAX_TPS, "%.2f TPS")
                ->setDescription()
-               ->handleKeybinds();
+               ->handleKeybinds()
+               ->toggleCallback([]() {
+                   config::set("bot.original.tpsbypass", config::get<bool>("global.tpsbypass.toggle", false));
+               });
         }
 
         #ifdef REQUIRE_PATCH

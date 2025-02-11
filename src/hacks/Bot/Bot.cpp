@@ -7,6 +7,7 @@
 #include <modules/gui/components/button.hpp>
 #include <modules/gui/components/filesystem-combo.hpp>
 #include <modules/gui/components/radio.hpp>
+#include <modules/gui/components/toggle.hpp>
 #include <modules/hack/hack.hpp>
 #include <modules/i18n/translations.hpp>
 
@@ -169,20 +170,49 @@ namespace eclipse::hacks::Bot {
     }
 
     class $hack(Bot) {
+        static void savePreBotSettings() {
+            config::set("bot.original.tpsbypass", config::get<bool>("global.tpsbypass.toggle", false));
+            config::set("bot.original.checkpointdelay", config::get<bool>("level.checkpointdelay", false));
+        }
+
+        static void restorePreBotSettings() {
+            config::set("global.tpsbypass.toggle", config::get<bool>("bot.original.tpsbypass", false));
+            config::set("level.checkpointdelay", config::get<bool>("bot.original.checkpointdelay", false));
+        }
+
+        static void applySettings() {
+            if (s_bot.getState() == bot::State::DISABLED) {
+                return;
+            }
+
+            config::set("level.checkpointdelay", true);
+            config::set("global.tpsbypass.toggle", true);
+            if (s_bot.getState() == bot::State::RECORD) {
+                s_bot.setFramerate(utils::getTPS());
+            } else {
+                config::set<float>("global.tpsbypass", s_bot.getFramerate());
+            }
+
+            static Mod* cbfMod = Loader::get()->getLoadedMod("syzzi.click_between_frames");
+            if (cbfMod) cbfMod->setSettingValue<bool>("soft-toggle", false);
+        }
+
         void init() override {
             const auto updateBotState = [](int state) {
-                static bool wasTps = eclipse::config::get<bool>("global.tpsbypass.toggle", true);
-                if(s_bot.getState() == bot::State::DISABLED)
-                    wasTps = eclipse::config::get<bool>("global.tpsbypass.toggle", true);
+                if (s_bot.getState() == bot::State::DISABLED) {
+                    savePreBotSettings();
+                }
 
                 s_bot.setState(static_cast<bot::State>(state));
 
-                if(state == 0)
-                    eclipse::config::set("global.tpsbypass.toggle", wasTps);
+                if (state == 0) {
+                    restorePreBotSettings();
+                }
             };
 
-            config::setIfEmpty("bot.state", 0);
-            updateBotState(config::get<int>("bot.state", 0));
+            config::set("bot.state", 0);
+            restorePreBotSettings();
+            updateBotState(0);
 
             auto tab = gui::MenuTab::find("tab.bot");
 
@@ -191,6 +221,9 @@ namespace eclipse::hacks::Bot {
             tab->addRadioButton("bot.playback", "bot.state", 2)->callback(updateBotState)->handleKeybinds();
 
             tab->addFilesystemCombo("bot.replays", "bot.selectedreplay", Mod::get()->getSaveDir() / "replays");
+
+            tab->addToggle("bot.ignore-inputs")->handleKeybinds()->setDescription();
+
             tab->addButton("common.new")->callback(newReplay);
             tab->addButton("common.save")->callback(saveReplay);
             tab->addButton("common.load")->callback(loadReplay);
@@ -218,20 +251,7 @@ namespace eclipse::hacks::Bot {
 
         void resetLevel() {
             PlayLayer::resetLevel();
-
-            static Mod* cbfMod = geode::Loader::get()->getLoadedMod("syzzi.click_between_frames");
-            if (s_bot.getState() != bot::State::DISABLED) {
-                if(cbfMod)
-                    cbfMod->setSettingValue<bool>("soft-toggle", true);
-
-                config::set<bool>("level.checkpointdelay", true);
-                config::set<bool>("global.tpsbypass.toggle", true);
-                if (s_bot.getState() == bot::State::RECORD) {
-                    s_bot.setFramerate(utils::getTPS());
-                } else {
-                    config::set<float>("global.tpsbypass", s_bot.getFramerate());
-                }
-            }
+            Bot::applySettings();
 
             if (s_bot.getState() == bot::State::RECORD) {
                 //gd does this automatically for holding but not releases so we do it manually
@@ -313,6 +333,9 @@ namespace eclipse::hacks::Bot {
         }
 
         void handleButton(bool down, int button, bool player1) {
+            if (s_bot.getState() == bot::State::PLAYBACK && s_bot.getInputCount() && config::get<bool>("bot.ignore-inputs", false))
+                return;
+
             GJBaseGameLayer::handleButton(down, button, player1);
 
             if (s_bot.getState() != bot::State::RECORD)

@@ -9,7 +9,12 @@ namespace eclipse::hacks::Level {
     class $hack(CheckpointDelay) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
-            tab->addToggle("level.checkpointdelay")->handleKeybinds()->setDescription();
+            tab->addToggle("level.checkpointdelay")
+               ->handleKeybinds()
+               ->setDescription()
+               ->callback([](bool value) {
+                   config::set("bot.original.checkpointdelay", value);
+               });
         }
 
         [[nodiscard]] const char* getId() const override { return "Checkpoint Delay Fix"; }
