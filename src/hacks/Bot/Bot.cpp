@@ -194,7 +194,7 @@ namespace eclipse::hacks::Bot {
             }
 
             static Mod* cbfMod = Loader::get()->getLoadedMod("syzzi.click_between_frames");
-            if (cbfMod) cbfMod->setSettingValue<bool>("soft-toggle", false);
+            if (cbfMod) cbfMod->setSettingValue<bool>("soft-toggle", true);
         }
 
         void init() override {
