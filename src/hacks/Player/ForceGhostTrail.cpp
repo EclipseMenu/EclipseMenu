@@ -30,8 +30,8 @@ namespace eclipse::hacks::Player {
 
                 auto p1 = static_cast<PlayerObjectFGTHook*>(gjbgl->m_player1);
                 auto p2 = static_cast<PlayerObjectFGTHook*>(gjbgl->m_player2);
-                p1->toggleGhostEffect(p1->m_fields->m_ghostType);
-                if (gjbgl->m_gameState.m_isDualMode) p2->toggleGhostEffect(p2->m_fields->m_ghostType);
+                p1->toggleGhostEffect(p1->m_fields->m_curGhostType);
+                if (gjbgl->m_gameState.m_isDualMode) p2->toggleGhostEffect(p2->m_fields->m_curGhostType);
             });
         }
       
