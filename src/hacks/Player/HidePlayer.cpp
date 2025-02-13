@@ -8,7 +8,7 @@
 namespace eclipse::hacks::Player {
     class $hack(ForceGhostTrail) {
         void init() override {
-            auto tab = auto tab = gui::MenuTab::find("tab.player");
+            auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.forceghosttrail")->setDescription()->handleKeybinds();
         }
       
