@@ -6,22 +6,21 @@
 #include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Player {
-    class $hack(ForceGhostTrail) {
+    class $hack(HidePlayer) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
-            tab->addToggle("player.forceghosttrail")->setDescription()->handleKeybinds();
+            tab->addToggle("player.hideplayer")->setDescription()->handleKeybinds();
         }
       
-        [[nodiscard]] const char* getId() const override { return "Force Ghost Trail"; }
+        [[nodiscard]] const char* getId() const override { return "Hide Player"; }
     };
 
-    REGISTER_HACK(ForceGhostTrail)
+    REGISTER_HACK(HidePlayer)
     
-    class $modify(PlayerObjectFGTHook, PlayerObject){
-        ADD_HOOKS_DELEGATE("player.forceghosttrail")
-        void toggleGhostEffect(GhostType p0) {
-            p0 = GhostType::Enabled;
-            PlayerObject::toggleGhostEffect(p0);
+    class $modify(PlayerObjectHPHook, PlayerObject){
+        ADD_HOOKS_DELEGATE("player.hideplayer")
+        void toggleVisibility(bool p0) {
+            PlayerObject::toggleVisibility(false);
         }
     };
 }
