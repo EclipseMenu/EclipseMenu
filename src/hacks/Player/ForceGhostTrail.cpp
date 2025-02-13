@@ -8,7 +8,7 @@
 namespace eclipse::hacks::Player {
     class $modify(PlayerObjectFGTHook, PlayerObject){
         struct Fields {
-            GhostType m_curGhostType;
+            GhostType m_curGhostType = GhostType::Disabled;
         };
 
         ADD_HOOKS_DELEGATE("player.forceghosttrail")
@@ -24,7 +24,7 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.forceghosttrail")->setDescription()->handleKeybinds()
-            ->toggleCallback([] {
+            ->callback([] {
                 auto* gjbgl = utils::get<GJBaseGameLayer>();
                 if (!gjbgl) return;
 
