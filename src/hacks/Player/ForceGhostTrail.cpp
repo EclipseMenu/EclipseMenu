@@ -24,7 +24,7 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.forceghosttrail")->setDescription()->handleKeybinds()
-            ->callback([] {
+            ->callback([](bool v) {
                 auto* gjbgl = utils::get<GJBaseGameLayer>();
                 if (!gjbgl) return;
 
