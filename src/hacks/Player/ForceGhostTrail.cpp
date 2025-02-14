@@ -11,14 +11,16 @@ namespace eclipse::hacks::Player {
             GhostType m_curGhostType = GhostType::Disabled;
         };
 
-        ADD_HOOKS_DELEGATE("player.forceghosttrail")
+        // ADD_HOOKS_DELEGATE("player.forceghosttrail")
 
         void toggleGhostEffect(GhostType p0) {
             m_fields->m_curGhostType = p0;
-            if (PlayerObject::m_isDead != true) p0 = GhostType::Enabled;
+            // if (PlayerObject::m_isDead != true) p0 = GhostType::Enabled;
             PlayerObject::toggleGhostEffect(p0);
         }
     };
+
+    
 
     class $hack(ForceGhostTrail) {
         void init() override {
@@ -39,4 +41,13 @@ namespace eclipse::hacks::Player {
     };
 
     REGISTER_HACK(ForceGhostTrail)
+
+    class $modify(PlayerObjectFGTHookImpl, PlayerObjectFGTHook){
+        ADD_HOOKS_DELEGATE("player.forceghosttrail");
+
+        void toggleGhostEffect(GhostType p0) {
+            if (PlayerObjectFGTHook::m_isDead != true) p0 = GhostType::Enabled;
+            PlayerObjectFGTHook::toggleGhostEffect(p0);
+        }
+    };
 }
