@@ -42,12 +42,12 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(ForceGhostTrail)
 
-    class $modify(PlayerObjectFGTHookImpl, PlayerObjectFGTHook){
+    class $modify(PlayerObjectFGTHookImpl, PlayerObject){
         ADD_HOOKS_DELEGATE("player.forceghosttrail");
 
         void toggleGhostEffect(GhostType p0) {
-            if (PlayerObjectFGTHook::m_isDead != true) p0 = GhostType::Enabled;
-            PlayerObjectFGTHook::toggleGhostEffect(p0);
+            if (PlayerObject::m_isDead != true) p0 = GhostType::Enabled;
+            PlayerObject::toggleGhostEffect(p0);
         }
     };
 }
