@@ -62,7 +62,7 @@ namespace eclipse::hacks::Player {
         ADD_HOOKS_DELEGATE("player.forceghosttrail");
 
         void toggleGhostEffect(GhostType p0) {
-            if (PlayerObject::m_isDead != true) p0 = GhostType::Enabled;
+            if (this->m_isDead != true) p0 = GhostType::Enabled;
             PlayerObject::toggleGhostEffect(p0);
         }
     };
