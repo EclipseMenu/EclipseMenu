@@ -62,7 +62,7 @@ namespace eclipse::hacks::Player {
         ADD_HOOKS_DELEGATE("player.hideplayer");
 
         void toggleVisibility(bool p0) {
-            PlayerObject::toggleGhostEffect(false);
+            PlayerObject::toggleVisibility(false);
         }
     };
 
@@ -70,7 +70,7 @@ namespace eclipse::hacks::Player {
         ADD_HOOKS_DELEGATE("player.nohidetrigger");
 
         void toggleVisibility(bool p0) {
-            PlayerObject::toggleGhostEffect(true);
+            PlayerObject::toggleVisibility(true);
         }
     };
 }
