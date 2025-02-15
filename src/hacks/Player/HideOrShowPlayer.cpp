@@ -51,7 +51,9 @@ namespace eclipse::hacks::Player {
                 if (gjbgl->m_gameState.m_isDualMode) p2->toggleVisibility(p2->m_fields->m_isPlayerInvis);
             });
         }
-      
+        [[nodiscard]] bool isCheating() const override {
+            return config::get<"player.nohidetrigger", bool>();
+        }
         [[nodiscard]] const char* getId() const override { return "No Hide Trigger"; }
     };
 
