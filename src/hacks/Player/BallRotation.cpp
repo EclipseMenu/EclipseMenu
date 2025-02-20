@@ -24,32 +24,30 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(BallRotation)
 
-    class BallRotationAction : public cocos2d::CCRepeatForever {
+    class BallRotationAction : public cocos2d::CCAction {
     public:
-        static BallRotationAction* create(CCActionInterval* action) {
+        static BallRotationAction* create(cocos2d::CCActionInterval* action) {
             auto ret = new BallRotationAction();
-            if (ret->initWithAction(action)) {
-                ret->autorelease();
-                return ret;
-            }
-            delete ret;
-            return nullptr;
+            ret->m_innerAction = action;
+            action->retain();
+            ret->autorelease();
+            return ret;
         }
 
         void step(float dt) override {
-            m_pInnerAction->step(dt);
+            m_innerAction->step(dt);
 
-            if (m_pInnerAction->isDone()) {
+            if (m_innerAction->isDone()) {
                 if (m_extraNode && m_madeExtraTurn) {
                     m_extraNode->setRotation(m_originalRotation);
                     return;
                 }
                 if (!m_madeExtraTurn) {
                     // restart the action
-                    float diff = m_pInnerAction->getElapsed() - m_pInnerAction->getDuration();
-                    m_pInnerAction->startWithTarget(m_pTarget);
-                    m_pInnerAction->step(0.0f);
-                    m_pInnerAction->step(diff);
+                    float diff = m_innerAction->getElapsed() - m_innerAction->getDuration();
+                    m_innerAction->startWithTarget(m_pTarget);
+                    m_innerAction->step(0.0f);
+                    m_innerAction->step(diff);
                     m_madeExtraTurn = m_extraNode != nullptr;
                 }
             }
@@ -60,7 +58,7 @@ namespace eclipse::hacks::Player {
         }
 
         bool isDone() override {
-            return m_pInnerAction->isDone() && m_extraNode;
+            return m_innerAction->isDone() && m_extraNode;
         }
 
         void beginExtraAction(cocos2d::CCNode* node) {
@@ -70,6 +68,7 @@ namespace eclipse::hacks::Player {
         }
 
     protected:
+        cocos2d::CCActionInterval* m_innerAction;
         cocos2d::CCNode* m_extraNode = nullptr;
         float m_originalRotation = 0;
         bool m_madeExtraTurn = false;
