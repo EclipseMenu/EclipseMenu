@@ -113,8 +113,7 @@ namespace eclipse::hacks::Player {
             }
         }
 
-        void runBallRotation(float p0) {
-            PlayerObject::runBallRotation(p0);
+        void prepareForRotation(float mult) {
             if (!config::get<bool>("player.ballrotation.variation", false)) {
                 return;
             }
@@ -134,11 +133,31 @@ namespace eclipse::hacks::Player {
             }
 
             fields->m_spinAction = BallRotationAction::create(
-                cocos2d::CCRotateBy::create(denom, numerator * p0)
+                cocos2d::CCRotateBy::create(denom, numerator * mult)
             );
 
             fields->m_spinNode->setRotation(m_mainLayer->getRotation());
             fields->m_spinNode->runAction(fields->m_spinAction);
         }
+
+        /* Sometimes you just gotta love macOS for the amount of inlines it has */
+        #ifdef GEODE_IS_MACOS
+        void runRotateAction(bool p0, int p1) {
+            bool willRun = !this->m_isLocked && !this->m_isDashing && this->m_isBall;
+            PlayerObject::runRotateAction(p0, p1);
+            if (willRun) this->prepareForRotation(1.f);
+        }
+
+        void stopDashing() {
+            bool willRun = this->m_isDashing && this->m_isBall;
+            PlayerObject::stopDashing();
+            if (willRun) this->prepareForRotation(1.f);
+        }
+        #else
+        void runBallRotation(float p0) {
+            PlayerObject::runBallRotation(p0);
+            this->prepareForRotation(p0);
+        }
+        #endif
     };
 }
