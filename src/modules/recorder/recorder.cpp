@@ -28,7 +28,7 @@ namespace km {
 
     inline void GLMatrixMode(kmGLEnum mode) {
         #ifdef GEODE_IS_MACOS
-        DEFINE_ADDRESS(kmGLMatrixMode, GEODE_ARM_MAC(0x1aba44) GEODE_INTEL_MAC(0x1a9f44), mode);
+        DEFINE_ADDRESS(kmGLMatrixMode, GEODE_ARM_MAC(0x1aba44) GEODE_INTEL_MAC(0x1f5f60), mode);
         #else
         kmGLMatrixMode(mode);
         #endif
