@@ -7,6 +7,7 @@
 
 namespace eclipse::keybinds {
     Keys convertCocosKey(cocos2d::enumKeyCodes key) {
+        using namespace cocos2d;
         switch (key) {
             case KEY_A: return Keys::A;
             case KEY_B: return Keys::B;
