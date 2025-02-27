@@ -60,12 +60,12 @@ namespace eclipse::keybinds {
     /// @brief Convert a key to a string.
     /// @param key Key to convert.
     /// @return String representation of the key.
-    [[nodiscard]] std::string keyToString(Keys key);
+    [[nodiscard]] std::string const& keyToString(Keys key);
 
     /// @brief Convert a string to a key.
     /// @param key String to convert.
     /// @return Key representation of the string.
-    [[nodiscard]] Keys stringToKey(const std::string& key);
+    [[nodiscard]] Keys stringToKey(std::string_view key);
 
     /// @brief Check if a key is currently being pressed.
     bool isKeyDown(Keys key);
