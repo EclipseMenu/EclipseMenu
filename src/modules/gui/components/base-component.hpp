@@ -19,8 +19,9 @@ namespace eclipse::gui {
         DisableTabbed = 1 << 1, // Hide the component in tabbed layout (imgui)
         DisablePanel = 1 << 2, // Hide the component in panel layout (imgui)
         DisableSidebar = 1 << 3, // Hide the component in sidebar layout (imgui)
+        StartWithKeyboardFocus = 1 << 4, // Starts the component with keyboard focus (imgui)
 
-        SearchedFor = 1 << 4, // The compoenent is being searched for
+        SearchedFor = 1 << 5, // The component is being searched for
 
         OnlyTabbed = DisablePanel | DisableSidebar | DisableCocos, // Display exclusively in tabbed layout (imgui)
         OnlyPanel = DisableTabbed | DisableSidebar | DisableCocos, // Display exclusively in panel layout (imgui)
@@ -30,6 +31,7 @@ namespace eclipse::gui {
     };
 
     bool operator&(ComponentFlags lhs, ComponentFlags rhs);
+    ComponentFlags operator|(ComponentFlags lhs, ComponentFlags rhs);
 
     class Component {
     public:

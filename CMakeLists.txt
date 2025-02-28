@@ -9,7 +9,7 @@ project(EclipseMenu VERSION 1.0.0 LANGUAGES CXX)
 set(MACOS_SOURCES "")
 if (APPLE)
   enable_language(OBJCXX)
-  set(MACOS_SOURCES src/modules/keybinds/mouse/macos.mm)
+  set(MACOS_SOURCES src/modules/keybinds/mouse/macos.mm src/modules/keybinds/keyboard/macos.mm)
 endif()
 
 # Sources

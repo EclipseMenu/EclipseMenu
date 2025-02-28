@@ -246,6 +246,10 @@ namespace eclipse::gui::imgui {
         return m_isOpened;
     }
 
+    const std::unique_ptr<Layout>& ImGuiRenderer::getLayout() const {
+        return m_layout;
+    }
+
     void ImGuiRenderer::shutdown() {
         ImGuiCocos::get().destroy();
         s_initialized = false;

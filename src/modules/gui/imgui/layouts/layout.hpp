@@ -22,9 +22,11 @@ namespace eclipse::gui::imgui {
         virtual bool wantStayVisible() const { return false; }
 
         [[nodiscard]] LayoutMode getMode() const { return m_mode; }
+        [[nodiscard]] bool canForceKeyboardFocus() const { return m_canForceKeyboardFocus; }
 
     protected:
         LayoutMode m_mode = LayoutMode::Tabbed;
+        bool m_canForceKeyboardFocus = false;
     };
 
 }

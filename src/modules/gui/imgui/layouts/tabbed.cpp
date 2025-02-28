@@ -117,9 +117,15 @@ namespace eclipse::gui::imgui {
 
         // Reset dragging state
         config::setTemp("draggingWindow", false);
+
+        if (m_actions.empty()) {
+            m_canForceKeyboardFocus = false;
+        }
     }
 
     void TabbedLayout::toggle(bool state) {
+        m_canForceKeyboardFocus = state;
+
         if (!state) {
             // Save window states
             std::vector<nlohmann::json> windowStates;
