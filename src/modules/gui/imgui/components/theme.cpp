@@ -454,11 +454,14 @@ namespace eclipse::gui::imgui {
         auto title = i18n::get(inputText->getTitle());
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
-        if (ImGui::InputText(fmt::format("##{}", title).c_str(), &value)) {
+        if (ImGui::InputText(fmt::format("##{}", inputText->getTitle()).c_str(), &value)) {
             inputText->setValue(value);
             inputText->triggerCallback(value);
         }
         ImGui::PopItemWidth();
+
+        if (inputText->getFlags() & ComponentFlags::StartWithKeyboardFocus && ImGuiRenderer::get()->getLayout()->canForceKeyboardFocus())
+            ImGui::SetKeyboardFocusHere(-1);
 
         ImGui::SameLine();
 

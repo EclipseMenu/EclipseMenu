@@ -327,7 +327,7 @@ $on_mod(Loaded) {
                     tab->setSearchedFor(hasFoundComponent);
                 }
             }
-        })->disableSaving()->setFlags(ComponentFlags::DisableCocos);
+        })->disableSaving()->setFlags(ComponentFlags::DisableCocos | ComponentFlags::StartWithKeyboardFocus);
     }
 
     // Schedule hack updates

@@ -53,6 +53,7 @@ namespace eclipse::gui::imgui {
         void init() override;
         void toggle() override;
         [[nodiscard]] bool isToggled() const override;
+        [[nodiscard]] const std::unique_ptr<Layout>& getLayout() const;
         void shutdown() override;
         void queueAfterDrawing(const std::function<void()>& func) override;
         void showPopup(const Popup& popup) override;

@@ -55,6 +55,9 @@ namespace eclipse::gui {
     bool operator&(ComponentFlags lhs, ComponentFlags rhs) {
         return static_cast<uint8_t>(lhs) & static_cast<uint8_t>(rhs);
     }
+    ComponentFlags operator|(ComponentFlags lhs, ComponentFlags rhs) {
+        return static_cast<ComponentFlags>(static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs));
+    }
 
     Component::Component() { m_uid = m_uniqueID++; }
 
@@ -85,7 +88,7 @@ namespace eclipse::gui {
 
     ComponentFlags Component::getFlags() const { return m_flags; }
     Component* Component::addFlag(ComponentFlags flag) {
-        m_flags = static_cast<ComponentFlags>(static_cast<uint8_t>(m_flags) | static_cast<uint8_t>(flag));
+        m_flags = m_flags | flag;
         return this;
     }
     Component* Component::removeFlag(ComponentFlags flag) {
