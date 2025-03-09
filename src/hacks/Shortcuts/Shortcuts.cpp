@@ -63,7 +63,13 @@ namespace eclipse::hacks::Shortcuts {
                             if (level->m_demon > 0) {
                                 gsm->setStat("5", gsm->getStat("5") - 1); // demons
                             }
-                            gsm->setStat("8", gsm->getStat("8") - level->m_coinsVerified);
+                            auto coinDict = gsm->m_verifiedUserCoins;
+                            for (auto i = 0; i < level->m_coins; i++) {
+                                auto key = level->getCoinKey(i + 1);
+                                if (gsm->hasUserCoin(key) || gsm->hasPendingUserCoin(key)) {
+                                    gsm->setStat("12", gsm->getStat("12") - 1);
+                                }
+                            }
                         }
                     }
 
@@ -184,6 +190,77 @@ namespace eclipse::hacks::Shortcuts {
         }
     #endif
 
+
+        static int getSecretCoinsRange(int min, int max) {
+            auto glm = utils::get<GameLevelManager>();
+            auto gsm = utils::get<GameStatsManager>();
+            int secretCoins = 0;
+            for (size_t i = min; i < max; i++) {
+                auto level = glm->getMainLevel(i, true);
+                if (gsm->hasCompletedMainLevel(i)) {
+                    for (auto ix = 0; ix < 3; ix++) {
+                        if (gsm->hasSecretCoin(level->getCoinKey(ix + 1))) {
+                            secretCoins++;
+                        }
+                    }
+                }
+            }
+            return secretCoins;
+        }
+        static void recountSecretCoins() {
+
+            auto am = AchievementManager::sharedState();
+            auto glm = utils::get<GameLevelManager>();
+            auto gsm = utils::get<GameStatsManager>();
+            int newSecretCoins = 0;
+            //gsm->hasCompletedMainLevel(1);
+            //https://wyliemaster.github.io/gddocs/#/resources/client/gamesave/GS_Value
+            auto mapPacks = gsm->getCompletedMapPacks();
+            //std::unordered_set<int> demonPacks = {19,20,21,22,26,27,28,29,30,31,46,47,48,49,50,64,65,66};
+            // official levels
+            newSecretCoins += getSecretCoinsRange(1, 23);
+            newSecretCoins += getSecretCoinsRange(5001, 5005);
+            // map packs
+            for (size_t i = 0; i < mapPacks->count(); i++) {
+                // so mr robert doesnt have a dict for coins, but for stars!? this is rigged!
+                // looking at GameManager::verifyCoinUnlocks, robert simply has a huge CCString CCArray of map packs to parse from to get the secret coins, that sounds very inefficient!
+                int key = mapPacks->stringAtIndex(i)->intValue();
+                //if (demonPacks.find(key) != demonPacks.end()) {
+                //    newSecretCoins += 2;
+                //} else {
+                //    newSecretCoins += 1;
+                //}
+
+                // anyway, most (actually all) demon map packs offer 2 secret coins, sooo...
+                if (gsm->m_completedMappacks->valueForKey(fmt::format("pack_{}", key))->intValue() == 10) {
+                    newSecretCoins += 2;
+                } else {
+                    newSecretCoins += 1;
+                }
+            }
+            if (gsm->hasSecretCoin("secret04")) {
+                newSecretCoins++;
+            }
+            if (gsm->hasSecretCoin("secret06")) {
+                newSecretCoins++;
+            }
+            if (gsm->hasSecretCoin("secretB03")) {
+                newSecretCoins++;
+            }
+            if (gsm->getStat("8") == newSecretCoins) return Popup::create(i18n::get_("common.info"), i18n::get_("shortcuts.recount-secret-coins.nochange"));
+            if (gsm->getStat("8") > newSecretCoins) return Popup::create(i18n::get_("common.error"), i18n::format("shortcuts.recount-secret-coins.error", gsm->getStat("8"), newSecretCoins));
+            Popup::create(
+                i18n::get_("shortcuts.recount-secret-coins.title"),
+                i18n::format("shortcuts.recount-secret-coins.msg", gsm->getStat("8"), newSecretCoins),
+                i18n::get_("common.yes"), i18n::get_("common.no"),
+                [newSecretCoins, gsm](bool yes) {
+                    if (!yes) return;
+                    if (gsm->getStat("8") > newSecretCoins) return;
+                    gsm->setStat("8", newSecretCoins);
+                }
+            );
+        }
+
         void init() override {
             config::setIfEmpty("shortcut.p1jump", keybinds::Keys::None);
             config::setIfEmpty("shortcut.p2jump", keybinds::Keys::None);
@@ -205,6 +282,7 @@ namespace eclipse::hacks::Shortcuts {
             tab->addButton("shortcuts.save-folder")->setDescription()->callback(openSaveFolder)->handleKeybinds();
             tab->addButton("shortcuts.reset-bg-volume")->setDescription()->callback(resetBGVolume)->handleKeybinds();
             tab->addButton("shortcuts.reset-sfx-volume")->setDescription()->callback(resetSFXVolume)->handleKeybinds();
+            tab->addButton("shortcuts.recount-secret-coins")->setDescription()->callback(recountSecretCoins)->handleKeybinds();
 
             auto manager = keybinds::Manager::get();
             manager->addListener("shortcut.p1jump", [](bool down) {
