@@ -19,12 +19,12 @@ namespace eclipse::hacks::Level {
 				->handleKeybinds()
 				->setDescription("Restore the pulse effect from older versions.")
 				->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-				options->addToggle("level.legacypulse.force_fps")
-					->setDescription("Enable fixed FPS for legacy pulse simulation")
-					->addOptions([](std::shared_ptr<gui::MenuTab> fpsOptions) {
-					fpsOptions->addInputFloat("level.legacypulse.fps", 1.f, FLT_MAX, "%.0f FPS");
+					options->addToggle("level.legacypulse.force_fps")
+						->setDescription("Enable fixed FPS for legacy pulse simulation")
+						->addOptions([](std::shared_ptr<gui::MenuTab> fpsOptions) {
+							fpsOptions->addInputFloat("level.legacypulse.fps", 1.f, FLT_MAX, "%.0f FPS");
 						});
-					});
+				});
 		}
 
 		[[nodiscard]] const char* getId() const override { return "Legacy Pulse"; }
@@ -78,8 +78,7 @@ namespace eclipse::hacks::Level {
 
 	REGISTER_HACK(LegacyPulse)
 
-		class $modify(LegacyPulseGJBGLHook, FMODAudioEngine) {
-
+	class $modify(LegacyPulseFMODHook, FMODAudioEngine) {
 		ADD_HOOKS_DELEGATE("level.legacypulse");
 
 		void update(float deltaTime) {

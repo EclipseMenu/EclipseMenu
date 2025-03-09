@@ -18,7 +18,8 @@ namespace eclipse::utils {
     template <typename T>
     concept HasSharedState = requires { T::get(); }
             || requires { T::sharedDispatcher(); }
-            || requires { T::sharedConfiguration(); };
+            || requires { T::sharedConfiguration(); }
+            || requires { T::sharedShaderCache(); };
 
     template <typename T>
     concept NestedInstance = one_of_v<base_type<T>, EditorUI, UILayer>;
@@ -122,6 +123,8 @@ namespace eclipse::utils {
                     ref = cocos2d::CCIMEDispatcher::sharedDispatcher();
                 } else if constexpr (std::is_same_v<type, cocos2d::CCConfiguration>) {
                     ref = cocos2d::CCConfiguration::sharedConfiguration();
+                } else if constexpr (std::is_same_v<type, cocos2d::CCShaderCache>) {
+                    ref = cocos2d::CCShaderCache::sharedShaderCache();
                 } else {
                     ref = type::get();
                 }
