@@ -1,5 +1,12 @@
 # Eclipse Menu
 
+## v1.1.1
+**Additions**:
+* Added <cg>Recount Secret Coins</c> for restoring any lost secret coins from Uncomplete Level.
+
+**Fixes**:
+* <cg>Fixed</c> uncomplete level from <cr>removing secret coins</c> rather than user coins if a rated level contains it.
+
 ## v1.1.0
 **Additions**:
 * Added <cg>Confirm Hacks</c> (Confirm Practice, Restart, etc.) (#140)
