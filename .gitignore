@@ -66,6 +66,9 @@ bindings/
 website/
 bindingsbefore/
 resources/translations/*
+build/
+bindings/
+bindingsbefore/
 
 # CLion
 /cmake-*/

@@ -31,6 +31,7 @@ namespace eclipse::hacks::Level {
     static bool s_isDead = false;
     static bool s_skipDrawHook = false;
     static bool s_slopeHitboxFix = false;
+    static GameObject* s_collisionObject = nullptr;
 
     static std::deque<std::pair<cocos2d::CCRect, cocos2d::CCRect>> s_playerTrail1, s_playerTrail2;
 
@@ -69,7 +70,9 @@ namespace eclipse::hacks::Level {
             toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                 options->addToggle("level.showhitboxes.editor");
                 options->addToggle("level.showhitboxes.hideplayer");
-                options->addToggle("level.showhitboxes.ondeath")->handleKeybinds();
+                options->addToggle("level.showhitboxes.ondeath")->handleKeybinds()->addOptions([](std::shared_ptr<gui::MenuTab> optionsOnDeath) {
+                    optionsOnDeath->addToggle("level.showhitboxes.ondeath.player");
+                });
                 options->addToggle("level.showhitboxes.customcolors")->addOptions([](std::shared_ptr<gui::MenuTab> optionsColor) {
                     optionsColor->addColorComponent("level.showhitboxes.solid_color");
                     optionsColor->addColorComponent("level.showhitboxes.danger_color");
@@ -226,12 +229,37 @@ namespace eclipse::hacks::Level {
         self->m_debugDrawNode->setVisible(show || robtopShow);
 
         bool onDeath = config::get<"level.showhitboxes.ondeath", bool>();
+        bool onDeathCollide = config::get<"level.showhitboxes.ondeath.player", bool>();
 
         if (!show) return;
-        if (onDeath) {
+        if (onDeath || onDeathCollide) {
             self->m_debugDrawNode->setVisible(s_isDead || robtopShow);
             if (!s_isDead && !editor) return;
+            if (s_isDead && s_collisionObject != nullptr && onDeathCollide) {
+                self->m_debugDrawNode->clear();
+                bool customColors = config::get<"level.showhitboxes.customcolors", bool>();
+                gui::Color borderColor;
+                switch (s_collisionObject->m_objectType) {
+                    case GameObjectType::Solid:
+                        borderColor = customColors ? config::get<"level.showhitboxes.solid_color", gui::Color>(gui::Color(0, 0.247, 1)) : gui::Color(0, 0.247, 1);
+                        break;
+                    case GameObjectType::Hazard:
+                        borderColor = customColors ? config::get<"level.showhitboxes.danger_color", gui::Color>(gui::Color(1, 0, 0)) : gui::Color(1, 0, 0);
+                        break;
+                    default:
+                        borderColor = customColors ? config::get<"level.showhitboxes.other_color", gui::Color>(gui::Color(0, 1, 0)) : gui::Color(0, 1, 0);
+                        break;
+                }
+                drawRect(
+                    self->m_debugDrawNode,
+                    s_collisionObject->getObjectRect(),
+                    gui::Color(borderColor.r, borderColor.g, borderColor.b, 0.f),
+                    0.25f,
+                    borderColor
+                );
+            }
         }
+
 
         if (!config::get<"level.showhitboxes.hideplayer", bool>()) {
             bool customColors = config::get<"level.showhitboxes.customcolors", bool>();
@@ -310,9 +338,23 @@ namespace eclipse::hacks::Level {
             PlayLayer::resetLevel();
 
             s_isDead = false;
+            s_collisionObject = nullptr;
 
             s_playerTrail1.clear();
             s_playerTrail2.clear();
+        }
+
+        void destroyPlayer(PlayerObject *p0, GameObject *p1) {
+            PlayLayer::destroyPlayer(p0, p1);
+            if (m_anticheatSpike == p1) return;
+            if (p1 != nullptr)
+                s_collisionObject = p1;
+        }
+
+        void onQuit() {
+            // This doesn't reset for some reason
+            s_collisionObject = nullptr;
+            PlayLayer::onQuit();
         }
     };
 
@@ -323,6 +365,10 @@ namespace eclipse::hacks::Level {
             if (auto* pl = utils::get<PlayLayer>())
                 s_isDead = this == pl->m_player1 || this == pl->m_player2;
             PlayerObject::playerDestroyed(p0);
+        }
+        void collidedWithObject(float p0, GameObject* p1, cocos2d::CCRect p2, bool p3) {
+            s_collisionObject = p1;
+            PlayerObject::collidedWithObject(p0, p1, p2, p3);
         }
     };
 
