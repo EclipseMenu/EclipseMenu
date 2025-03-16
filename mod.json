@@ -1,5 +1,5 @@
 {
-	"geode": "4.2.0",
+	"geode": "4.3.1",
 	"gd": {
 		"win": "2.2074",
 		"mac": "2.2074",
@@ -12,7 +12,7 @@
 	"links": {
 		"homepage": "https://eclipse.menu",
 		"source": "https://github.com/EclipseMenu/EclipseMenu",
-        "community": "https://discord.gg/NnpwFRDMND"
+		"community": "https://discord.gg/NnpwFRDMND"
 	},
 	"api": { "include": [ "include/*.hpp" ] },
 	"tags": ["cheat", "gameplay", "utility", "customization", "interface"],
@@ -53,13 +53,11 @@
 			"UISheet": [ "resources/UISheet/*.png" ]
 		}
 	},
-	"dependencies": [
-        {
-            "id": "eclipse.ffmpeg-api",
-            "version": ">=1.2.0",
-            "importance": "suggested"
-        }
-	],
+	"dependencies": [{
+		"id": "eclipse.ffmpeg-api",
+		"version": ">=1.2.0",
+		"importance": "suggested"
+	}],
 	"settings": {
 		"legacy-render": {
 			"name": "Use Legacy rendering",
