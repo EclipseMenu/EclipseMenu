@@ -72,7 +72,6 @@ namespace eclipse::hacks::Player {
         }
 */
         void updateStroke(float dt) {
-            //log::info("ok its {}", this);
             if (config::get<"player.customwavetrail.rainbow", bool>(false)) {
                 auto speed = config::get<"player.customwavetrail.speed", float>(0.5f);
                 auto saturation = config::get<"player.customwavetrail.saturation", float>(100.f);
