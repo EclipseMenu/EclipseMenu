@@ -23,6 +23,7 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.customwavetrail.color", gui::Color::WHITE);
             config::setIfEmpty("player.customwavetrail.outline.color", gui::Color::BLACK);
             config::setIfEmpty("player.customwavetrail.outline.stroke", 2.f);
+            config::setIfEmpty("player.customwavetrail.outline.blur", 0);
 
             tab->addToggle("player.customwavetrail")->handleKeybinds()->setDescription()
                ->addOptions([](auto options) {
@@ -37,6 +38,7 @@ namespace eclipse::hacks::Player {
                    });
                    options->addToggle("player.customwavetrail.outline")->addOptions([](auto opt) {
                        opt->addInputFloat("player.customwavetrail.outline.stroke", 0.f, 10.f, "%.2f");
+                       opt->addInputInt("player.customwavetrail.outline.blur", 0, 32);
                        opt->addColorComponent("player.customwavetrail.outline.color");
                    });
                });
@@ -49,28 +51,6 @@ namespace eclipse::hacks::Player {
 
     class $modify(WaveTrailSizeHSHook, HardStreak) {
         ADD_HOOKS_DELEGATE("player.customwavetrail")
-/*
-        double normalizeAngle2(double p1) {
-            if (360.0 < p1) {
-                return p1 - 360.0;
-            } else if (0.0 <= p1) {
-                return p1;
-            } else {
-                return p1 + 360.0;
-            }
-        }
-        cocos2d::CCPoint quadOffset(cocos2d::CCPoint p1, cocos2d::CCPoint p2, float p3) {
-            if (1.0F <= p3) {
-                double dVar2 = normalizeAngle2(
-                    (std::atan2((p2.y - p1.y), (p2.x - p1.x)) * 180.0) / M_PI + 90.0
-                );
-                float fVar3 = ((float)(dVar2 * M_PI) / 180.F);
-                return cocos2d::CCPoint(p3 * 0.5f * std::cosf(fVar3), p3 * 0.5f * std::sinf(fVar3));
-            } else {
-                return cocos2d::CCPoint();
-            }
-        }
-*/
         void updateStroke(float dt) {
             if (config::get<"player.customwavetrail.rainbow", bool>(false)) {
                 auto speed = config::get<"player.customwavetrail.speed", float>(0.5f);
@@ -91,22 +71,51 @@ namespace eclipse::hacks::Player {
     class $modify(WaveTrailStrokeHSHook, cocos2d::CCDrawNode) {
         ADD_HOOKS_DELEGATE("player.customwavetrail.outline")
         bool drawPolygon(cocos2d::CCPoint *verts, unsigned int count, const cocos2d::ccColor4F &fillColor, float borderWidth, const cocos2d::ccColor4F &borderColor) {
-            if (fillColor.r == 1.F && fillColor.g == 1.F && fillColor.b == 1.F && fillColor.a != 1.F) return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor);
+            if (fillColor.r == 1.F && fillColor.g == 1.F && fillColor.b == 1.F && fillColor.a != 1.F)
+                return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor);
+            
             auto color = config::get<"player.customwavetrail.outline.color", gui::Color>(gui::Color::BLACK);
             auto width = config::get<"player.customwavetrail.outline.stroke", float>(2.F);
+
             this->setBlendFunc(cocos2d::CCSprite::create()->getBlendFunc());
             this->setZOrder(-1);
-            std::vector<CCPoint> newVerts(count);
-            for (unsigned int i = 0; i < count; i++) {
-                newVerts[i] = verts[i];
+
+            const int glowLayers = config::get<"player.customwavetrail.outline.blur", int>(0);
+            if (glowLayers == 0) {
+                std::vector<CCPoint> newVerts(count);
+                for (unsigned int i = 0; i < count; i++) {
+                    newVerts[i] = verts[i];
+                }
+                float offset = width + (width / count);
+                newVerts[0].y -= offset;
+                newVerts[3].y -= offset;
+                newVerts[1].y += offset;
+                newVerts[2].y += offset;
+                this->drawSegment(newVerts[0], newVerts[3], width, color);
+                this->drawSegment(newVerts[1], newVerts[2], width, color);
+                return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor);
             }
-            float offset = width + (width / count);
-            newVerts[0].y -= offset;
-            newVerts[3].y -= offset;
-            newVerts[1].y += offset;
-            newVerts[2].y += offset;
-            this->drawSegment(newVerts[0], newVerts[3], width, color);
-            this->drawSegment(newVerts[1], newVerts[2], width, color);
+            //width = width / glowLayers;
+            for (int i = 0; i < glowLayers; i++) {
+                float layerWidth = width * (1.0f + (i * 0.8f));
+                float opacity = std::max({0.05f, 0.8f * (float)std::pow(0.7f, i)});
+                auto glowColor = color;
+                glowColor.a *= opacity;
+
+                std::vector<CCPoint> newVerts(count);
+                for (unsigned int j = 0; j < count; j++) {
+                    newVerts[j] = verts[j];
+                }
+
+                float offset = layerWidth + (layerWidth / count);
+                newVerts[0].y -= offset;
+                newVerts[3].y -= offset;
+                newVerts[1].y += offset;
+                newVerts[2].y += offset;
+                
+                this->drawSegment(newVerts[0], newVerts[3], layerWidth, glowColor);
+                this->drawSegment(newVerts[1], newVerts[2], layerWidth, glowColor);
+            }
             return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor);
         }
     };
