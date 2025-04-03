@@ -6,7 +6,7 @@
 #include <modules/hack/hack.hpp>
 #include <modules/keybinds/manager.hpp>
 
-#ifndef GEODE_IS_ANDROID
+#ifndef GEODE_IS_MOBILE
 
 namespace eclipse::hacks::Player {
     double degToRad(double degrees) {

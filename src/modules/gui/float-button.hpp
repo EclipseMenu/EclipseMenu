@@ -14,8 +14,12 @@ namespace eclipse::gui {
         // move progress per second
         constexpr static float MOVE_SPEED = 9.75f;
         // how many units until the button snaps to touch pos
+#ifndef GEODE_IS_IOS
         constexpr static float SNAP_MARGIN = 0.1f;
-
+#else
+        // TODO: change this as this may not be the right value for iOS! (it wont move unless the value is big)
+        constexpr static float SNAP_MARGIN = 40.f;
+#endif
         std::function<void()> m_callback;
         cocos2d::CCSprite* m_sprite{}; // "main-sprite"
         cocos2d::CCPoint m_holdPosition{}; // last cursor/touch position

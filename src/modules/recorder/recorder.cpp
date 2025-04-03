@@ -43,8 +43,8 @@ namespace km {
     }
 
     inline kmMat4* Mat4OrthographicProjection(kmMat4* pOut, float left, float right, float bottom, float top, float nearVal, float farVal) {
-        #ifdef GEODE_IS_MACOS
-        DEFINE_ADDRESS(kmMat4OrthographicProjection, GEODE_ARM_MAC(0x34a914) GEODE_INTEL_MAC(0x3c1240), pOut, left, right, bottom, top, nearVal, farVal);
+        #ifdef __APPLE__
+        DEFINE_ADDRESS(kmMat4OrthographicProjection, GEODE_ARM_MAC(0x34a914) GEODE_INTEL_MAC(0x3c1240) GEODE_IOS(0x3ab750), pOut, left, right, bottom, top, nearVal, farVal);
         #else
         return kmMat4OrthographicProjection(pOut, left, right, bottom, top, nearVal, farVal);
         #endif

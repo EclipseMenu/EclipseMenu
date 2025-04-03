@@ -182,7 +182,7 @@ namespace eclipse::hacks::Shortcuts {
             FMODAudioEngine::sharedEngine()->setEffectsVolume(1.F);
         }
 
-    #ifdef GEODE_IS_ANDROID
+    #ifdef GEODE_IS_MOBILE
         static void openDevtools() {
             // simple hack that will call onMoreGames, which should open devtools
             // calling it on CCScene just to make sure hook will not actually crash on nullptr in case someone else hooked it

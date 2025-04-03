@@ -15,7 +15,7 @@ target_sources(imgui INTERFACE
 )
 set(HAS_IMGUI ON)
 
-if (NOT ANDROID)
+if (NOT ANDROID AND NOT IOS)
     set(RAPIDJSONTEST OFF)
     CPMAddPackage("gh:EclipseMenu/discord-rpc#1259d3a")
 endif()
@@ -52,6 +52,6 @@ target_link_libraries(third_party INTERFACE
     sinaps
 )
 
-if (NOT ANDROID)
+if (NOT ANDROID AND NOT IOS)
     target_link_libraries(third_party INTERFACE discord-rpc)
 endif()

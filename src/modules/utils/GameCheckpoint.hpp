@@ -98,9 +98,9 @@ namespace eclipse::utils {
             m_landParticlesAngle = player->m_landParticlesAngle;
             m_landParticleRelatedY = player->m_landParticleRelatedY;
             m_playerStreak = player->m_playerStreak;
-            m_streakRelated1 = player->m_streakRelated1;
-            m_streakRelated2 = player->m_streakRelated2;
-            m_streakRelated3 = player->m_streakRelated3;
+            m_streakStrokeWidth = player->m_streakStrokeWidth;
+            m_disableStreakTint = player->m_disableStreakTint;
+            m_alwaysShowStreak = player->m_alwaysShowStreak;
             m_shipStreakType = player->m_shipStreakType;
             m_slopeRotation = player->m_slopeRotation;
             m_currentSlopeYVelocity = player->m_currentSlopeYVelocity;
@@ -114,7 +114,7 @@ namespace eclipse::utils {
             m_collidedBottomMaxY = player->m_collidedBottomMaxY;
             m_collidedLeftMaxX = player->m_collidedLeftMaxX;
             m_collidedRightMinX = player->m_collidedRightMinX;
-            m_streakRelated4 = player->m_streakRelated4;
+            m_fadeOutStreak = player->m_fadeOutStreak;
             // m_canPlaceCheckpoint = player->m_canPlaceCheckpoint; (breaking)
             m_colorRelated = player->m_colorRelated;
             m_secondColorRelated = player->m_secondColorRelated;
@@ -361,9 +361,9 @@ namespace eclipse::utils {
             player->m_landParticlesAngle = m_landParticlesAngle;
             player->m_landParticleRelatedY = m_landParticleRelatedY;
             player->m_playerStreak = m_playerStreak;
-            player->m_streakRelated1 = m_streakRelated1;
-            player->m_streakRelated2 = m_streakRelated2;
-            player->m_streakRelated3 = m_streakRelated3;
+            player->m_streakStrokeWidth = m_streakStrokeWidth;
+            player->m_disableStreakTint = m_disableStreakTint;
+            player->m_alwaysShowStreak = m_alwaysShowStreak;
             player->m_shipStreakType = m_shipStreakType;
             player->m_slopeRotation = m_slopeRotation;
             player->m_currentSlopeYVelocity = m_currentSlopeYVelocity;
@@ -377,7 +377,7 @@ namespace eclipse::utils {
             player->m_collidedBottomMaxY = m_collidedBottomMaxY;
             player->m_collidedLeftMaxX = m_collidedLeftMaxX;
             player->m_collidedRightMinX = m_collidedRightMinX;
-            player->m_streakRelated4 = m_streakRelated4;
+            player->m_fadeOutStreak = m_fadeOutStreak;
             // player->m_canPlaceCheckpoint = m_canPlaceCheckpoint; (breaking)
             player->m_colorRelated = m_colorRelated;
             player->m_secondColorRelated = m_secondColorRelated;
@@ -626,9 +626,9 @@ namespace eclipse::utils {
         float m_landParticlesAngle;
         float m_landParticleRelatedY;
         int m_playerStreak;
-        float m_streakRelated1;
-        bool m_streakRelated2;
-        bool m_streakRelated3;
+        float m_streakStrokeWidth;
+        bool m_disableStreakTint;
+        bool m_alwaysShowStreak;
         ShipStreak m_shipStreakType;
         double m_slopeRotation;
         double m_currentSlopeYVelocity;
@@ -642,7 +642,7 @@ namespace eclipse::utils {
         double m_collidedBottomMaxY;
         double m_collidedLeftMaxX;
         double m_collidedRightMinX;
-        bool m_streakRelated4;
+        bool m_fadeOutStreak;
         // bool m_canPlaceCheckpoint; (breaking)
         cocos2d::ccColor3B m_colorRelated;
         cocos2d::ccColor3B m_secondColorRelated;

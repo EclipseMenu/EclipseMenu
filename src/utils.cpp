@@ -14,7 +14,7 @@
 // headers for getBaseSize()
 #ifdef GEODE_IS_WINDOWS
     #include <psapi.h>
-#elif defined(GEODE_IS_MACOS)
+#elif defined(__APPLE__)
     #include <mach-o/dyld.h>
     #include <mach-o/getsect.h>
     #include <mach-o/loader.h>
@@ -48,7 +48,7 @@ namespace eclipse::utils {
     }
 
     bool shouldUseLegacyDraw() {
-        #ifdef GEODE_IS_MACOS
+        #ifdef __APPLE__
         static bool hasVAO = hasOpenGLExtension("GL_APPLE_vertex_array_object");
         #else
         static bool hasVAO = hasOpenGLExtension("GL_ARB_vertex_array_object");
@@ -218,12 +218,13 @@ namespace eclipse::utils {
 
             return info.SizeOfImage;
 
-            #elif defined(GEODE_IS_MACOS)
+            #elif defined(__APPLE__)
 
             // i have no idea how to do this on macOS,
             // so for now just hardcode some arbitrary value within the range of the base size :fire:
             return GEODE_INTEL_MAC(0x980000)
-                   GEODE_ARM_MAC(0x8B0000);
+                   GEODE_ARM_MAC(0x8B0000)
+                   GEODE_IOS(0x8C0000);
 
             #elif defined(GEODE_IS_ANDROID)
 

@@ -43,8 +43,8 @@ namespace eclipse::hacks::Player {
         }
 
         void deactivateStreak(bool p0) {
-            if (!this->m_streakRelated4) return;
-            this->m_streakRelated4 = false;
+            if (!this->m_fadeOutStreak) return;
+            this->m_fadeOutStreak = false;
             this->fadeOutStreak2(this->m_playEffects ? 0.2f : 0.6f);
         }
 
@@ -53,7 +53,7 @@ namespace eclipse::hacks::Player {
             if (utils::get<GameManager>()->m_editorEnabled) return;
             if (this->m_isHidden) return;
 
-            this->m_streakRelated4 = true;
+            this->m_fadeOutStreak = true;
             if (this->m_isDart) {
                 auto pos = this->getPosition();
                 this->m_waveTrail->m_currentPoint = pos;

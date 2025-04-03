@@ -1,7 +1,15 @@
 cmake_minimum_required(VERSION 3.21)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR IOS)
+    set(IOS TRUE)
+    set(CMAKE_OSX_ARCHITECTURES "arm64")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0")
+    add_definitions(-DGLES_SILENCE_DEPRECATION)
+    set(SIMDUTF_TOOLS OFF) # required or it wont compile
+else()
+    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
+endif()
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 project(EclipseMenu VERSION 1.0.0 LANGUAGES CXX)
@@ -9,7 +17,9 @@ project(EclipseMenu VERSION 1.0.0 LANGUAGES CXX)
 set(MACOS_SOURCES "")
 if (APPLE)
   enable_language(OBJCXX)
+  if (NOT IOS)
   set(MACOS_SOURCES src/modules/keybinds/mouse/macos.mm src/modules/keybinds/keyboard/macos.mm)
+  endif()
 endif()
 
 # Sources
