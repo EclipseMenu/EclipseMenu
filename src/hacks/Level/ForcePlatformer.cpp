@@ -13,6 +13,7 @@ namespace eclipse::hacks::Level {
             tab->addToggle("level.forceplatformer")->handleKeybinds()->setDescription();
         }
 
+        [[nodiscard]] bool isCheating() const override { return config::get<"level.forceplatformer", bool>(); }
         [[nodiscard]] const char* getId() const override { return "Force Platformer"; }
     };
 

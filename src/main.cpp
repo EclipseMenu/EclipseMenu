@@ -101,9 +101,14 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
 
 class HackUpdater : public cocos2d::CCObject {
 public:
-    static HackUpdater* get() {
-        static HackUpdater instance;
-        return &instance;
+    static HackUpdater* create() {
+        auto ret = new HackUpdater();
+        if (ret) {
+            ret->autorelease();
+            return ret;
+        }
+        CC_SAFE_DELETE(ret);
+        return nullptr;
     }
 
     void update(float dt) override {
@@ -333,6 +338,6 @@ $on_mod(Loaded) {
     // Schedule hack updates
     cocos2d::CCScheduler::get()->scheduleSelector(
         schedule_selector(HackUpdater::update),
-        HackUpdater::get(), 0.f, false
+        HackUpdater::create(), 0.f, false
     );
 }

@@ -23,6 +23,10 @@ namespace eclipse::hacks::Global {
 
         int stroke = config::get<int>("global.show-taps.stroke", 0);
         
+        /*if (!fill) { // this definitely is a good idea
+            glEnable(GL_LINE_SMOOTH);
+            glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        }*/
         cocos2d::ccDrawColor4B(color.r, color.g, color.b, 255.F * ((float)config::get<int>("global.show-taps.opacity", 50) / 100.F));
         cocos2d::ccGLBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         for (size_t i = 0; i < touchNodes.size();) {
@@ -72,7 +76,7 @@ namespace eclipse::hacks::Global {
 
     REGISTER_HACK(ShowTaps)
 
-    #ifdef GEODE_IS_WINDOWS
+    #if defined(GEODE_IS_WINDOWS) || defined(GEODE_IS_IOS)
     class $modify(ShowTapsCCEGLVHook, cocos2d::CCEGLView) {
         ADD_HOOKS_DELEGATE("global.show-taps")
         void swapBuffers() override {
