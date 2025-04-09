@@ -19,7 +19,7 @@
 namespace eclipse::labels {
     static std::vector<EffectGameObject*> s_coins;
 
-    rift::Value getConfigValue(std::string key) {
+    rift::Value getConfigValue(std::string const& key) {
         if (!config::has(key)) {
             return {};
         }
