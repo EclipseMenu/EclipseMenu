@@ -518,6 +518,7 @@ namespace eclipse::hacks::Labels {
                    if (value < 0 || value >= DEFAULT_LABELS.size()) return;
                    gui::Engine::queueAfterDrawing([this, value] {
                        auto preset = DEFAULT_LABELS[value];
+                       preset.id = labels::LabelSettings::instanceCount++;
                        preset.visible = true;
                        s_labels.push_back(std::move(preset));
                        config::set("labels", s_labels);
