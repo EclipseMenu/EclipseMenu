@@ -57,15 +57,21 @@ namespace eclipse::utils {
         return !hasVAO || useLegacy;
     }
 
-    std::string formatTime(double time) {
+    std::string formatTime(double time, bool showMillis) {
         auto hours = static_cast<int>(time / 3600);
-        auto minutes = static_cast<int>(time / 60);
+        auto minutes = static_cast<int>(time / 60) % 60;
         auto seconds = static_cast<int>(time) % 60;
         auto millis = static_cast<int>(time * 1000) % 1000;
 
-        if (hours > 0) return fmt::format("{}:{:02d}:{:02d}.{:03d}", hours, minutes, seconds, millis);
-        if (minutes > 0) return fmt::format("{}:{:02d}.{:03d}", minutes, seconds, millis);
-        return fmt::format("{}.{:03d}", seconds, millis);
+        if (showMillis) {
+            if (hours > 0) return fmt::format("{}:{:02d}:{:02d}.{:03d}", hours, minutes, seconds, millis);
+            if (minutes > 0) return fmt::format("{}:{:02d}.{:03d}", minutes, seconds, millis);
+            return fmt::format("{}.{:03d}", seconds, millis);
+        }
+
+        if (hours > 0) return fmt::format("{}:{:02d}:{:02d}", hours, minutes, seconds);
+        if (minutes > 0) return fmt::format("{}:{:02d}", minutes, seconds);
+        return fmt::format("{}", seconds);
     }
 
     float getActualProgress(GJBaseGameLayer* game) {

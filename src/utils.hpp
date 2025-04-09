@@ -75,8 +75,9 @@ namespace eclipse::utils {
 
     /// @brief Format time in seconds to a string.
     /// @param time Time in seconds.
+    /// @param showMillis Whether to show milliseconds.
     /// @return Formatted time string (e.g. "1:23:45.678").
-    std::string formatTime(double time);
+    std::string formatTime(double time, bool showMillis = true);
 
     /// @brief Bugfixed version of getCurrentPercent.
     /// @param game GJBaseGameLayer to get the progress from.
