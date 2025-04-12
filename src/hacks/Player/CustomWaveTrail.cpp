@@ -12,6 +12,9 @@
 using namespace geode::prelude;
 
 namespace eclipse::hacks::Player {
+
+    static cocos2d::CCDrawNode* s_currentStreak = nullptr;
+
     class $hack(CustomWaveTrail) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
@@ -64,6 +67,8 @@ namespace eclipse::hacks::Player {
 
             this->m_pulseSize = config::get<"player.customwavetrail.scale", float>(2.f);
 
+            s_currentStreak = this;
+
             HardStreak::updateStroke(dt);
         }
     };
@@ -71,7 +76,7 @@ namespace eclipse::hacks::Player {
     class $modify(WaveTrailStrokeHSHook, cocos2d::CCDrawNode) {
         ADD_HOOKS_DELEGATE("player.customwavetrail.outline")
         bool drawPolygon(cocos2d::CCPoint *verts, unsigned int count, const cocos2d::ccColor4F &fillColor, float borderWidth, const cocos2d::ccColor4F &borderColor) {
-            if (fillColor.r == 1.F && fillColor.g == 1.F && fillColor.b == 1.F && fillColor.a != 1.F)
+            if ((fillColor.r == 1.F && fillColor.g == 1.F && fillColor.b == 1.F && fillColor.a != 1.F) || (s_currentStreak != this))
                 return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor);
             
             auto color = config::get<"player.customwavetrail.outline.color", gui::Color>(gui::Color::BLACK);

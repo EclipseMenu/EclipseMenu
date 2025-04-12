@@ -53,7 +53,7 @@ namespace eclipse::hacks::Shortcuts {
                         gsm->m_completedLevels->removeObjectForKey(fmt::format("c_{}", levelid));
                         if (level->m_stars > 0) {
                             //GSM->m_completedLevels->removeObjectForKey(fmt::format("unique_{}", levelid));
-                            gsm->m_completedLevels->removeObjectForKey(fmt::format("star_{}", levelid));
+                            gsm->m_completedLevels->removeObjectForKey(fmt::format("{}", gsm->getStarLevelKey(level))); // star_{}
                             gsm->m_completedLevels->removeObjectForKey(fmt::format("demon_{}", levelid));
                             if (level->isPlatformer()) {
                                 gsm->setStat("28", gsm->getStat("28") - level->m_stars); // moons
