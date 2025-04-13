@@ -1,3 +1,5 @@
+#ifndef GEODE_IS_MACOS
+// TODO: someone look at fixing this for imac
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
 #include <modules/gui/components/toggle.hpp>
@@ -30,14 +32,11 @@ namespace eclipse::hacks::Level {
             GM->m_unkAnimationDict->setObject(GM->m_unkAnimationDict->objectForKey(142)->copy(), -142);
             GM->m_unkAnimationDict->setObject(GM->m_unkAnimationDict->objectForKey(1329)->copy(), -1329);
         } else if (uncollectedSecretCoin && uncollectedUserCoin) {
-#ifndef GEODE_IS_MACOS
-            // TODO: someone look at fixing this for imac
             GM->m_unkAnimationDict->removeObjectForKey(-142);
             GM->m_unkAnimationDict->removeObjectForKey(-1329);
 
             GM->m_unkAnimationDict->setObject(uncollectedSecretCoin, -142);
             GM->m_unkAnimationDict->setObject(uncollectedUserCoin, -1329);
-#endif
         }
     }
 
@@ -79,3 +78,4 @@ namespace eclipse::hacks::Level {
         }
     };
 }
+#endif
