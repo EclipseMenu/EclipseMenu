@@ -10,6 +10,7 @@
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/EditorUI.hpp>
 
 namespace eclipse::hacks::Level {
     /// @brief Check whether hitboxes made by RobTop should be drawn. (e.g. in practice mode)
@@ -429,6 +430,18 @@ namespace eclipse::hacks::Level {
              */
             if (s_slopeHitboxFix) return;
             GameObject::determineSlopeDirection();
+        }
+    };
+
+    class $modify(ShowHitboxesEditorHook, EditorUI) {
+        void onPlaytest(cocos2d::CCObject *sender) {
+            EditorUI::onPlaytest(sender);
+
+            s_isDead = false;
+            s_collisionObject = nullptr;
+
+            s_playerTrail1.clear();
+            s_playerTrail2.clear();
         }
     };
 }

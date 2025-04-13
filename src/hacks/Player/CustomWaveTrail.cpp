@@ -64,18 +64,6 @@ namespace eclipse::hacks::Player {
 
     class $modify(WaveTrailSizeHSHook, HardStreak) {
         ADD_HOOKS_DELEGATE("player.customwavetrail")
-        bool init() {
-            if (!HardStreak::init()) return false;
-            if (s_currentStreak == nullptr) {
-                s_currentStreak = this;
-                return true;
-            }
-            if (s_currentStreak2 == nullptr) {
-                s_currentStreak2 = this;
-                return true;
-            }
-            return true;
-        }
         void updateStroke(float dt) {
             if (config::get<"player.customwavetrail.rainbow", bool>(false)) {
                 auto speed = config::get<"player.customwavetrail.speed", float>(0.5f);
@@ -88,6 +76,23 @@ namespace eclipse::hacks::Player {
             }
 
             this->m_pulseSize = config::get<"player.customwavetrail.scale", float>(2.f);
+
+            if (s_currentStreak == nullptr || s_currentStreak2 == nullptr) {
+                if (auto PL = utils::get<PlayLayer>()) {
+                    if (PL->m_player1 && s_currentStreak == nullptr) {
+                        if (this == PL->m_player1->m_waveTrail) {
+                            s_currentStreak = this;
+                            PL->m_player1->m_waveTrail->updateStroke(dt);
+                        }
+                    }
+                    if (PL->m_player2 && s_currentStreak2 == nullptr) {
+                        if (this == PL->m_player2->m_waveTrail) {
+                            s_currentStreak2 = this;
+                            PL->m_player2->m_waveTrail->updateStroke(dt);
+                        }
+                    }
+                }
+            }
 
             HardStreak::updateStroke(dt);
         }
