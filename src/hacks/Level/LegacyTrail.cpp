@@ -18,7 +18,7 @@ namespace eclipse::hacks::Level {
 				->handleKeybinds()
 				->setDescription("Restore the trail effect from older versions.")
 				->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-					options->addIntToggle("Points", "level.legacytrail.max_points", 10, 20);
+					options->addIntToggle("level.legacytrail.max_points", 10, 20);
 				});
 		}
 

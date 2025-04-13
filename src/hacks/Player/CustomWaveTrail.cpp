@@ -5,7 +5,7 @@
 #include <modules/gui/components/toggle.hpp>
 #include <modules/hack/hack.hpp>
 
-#include <Geode/modify/PlayerObject.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/HardStreak.hpp>
 #include <Geode/modify/CCDrawNode.hpp>
 
@@ -14,6 +14,7 @@ using namespace geode::prelude;
 namespace eclipse::hacks::Player {
 
     static cocos2d::CCDrawNode* s_currentStreak = nullptr;
+    static cocos2d::CCDrawNode* s_currentStreak2 = nullptr;
 
     class $hack(CustomWaveTrail) {
         void init() override {
@@ -52,8 +53,29 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(CustomWaveTrail)
 
+    class $modify(WaveTrailSizePLHook, PlayLayer) {
+        ADD_HOOKS_DELEGATE("player.customwavetrail.outline")
+        void resetLevel() {
+            s_currentStreak = nullptr;
+            s_currentStreak2 = nullptr;
+            PlayLayer::resetLevel();
+        }
+    };
+
     class $modify(WaveTrailSizeHSHook, HardStreak) {
         ADD_HOOKS_DELEGATE("player.customwavetrail")
+        bool init() {
+            if (!HardStreak::init()) return false;
+            if (s_currentStreak == nullptr) {
+                s_currentStreak = this;
+                return true;
+            }
+            if (s_currentStreak2 == nullptr) {
+                s_currentStreak2 = this;
+                return true;
+            }
+            return true;
+        }
         void updateStroke(float dt) {
             if (config::get<"player.customwavetrail.rainbow", bool>(false)) {
                 auto speed = config::get<"player.customwavetrail.speed", float>(0.5f);
@@ -76,7 +98,7 @@ namespace eclipse::hacks::Player {
     class $modify(WaveTrailStrokeHSHook, cocos2d::CCDrawNode) {
         ADD_HOOKS_DELEGATE("player.customwavetrail.outline")
         bool drawPolygon(cocos2d::CCPoint *verts, unsigned int count, const cocos2d::ccColor4F &fillColor, float borderWidth, const cocos2d::ccColor4F &borderColor) {
-            if ((fillColor.r == 1.F && fillColor.g == 1.F && fillColor.b == 1.F && fillColor.a != 1.F) || (s_currentStreak != this))
+            if ((fillColor.r == 1.F && fillColor.g == 1.F && fillColor.b == 1.F && fillColor.a != 1.F) || ((s_currentStreak != this) && (s_currentStreak2 != this)))
                 return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor);
             
             auto color = config::get<"player.customwavetrail.outline.color", gui::Color>(gui::Color::BLACK);
