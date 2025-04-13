@@ -89,8 +89,6 @@ namespace eclipse::hacks::Player {
 
             this->m_pulseSize = config::get<"player.customwavetrail.scale", float>(2.f);
 
-            s_currentStreak = this;
-
             HardStreak::updateStroke(dt);
         }
     };

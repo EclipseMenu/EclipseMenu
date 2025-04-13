@@ -1,5 +1,11 @@
 # Eclipse Menu
 
+## v1.2.1
+**Fixes**:
+* <cg>Fixed</c> Mac OS crashing on startup
+* <cg>Fixed</c> duals not working with <co>Trail Outline</c>
+* <cg>Fixed</c> certain settings not showing up on Android
+
 ## v1.2.0
 **Additions**:
 * <cg>iOS</c> support. All platforms are now supported!
