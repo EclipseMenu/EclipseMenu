@@ -1,5 +1,23 @@
 # Eclipse Menu
 
+## v1.2.0
+**Additions**:
+* <cg>iOS</c> support. All platforms are now supported!
+* Added <cg>Layout Mode</c>
+* Added <cg>Trail Outline</c> to allow your wave trail to have an outline! Customizable too!
+* Added <cg>Only Show Death Object</c>, for seeing which object you exactly died to!
+* Added <cg>Force Ghost Trail</c>
+* Added the <cg>Ball Variance</c> setting for <cg>Ball Rotation Bug</c>
+* Added settings for <cg>Legacy Pulse</c>
+* Added settings for <cg>Trail Cutting</c>
+* <co>Force Platformer</c> is now considered a <cr>cheat</c>
+
+**Fixes**:
+* <cg>Improved</c> Mac OS keybinds
+* <cg>Fixed</c> <co>Internal Recorder</c> crashes on iMac
+* <cg>Fixed</c> ball rotation issues on Mac OS
+* <cg>Fixed</c> label presets causing issues
+
 ## v1.1.1
 **Additions**:
 * Added <cg>Recount Secret Coins</c> for restoring any lost secret coins from Uncomplete Level.
