@@ -157,7 +157,7 @@ namespace eclipse::keybinds {
 
         if (event.isARepeat) return;
         auto key = convertMacKey(event.keyCode);
-        dispatch_async(dispatch_get_main_queue(), ^{
+        Loader::get()->queueInMainThread([=]() {
             Manager::get()->registerKeyPress(key);
         });
     }
@@ -167,7 +167,7 @@ namespace eclipse::keybinds {
 
         if (event.isARepeat) return;
         auto key = convertMacKey(event.keyCode);
-        dispatch_async(dispatch_get_main_queue(), ^{
+        Loader::get()->queueInMainThread([=]() {
             Manager::get()->registerKeyRelease(key);
         });
     }
