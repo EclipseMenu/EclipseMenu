@@ -156,14 +156,20 @@ namespace eclipse::keybinds {
         originalKeyDown(self, _cmd, event);
 
         if (event.isARepeat) return;
-        Manager::get()->registerKeyPress(convertMacKey(event.keyCode));
+        auto key = convertMacKey(event.keyCode);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            Manager::get()->registerKeyPress(key);
+        });
     }
 
     void keyUpHook(EAGLView* self, SEL _cmd, NSEvent* event) {
         originalKeyUp(self, _cmd, event);
 
         if (event.isARepeat) return;
-        Manager::get()->registerKeyRelease(convertMacKey(event.keyCode));
+        auto key = convertMacKey(event.keyCode);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            Manager::get()->registerKeyRelease(key);
+        });
     }
 
     #define OBJC_SWIZZLE(method, swizzle, original) do { \
