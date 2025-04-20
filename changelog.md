@@ -1,5 +1,14 @@
 # Eclipse Menu
 
+## v1.2.2
+**Additions**:
+* Added <cg>Click Between Frames</c> toggle for <co>all platforms</c>
+
+**Fixes**:
+* <cg>Fixed</c> <co>Hitbox Trails</c> not clearing in Editor
+* <cg>Disabled</c> <co>Always Show Coins</c> on Mac OS to prevent crashing
+* <cg>Fixed</c> <co>Startpos Switcher</c> crashing on Mac OS
+
 ## v1.2.1
 **Fixes**:
 * <cg>Fixed</c> Mac OS crashing on startup

@@ -19,6 +19,22 @@ namespace eclipse::hacks::Shortcuts {
             }
         }
 
+        // recreation since im not sure if i can even use fmt::format in bindings
+        static std::string getLevelKey(int levelID, bool isOnline, bool isDaily, bool isGauntlet, bool isEvent) {
+            /*
+            gauntlet - g_{}
+            online - c_{}
+            daily - d_{}
+            other - n_{}
+            event - e_{}
+            */
+            if (isOnline) return fmt::format("c_{}", levelID);
+            if (isDaily) return fmt::format("d_{}", levelID);
+            if (isGauntlet) return fmt::format("g_{}", levelID);
+            if (isEvent) return fmt::format("e_{}", levelID);
+            return fmt::format("n_{}", levelID);
+        }
+
         static void uncompleteLevel() {
             auto scene = utils::get<cocos2d::CCScene>();
             if (!scene) return; // sometimes people frget CCScene can sometimes be nullptr for no reason
@@ -50,7 +66,9 @@ namespace eclipse::hacks::Shortcuts {
                         int levelid = level->m_levelID.value();
                         // Delete completion
                         gsm->setStat("4", gsm->getStat("4") - 1); // completed levels
-                        gsm->m_completedLevels->removeObjectForKey(fmt::format("c_{}", levelid));
+                        auto levelKey = getLevelKey(level->m_levelID, level->m_levelType != GJLevelType::Local, level->m_dailyID > 0, level->m_gauntletLevel, level->m_dailyID > 200000);
+                        geode::log::debug("Deleting level key {} from completed levels", levelKey);
+                        gsm->m_completedLevels->removeObjectForKey(levelKey);
                         if (level->m_stars > 0) {
                             //GSM->m_completedLevels->removeObjectForKey(fmt::format("unique_{}", levelid));
                             gsm->m_completedLevels->removeObjectForKey(fmt::format("{}", gsm->getStarLevelKey(level))); // star_{}
@@ -63,14 +81,25 @@ namespace eclipse::hacks::Shortcuts {
                             if (level->m_demon > 0) {
                                 gsm->setStat("5", gsm->getStat("5") - 1); // demons
                             }
-                            auto coinDict = gsm->m_verifiedUserCoins;
                             for (auto i = 0; i < level->m_coins; i++) {
                                 auto key = level->getCoinKey(i + 1);
-                                if (gsm->hasUserCoin(key) || gsm->hasPendingUserCoin(key)) {
+                                if (gsm->hasUserCoin(key) && level->m_coinsVerified.value() > 0) {
                                     gsm->setStat("12", gsm->getStat("12") - 1);
                                 }
                             }
                         }
+
+                        // Remove coins
+                        auto coinDict = gsm->m_verifiedUserCoins;
+                        for (auto i = 0; i < level->m_coins; i++) {
+                            auto key = level->getCoinKey(i + 1);
+                            if (level->m_coinsVerified.value() > 0 && gsm->hasUserCoin(key)) {
+                                gsm->m_verifiedUserCoins->removeObjectForKey(key);
+                            } else if (gsm->hasPendingUserCoin(key)) {
+                                gsm->m_pendingUserCoins->removeObjectForKey(key);
+                            }
+                        }
+
                     }
 
                     // Clear progress
@@ -88,13 +117,6 @@ namespace eclipse::hacks::Shortcuts {
                     level->m_chk = 0;
                     level->m_coinsVerified = 0;
                     */
-
-                    // Remove coins
-                    auto coinDict = gsm->m_verifiedUserCoins;
-                    for (auto i = 0; i < level->m_coins; i++) {
-                        auto key = level->getCoinKey(i + 1);
-                        coinDict->removeObjectForKey(key);
-                    }
 
                     // Save the level
                     glm->saveLevel(level);

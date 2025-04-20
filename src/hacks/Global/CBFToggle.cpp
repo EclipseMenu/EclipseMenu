@@ -4,8 +4,6 @@
 #include <modules/hack/hack.hpp>
 #include <modules/labels/variables.hpp>
 
-#ifdef GEODE_IS_WINDOWS
-
 namespace eclipse::hacks::Global {
     class $hack(CBFToggle) {
         void init() override {}
@@ -38,4 +36,3 @@ namespace eclipse::hacks::Global {
 
     REGISTER_HACK(CBFToggle)
 }
-#endif
