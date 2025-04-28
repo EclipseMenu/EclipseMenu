@@ -17,10 +17,10 @@
 namespace eclipse::hacks::Global {
     std::chrono::time_point<std::chrono::steady_clock> s_lastDiscordUpdate;
     std::map<std::string, std::unique_ptr<rift::Script>> s_discordScripts;
+    static time_t s_startTimestamp, s_levelTimestamp;
 
     class $hack(DiscordRPC) {
         constexpr static auto DEFAULT_CLIENT_ID = "1212016614325624852";
-        static time_t startTimestamp, levelTimestamp;
 
         static void handleDiscordError(int errcode, const char* message) {
             geode::log::error("Discord RPC error: {} ({})", message, errcode);
@@ -97,13 +97,13 @@ namespace eclipse::hacks::Global {
             switch (config::get<int>("global.discordrpc.timemode", 1)) {
                 default: break;
                 case 1: { // Total playtime
-                    presence.startTimestamp = startTimestamp;
+                    presence.startTimestamp = s_startTimestamp;
                 } break;
                 case 2: if (gameState != GameState::Menu) { // Level playtime
-                    presence.startTimestamp = levelTimestamp;
+                    presence.startTimestamp = s_levelTimestamp;
                 } break;
                 case 3: { // Total+Level playtime
-                    presence.startTimestamp = gameState == GameState::Menu ? startTimestamp : levelTimestamp;
+                    presence.startTimestamp = gameState == GameState::Menu ? s_startTimestamp : s_levelTimestamp;
                 } break;
             }
 
@@ -187,8 +187,8 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.discordrpc.interval", 250.0f);
             config::setIfEmpty("global.discordrpc.timemode", 1);
 
-            startTimestamp = std::time(nullptr);
-            levelTimestamp = std::time(nullptr);
+            s_startTimestamp = std::time(nullptr);
+            s_levelTimestamp = std::time(nullptr);
 
             // Setting default scripts:
             {
@@ -317,15 +317,12 @@ namespace eclipse::hacks::Global {
         [[nodiscard]] const char* getId() const override { return "Discord RPC"; }
     };
 
-    time_t DiscordRPC::startTimestamp = 0;
-    time_t DiscordRPC::levelTimestamp = 0;
-
     REGISTER_HACK(DiscordRPC);
 
     class $modify(DiscordRPCGJBGLHook, GJBaseGameLayer) {
         bool init() override {
             if (!GJBaseGameLayer::init()) return false;
-            DiscordRPC::levelTimestamp = std::time(nullptr);
+            s_levelTimestamp = std::time(nullptr);
             return true;
         }
     };

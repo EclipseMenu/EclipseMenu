@@ -125,9 +125,10 @@ namespace eclipse::gui::cocos {
             auto btn = geode::cocos::CCMenuItemExt::createSpriteExtra(
                 btnSprite,
                 [this](auto) {
+                    auto ref = geode::Ref<KeybindComponentNode>(this);
                     SelectKeybindPopup::create(
                         config::get<keybinds::Keys>(m_component->getId(), keybinds::Keys::None),
-                        [ref = geode::Ref(this)](auto key) {
+                        [ref = std::move(ref)](auto key) {
                             auto& component = ref->m_component;
                             config::set(component->getId(), key);
                             component->triggerCallback(key);

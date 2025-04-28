@@ -53,7 +53,7 @@ namespace eclipse::labels {
         size_t labelId;
         size_t eventId;
         LabelEvent* event;
-        class LabelSettings* settings;
+        struct LabelSettings* settings;
 
         Event(size_t labelId, size_t eventId, LabelEvent* event, LabelSettings* settings)
             : labelId(labelId), eventId(eventId), event(event), settings(settings) {}
