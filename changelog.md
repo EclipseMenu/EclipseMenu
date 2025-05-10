@@ -2,12 +2,13 @@
 
 ## v.1.x.x (Nightly)
 **Additions**:
-* Removed no longer required dependencies to make Eclipse size smaller
+* Removed no longer required dependencies to reduce mod size
 
 **Fixes**:
 * <cg>Fixed</c> crash that could happen with <co>Only Show Death Object</c>
 * <cg>Fixed</c> crash with <co>Legacy Trail</c> after changing resolution
 * <cg>Fixed</c> menu popping up for few frames on launch
+* <cg>Fixed</c> crash when using <co>Ghost Trail</c> hacks with editors
 
 ## v1.2.2
 **Additions**:
