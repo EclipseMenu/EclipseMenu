@@ -1,5 +1,14 @@
 # Eclipse Menu
 
+## v.1.x.x (Nightly)
+**Additions**:
+* Removed no longer required dependencies to make Eclipse size smaller
+
+**Fixes**:
+* <cg>Fixed</c> crash that could happen with <co>Only Show Death Object</c>
+* <cg>Fixed</c> crash with <co>Legacy Trail</c> after changing resolution
+* <cg>Fixed</c> menu popping up for few frames on launch
+
 ## v1.2.2
 **Additions**:
 * Added <cg>Click Between Frames</c> toggle for <co>all platforms</c>

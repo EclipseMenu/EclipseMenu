@@ -8,10 +8,6 @@
 
 namespace eclipse::gui::imgui {
 
-    constexpr std::array themes = {
-        "Default", "MegaHack"
-    };
-
     void TabbedLayout::init() {
         m_windows.clear();
 
@@ -74,7 +70,7 @@ namespace eclipse::gui::imgui {
                     }
                 }
                 m_preloadStep = 1;
-                break;
+                return;
             case 1:
                 // Move windows outside the screen to prepare for animation
                 for (auto& window : m_windows) {
@@ -83,7 +79,7 @@ namespace eclipse::gui::imgui {
                 }
                 ImGui::GetStyle().Alpha = 1.f;
                 m_preloadStep = 2;
-                break;
+                return;
             default:
                 break;
         }
