@@ -1,3 +1,4 @@
+#include <Geode/platform/cplatform.h>
 #ifdef GEODE_IS_DESKTOP
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
@@ -9,7 +10,7 @@
 #include <modules/i18n/translations.hpp>
 #include <modules/labels/variables.hpp>
 
-#include <discord_rpc.h>
+#include <discord-rpc.hpp>
 #include <rift.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
@@ -21,10 +22,6 @@ namespace eclipse::hacks::Global {
 
     class $hack(DiscordRPC) {
         constexpr static auto DEFAULT_CLIENT_ID = "1212016614325624852";
-
-        static void handleDiscordError(int errcode, const char* message) {
-            geode::log::error("Discord RPC error: {} ({})", message, errcode);
-        }
 
         enum class GameState {
             Menu,
@@ -41,9 +38,9 @@ namespace eclipse::hacks::Global {
             return GameState::Menu;
         }
 
-        void refreshPresence() {
+        static void refreshPresence() {
             auto gameState = getGameState();
-            auto getScript = [this, gameState](const std::string& key, bool addPrefix = true) -> rift::Script* {
+            auto getScript = [gameState](const std::string& key, bool addPrefix = true) -> rift::Script* {
                 static auto nullScript = rift::compile("").unwrap(); // Script that returns empty string
                 std::string keyStr;
                 if (addPrefix) {
@@ -63,80 +60,75 @@ namespace eclipse::hacks::Global {
                 return it != s_discordScripts.end() ? it->second.get() : nullScript.get();
             };
 
-            DiscordRichPresence presence = {};
-            static std::string state, details, largeImage, largeImageText, smallImage, smallImageText, button1Text, button2Text, button1URL, button2URL;
-
             auto& varManager = labels::VariableManager::get();
             varManager.refetch(); // collect all variables
             const auto& vars = varManager.getVariables();
-            state = getScript("state")->run(vars).unwrapOrDefault();
-            details = getScript("details")->run(vars).unwrapOrDefault();
-            largeImage = getScript("largeimage")->run(vars).unwrapOrDefault();
-            largeImageText = getScript("largeimage.text")->run(vars).unwrapOrDefault();
-            smallImage = getScript("smallimage")->run(vars).unwrapOrDefault();
-            smallImageText = getScript("smallimage.text")->run(vars).unwrapOrDefault();
-            button1Text = getScript("button1.text", false)->run(vars).unwrapOrDefault();
-            button2Text = getScript("button2.text", false)->run(vars).unwrapOrDefault();
-            button1URL = getScript("button1.url", false)->run(vars).unwrapOrDefault();
-            button2URL = getScript("button2.url", false)->run(vars).unwrapOrDefault();
-
-            presence.state = state.c_str();
-            presence.details = details.c_str();
-            presence.largeImageKey = largeImage.c_str();
-            presence.largeImageText = largeImageText.c_str();
-            presence.smallImageKey = smallImage.c_str();
-            presence.smallImageText = smallImageText.c_str();
-            presence.buttons[0].active = config::get<bool>("global.discordrpc.button1.enabled", false) && !button1URL.empty() && !button1Text.empty();
-            presence.buttons[0].label = button1Text.c_str();
-            presence.buttons[0].url = button1URL.c_str();
-            presence.buttons[1].active = config::get<bool>("global.discordrpc.button2.enabled", false) && !button2URL.empty() && !button2Text.empty();
-            presence.buttons[1].label = button2Text.c_str();
-            presence.buttons[1].url = button2URL.c_str();
+            auto& presence = discord::RPCManager::get().getPresence();
+            presence
+                .setState(getScript("state")->run(vars).unwrapOrDefault())
+                .setDetails(getScript("details")->run(vars).unwrapOrDefault())
+                .setLargeImageKey(getScript("largeimage")->run(vars).unwrapOrDefault())
+                .setLargeImageText(getScript("largeimage.text")->run(vars).unwrapOrDefault())
+                .setSmallImageKey(getScript("smallimage")->run(vars).unwrapOrDefault())
+                .setSmallImageText(getScript("smallimage.text")->run(vars).unwrapOrDefault())
+                .setButton1(getScript("button1.text", false)->run(vars).unwrapOrDefault(),
+                            getScript("button1.url", false)->run(vars).unwrapOrDefault(),
+                            config::get<bool>("global.discordrpc.button1.enabled", false))
+                .setButton2(getScript("button2.text", false)->run(vars).unwrapOrDefault(),
+                            getScript("button2.url", false)->run(vars).unwrapOrDefault(),
+                            config::get<bool>("global.discordrpc.button2.enabled", false));
 
             // Time mode
             switch (config::get<int>("global.discordrpc.timemode", 1)) {
                 default: break;
                 case 1: { // Total playtime
-                    presence.startTimestamp = s_startTimestamp;
+                    presence.setStartTimestamp(s_startTimestamp);
                 } break;
                 case 2: if (gameState != GameState::Menu) { // Level playtime
-                    presence.startTimestamp = s_levelTimestamp;
+                    presence.setStartTimestamp(s_levelTimestamp);
                 } break;
                 case 3: { // Total+Level playtime
-                    presence.startTimestamp = gameState == GameState::Menu ? s_startTimestamp : s_levelTimestamp;
+                    presence.setStartTimestamp(gameState == GameState::Menu ? s_startTimestamp : s_levelTimestamp);
                 } break;
             }
 
-            Discord_UpdatePresence(&presence);
+            presence.refresh();
         }
 
-        void toggleRPC(bool enabled) {
+        static void toggleRPC(bool enabled) {
             if (enabled) refreshPresence();
-            else Discord_ClearPresence();
+            else discord::RPCManager::get().clearPresence();
         }
 
         static void initializeDiscord() {
             static bool initialized = false;
             if (initialized) {
-                Discord_Shutdown();
+                discord::RPCManager::get().shutdown();
                 initialized = false;
             }
 
-            DiscordEventHandlers handlers = {};
-            handlers.errored = handleDiscordError;
-            auto clientID = config::get<std::string>("global.discordrpc.clientid", DEFAULT_CLIENT_ID);
-            Discord_Initialize(clientID.c_str(), &handlers, 1, nullptr);
+            geode::log::info("Initializing Discord RPC");
+            discord::RPCManager::get()
+                .setClientID(config::get<std::string>("global.discordrpc.clientid", DEFAULT_CLIENT_ID))
+                .onReady([](auto& user) {
+                    geode::log::info("Discord RPC ready: {}", user.username);
+                })
+                .onErrored([](auto code, auto message) {
+                    geode::log::error("Discord RPC error: {} ({})", message, code);
+                })
+                .initialize();
+
             initialized = true;
         }
 
-        void compileScript(const std::string& name) {
+        static void compileScript(const std::string& name) {
             auto res = rift::compile(config::get<std::string>("global.discordrpc." + name, ""));
             if (res.isOk()) {
                 s_discordScripts[name] = std::move(res.unwrap());
             }
         }
 
-        void recompileScripts() {
+        static void recompileScripts() {
             // Delete all scripts
             s_discordScripts.clear();
 
