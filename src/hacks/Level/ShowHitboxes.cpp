@@ -351,12 +351,6 @@ namespace eclipse::hacks::Level {
             if (p1 != nullptr)
                 s_collisionObject = p1;
         }
-
-        void onQuit() {
-            // This doesn't reset for some reason
-            s_collisionObject = nullptr;
-            PlayLayer::onQuit();
-        }
     };
 
     class $modify(ShowHitboxesPOHook, PlayerObject) {
@@ -374,6 +368,11 @@ namespace eclipse::hacks::Level {
     };
 
     class $modify(ShowHitboxesBGLHook, GJBaseGameLayer) {
+        bool init() override {
+            s_collisionObject = nullptr;
+            return GJBaseGameLayer::init();
+        }
+
         void processCommands(float dt) {
             GJBaseGameLayer::processCommands(dt);
 
