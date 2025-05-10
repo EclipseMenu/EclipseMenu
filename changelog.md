@@ -2,6 +2,7 @@
 
 ## v.1.x.x (Nightly)
 **Additions**:
+* Added <cg>two new themes</c> <cg>Gruvbox</c> (thanks fleeym) and <cg>OpenHack</c>
 * Removed no longer required dependencies to reduce mod size
 
 **Fixes**:

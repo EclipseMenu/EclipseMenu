@@ -1,0 +1,53 @@
+{
+    "details": {
+        "author": "Eclipse Team",
+        "description": "Port of the default theme from OpenHack",
+        "layout": 0,
+        "name": "OpenHack",
+        "renderer": 0,
+        "schema": 1,
+        "style": 4
+    },
+    "blur": {
+        "blurEnabled": true,
+        "blurRadius": 1.0,
+        "blurSpeed": 0.3
+    },
+    "colors": {
+        "backgroundColor": "111111E5",
+        "borderColor": "000000FF",
+        "buttonActivatedColor": "704F94FF",
+        "buttonActiveForeground": "FFFFFFFF",
+        "buttonBackgroundColor": "BA87FCFF",
+        "buttonDisabledColor": "D393AFFF",
+        "buttonDisabledForeground": "B2B2B2FF",
+        "buttonForegroundColor": "FFFFFFFF",
+        "buttonHoveredColor": "946BC9FF",
+        "buttonHoveredForeground": "FFFFFFFF",
+        "checkboxBackgroundColor": "2F2F2FF2",
+        "checkboxCheckmarkColor": "BA87FCFF",
+        "checkboxForegroundColor": "BBBBBBFF",
+        "disabledColor": "808080F2",
+        "foregroundColor": "FFFFFFFF",
+        "searchedColor": "AB2C67FF",
+        "frameBackground": "1F1F1FF2",
+        "titleBackgroundColor": "1F1F1FFF",
+        "titleForegroundColor": "FFFFFFFF"
+    },
+    "other": {
+        "borderSize": 0.0,
+        "font": "Poppins",
+        "fontSize": 18.0,
+        "framePadding": 3.0,
+        "frameRounding": 4.0,
+        "horizontalInnerSpacing": 8.0,
+        "horizontalSpacing": 12.0,
+        "indentSpacing": 25.0,
+        "uiScale": 1.0,
+        "verticalInnerSpacing": 6.0,
+        "verticalSpacing": 2.0,
+        "windowMargin": 4.0,
+        "windowPadding": 4.0,
+        "windowRounding": 4.0
+    }
+}

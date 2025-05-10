@@ -55,7 +55,7 @@ std::pair<std::string, float> truncateString(std::string_view str, float availWi
 namespace eclipse::gui::imgui {
 
     std::vector<std::string> THEME_NAMES = {
-        "ImGui", "MegaHack", "MegaOverlay"
+        "ImGui", "MegaHack", "MegaOverlay", "Gruvbox", "OpenHack"
     };
 
     void Theme::visit(const std::shared_ptr<Component>& component) const {
@@ -136,6 +136,7 @@ namespace eclipse::gui::imgui {
     void Theme::init() {
         auto& style = ImGui::GetStyle();
         style.WindowMenuButtonPosition = ImGuiDir_Left;
+        style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
     }
 
     void Theme::update() {
@@ -152,7 +153,6 @@ namespace eclipse::gui::imgui {
         style.PopupRounding = tm->getFrameRounding();
         style.ItemSpacing = ImVec2(tm->getHorizontalSpacing(), tm->getVerticalSpacing());
         style.ItemInnerSpacing = ImVec2(tm->getHorizontalInnerSpacing(), tm->getVerticalInnerSpacing());
-        style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
         style.IndentSpacing = tm->getIndentSpacing();
         style.ScrollbarSize = 15.0f;
         style.ScrollbarRounding = 9.0f;
@@ -865,8 +865,11 @@ namespace eclipse::gui::imgui {
 
         auto tm = ThemeManager::get();
 
-        if (isSearchedFor)
+        if (isSearchedFor) {
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getSearchedColor()));
+        } else {
+            ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(tm->getButtonForegroundColor()));
+        }
 
         ImGui::PushStyleColor(ImGuiCol_Button, static_cast<ImVec4>(tm->getButtonBackgroundColor()));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, static_cast<ImVec4>(tm->getButtonHoveredBackground()));
@@ -874,7 +877,7 @@ namespace eclipse::gui::imgui {
 
         bool pressed = ImGui::Button(text.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 0));
 
-        ImGui::PopStyleColor(isSearchedFor ? 4 : 3);
+        ImGui::PopStyleColor(4);
         ImGui::PopItemWidth();
 
         return pressed;

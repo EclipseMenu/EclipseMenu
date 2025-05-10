@@ -1,0 +1,53 @@
+{
+    "details": {
+        "author": "fleeym",
+        "name": "Gruvbox",
+        "description": "Gruvbox!",
+        "layout": 0,
+        "renderer": 0,
+        "schema": 1,
+        "style": 3
+    },
+    "blur": {
+        "blurEnabled": false,
+        "blurRadius": 1.0,
+        "blurSpeed": 0.30
+    },
+    "colors": {
+        "backgroundColor": "282828ff",
+        "borderColor": "a89984ff",
+        "buttonActivatedColor": "665c54ff",
+        "buttonActiveForeground": "fabd2fff",
+        "buttonBackgroundColor": "504945ff",
+        "buttonDisabledColor": "282828ff",
+        "buttonDisabledForeground": "665c54ff",
+        "buttonForegroundColor": "ebdbb2ff",
+        "buttonHoveredColor": "665c54ff",
+        "buttonHoveredForeground": "ff0000ff",
+        "checkboxBackgroundColor": "3c3836ff",
+        "checkboxCheckmarkColor": "d79921ff",
+        "checkboxForegroundColor": "fbf1c7ff",
+        "disabledColor": "928374ff",
+        "foregroundColor": "ebdbb2ff",
+        "searchedColor": "83a598ff",
+        "frameBackground": "3c3836ff",
+        "titleBackgroundColor": "504945ff",
+        "titleForegroundColor": "fbf1c7ff"
+    },
+    "other": {
+        "borderSize": 0.5,
+        "font": "Rubik",
+        "fontSize": 17.0,
+        "framePadding": 3.0,
+        "frameRounding": 4.0,
+        "horizontalInnerSpacing": 8.0,
+        "horizontalSpacing": 12.0,
+        "indentSpacing": 25.0,
+        "uiScale": 1.0,
+        "verticalInnerSpacing": 6.0,
+        "verticalSpacing": 5.0,
+        "windowMargin": 4.0,
+        "windowPadding": 4.0,
+        "windowRounding": 5.0
+    }
+}

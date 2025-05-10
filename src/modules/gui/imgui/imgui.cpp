@@ -8,8 +8,10 @@
 #include <modules/gui/theming/manager.hpp>
 #include <modules/i18n/translations.hpp>
 
+#include "components/gruvbox/gruvbox.hpp"
 #include "components/megahack/megahack.hpp"
 #include "components/megaoverlay/megaoverlay.hpp"
+#include "components/openhack/openhack.hpp"
 #include "layouts/panel.hpp"
 #include "layouts/sidebar.hpp"
 #include "layouts/tabbed.hpp"
@@ -292,6 +294,12 @@ namespace eclipse::gui::imgui {
                 break;
             case ComponentTheme::MegaOverlay:
                 m_theme = std::make_unique<themes::MegaOverlay>();
+                break;
+            case ComponentTheme::Gruvbox:
+                m_theme = std::make_unique<themes::Gruvbox>();
+                break;
+            case ComponentTheme::OpenHack:
+                m_theme = std::make_unique<themes::OpenHack>();
                 break;
         }
         if (s_initialized) m_theme->init();
