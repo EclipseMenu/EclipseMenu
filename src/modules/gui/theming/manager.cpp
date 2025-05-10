@@ -269,7 +269,11 @@ namespace eclipse::gui {
     void ThemeManager::exportTheme(const std::filesystem::path& path) {}
 
     float ThemeManager::getGlobalScale() const {
-        return m_uiScale * config::getTemp<float>("ui.scale", 1.f) * imgui::DEFAULT_SCALE;
+        auto ret = m_uiScale * imgui::DEFAULT_SCALE;
+        if (config::get<"interface.dpi-scaling", bool>()) {
+            ret *= config::getTemp<"ui.scale", float>(1.f);
+        }
+        return ret;
     }
 
     std::optional<ThemeMeta> ThemeManager::checkTheme(const std::filesystem::path& path) {

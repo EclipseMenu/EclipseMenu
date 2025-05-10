@@ -176,6 +176,9 @@ $on_mod(Loaded) {
            ->callback([](float value) {
                ThemeManager::get()->setUIScale(value);
            })->disableSaving()->setFlags(ComponentFlags::DisableCocos);
+        tab->addToggle("interface.dpi-scaling")
+           ->setDescription()
+           ->setFlags(ComponentFlags::DisableCocos);
 
         auto fontCombo = tab->addCombo("interface.font", "fontIndex", ThemeManager::getFontNames(), 0);
         fontCombo->callback([](int value) {
