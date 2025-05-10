@@ -100,7 +100,11 @@ namespace eclipse::utils {
             if constexpr (PurgeableSingleton<type>) {
                 auto& pref = getPurgeable<T>();
                 if (pref) return pref;
-                pref = type::get();
+                if constexpr (std::is_same_v<type, cocos2d::CCShaderCache>) {
+                    pref = cocos2d::CCShaderCache::sharedShaderCache();
+                } else {
+                    pref = type::get();
+                }
                 return pref;
             }
 
@@ -125,9 +129,7 @@ namespace eclipse::utils {
                     ref = cocos2d::CCIMEDispatcher::sharedDispatcher();
                 } else if constexpr (std::is_same_v<type, cocos2d::CCConfiguration>) {
                     ref = cocos2d::CCConfiguration::sharedConfiguration();
-                } else if constexpr (std::is_same_v<type, cocos2d::CCShaderCache>) {
-                    ref = cocos2d::CCShaderCache::sharedShaderCache();
-                } else {
+                } else if constexpr (!PurgeableSingleton<type>) {
                     ref = type::get();
                 }
             } else {
