@@ -23,13 +23,13 @@ namespace eclipse::hacks::Player {
             tab->addToggle("player.forceghosttrail")->setDescription()->handleKeybinds()
             ->callback([](bool v) {
                 config::set("player.noghosttrail", false);
-                auto* gjbgl = utils::get<GJBaseGameLayer>();
-                if (!gjbgl) return;
+                auto* pl = utils::get<PlayLayer>();
+                if (!pl) return;
 
-                auto p1 = static_cast<PlayerObjectGTHook*>(gjbgl->m_player1);
-                auto p2 = static_cast<PlayerObjectGTHook*>(gjbgl->m_player2);
+                auto p1 = static_cast<PlayerObjectGTHook*>(pl->m_player1);
+                auto p2 = static_cast<PlayerObjectGTHook*>(pl->m_player2);
                 p1->toggleGhostEffect(p1->m_fields->m_curGhostType);
-                if (gjbgl->m_gameState.m_isDualMode) p2->toggleGhostEffect(p2->m_fields->m_curGhostType);
+                if (pl->m_gameState.m_isDualMode) p2->toggleGhostEffect(p2->m_fields->m_curGhostType);
             });
         }
       
@@ -42,13 +42,13 @@ namespace eclipse::hacks::Player {
             tab->addToggle("player.noghosttrail")->setDescription()->handleKeybinds()
             ->callback([](bool v) {
                 config::set("player.forceghosttrail", false);
-                auto* gjbgl = utils::get<GJBaseGameLayer>();
-                if (!gjbgl) return;
+                auto* pl = utils::get<PlayLayer>();
+                if (!pl) return;
 
-                auto p1 = static_cast<PlayerObjectGTHook*>(gjbgl->m_player1);
-                auto p2 = static_cast<PlayerObjectGTHook*>(gjbgl->m_player2);
+                auto p1 = static_cast<PlayerObjectGTHook*>(pl->m_player1);
+                auto p2 = static_cast<PlayerObjectGTHook*>(pl->m_player2);
                 p1->toggleGhostEffect(p1->m_fields->m_curGhostType);
-                if (gjbgl->m_gameState.m_isDualMode) p2->toggleGhostEffect(p2->m_fields->m_curGhostType);
+                if (pl->m_gameState.m_isDualMode) p2->toggleGhostEffect(p2->m_fields->m_curGhostType);
             });
         }
       
@@ -62,7 +62,7 @@ namespace eclipse::hacks::Player {
         ADD_HOOKS_DELEGATE("player.forceghosttrail");
 
         void toggleGhostEffect(GhostType p0) {
-            if (!this->m_isDead) p0 = GhostType::Enabled;
+            if (!this->m_isDead && utils::get<PlayLayer>()) p0 = GhostType::Enabled;
             PlayerObject::toggleGhostEffect(p0);
         }
     };
