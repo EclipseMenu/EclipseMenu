@@ -29,6 +29,7 @@ namespace eclipse::utils {
     concept PurgeableSingleton = one_of_v<
         base_type<T>,
         cocos2d::CCSpriteFrameCache,
+        cocos2d::CCShaderCache,
         cocos2d::CCTextureCache,
         cocos2d::CCFileUtils,
         BitmapFontCache,
@@ -72,6 +73,7 @@ namespace eclipse::utils {
     /// @brief Cleans up internally stored singleton cache for types that require it.
     inline void purgeAllSingletons() {
         purgeSingleton<cocos2d::CCSpriteFrameCache>();
+        purgeSingleton<cocos2d::CCShaderCache>();
         purgeSingleton<cocos2d::CCTextureCache>();
         purgeSingleton<cocos2d::CCFileUtils>();
         purgeSingleton<BitmapFontCache>();
