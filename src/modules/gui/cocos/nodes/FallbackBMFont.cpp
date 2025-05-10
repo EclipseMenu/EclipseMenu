@@ -124,7 +124,7 @@ namespace eclipse::gui::cocos {
         return Label::initWrapped(text, getCurrentAtlas(), BMFontAlignment::Left, scale, wrapWidth);
     }
 
-    bool EmojiLabel::init(std::string_view text, std::string_view font) {
+    bool EmojiLabel::init(std::string_view text, std::string const& font) {
         this->enableEmojis("emojis.png"_spr, &g_emojis);
         return Label::init(text, font, BMFontAlignment::Left, 1.f);
     }

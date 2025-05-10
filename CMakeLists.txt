@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.21)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR IOS)
     set(IOS TRUE)
     set(CMAKE_OSX_ARCHITECTURES "arm64")
     set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0")
     add_definitions(-DGLES_SILENCE_DEPRECATION)
-    set(SIMDUTF_TOOLS OFF) # required or it wont compile
 else()
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 endif()

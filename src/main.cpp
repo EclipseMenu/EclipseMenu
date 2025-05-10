@@ -1,7 +1,7 @@
 #include <Geode/loader/Setting.hpp>
 #include <Geode/modify/CCScheduler.hpp>
-#include <Geode/modify/MenuLayer.hpp>
 #include <Geode/modify/GameManager.hpp>
+#include <Geode/modify/MenuLayer.hpp>
 
 #include <imgui-cocos.hpp>
 #include <modules/config/config.hpp>
@@ -11,8 +11,8 @@
 #include <modules/gui/float-button.hpp>
 #include <modules/gui/blur/blur.hpp>
 
+#include <AdvancedLabel.hpp>
 #include <modules/gui/cocos/cocos.hpp>
-#include <modules/gui/cocos/nodes/label.hpp>
 #include <modules/gui/theming/manager.hpp>
 
 #include <modules/i18n/DownloadPopup.hpp>
@@ -42,7 +42,6 @@ class $modify(ClearCacheGMHook, GameManager) {
         GameManager::reloadAllStep5();
         utils::purgeAllSingletons();
         gui::blur::cleanup();
-        BMFontConfiguration::purgeCachedData();
         #ifdef ECLIPSE_USE_FLOATING_BUTTON
         gui::FloatingButton::get()->reloadSprite();
         #endif

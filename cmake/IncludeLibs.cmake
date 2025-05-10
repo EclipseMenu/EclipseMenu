@@ -24,7 +24,7 @@ CPMAddPackage("gh:maxnut/GDR-converter#55c5321")
 set(RIFT_INCLUDE_MATJSON ON)
 CPMAddPackage("gh:EclipseMenu/rift#0c452b1")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
-CPMAddPackage("gh:simdutf/simdutf@6.1.0")
+CPMAddPackage("gh:prevter/AdvancedLabel#c830a4f")
 CPMAddPackage("gh:prevter/sinaps#1663e86")
 CPMAddPackage(
     NAME nlohmann_json
@@ -48,7 +48,7 @@ target_link_libraries(third_party INTERFACE
     imgui-cocos
     nlohmann_json::nlohmann_json
     rift
-    simdutf
+    advanced_label
     sinaps
 )
 

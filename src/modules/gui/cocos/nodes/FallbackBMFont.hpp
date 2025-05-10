@@ -1,5 +1,5 @@
 #pragma once
-#include "label.hpp"
+#include <AdvancedLabel.hpp>
 
 namespace eclipse::gui::cocos {
 
@@ -58,7 +58,7 @@ namespace eclipse::gui::cocos {
 
     class EmojiLabel : public Label {
     public:
-        static EmojiLabel* create(std::string_view text, std::string_view font) {
+        static EmojiLabel* create(std::string_view text, std::string const& font) {
             auto ret = new EmojiLabel();
             if (ret->init(text, font)) {
                 ret->autorelease();
@@ -69,7 +69,7 @@ namespace eclipse::gui::cocos {
         }
 
     protected:
-        bool init(std::string_view text, std::string_view font);
+        bool init(std::string_view text, std::string const& font);
     };
 
 }
