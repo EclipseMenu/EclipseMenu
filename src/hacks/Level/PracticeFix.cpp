@@ -101,5 +101,18 @@ namespace eclipse::Hacks::Level {
 
             PlayLayer::removeCheckpoint(first);
         }
+
+        #ifdef GEODE_IS_DESKTOP
+        void storeCheckpoint(CheckpointObject* checkpoint) {
+            auto oldCheckpoint = static_cast<CheckpointObject*>(m_checkpointArray->objectAtIndex(0));
+
+            PlayLayer::storeCheckpoint(checkpoint);
+
+            auto fields = m_fields.self();
+            if (!m_checkpointArray->containsObject(oldCheckpoint) && fields->m_checkpoints.contains(oldCheckpoint)) {
+                fields->m_checkpoints.erase(oldCheckpoint);
+            }
+        }
+        #endif
     };
 }
