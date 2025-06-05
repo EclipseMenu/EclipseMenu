@@ -28,13 +28,15 @@ namespace eclipse::Hacks::Level {
     public:
         CheckpointData() = default;
 
-        CheckpointData(PlayerObject* player1, PlayerObject* player2) {
+        CheckpointData(PlayerObject* player1, PlayerObject* player2, PlayLayer* playLayer) {
+            m_checkpointPlayLayer = utils::FixPlayLayerCheckpoint(playLayer);
             m_checkpointPlayer1 = utils::FixPlayerCheckpoint(player1);
             if (player2)
                 m_checkpointPlayer2 = utils::FixPlayerCheckpoint(player2);
         }
 
-        void apply(PlayerObject* player1, PlayerObject* player2) {
+        void apply(PlayerObject* player1, PlayerObject* player2, PlayLayer* playLayer) {
+            m_checkpointPlayLayer.apply(playLayer);
             m_checkpointPlayer1.apply(player1);
             if (player2)
                 m_checkpointPlayer2.apply(player2);
@@ -43,6 +45,7 @@ namespace eclipse::Hacks::Level {
     private:
         utils::FixPlayerCheckpoint m_checkpointPlayer1;
         utils::FixPlayerCheckpoint m_checkpointPlayer2;
+        utils::FixPlayLayerCheckpoint m_checkpointPlayLayer;
     };
 
     class $modify(FixPlayLayer, PlayLayer) {
@@ -64,7 +67,7 @@ namespace eclipse::Hacks::Level {
                     PlayLayer::loadFromCheckpoint(checkpoint);
 
                     CheckpointData& data = fields->m_checkpoints[checkpoint];
-                    data.apply(m_player1, m_gameState.m_isDualMode ? m_player2 : nullptr);
+                    data.apply(m_player1, m_gameState.m_isDualMode ? m_player2 : nullptr, this);
 
                     return;
                 }
@@ -79,7 +82,7 @@ namespace eclipse::Hacks::Level {
                 return checkpoint;
 
             if (m_gameState.m_currentProgress > 0) {
-                CheckpointData data(m_player1, m_gameState.m_isDualMode ? m_player2 : nullptr);
+                CheckpointData data(m_player1, m_gameState.m_isDualMode ? m_player2 : nullptr, this);
                 m_fields->m_checkpoints[checkpoint] = std::move(data);
             }
 

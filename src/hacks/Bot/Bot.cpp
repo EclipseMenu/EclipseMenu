@@ -1,3 +1,4 @@
+#include "Geode/binding/GameManager.hpp"
 #include <Geode/Result.hpp>
 #include <modules/bot/bot.hpp>
 #include <modules/config/config.hpp>
@@ -294,6 +295,8 @@ namespace eclipse::hacks::Bot {
     class $modify(BotBGLHook, GJBaseGameLayer) {
         void simulateClick(PlayerButton button, bool down, bool player2) {
             auto performButton = down ? &PlayerObject::pushButton : &PlayerObject::releaseButton;
+            bool swapControls = GameManager::get()->getGameVariable("0010");
+            player2 = swapControls ? !player2 : player2;
 
             // in two player mode, only one player should be controlled
             if (m_levelSettings->m_twoPlayerMode && m_gameState.m_isDualMode) {
