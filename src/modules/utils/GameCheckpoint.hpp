@@ -157,7 +157,6 @@ namespace eclipse::utils {
             m_scaledCountDisplay = playLayer->m_scaledCountDisplay;
             m_rotatedCountDisplay = playLayer->m_rotatedCountDisplay;
             m_followedCountDisplay = playLayer->m_followedCountDisplay;
-            m_unknown3684 = playLayer->m_unknown3684;
             m_unk3678 = playLayer->m_unk3678;
             m_isDebugDrawEnabled = playLayer->m_isDebugDrawEnabled;
             m_unk3501 = playLayer->m_unk3501;
@@ -238,7 +237,7 @@ namespace eclipse::utils {
             m_timeWarp = playLayer->m_gameState.m_timeWarp;
             m_timeWarpRelated = playLayer->m_gameState.m_timeWarpRelated;
             m_currentChannel = playLayer->m_gameState.m_currentChannel;
-            m_unkInt17 = playLayer->m_gameState.m_unkInt17;
+            m_rotateChannel = playLayer->m_gameState.m_rotateChannel;
             m_totalTime = playLayer->m_gameState.m_totalTime;
             m_levelTime = playLayer->m_gameState.m_levelTime;
             m_unkDouble3 = playLayer->m_gameState.m_unkDouble3;
@@ -584,7 +583,6 @@ namespace eclipse::utils {
             playLayer->m_scaledCountDisplay = m_scaledCountDisplay;
             playLayer->m_rotatedCountDisplay = m_rotatedCountDisplay;
             playLayer->m_followedCountDisplay = m_followedCountDisplay;
-            playLayer->m_unknown3684 = m_unknown3684;
             playLayer->m_unk3678 = m_unk3678;
             playLayer->m_isDebugDrawEnabled = m_isDebugDrawEnabled;
             playLayer->m_unk3501 = m_unk3501;
@@ -665,7 +663,7 @@ namespace eclipse::utils {
             playLayer->m_gameState.m_timeWarp = m_timeWarp;
             playLayer->m_gameState.m_timeWarpRelated = m_timeWarpRelated;
             playLayer->m_gameState.m_currentChannel = m_currentChannel;
-            playLayer->m_gameState.m_unkInt17 = m_unkInt17;
+            playLayer->m_gameState.m_rotateChannel = m_rotateChannel;
             playLayer->m_gameState.m_totalTime = m_totalTime;
             playLayer->m_gameState.m_levelTime = m_levelTime;
             playLayer->m_gameState.m_unkDouble3 = m_unkDouble3;
@@ -1009,7 +1007,6 @@ namespace eclipse::utils {
         int m_scaledCountDisplay;
         int m_rotatedCountDisplay;
         int m_followedCountDisplay;
-        int m_unknown3684;
         void* m_unk3678;
         bool m_isDebugDrawEnabled;
         bool m_unk3501;
@@ -1090,7 +1087,7 @@ namespace eclipse::utils {
         float m_timeWarp;
         float m_timeWarpRelated;
         int m_currentChannel;
-        int m_unkInt17;
+        int m_rotateChannel;
         double m_totalTime;
         double m_levelTime;
         double m_unkDouble3;
