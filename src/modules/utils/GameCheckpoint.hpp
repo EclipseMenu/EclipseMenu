@@ -175,7 +175,7 @@ namespace eclipse::utils {
             m_lastGroundedPos = player->m_lastGroundedPos;
             m_lastActivatedPortal = player->m_lastActivatedPortal;
             m_hasEverJumped = player->m_hasEverJumped;
-            m_ringOrStreakRelated = player->m_ringOrStreakRelated;
+            // m_ringOrStreakRelated = player->m_ringOrStreakRelated;
             m_playerColor1 = player->m_playerColor1;
             m_playerColor2 = player->m_playerColor2;
             m_isSecondPlayer = player->m_isSecondPlayer;
@@ -438,7 +438,7 @@ namespace eclipse::utils {
             player->m_lastGroundedPos = m_lastGroundedPos;
             player->m_lastActivatedPortal = m_lastActivatedPortal;
             player->m_hasEverJumped = m_hasEverJumped;
-            player->m_ringOrStreakRelated = m_ringOrStreakRelated;
+            // player->m_ringOrStreakRelated = m_ringOrStreakRelated;
             player->m_playerColor1 = m_playerColor1;
             player->m_playerColor2 = m_playerColor2;
             player->m_isSecondPlayer = m_isSecondPlayer;
@@ -703,7 +703,7 @@ namespace eclipse::utils {
         cocos2d::CCPoint m_lastGroundedPos;
         GameObject* m_lastActivatedPortal;
         bool m_hasEverJumped;
-        bool m_ringOrStreakRelated;
+        // bool m_ringOrStreakRelated;
         cocos2d::ccColor3B m_playerColor1;
         cocos2d::ccColor3B m_playerColor2;
         bool m_isSecondPlayer;
