@@ -390,9 +390,7 @@ namespace eclipse::utils {
             m_unknownE58 = playLayer->m_unknownE58;
             m_umapIntVectorLabelGameObjectPtr = playLayer->m_umapIntVectorLabelGameObjectPtr;
             m_umapIntVectorLabelGameObjectPtr2 = playLayer->m_umapIntVectorLabelGameObjectPtr2;
-            m_mapTupleIntIntIntTupleIntIntInt = playLayer->m_mapTupleIntIntIntTupleIntIntInt;
             m_massiveFloatArray = playLayer->m_massiveFloatArray;
-            m_mapPairIntIntPairFloatFloat = playLayer->m_mapPairIntIntPairFloatFloat;
             m_umapIntInt3 = playLayer->m_umapIntInt3;
             m_unk3198 = playLayer->m_unk3198;
             m_unk31b8 = playLayer->m_unk31b8;
@@ -815,9 +813,7 @@ namespace eclipse::utils {
             playLayer->m_unknownE58 = m_unknownE58;
             playLayer->m_umapIntVectorLabelGameObjectPtr = m_umapIntVectorLabelGameObjectPtr;
             playLayer->m_umapIntVectorLabelGameObjectPtr2 = m_umapIntVectorLabelGameObjectPtr2;
-            playLayer->m_mapTupleIntIntIntTupleIntIntInt = m_mapTupleIntIntIntTupleIntIntInt;
             playLayer->m_massiveFloatArray = m_massiveFloatArray;
-            playLayer->m_mapPairIntIntPairFloatFloat = m_mapPairIntIntPairFloatFloat;
             playLayer->m_umapIntInt3 = m_umapIntInt3;
             playLayer->m_unk3198 = m_unk3198;
             playLayer->m_unk31b8 = m_unk31b8;
@@ -1240,9 +1236,7 @@ namespace eclipse::utils {
         gd::unordered_map<int, std::pair<int, int>> m_unknownE58;
         gd::unordered_map<int, gd::vector<LabelGameObject*>> m_umapIntVectorLabelGameObjectPtr;
         gd::unordered_map<int, gd::vector<LabelGameObject*>> m_umapIntVectorLabelGameObjectPtr2;
-        gd::map<std::pair<int, int>, int> m_mapTupleIntIntIntTupleIntIntInt;
         std::array<float, 2000> m_massiveFloatArray;
-        gd::map<std::pair<int, int>, int> m_mapPairIntIntPairFloatFloat;
         gd::vector<float> field_3058;
         gd::unordered_map<int, int> m_umapIntInt3;
         gd::vector<GameObject*> m_unk3198;
