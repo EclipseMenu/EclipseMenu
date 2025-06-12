@@ -583,7 +583,7 @@ namespace eclipse::labels {
         m_variables["progress"] = utils::getActualProgress(gameLayer);
         m_variables["timeWarp"] = gameLayer->m_gameState.m_timeWarp;
         m_variables["gravity"] = gameLayer->m_player1->m_gravityMod;
-        m_variables["activeObjects"] = gameLayer->m_activeObjects;
+        m_variables["activeObjects"] = gameLayer->m_activeObjectsCount;
         m_variables["gradients"] = gameLayer->m_activeGradients;
         m_variables["particleCount"] = gameLayer->m_particleCount;
 

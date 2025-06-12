@@ -23,8 +23,8 @@ namespace eclipse::hacks::Level {
         if (!gjbgl) return;
 
         // ambient particles visible after entering a portal
-        if (gjbgl->m_unk3238)
-            gjbgl->m_unk3238->setVisible(miscParticlesEnabled);
+        if (gjbgl->m_glitterParticles)
+            gjbgl->m_glitterParticles->setVisible(miscParticlesEnabled);
 
         for (const auto& [name, array] : geode::cocos::CCDictionaryExt<gd::string, cocos2d::CCArray*>{gjbgl->m_particlesDict}) {
             for (const auto& particle : geode::cocos::CCArrayExt<cocos2d::CCParticleSystemQuad*>{array}) {
