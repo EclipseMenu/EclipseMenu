@@ -93,8 +93,8 @@ namespace eclipse::hacks::Recorder {
 
         // reset ui object start positions
         for (auto obj : geode::cocos::CCArrayExt<GameObject*>(pl->m_objects)) {
-            auto it = pl->m_umapIntCCPoint.find(obj->m_uniqueID);
-            if (it == pl->m_umapIntCCPoint.end()) continue;
+            auto it = pl->m_uiObjectPositions.find(obj->m_uniqueID);
+            if (it == pl->m_uiObjectPositions.end()) continue;
 
             // revert the object to its original position
             obj->setStartPos(it->second);
