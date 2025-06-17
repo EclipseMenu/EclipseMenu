@@ -1469,9 +1469,9 @@ namespace eclipse::utils {
             m_unkAAC = player->m_unkAAC;
             m_unkAngle1 = player->m_unkAngle1;
             m_yVelocityRelated3 = player->m_yVelocityRelated3;
-            m_gamevar0060 = player->m_gamevar0060;
+            m_defaultMiniIcon = player->m_defaultMiniIcon;
             m_swapColors = player->m_swapColors;
-            m_gamevar0062 = player->m_gamevar0062;
+            m_switchDashFireColor = player->m_switchDashFireColor;
             m_followRelated = player->m_followRelated;
             m_unk838 = player->m_unk838;
             m_stateOnGround = player->m_stateOnGround;
@@ -1732,9 +1732,9 @@ namespace eclipse::utils {
             player->m_unkAAC = m_unkAAC;
             player->m_unkAngle1 = m_unkAngle1;
             player->m_yVelocityRelated3 = m_yVelocityRelated3;
-            player->m_gamevar0060 = m_gamevar0060;
+            player->m_defaultMiniIcon = m_defaultMiniIcon;
             player->m_swapColors = m_swapColors;
-            player->m_gamevar0062 = m_gamevar0062;
+            player->m_switchDashFireColor = m_switchDashFireColor;
             player->m_followRelated = m_followRelated;
             player->m_unk838 = m_unk838;
             player->m_stateOnGround = m_stateOnGround;
@@ -1997,9 +1997,9 @@ namespace eclipse::utils {
         float m_unkAAC;
         float m_unkAngle1;
         float m_yVelocityRelated3;
-        bool m_gamevar0060;
+        bool m_defaultMiniIcon;
         bool m_swapColors;
-        bool m_gamevar0062;
+        bool m_switchDashFireColor;
         int m_followRelated;
         float m_unk838;
         int m_stateOnGround;
