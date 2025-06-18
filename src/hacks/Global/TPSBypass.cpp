@@ -32,41 +32,58 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.tpsbypass", 240.f);
 
             // this patch allows us to manually set the expected amount of ticks per update call
-            geode::Patch* patch = nullptr;
+            uintptr_t addr = 0;
+            std::vector<uint8_t> bytes;
             #ifdef GEODE_IS_WINDOWS
             {
                 using namespace assembler::x86_64;
-                auto addr = geode::base::get() + 0x232294; // TODO: sigscan
-                auto bytes = Builder(addr)
+                addr = geode::base::get() + 0x232294; // TODO: sigscan
+                bytes = Builder(addr)
                     .movabs(Register64::rax, std::bit_cast<uint64_t>(&g_expectedTicks))
                     .mov(Register32::r11d, Register64::rax)
-                    .jmp(addr + 0x43, true) // skip the section
+                    .jmp(addr + 0x43, true)
                     .nop(4)
                     .build();
-
-                if (auto res = geode::Mod::get()->patch(reinterpret_cast<void*>(addr), bytes)) {
-                    patch = res.unwrap();
-                } else {
-                    geode::log::error("TPS Bypass: Failed to patch GJBaseGameLayer::update: {}", res.unwrapErr());
-                }
             }
             #elif defined(GEODE_IS_ANDROID64)
             {
                 using namespace assembler::arm64;
-                auto addr = geode::base::get() + 0x87DA40; // TODO: sigscan
-                auto bytes = Builder(addr)
+                addr = geode::base::get() + 0x87DA40; // TODO: sigscan
+                bytes = Builder(addr)
                     .mov(Register::x9, std::bit_cast<uint64_t>(&g_expectedTicks))
                     .ldr(Register::w0, Register::x9)
-                    .b(addr + 0x2c, true) // skip the section
+                    .b(addr + 0x2c, true)
                     .build();
-
-                if (auto res = geode::Mod::get()->patch(reinterpret_cast<void*>(addr), bytes)) {
-                    patch = res.unwrap();
-                } else {
-                    geode::log::error("TPS Bypass: Failed to patch GJBaseGameLayer::update: {}", res.unwrapErr());
-                }
+            }
+            #elif defined(GEODE_IS_ANDROID32)
+            {
+                using namespace assembler::armv7;
+                addr = geode::base::get() + 0x4841BC; // TODO: sigscan
+                bytes = Builder(addr)
+                    .mov(Register::r1, std::bit_cast<uint32_t>(&g_expectedTicks))
+                    .ldr_t(Register::r0, Register::r1)
+                    .nop_t()
+                    .build();
             }
             #endif
+
+            if (!addr || bytes.empty()) {
+                geode::log::error("TPS Bypass: Failed to find patch address or bytes");
+                config::set("global.tpsbypass.toggle", false);
+                // add a safeguard to disable tps bypass if it gets enabled
+                config::addDelegate("global.tpsbypass.toggle", []() {
+                    if (config::get<bool>("global.tpsbypass.toggle", false))
+                        config::set("global.tpsbypass.toggle", false);
+                });
+                return;
+            }
+
+            geode::Patch* patch = nullptr;
+            if (auto res = geode::Mod::get()->patch(reinterpret_cast<void*>(addr), bytes)) {
+                patch = res.unwrap();
+            } else {
+                geode::log::error("TPS Bypass: Failed to patch GJBaseGameLayer::update: {}", res.unwrapErr());
+            }
 
             // patch toggler
             if (!patch) {

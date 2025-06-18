@@ -375,4 +375,113 @@ namespace eclipse::assembler {
             std::vector<uint8_t> m_bytes;
         };
     }
+
+    namespace armv7 {
+        enum class Register : uint8_t {
+            r0 = 0, r1 = 1, r2 = 2, r3 = 3,
+            r4 = 4, r5 = 5, r6 = 6, r7 = 7,
+            r8 = 8, r9 = 9, r10 = 10, r11 = 11,
+            r12 = 12, sp = 13, lr = 14, pc = 15
+        };
+
+        /// @brief NOP instruction for Thumb-2 (ARMv7). 2 bytes.
+        constexpr std::array<uint8_t, 2> nop_t() {
+            return {0x00, 0xBF};
+        }
+
+        /// @brief NOP instruction for ARMv7. 4 bytes.
+        constexpr std::array<uint8_t, 4> nop() {
+            return {0x00, 0x00, 0xA0, 0xE3};
+        }
+
+        /// @brief MOV immediate (Thumb-2, 32-bit instruction)
+        /// MOVW <Rd>, #<imm16> - Move 16-bit immediate to register
+        constexpr std::array<uint8_t, 4> movw(Register rd, uint16_t imm16) {
+            uint8_t rd_bits = static_cast<uint8_t>(rd) & 0xF;
+            uint8_t imm4 = (imm16 >> 12) & 0xF;
+            uint8_t i = (imm16 >> 11) & 1;
+            uint8_t imm3 = (imm16 >> 8) & 0x7;
+            uint8_t imm8 = imm16 & 0xFF;
+
+            return {
+                static_cast<uint8_t>(0x40 | imm4),
+                static_cast<uint8_t>(0xF2 | (i << 2)),
+                imm8,
+                static_cast<uint8_t>((imm3 << 4) | rd_bits),
+            };
+        }
+
+        /// @brief MOVT (Move Top) - Move 16-bit immediate to top half of register (Thumb-2, 32-bit instruction)
+        /// MOVT <Rd>, #<imm16> - Move immediate to bits [31:16], keeping bits [15:0]
+        constexpr std::array<uint8_t, 4> movt(Register rd, uint16_t imm16) {
+            uint8_t rd_bits = static_cast<uint8_t>(rd) & 0xF;
+            uint8_t imm4 = (imm16 >> 12) & 0xF;
+            uint8_t i = (imm16 >> 11) & 1;
+            uint8_t imm3 = (imm16 >> 8) & 0x7;
+            uint8_t imm8 = imm16 & 0xFF;
+
+            return {
+                static_cast<uint8_t>(0xC0 | imm4),
+                static_cast<uint8_t>(0xF2 | (i << 2)),
+                imm8,
+                static_cast<uint8_t>((imm3 << 4) | rd_bits),
+            };
+        }
+
+        /// @brief LDR immediate (Thumb, 16-bit instruction)
+        /// LDR <Rt>, [<Rn>] - Load register from memory
+        constexpr std::array<uint8_t, 2> ldr(Register rt, Register rn) {
+            uint8_t rt_bits = static_cast<uint8_t>(rt) & 0x7;
+            uint8_t rn_bits = static_cast<uint8_t>(rn) & 0x7;
+
+            return {
+                static_cast<uint8_t>(rn_bits << 3),
+                static_cast<uint8_t>(0x68 | rt_bits)
+            };
+        }
+
+        class Builder {
+        public:
+            Builder() = default;
+            explicit Builder(uintptr_t baseAddress) : m_baseAddress(baseAddress) {}
+
+            Builder& mov(Register dst, uint32_t imm) {
+                auto bytes = armv7::movw(dst, static_cast<uint16_t>(imm & 0xFFFF));
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                if (imm > 0xFFFF) {
+                    bytes = armv7::movt(dst, static_cast<uint16_t>((imm >> 16) & 0xFFFF));
+                    m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                }
+                return *this;
+            }
+
+            Builder& ldr_t(Register rt, Register rn, uint16_t imm = 0) {
+                auto bytes = armv7::ldr(rt, rn);
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                return *this;
+            }
+
+            Builder& nop(size_t count = 1) {
+                for (size_t i = 0; i < count; ++i) {
+                    auto bytes = armv7::nop();
+                    m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                }
+                return *this;
+            }
+
+            Builder& nop_t(size_t count = 1) {
+                for (size_t i = 0; i < count; ++i) {
+                    auto bytes = armv7::nop_t();
+                    m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                }
+                return *this;
+            }
+
+            std::vector<uint8_t> build() { return std::move(m_bytes); }
+
+        private:
+            uintptr_t m_baseAddress = 0;
+            std::vector<uint8_t> m_bytes;
+        };
+    }
 }
