@@ -7,6 +7,8 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/HardStreak.hpp>
+#include <Geode/modify/GJEffectManager.hpp>
 
 #include <sinaps.hpp>
 
@@ -26,20 +28,48 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.tpsbypass", 240.f);
 
             // this patch allows us to manually set the expected amount of ticks per update call
+            geode::Patch* patch = nullptr;
             {
                 using namespace assembler::x86_64;
-                auto patch = Builder()
+                auto bytes = Builder()
                     .movabs(Register64::rax, std::bit_cast<uint64_t>(&g_expectedTicks))
                     .mov(Register32::r11d, Register64::rax)
                     .nop(54)
                     .build();
 
                 auto addr = geode::base::get() + 0x232294;
-                geode::Mod::get()->patch(reinterpret_cast<void*>(addr), patch).unwrap();
-                geode::log::debug("TPSBypass: patched 0x{:X} with midhook value address 0x{:X}", addr, (uintptr_t)&g_expectedTicks);
+                if (auto res = geode::Mod::get()->patch(reinterpret_cast<void*>(addr), bytes)) {
+                    patch = res.unwrap();
+                } else {
+                    geode::log::error("TPS Bypass: Failed to patch GJBaseGameLayer::update: {}", res.unwrapErr());
+                }
             }
 
-            // on macOS we also have to patch instructions in GJBaseGameLayer::getModifiedDelta because it's inlined
+            // patch toggler
+            if (!patch) {
+                geode::log::error("TPS Bypass: Failed to patch GJBaseGameLayer::update");
+                config::set("global.tpsbypass.toggle", false);
+                // add a safeguard to disable tps bypass if it gets enabled
+                config::addDelegate("global.tpsbypass.toggle", []() {
+                    if (config::get<bool>("global.tpsbypass.toggle"))
+                        config::set("global.tpsbypass.toggle", false);
+                });
+                return;
+            }
+
+            // toggle the patch if enabled
+            config::addDelegate("global.tpsbypass.toggle", [patch] {
+                (void) (config::get<bool>("global.tpsbypass.toggle")
+                    ? patch->enable()
+                    : patch->disable());
+            });
+
+            // set the initial state of the patch
+            (void) (config::get<bool>("global.tpsbypass.toggle")
+                    ? patch->enable()
+                    : patch->disable());
+
+            // on macOS, we also have to patch instructions in GJBaseGameLayer::getModifiedDelta because it's inlined
             #ifdef REQUIRE_MODIFIED_DELTA_PATCH
             auto res = setupModifiedDeltaPatches();
             if (!res) {
@@ -47,7 +77,7 @@ namespace eclipse::hacks::Global {
                 config::set("global.tpsbypass.toggle", false);
                 // add a safeguard to disable tps bypass if it gets enabled
                 config::addDelegate("global.tpsbypass.toggle", []() {
-                    if (config::get<"global.tpsbypass.toggle", bool>(false))
+                    if (config::get<bool>("global.tpsbypass.toggle"))
                         config::set("global.tpsbypass.toggle", false);
                 });
                 return;
@@ -194,12 +224,12 @@ namespace eclipse::hacks::Global {
 
         struct Fields {
             double m_extraDelta = 0.0;
-            float m_realDelta = 0.0;
-            bool m_shouldHide = false;
-            bool m_shouldBufferPostUpdate = false;
-            bool m_shouldBreak = false;
-            bool m_postRestart = false;
+            float m_visualDelta = 0.0;
         };
+
+        static TPSBypassGJBGLHook* get() {
+            return static_cast<TPSBypassGJBGLHook*>(GJBaseGameLayer::get());
+        }
 
         float getCustomDelta(float dt, float tps, bool applyExtraDelta = true) {
             auto spt = 1.f / tps;
@@ -223,17 +253,8 @@ namespace eclipse::hacks::Global {
         }
         #endif
 
-        bool shouldContinue(const Fields* fields) const {
-            if (!m_isEditor) return true;
-
-            // in editor, player hitbox is removed from section when it dies,
-            // so we need to check if it's still there
-            return !fields->m_shouldBreak;
-        }
-
         void update(float dt) override {
             auto fields = m_fields.self();
-            fields->m_realDelta = dt;
             fields->m_extraDelta += dt;
 
             // calculate number of steps based on the new TPS
@@ -243,6 +264,8 @@ namespace eclipse::hacks::Global {
             auto totalDelta = steps * spt;
             fields->m_extraDelta -= totalDelta;
             g_expectedTicks = static_cast<int>(steps);
+
+            fields->m_visualDelta = totalDelta;
 
             GJBaseGameLayer::update(totalDelta);
         }
@@ -259,20 +282,7 @@ namespace eclipse::hacks::Global {
 
         // PlayLayer postUpdate handles practice mode checkpoints, labels and also calls updateVisibility
         void postUpdate(float dt) override {
-            auto fields = getFields(this);
-            if (fields->m_shouldHide) {
-                fields->m_shouldBufferPostUpdate = true;
-                return;
-            }
-
-            fields->m_shouldBufferPostUpdate = false;
-            PlayLayer::postUpdate(fields->m_realDelta);
-        }
-
-        void resetLevel() {
-            auto fields = getFields(this);
-            fields->m_postRestart = true;
-            PlayLayer::resetLevel();
+            PlayLayer::postUpdate(getFields(this)->m_visualDelta);
         }
 
         // we also would like to fix the percentage calculation, which uses constant 240 TPS to determine the progress
@@ -280,7 +290,7 @@ namespace eclipse::hacks::Global {
             auto timestamp = m_level->m_timestamp;
             auto currentProgress = m_gameState.m_currentProgress;
             // this is only an issue for 2.2+ levels (with TPS greater than 240)
-            if (timestamp > 0 && config::get<"global.tpsbypass", float>(240.f) > 240.f) {
+            if (timestamp > 0 && config::get<"global.tpsbypass", float>(240.f) != 240.f) {
                 // recalculate m_currentProgress based on the actual time passed
                 auto progress = utils::getActualProgress(this);
                 m_gameState.m_currentProgress = timestamp * progress / 100.f;
@@ -304,7 +314,7 @@ namespace eclipse::hacks::Global {
             // levelComplete uses m_gameState.m_unkUint2 to store the timestamp
             // also we can't rely on m_level->m_timestamp, because it might not be updated yet
             auto oldTimestamp = m_gameState.m_unkUint2;
-            if (config::get<"global.tpsbypass", float>(240.f) > 240.f) {
+            if (config::get<"global.tpsbypass", float>(240.f) != 240.f) {
                 auto ticks = static_cast<uint32_t>(std::round(m_gameState.m_levelTime * 240));
                 m_gameState.m_unkUint2 = ticks;
             }
@@ -320,11 +330,29 @@ namespace eclipse::hacks::Global {
         void postUpdate(float dt) override {
             // editor disables playback mode in postUpdate, so we should call the function if we're dead
             auto fields = getFields(this);
-            if (fields->m_shouldHide && !m_player1->m_maybeIsColliding && !m_player2->m_maybeIsColliding) return;
-            // m_maybeIsColliding will be reset in our inner update call next iteration,
-            // so we need to store it here to check if we should break out of the loop
-            fields->m_shouldBreak = m_player1->m_maybeIsColliding || m_player2->m_maybeIsColliding;
-            LevelEditorLayer::postUpdate(fields->m_realDelta);
+            if (!m_player1->m_maybeIsColliding && !m_player2->m_maybeIsColliding) return;
+            LevelEditorLayer::postUpdate(fields->m_visualDelta);
+        }
+    };
+
+    // few more hooks to restore speed of animations
+    class $modify(TPSBypassHSHook, HardStreak) {
+        ALL_DELEGATES_AND_SAFE_PRIO("global.tpsbypass.toggle")
+
+        void updateStroke(float dt) {
+            auto gjbgl = TPSBypassGJBGLHook::get();
+            if (!gjbgl) return HardStreak::updateStroke(dt);
+            HardStreak::updateStroke(gjbgl->m_fields->m_visualDelta);
+        }
+    };
+
+    class $modify(TPSBypassGJEMHook, GJEffectManager) {
+        ALL_DELEGATES_AND_SAFE_PRIO("global.tpsbypass.toggle")
+
+        void updateEffects(float dt) {
+            auto gjbgl = TPSBypassGJBGLHook::get();
+            if (!gjbgl) return GJEffectManager::update(dt);
+            GJEffectManager::update(gjbgl->m_fields->m_visualDelta);
         }
     };
 }
