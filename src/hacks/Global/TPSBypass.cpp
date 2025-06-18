@@ -22,7 +22,8 @@ constexpr float MAX_TPS = 100000.f;
 namespace eclipse::hacks::Global {
     using TicksType =
         GEODE_WINDOWS(uint32_t)
-        GEODE_ANDROID64(uint32_t);
+        GEODE_ANDROID64(uint32_t)
+        GEODE_ANDROID32(float);
 
     static TicksType g_expectedTicks = 0;
 
