@@ -31,13 +31,14 @@ namespace eclipse::hacks::Global {
             geode::Patch* patch = nullptr;
             {
                 using namespace assembler::x86_64;
-                auto bytes = Builder()
+                auto addr = geode::base::get() + 0x232294; // TODO: sigscan
+                auto bytes = Builder(addr)
                     .movabs(Register64::rax, std::bit_cast<uint64_t>(&g_expectedTicks))
                     .mov(Register32::r11d, Register64::rax)
-                    .nop(54)
+                    .jmp(addr + 0x43, true) // skip the section
+                    .nop(4)
                     .build();
 
-                auto addr = geode::base::get() + 0x232294;
                 if (auto res = geode::Mod::get()->patch(reinterpret_cast<void*>(addr), bytes)) {
                     patch = res.unwrap();
                 } else {
@@ -51,7 +52,7 @@ namespace eclipse::hacks::Global {
                 config::set("global.tpsbypass.toggle", false);
                 // add a safeguard to disable tps bypass if it gets enabled
                 config::addDelegate("global.tpsbypass.toggle", []() {
-                    if (config::get<bool>("global.tpsbypass.toggle"))
+                    if (config::get<bool>("global.tpsbypass.toggle", false))
                         config::set("global.tpsbypass.toggle", false);
                 });
                 return;
@@ -59,13 +60,13 @@ namespace eclipse::hacks::Global {
 
             // toggle the patch if enabled
             config::addDelegate("global.tpsbypass.toggle", [patch] {
-                (void) (config::get<bool>("global.tpsbypass.toggle")
+                (void) (config::get<bool>("global.tpsbypass.toggle", false)
                     ? patch->enable()
                     : patch->disable());
             });
 
             // set the initial state of the patch
-            (void) (config::get<bool>("global.tpsbypass.toggle")
+            (void) (config::get<bool>("global.tpsbypass.toggle", false)
                     ? patch->enable()
                     : patch->disable());
 
@@ -77,7 +78,7 @@ namespace eclipse::hacks::Global {
                 config::set("global.tpsbypass.toggle", false);
                 // add a safeguard to disable tps bypass if it gets enabled
                 config::addDelegate("global.tpsbypass.toggle", []() {
-                    if (config::get<bool>("global.tpsbypass.toggle"))
+                    if (config::get<bool>("global.tpsbypass.toggle", false))
                         config::set("global.tpsbypass.toggle", false);
                 });
                 return;

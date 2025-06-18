@@ -51,9 +51,21 @@ namespace eclipse::assembler {
             return {rex, 0x8B, modrm};
         }
 
+        /// @brief jmp rel32: Jump to a relative address.
+        constexpr std::array<uint8_t, 5> jmp(int32_t rel) {
+            return {
+                0xE9,
+                static_cast<uint8_t>(rel & 0xFF),
+                static_cast<uint8_t>((rel >> 8) & 0xFF),
+                static_cast<uint8_t>((rel >> 16) & 0xFF),
+                static_cast<uint8_t>((rel >> 24) & 0xFF)
+            };
+        }
+
         class Builder {
         public:
             Builder() = default;
+            explicit Builder(uintptr_t baseAddress) : m_baseAddress(baseAddress) {}
 
             Builder& movabs(Register64 dst, uint64_t imm) {
                 auto bytes = x86_64::movabs(dst, imm);
@@ -67,6 +79,14 @@ namespace eclipse::assembler {
                 return *this;
             }
 
+            Builder& jmp(int32_t offset, bool relative = false) {
+                // If relative is true, offset is the absolute address, and we calculate the relative jump.
+                if (relative) offset -= m_baseAddress + m_bytes.size() + 5; // 5 is the size of the jmp instruction
+                auto bytes = x86_64::jmp(offset);
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                return *this;
+            }
+
             Builder& nop(size_t count = 1) {
                 m_bytes.insert(m_bytes.end(), count, 0x90);
                 return *this;
@@ -75,6 +95,7 @@ namespace eclipse::assembler {
             std::vector<uint8_t> build() { return std::move(m_bytes); }
 
         private:
+            uintptr_t m_baseAddress = 0;
             std::vector<uint8_t> m_bytes;
         };
     }
