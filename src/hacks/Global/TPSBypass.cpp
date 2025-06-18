@@ -14,19 +14,34 @@ constexpr float MIN_TPS = 0.f;
 constexpr float MAX_TPS = 100000.f;
 
 #ifdef GEODE_IS_MACOS
-#define REQUIRE_PATCH
+#define REQUIRE_MODIFIED_DELTA_PATCH
 #endif
 
 namespace eclipse::hacks::Global {
-    static float g_midhookValue = 0.f;
+    static int g_expectedTicks = 0.f;
 
     class $hack(TPSBypass) {
     public:
         void init() override {
             config::setIfEmpty("global.tpsbypass", 240.f);
 
-            #ifdef REQUIRE_PATCH
-            auto res = setupPatches();
+            // this patch allows us to manually set the expected amount of ticks per update call
+            {
+                using namespace assembler::x86_64;
+                auto patch = Builder()
+                    .movabs(Register64::rax, std::bit_cast<uint64_t>(&g_expectedTicks))
+                    .mov(Register32::r11d, Register64::rax)
+                    .nop(54)
+                    .build();
+
+                auto addr = geode::base::get() + 0x232294;
+                geode::Mod::get()->patch(reinterpret_cast<void*>(addr), patch).unwrap();
+                geode::log::debug("TPSBypass: patched 0x{:X} with midhook value address 0x{:X}", addr, (uintptr_t)&g_expectedTicks);
+            }
+
+            // on macOS we also have to patch instructions in GJBaseGameLayer::getModifiedDelta because it's inlined
+            #ifdef REQUIRE_MODIFIED_DELTA_PATCH
+            auto res = setupModifiedDeltaPatches();
             if (!res) {
                 geode::log::error("TPSBypass: {}", res.unwrapErr());
                 config::set("global.tpsbypass.toggle", false);
@@ -39,20 +54,6 @@ namespace eclipse::hacks::Global {
             }
             #endif
 
-            {
-                using namespace assembler::x86_64;
-                auto patch = Builder()
-                    .movabs(Register64::rax, std::bit_cast<uint64_t>(&g_midhookValue))
-                    .mov(Register32::r11d, Register64::rax)
-                    .nop(54)
-                    .build();
-
-                auto addr = geode::base::get() + 0x232294;
-                geode::Mod::get()->patch(reinterpret_cast<void*>(addr), patch).unwrap();
-                geode::log::debug("TPSBypass: patched 0x{:X} with midhook value address 0x{:X}", addr, (uintptr_t)&g_midhookValue);
-            }
-
-
             auto tab = gui::MenuTab::find("tab.global");
             tab->addFloatToggle("global.tpsbypass", MIN_TPS, MAX_TPS, "%.2f TPS")
                ->setDescription()
@@ -60,13 +61,9 @@ namespace eclipse::hacks::Global {
                ->toggleCallback([]() {
                    config::set("bot.original.tpsbypass", config::get<bool>("global.tpsbypass.toggle", false));
                });
-
-            tab->addInputFloat("tps bypass thingy", "soadmpsaomdpo")->callback([](float val) {
-                g_midhookValue = val;
-            })->disableSaving();
         }
 
-        #ifdef REQUIRE_PATCH
+        #ifdef REQUIRE_MODIFIED_DELTA_PATCH
 
         // function to quickly get the bytes for the patch
         #ifdef GEODE_IS_INTEL_MAC
@@ -101,7 +98,7 @@ namespace eclipse::hacks::Global {
         }
         #endif
 
-        geode::Result<> setupPatches() {
+        geode::Result<> setupModifiedDeltaPatches() {
             auto base = reinterpret_cast<uint8_t*>(geode::base::get());
             auto moduleSize = utils::getBaseSize();
             geode::log::debug("TPSBypass: base = 0x{:X}", (uintptr_t)base);
@@ -220,7 +217,7 @@ namespace eclipse::hacks::Global {
             return static_cast<float>(newDelta);
         }
 
-        #ifndef REQUIRE_PATCH
+        #ifndef REQUIRE_MODIFIED_DELTA_PATCH
         float getModifiedDelta(float dt) {
             return getCustomDelta(dt, config::get<"global.tpsbypass", float>(240.f));
         }
@@ -235,62 +232,19 @@ namespace eclipse::hacks::Global {
         }
 
         void update(float dt) override {
-            // auto fields = m_fields.self();
-            //
-            // // to prevent the lag after restarting the level, we will call just skip this iteration (and reset the spillover delta)
-            // if (fields->m_postRestart) {
-            //     fields->m_postRestart = false;
-            //     fields->m_extraDelta = 0.0;
-            //     return;
-            // }
-            //
-            // fields->m_extraDelta += dt;
-            // fields->m_shouldBreak = false;
-            //
-            // // store current frame delta for later use in updateVisibility
-            // fields->m_realDelta = getCustomDelta(fields->m_extraDelta, 240.f, false);
-            //
-            // auto newTPS = config::get<"global.tpsbypass", float>(240.f);
-            //
-            // // extra divisor, to make the iterations smoother
-            // auto divisor = std::max(1.0, newTPS / 240.0);
-            //
-            // auto newDelta = 1.0 / newTPS / divisor;
-            //
-            // if (fields->m_extraDelta >= newDelta) {
-            //     // call original update several times, until the extra delta is less than the new delta
-            //     size_t steps = fields->m_extraDelta / newDelta;
-            //     fields->m_extraDelta -= steps * newDelta;
-            //
-            //     auto start = utils::getTimestamp();
-            //     auto ms = dt * 1000;
-            //     fields->m_shouldHide = true;
-            //     while (steps > 1 && shouldContinue(fields)) {
-            //         GJBaseGameLayer::update(newDelta);
-            //         --steps;
-            //
-            //         // if the update took too long, break out of the loop
-            //         auto end = utils::getTimestamp();
-            //         if (end - start > ms) {
-            //             // re-add the remaining delta
-            //             fields->m_extraDelta += steps * newDelta;
-            //             fields->m_shouldHide = false;
-            //             goto END; // don't feel like adding a bool to skip the last update
-            //         }
-            //     }
-            //     fields->m_shouldHide = false;
-            //
-            //     if (shouldContinue(fields)) {
-            //         // call one last time with the remaining delta
-            //         GJBaseGameLayer::update(newDelta * steps);
-            //     }
-            //
-            //     END: if (fields->m_shouldBufferPostUpdate) {
-            //         fields->m_shouldBufferPostUpdate = false;
-            //         reinterpret_cast<PlayLayer*>(this)->postUpdate(fields->m_realDelta);
-            //     }
-            // }
-            GJBaseGameLayer::update(dt);
+            auto fields = m_fields.self();
+            fields->m_realDelta = dt;
+            fields->m_extraDelta += dt;
+
+            // calculate number of steps based on the new TPS
+            auto newTPS = config::get<"global.tpsbypass", float>(240.f);
+            auto spt = 1.0 / newTPS;
+            auto steps = std::round(fields->m_extraDelta / spt);
+            auto totalDelta = steps * spt;
+            fields->m_extraDelta -= totalDelta;
+            g_expectedTicks = static_cast<int>(steps);
+
+            GJBaseGameLayer::update(totalDelta);
         }
     };
 
