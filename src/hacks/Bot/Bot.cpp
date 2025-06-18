@@ -317,7 +317,7 @@ namespace eclipse::hacks::Bot {
                 m_clicks++;
                 if (button == PlayerButton::Jump) {
                     // not sure what this does, but this is how it is in original handleButton
-                    m_bUnk30b8 = true;
+                    m_jumping = true;
                 }
             }
         }
