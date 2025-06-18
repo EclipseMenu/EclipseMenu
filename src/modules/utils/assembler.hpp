@@ -1,4 +1,7 @@
 #pragma once
+#include <array>
+#include <cstdint>
+#include <vector>
 
 namespace eclipse::assembler {
     namespace x86_64 {
@@ -139,9 +142,48 @@ namespace eclipse::assembler {
             sp = 0b11111
         };
 
+        enum class FloatRegister {
+            s0  = 0b00000, d0  = 0b100000,
+            s1  = 0b00001, d1  = 0b100001,
+            s2  = 0b00010, d2  = 0b100010,
+            s3  = 0b00011, d3  = 0b100011,
+            s4  = 0b00100, d4  = 0b100100,
+            s5  = 0b00101, d5  = 0b100101,
+            s6  = 0b00110, d6  = 0b100110,
+            s7  = 0b00111, d7  = 0b100111,
+            s8  = 0b01000, d8  = 0b101000,
+            s9  = 0b01001, d9  = 0b101001,
+            s10 = 0b01010, d10 = 0b101010,
+            s11 = 0b01011, d11 = 0b101011,
+            s12 = 0b01100, d12 = 0b101100,
+            s13 = 0b01101, d13 = 0b101101,
+            s14 = 0b01110, d14 = 0b101110,
+            s15 = 0b01111, d15 = 0b101111,
+            s16 = 0b10000, d16 = 0b110000,
+            s17 = 0b10001, d17 = 0b110001,
+            s18 = 0b10010, d18 = 0b110010,
+            s19 = 0b10011, d19 = 0b110011,
+            s20 = 0b10100, d20 = 0b110100,
+            s21 = 0b10101, d21 = 0b110101,
+            s22 = 0b10110, d22 = 0b110110,
+            s23 = 0b10111, d23 = 0b110111,
+            s24 = 0b11000, d24 = 0b111000,
+            s25 = 0b11001, d25 = 0b111001,
+            s26 = 0b11010, d26 = 0b111010,
+            s27 = 0b11011, d27 = 0b111011,
+            s28 = 0b11100, d28 = 0b111100,
+            s29 = 0b11101, d29 = 0b111101,
+            s30 = 0b11110, d30 = 0b111110,
+            s31 = 0b11111, d31 = 0b111111
+        };
+
         constexpr bool is_w(Register reg) { return static_cast<int>(reg) & 0b100000; }
         constexpr int operator&(Register dst, int rhs) { return static_cast<int>(dst) & rhs; }
         constexpr int operator|(int lhs, Register dst) { return lhs | static_cast<int>(dst); }
+
+        constexpr bool is_d(FloatRegister reg) { return static_cast<int>(reg) & 0b100000; }
+        constexpr int operator&(FloatRegister dst, int rhs) { return static_cast<int>(dst) & rhs; }
+        constexpr int operator|(int lhs, FloatRegister dst) { return lhs | static_cast<int>(dst); }
 
         /// @brief Move with Zero:
         /// Move a 16-bit immediate value to a register, with a left shift.
@@ -171,6 +213,82 @@ namespace eclipse::assembler {
             };
         }
 
+        /// @brief Load SIMD&FP Register with Immediate Offset:
+        /// LDR <St>, [<Xn|SP>{, #<pimm>}] - 32-bit variant
+        /// LDR <Dt>, [<Xn|SP>{, #<pimm>}] - 64-bit variant
+        constexpr std::array<uint8_t, 4> ldr(FloatRegister rt, Register rn, uint16_t imm = 0) {
+            uint8_t size, opc;
+            uint8_t scale;
+            if (is_d(rt)) {
+                // Double precision (D register) - 64-bit
+                size = 0b11;
+                opc = 0b01;
+                scale = 3;
+            } else {
+                // Single precision (S register) - 32-bit
+                size = 0b10;
+                opc = 0b01;
+                scale = 2;
+            }
+
+            uint16_t imm12 = imm >> scale;
+            uint8_t rt_bits = rt & 0b11111;
+            uint8_t rn_bits = rn & 0b11111;
+
+            return {
+                static_cast<uint8_t>(rt_bits | ((rn_bits & 0b111) << 5)),
+                static_cast<uint8_t>((rn_bits >> 3) | ((imm12 & 0b1111111) << 2)),
+                static_cast<uint8_t>(0b01000000 | ((imm12 >> 7) & 0b11111)),
+                static_cast<uint8_t>((size << 6) | 0b111000 | (opc << 2) | 0b1)
+            };
+        }
+
+        /// @brief Load General Purpose Register with Immediate Offset:
+        /// LDR <Wt>, [<Xn|SP>{, #<pimm>}] - 32-bit variant
+        /// LDR <Xt>, [<Xn|SP>{, #<pimm>}] - 64-bit variant
+        constexpr std::array<uint8_t, 4> ldr(Register rt, Register rn, uint16_t imm = 0) {
+            uint8_t size, opc;
+            uint8_t scale;
+
+            if (is_w(rt)) {
+                // 32-bit W register
+                size = 0b10;
+                opc = 0b00;
+                scale = 2;
+            } else {
+                // 64-bit X register
+                size = 0b11;
+                opc = 0b00;
+                scale = 3;
+            }
+
+            uint16_t imm12 = imm >> scale;
+            uint8_t rt_bits = rt & 0b11111;
+            uint8_t rn_bits = rn & 0b11111;
+
+            return {
+                static_cast<uint8_t>(rt_bits | ((rn_bits & 0b111) << 5)),
+                static_cast<uint8_t>((rn_bits >> 3) | ((imm12 & 0b1111111) << 2)),
+                static_cast<uint8_t>(0b01000000 | ((imm12 >> 7) & 0b11111)),
+                static_cast<uint8_t>((size << 6) | 0b111000 | (opc << 2) | 0b1)
+            };
+        }
+
+        /// @brief Branch with Immediate:
+        /// Branch to a relative address, with a signed 26-bit immediate value.
+        constexpr std::array<uint8_t, 4> b(int32_t offset) {
+            int32_t word_offset = offset >> 2;
+            uint32_t imm26 = static_cast<uint32_t>(word_offset) & 0x3FFFFFF;
+            uint32_t instr = (0b000101 << 26) | imm26;
+
+            return {
+                static_cast<uint8_t>(instr & 0xFF),
+                static_cast<uint8_t>((instr >> 8) & 0xFF),
+                static_cast<uint8_t>((instr >> 16) & 0xFF),
+                static_cast<uint8_t>((instr >> 24) & 0xFF)
+            };
+        }
+
         /// @brief Helper function to move a float to a register as an immediate value. Generates 2 instructions.
         [[nodiscard]] inline std::array<uint8_t, 8> mov_float(Register dst, float imm) {
             auto bytes = reinterpret_cast<uint8_t*>(&imm);
@@ -194,5 +312,67 @@ namespace eclipse::assembler {
                 instr3[0], instr3[1], instr3[2], instr3[3]
             };
         }
+
+        class Builder {
+        public:
+            Builder() = default;
+            explicit Builder(uintptr_t baseAddress) : m_baseAddress(baseAddress) {}
+
+            Builder& movz(Register dst, uint16_t imm, uint8_t shift = 0) {
+                auto bytes = arm64::movz(dst, imm, shift);
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                return *this;
+            }
+
+            Builder& movk(Register dst, uint16_t imm, uint8_t shift = 0) {
+                auto bytes = arm64::movk(dst, imm, shift);
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                return *this;
+            }
+
+            Builder& mov(Register dst, uint64_t imm) {
+                auto bytes = arm64::movz(dst, static_cast<uint16_t>(imm & 0xFFFF));
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                if (imm > 0xFFFF) {
+                    bytes = arm64::movk(dst, static_cast<uint16_t>((imm >> 16) & 0xFFFF), 16);
+                    m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                }
+                if (imm > 0xFFFFFFFF) {
+                    bytes = arm64::movk(dst, static_cast<uint16_t>((imm >> 32) & 0xFFFF), 32);
+                    m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                }
+                if (imm > 0xFFFFFFFFFFFF) {
+                    bytes = arm64::movk(dst, static_cast<uint16_t>((imm >> 48) & 0xFFFF), 48);
+                    m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                }
+                return *this;
+            }
+
+            Builder& ldr(FloatRegister rt, Register rn, uint16_t imm = 0) {
+                auto bytes = arm64::ldr(rt, rn, imm);
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                return *this;
+            }
+
+            Builder& ldr(Register rt, Register rn, uint16_t imm = 0) {
+                auto bytes = arm64::ldr(rt, rn, imm);
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                return *this;
+            }
+
+            Builder& b(int32_t offset, bool relative = false) {
+                // If relative is true, offset is the absolute address, and we calculate the relative jump.
+                if (relative) offset -= m_baseAddress + m_bytes.size() + 4;
+                auto bytes = arm64::b(offset);
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                return *this;
+            }
+
+            std::vector<uint8_t> build() { return std::move(m_bytes); }
+
+        private:
+            uintptr_t m_baseAddress = 0;
+            std::vector<uint8_t> m_bytes;
+        };
     }
 }

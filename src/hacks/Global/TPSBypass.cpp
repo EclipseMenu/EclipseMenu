@@ -20,7 +20,11 @@ constexpr float MAX_TPS = 100000.f;
 #endif
 
 namespace eclipse::hacks::Global {
-    static int g_expectedTicks = 0.f;
+    using TicksType =
+        GEODE_WINDOWS(uint32_t)
+        GEODE_ANDROID64(uint32_t);
+
+    static TicksType g_expectedTicks = 0;
 
     class $hack(TPSBypass) {
     public:
@@ -29,6 +33,7 @@ namespace eclipse::hacks::Global {
 
             // this patch allows us to manually set the expected amount of ticks per update call
             geode::Patch* patch = nullptr;
+            #ifdef GEODE_IS_WINDOWS
             {
                 using namespace assembler::x86_64;
                 auto addr = geode::base::get() + 0x232294; // TODO: sigscan
@@ -45,6 +50,23 @@ namespace eclipse::hacks::Global {
                     geode::log::error("TPS Bypass: Failed to patch GJBaseGameLayer::update: {}", res.unwrapErr());
                 }
             }
+            #elif defined(GEODE_IS_ANDROID64)
+            {
+                using namespace assembler::arm64;
+                auto addr = geode::base::get() + 0x87DA40; // TODO: sigscan
+                auto bytes = Builder(addr)
+                    .mov(Register::x9, std::bit_cast<uint64_t>(&g_expectedTicks))
+                    .ldr(Register::w0, Register::x9)
+                    .b(addr + 0x2c, true) // skip the section
+                    .build();
+
+                if (auto res = geode::Mod::get()->patch(reinterpret_cast<void*>(addr), bytes)) {
+                    patch = res.unwrap();
+                } else {
+                    geode::log::error("TPS Bypass: Failed to patch GJBaseGameLayer::update: {}", res.unwrapErr());
+                }
+            }
+            #endif
 
             // patch toggler
             if (!patch) {
@@ -264,11 +286,16 @@ namespace eclipse::hacks::Global {
             auto steps = std::round(fields->m_extraDelta / spt);
             auto totalDelta = steps * spt;
             fields->m_extraDelta -= totalDelta;
-            g_expectedTicks = static_cast<int>(steps);
+            g_expectedTicks = steps;
 
+            // for particles and other visual effects
             fields->m_visualDelta = totalDelta;
 
             GJBaseGameLayer::update(totalDelta);
+        }
+
+        void updateShaderLayer(float dt) {
+            GJBaseGameLayer::updateShaderLayer(m_fields->m_visualDelta);
         }
     };
 
