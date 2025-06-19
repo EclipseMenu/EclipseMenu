@@ -64,7 +64,7 @@ namespace eclipse::hacks::Global {
                 auto func = dlsym(RTLD_DEFAULT, "_ZN15GJBaseGameLayer6updateEf");
                 addr = sinaps::find<"0B 19 2B 1E 0F 10 62 1E 00 10 2E 1E">(static_cast<const uint8_t*>(func), 0x500);
                 if (addr != sinaps::not_found) {
-                    addr += reinterpret_cast<intptr_t>(func) - base; // we need offset from the base
+                    addr += reinterpret_cast<intptr_t>(func) - reinterpret_cast<intptr_t>(base); // we need offset from the base
                     bytes = Builder(addr)
                         .mov(Register::x9, std::bit_cast<uint64_t>(&g_expectedTicks))
                         .ldr(Register::w0, Register::x9)
@@ -79,7 +79,7 @@ namespace eclipse::hacks::Global {
                 auto func = dlsym(RTLD_DEFAULT, "_ZN15GJBaseGameLayer6updateEf");
                 addr = sinaps::find<"B7 EE C7 7A 27 EE 06 7B ^ F7 EE C7 7B 17 EE 90 0A">(static_cast<const uint8_t*>(func), 0x500);
                 if (addr != sinaps::not_found) {
-                    addr += reinterpret_cast<intptr_t>(func) - base; // we need offset from the base
+                    addr += reinterpret_cast<intptr_t>(func) - reinterpret_cast<intptr_t>(base); // we need offset from the base
                     bytes = Builder(addr)
                         .mov(Register::r1, std::bit_cast<uint32_t>(&g_expectedTicks))
                         .ldr_t(Register::r0, Register::r1)
