@@ -73,7 +73,7 @@ namespace eclipse::assembler {
         }
 
         /// @brief movss xmm, dword ptr [r64]: Move scalar single-precision floating-point from memory to XMM register
-        constexpr std::array<uint8_t, 4> movss(XmmRegister dst, Register64 src) {
+        constexpr std::array<uint8_t, 5> movss(XmmRegister dst, Register64 src) {
             uint8_t rex = 0x40;
             if (static_cast<uint8_t>(dst) >= 8)
                 rex |= 0x04; // REX.R bit for destination register extension
