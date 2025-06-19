@@ -24,7 +24,8 @@ namespace eclipse::hacks::Global {
         GEODE_WINDOWS(uint32_t)
         GEODE_ANDROID64(uint32_t)
         GEODE_ANDROID32(float)
-        GEODE_IOS(float);
+        GEODE_IOS(float)
+        GEODE_ARM_MAC(float);
 
     static TicksType g_expectedTicks = 0;
 
@@ -67,10 +68,10 @@ namespace eclipse::hacks::Global {
                     .nop_t()
                     .build();
             }
-            #elif defined(GEODE_IS_IOS)
+            #elif defined(GEODE_IS_IOS) || defined(GEODE_IS_ARM_MAC) // lucky me, they're virtually the same
             {
                 using namespace assembler::arm64;
-                addr = geode::base::get() + 0x200C30; // TODO: sigscan
+                addr = geode::base::get() + GEODE_IOS(0x200C30) GEODE_ARM_MAC(0x119454); // TODO: sigscan
                 bytes = Builder(addr)
                     .mov(Register::x9, std::bit_cast<uint64_t>(&g_expectedTicks))
                     .ldr(FloatRegister::s0, Register::x9)
