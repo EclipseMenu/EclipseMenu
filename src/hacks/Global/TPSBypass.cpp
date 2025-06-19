@@ -17,6 +17,8 @@ constexpr float MAX_TPS = 100000.f;
 
 #ifdef GEODE_IS_MACOS
 #define REQUIRE_MODIFIED_DELTA_PATCH
+#elif defined(GEODE_IS_ANDROID)
+#include <dlfcn.h>
 #endif
 
 namespace eclipse::hacks::Global {
@@ -35,64 +37,86 @@ namespace eclipse::hacks::Global {
         void init() override {
             config::setIfEmpty("global.tpsbypass", 240.f);
 
+            auto base = reinterpret_cast<uint8_t*>(geode::base::get());
+            auto baseSize = utils::getBaseSize();
+
             // this patch allows us to manually set the expected amount of ticks per update call
-            uintptr_t addr = 0;
+            intptr_t addr = -1;
             std::vector<uint8_t> bytes;
             #ifdef GEODE_IS_WINDOWS
             {
                 using namespace assembler::x86_64;
-                addr = geode::base::get() + 0x232294; // TODO: sigscan
-                bytes = Builder(addr)
-                    .movabs(Register64::rax, std::bit_cast<uint64_t>(&g_expectedTicks))
-                    .mov(Register32::r11d, Register64::rax)
-                    .jmp(addr + 0x43, true)
-                    .nop(4)
-                    .build();
+                // 2.2074: 0x232294
+                addr = sinaps::find<"FF 90 ? ? ? ? ^ F3 0F 10 8E ? ? ? ? F3 44 0F 10">(base, baseSize);
+                if (addr != sinaps::not_found) {
+                    bytes = Builder(addr)
+                        .movabs(Register64::rax, std::bit_cast<uint64_t>(&g_expectedTicks))
+                        .mov(Register32::r11d, Register64::rax)
+                        .jmp(addr + 0x43, true)
+                        .nop(4)
+                        .build();
+                }
             }
             #elif defined(GEODE_IS_ANDROID64)
             {
                 using namespace assembler::arm64;
-                addr = geode::base::get() + 0x87DA40; // TODO: sigscan
-                bytes = Builder(addr)
-                    .mov(Register::x9, std::bit_cast<uint64_t>(&g_expectedTicks))
-                    .ldr(Register::w0, Register::x9)
-                    .b(addr + 0x2c, true)
-                    .build();
+                // 2.2074: 0x87DA40 (google) / 0x87BE28 (amazon)
+                auto func = dlsym(RTLD_DEFAULT, "_ZN15GJBaseGameLayer6updateEf");
+                addr = sinaps::find<"0B 19 2B 1E 0F 10 62 1E 00 10 2E 1E">(static_cast<const uint8_t*>(func), 0x500);
+                if (addr != sinaps::not_found) {
+                    addr += static_cast<intptr_t>(func) - base; // we need offset from the base
+                    bytes = Builder(addr)
+                        .mov(Register::x9, std::bit_cast<uint64_t>(&g_expectedTicks))
+                        .ldr(Register::w0, Register::x9)
+                        .b(addr + 0x2c, true)
+                        .build();
+                }
             }
             #elif defined(GEODE_IS_ANDROID32)
             {
                 using namespace assembler::armv7;
-                addr = geode::base::get() + 0x4841BC; // TODO: sigscan
-                bytes = Builder(addr)
-                    .mov(Register::r1, std::bit_cast<uint32_t>(&g_expectedTicks))
-                    .ldr_t(Register::r0, Register::r1)
-                    .nop_t()
-                    .build();
+                // 2.2074: 0x4841BC (google) / 0x483F0C (amazon)
+                auto func = dlsym(RTLD_DEFAULT, "_ZN15GJBaseGameLayer6updateEf");
+                addr = sinaps::find<"B7 EE C7 7A 27 EE 06 7B ^ F7 EE C7 7B 17 EE 90 0A">(static_cast<const uint8_t*>(func), 0x500);
+                if (addr != sinaps::not_found) {
+                    addr += static_cast<intptr_t>(func) - base; // we need offset from the base
+                    bytes = Builder(addr)
+                        .mov(Register::r1, std::bit_cast<uint32_t>(&g_expectedTicks))
+                        .ldr_t(Register::r0, Register::r1)
+                        .nop_t()
+                        .build();
+                }
             }
             #elif defined(GEODE_IS_IOS) || defined(GEODE_IS_ARM_MAC) // lucky me, they're virtually the same
             {
                 using namespace assembler::arm64;
-                addr = geode::base::get() + GEODE_IOS(0x200C30) GEODE_ARM_MAC(0x119454); // TODO: sigscan
-                bytes = Builder(addr)
-                    .mov(Register::x9, std::bit_cast<uint64_t>(&g_expectedTicks))
-                    .ldr(FloatRegister::s0, Register::x9)
-                    .pad_nops(20) // we need to replace 20 bytes, but mov can take 3-4 instructions depending on address
-                    .build();
+                // 2.2074: 0x200C30 (iOS) / 0x119454 (macOS)
+                addr = sinaps::find<"00 19 20 1E 02 10 22 1E">(base, baseSize);
+                if (addr != sinaps::not_found) {
+                    bytes = Builder(addr)
+                        .mov(Register::x9, std::bit_cast<uint64_t>(&g_expectedTicks))
+                        .ldr(FloatRegister::s0, Register::x9)
+                        .pad_nops(20) // we need to replace 20 bytes, but mov can take 3-4 instructions depending on address
+                        .build();
+                }
             }
             #elif defined(GEODE_IS_INTEL_MAC)
             {
                 using namespace assembler::x86_64;
-                addr = geode::base::get() + 0x14233E; // TODO: sigscan
-                bytes = Builder(addr)
-                    .movabs(Register64::rax, std::bit_cast<uint64_t>(&g_expectedTicks))
-                    .movss(XmmRegister::xmm0, Register64::rax)
-                    .jmp(addr + 0x36, true)
-                    .nop(3)
-                    .build();
+                // 2.2074: 0x14233E
+                addr = sinaps::find<"0F 28 C5 F3 0F 5D 83 ? ? ? ? F3 0F 5E D8">(base, baseSize);
+                if (addr != sinaps::not_found) {
+                    bytes = Builder(addr)
+                        .movabs(Register64::rax, std::bit_cast<uint64_t>(&g_expectedTicks))
+                        .movss(XmmRegister::xmm0, Register64::rax)
+                        .jmp(addr + 0x36, true)
+                        .nop(3)
+                        .build();
+                }
             }
             #endif
 
-            if (!addr || bytes.empty()) {
+            if (addr == sinaps::not_found || bytes.empty()) {
                 geode::log::error("TPS Bypass: Failed to find patch address or bytes");
                 config::set("global.tpsbypass.toggle", false);
                 // add a safeguard to disable tps bypass if it gets enabled
@@ -104,8 +128,9 @@ namespace eclipse::hacks::Global {
             }
 
             geode::Patch* patch = nullptr;
-            if (auto res = geode::Mod::get()->patch(reinterpret_cast<void*>(addr), bytes)) {
+            if (auto res = geode::Mod::get()->patch(reinterpret_cast<void*>(addr + base), bytes)) {
                 patch = res.unwrap();
+                geode::log::info("TPS Bypass: Patch enabled at offset 0x{:X}", addr);
             } else {
                 geode::log::error("TPS Bypass: Failed to patch GJBaseGameLayer::update: {}", res.unwrapErr());
             }
@@ -225,7 +250,7 @@ namespace eclipse::hacks::Global {
             auto doubleAddr = sinaps::find<"09 00 A4 D2 29 22 C2 F2 29 EE E7 F2">(base, moduleSize);
             #endif
 
-            if (floatAddr == -1 || doubleAddr == -1) {
+            if (floatAddr == sinaps::not_found || doubleAddr == sinaps::not_found) {
                 return geode::Err(fmt::format("failed to find addresses: float = 0x{:X}, double = 0x{:X}", floatAddr, doubleAddr));
             }
 
