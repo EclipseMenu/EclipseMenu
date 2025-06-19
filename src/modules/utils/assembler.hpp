@@ -19,6 +19,13 @@ namespace eclipse::assembler {
             r12d = 12, r13d = 13, r14d = 14, r15d = 15
         };
 
+        enum class XmmRegister : uint8_t {
+            xmm0  = 0, xmm1  = 1, xmm2  = 2, xmm3  = 3,
+            xmm4  = 4, xmm5  = 5, xmm6  = 6, xmm7  = 7,
+            xmm8  = 8, xmm9  = 9, xmm10 = 10, xmm11 = 11,
+            xmm12 = 12, xmm13 = 13, xmm14 = 14, xmm15 = 15,
+        };
+
         /// @brief movabs r64, imm64: Move a 64-bit immediate value to a register.
         constexpr std::array<uint8_t, 10> movabs(Register64 dst, uint64_t imm) {
             uint8_t rex = 0x48;
@@ -65,6 +72,20 @@ namespace eclipse::assembler {
             };
         }
 
+        /// @brief movss xmm, dword ptr [r64]: Move scalar single-precision floating-point from memory to XMM register
+        constexpr std::array<uint8_t, 4> movss(XmmRegister dst, Register64 src) {
+            uint8_t rex = 0x40;
+            if (static_cast<uint8_t>(dst) >= 8)
+                rex |= 0x04; // REX.R bit for destination register extension
+            if (static_cast<uint8_t>(src) >= 8)
+                rex |= 0x01; // REX.B bit for source register extension
+
+            uint8_t modrm = (static_cast<uint8_t>(dst) & 0x7) << 3;
+            modrm |= (static_cast<uint8_t>(src) & 0x7);
+
+            return {0xF3, rex, 0x0F, 0x10, modrm};
+        }
+
         class Builder {
         public:
             Builder() = default;
@@ -92,6 +113,12 @@ namespace eclipse::assembler {
 
             Builder& nop(size_t count = 1) {
                 m_bytes.insert(m_bytes.end(), count, 0x90);
+                return *this;
+            }
+
+            Builder& movss(XmmRegister dst, Register64 src) {
+                auto bytes = x86_64::movss(dst, src);
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 

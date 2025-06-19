@@ -25,7 +25,8 @@ namespace eclipse::hacks::Global {
         GEODE_ANDROID64(uint32_t)
         GEODE_ANDROID32(float)
         GEODE_IOS(float)
-        GEODE_ARM_MAC(float);
+        GEODE_ARM_MAC(float)
+        GEODE_INTEL_MAC(float);
 
     static TicksType g_expectedTicks = 0;
 
@@ -76,6 +77,17 @@ namespace eclipse::hacks::Global {
                     .mov(Register::x9, std::bit_cast<uint64_t>(&g_expectedTicks))
                     .ldr(FloatRegister::s0, Register::x9)
                     .pad_nops(20) // we need to replace 20 bytes, but mov can take 3-4 instructions depending on address
+                    .build();
+            }
+            #elif defined(GEODE_IS_INTEL_MAC)
+            {
+                using namespace assembler::x86_64;
+                addr = geode::base::get() + 0x14233E; // TODO: sigscan
+                bytes = Builder(addr)
+                    .movabs(Register64::rax, std::bit_cast<uint64_t>(&g_expectedTicks))
+                    .movss(XmmRegister::xmm0, Register64::rax)
+                    .jmp(addr + 0x36, true)
+                    .nop(3)
                     .build();
             }
             #endif
