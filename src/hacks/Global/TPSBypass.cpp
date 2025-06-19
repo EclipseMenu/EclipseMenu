@@ -262,7 +262,7 @@ namespace eclipse::hacks::Global {
 
             // update patches on enable/disable
             config::addDelegate("global.tpsbypass.toggle", [setState] {
-                setState(config::get<"global.tpsbypass.toggle", bool>());
+                setState(config::get<bool>("global.tpsbypass.toggle", false));
             });
 
             // apply initial state
