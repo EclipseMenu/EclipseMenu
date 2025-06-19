@@ -289,6 +289,12 @@ namespace eclipse::assembler {
             };
         }
 
+        /// @brief No Operation:
+        /// Instruction that does nothing, used for padding.
+        constexpr std::array<uint8_t, 4> nop() {
+            return {0x1F, 0x20, 0x03, 0xD5};
+        }
+
         /// @brief Helper function to move a float to a register as an immediate value. Generates 2 instructions.
         [[nodiscard]] inline std::array<uint8_t, 8> mov_float(Register dst, float imm) {
             auto bytes = reinterpret_cast<uint8_t*>(&imm);
@@ -365,6 +371,24 @@ namespace eclipse::assembler {
                 if (relative) offset -= m_baseAddress + m_bytes.size() + 4;
                 auto bytes = arm64::b(offset);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                return *this;
+            }
+
+            Builder& nop(size_t count = 1) {
+                for (size_t i = 0; i < count; ++i) {
+                    auto bytes = arm64::nop();
+                    m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                }
+                return *this;
+            }
+
+            /// @brief Adds NOP instructions to make the total size of bytes equal to `byteCount`.
+            Builder& pad_nops(size_t byteCount) {
+                size_t currentSize = m_bytes.size();
+                if (currentSize < byteCount) {
+                    size_t nopsToAdd = (byteCount - currentSize + 3) / 4; // Each NOP is 4 bytes
+                    this->nop(nopsToAdd);
+                }
                 return *this;
             }
 

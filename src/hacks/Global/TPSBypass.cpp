@@ -5,10 +5,10 @@
 #include <modules/utils/assembler.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/GJEffectManager.hpp>
+#include <Geode/modify/HardStreak.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
-#include <Geode/modify/HardStreak.hpp>
-#include <Geode/modify/GJEffectManager.hpp>
 
 #include <sinaps.hpp>
 
@@ -23,7 +23,8 @@ namespace eclipse::hacks::Global {
     using TicksType =
         GEODE_WINDOWS(uint32_t)
         GEODE_ANDROID64(uint32_t)
-        GEODE_ANDROID32(float);
+        GEODE_ANDROID32(float)
+        GEODE_IOS(float);
 
     static TicksType g_expectedTicks = 0;
 
@@ -64,6 +65,16 @@ namespace eclipse::hacks::Global {
                     .mov(Register::r1, std::bit_cast<uint32_t>(&g_expectedTicks))
                     .ldr_t(Register::r0, Register::r1)
                     .nop_t()
+                    .build();
+            }
+            #elif defined(GEODE_IS_IOS)
+            {
+                using namespace assembler::arm64;
+                addr = geode::base::get() + 0x200C30; // TODO: sigscan
+                bytes = Builder(addr)
+                    .mov(Register::x9, std::bit_cast<uint64_t>(&g_expectedTicks))
+                    .ldr(FloatRegister::s0, Register::x9)
+                    .pad_nops(20) // we need to replace 20 bytes, but mov can take 3-4 instructions depending on address
                     .build();
             }
             #endif
