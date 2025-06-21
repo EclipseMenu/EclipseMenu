@@ -11,10 +11,18 @@ body:
         - For enhancement requests, please use the Feature Request template.
         - Please fill out the template below to the best of your ability.
   - type: textarea
+    id: expected-behavior
+    attributes:
+      label: What happened?
+      description: What did you expect to happen?
+      placeholder: Tell us what you want!
+    validations:
+      required: true
+  - type: textarea
     id: what-happened
     attributes:
       label: What happened?
-      description: Also tell us, what did you expect to happen?
+      description: Also tell us, what actually happened?
       placeholder: Tell us what you see!
     validations:
       required: true
@@ -34,6 +42,8 @@ body:
       options:
         - Windows
         - macOS
+        - iOS
+        - Android
     validations:
       required: true
   - type: textarea
@@ -41,4 +51,4 @@ body:
     attributes:
       label: Relevant log output
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: shell
+      render: txt
