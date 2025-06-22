@@ -347,8 +347,10 @@ namespace eclipse::hacks::Global {
             auto fields = m_fields.self();
             fields->m_extraDelta += dt;
 
+            auto timeWarp = std::min(m_gameState.m_timeWarp, 1.f);
+
             // calculate number of steps based on the new TPS
-            auto newTPS = config::get<"global.tpsbypass", float>(240.f);
+            auto newTPS = config::get<"global.tpsbypass", float>(240.f) / timeWarp;
             auto spt = 1.0 / newTPS;
             auto steps = std::round(fields->m_extraDelta / spt);
             auto totalDelta = steps * spt;
