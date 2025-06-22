@@ -314,12 +314,7 @@ namespace eclipse::hacks::Global {
 
         struct Fields {
             double m_extraDelta = 0.0;
-            float m_visualDelta = 0.0;
         };
-
-        static TPSBypassGJBGLHook* get() {
-            return static_cast<TPSBypassGJBGLHook*>(GJBaseGameLayer::get());
-        }
 
         float getCustomDelta(float dt, float tps, bool applyExtraDelta = true) {
             auto spt = 1.f / tps;
@@ -347,9 +342,8 @@ namespace eclipse::hacks::Global {
             auto fields = m_fields.self();
             fields->m_extraDelta += dt;
 
-            auto timeWarp = std::min(m_gameState.m_timeWarp, 1.f);
-
             // calculate number of steps based on the new TPS
+            auto timeWarp = std::min(m_gameState.m_timeWarp, 1.f);
             auto newTPS = config::get<"global.tpsbypass", float>(240.f) / timeWarp;
             auto spt = 1.0 / newTPS;
             auto steps = std::round(fields->m_extraDelta / spt);
@@ -357,14 +351,7 @@ namespace eclipse::hacks::Global {
             fields->m_extraDelta -= totalDelta;
             g_expectedTicks = steps;
 
-            // for particles and other visual effects
-            fields->m_visualDelta = totalDelta;
-
             GJBaseGameLayer::update(totalDelta);
-        }
-
-        void updateShaderLayer(float dt) {
-            GJBaseGameLayer::updateShaderLayer(m_fields->m_visualDelta);
         }
     };
 
@@ -372,17 +359,10 @@ namespace eclipse::hacks::Global {
         return reinterpret_cast<TPSBypassGJBGLHook*>(self)->m_fields.self();
     }
 
-    // Skip some functions to make the game run faster during extra updates period
-
     class $modify(TPSBypassPLHook, PlayLayer) {
         ALL_DELEGATES_AND_SAFE_PRIO("global.tpsbypass.toggle")
 
-        // PlayLayer postUpdate handles practice mode checkpoints, labels and also calls updateVisibility
-        void postUpdate(float dt) override {
-            PlayLayer::postUpdate(getFields(this)->m_visualDelta);
-        }
-
-        // we also would like to fix the percentage calculation, which uses constant 240 TPS to determine the progress
+        // we would like to fix the percentage calculation, which uses constant 240 TPS to determine the progress
         int calculationFix() {
             auto timestamp = m_level->m_timestamp;
             auto currentProgress = m_gameState.m_currentProgress;
@@ -417,39 +397,6 @@ namespace eclipse::hacks::Global {
             }
             PlayLayer::levelComplete();
             m_gameState.m_unkUint2 = oldTimestamp;
-        }
-    };
-
-    class $modify(TPSBypassLELHook, LevelEditorLayer) {
-        ALL_DELEGATES_AND_SAFE_PRIO("global.tpsbypass.toggle")
-
-        // Editor postUpdate handles the exit of playback mode and player trail drawing and calls updateVisibility
-        void postUpdate(float dt) override {
-            // editor disables playback mode in postUpdate, so we should call the function if we're dead
-            auto fields = getFields(this);
-            if (!m_player1->m_maybeIsColliding && !m_player2->m_maybeIsColliding) return;
-            LevelEditorLayer::postUpdate(fields->m_visualDelta);
-        }
-    };
-
-    // few more hooks to restore speed of animations
-    class $modify(TPSBypassHSHook, HardStreak) {
-        ALL_DELEGATES_AND_SAFE_PRIO("global.tpsbypass.toggle")
-
-        void updateStroke(float dt) {
-            auto gjbgl = TPSBypassGJBGLHook::get();
-            if (!gjbgl) return HardStreak::updateStroke(dt);
-            HardStreak::updateStroke(gjbgl->m_fields->m_visualDelta);
-        }
-    };
-
-    class $modify(TPSBypassGJEMHook, GJEffectManager) {
-        ALL_DELEGATES_AND_SAFE_PRIO("global.tpsbypass.toggle")
-
-        void updateEffects(float dt) {
-            auto gjbgl = TPSBypassGJBGLHook::get();
-            if (!gjbgl) return GJEffectManager::update(dt);
-            GJEffectManager::update(gjbgl->m_fields->m_visualDelta);
         }
     };
 }
