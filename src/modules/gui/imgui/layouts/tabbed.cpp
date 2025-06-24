@@ -85,7 +85,8 @@ namespace eclipse::gui::imgui {
         }
 
         // Run move actions
-        auto deltaTime = ImGui::GetIO().DeltaTime;
+        // Using CCDirector deltaTime since ImGui doesn't take into account values higher than the refresh rate properly
+        auto deltaTime = CCDirector::get()->getDeltaTime();
         for (const auto& action : m_actions)
             action->update(deltaTime);
 
