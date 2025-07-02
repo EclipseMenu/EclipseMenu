@@ -49,7 +49,7 @@ namespace eclipse::hacks::Global {
             } else if (config::get<"level.accuratepercentage.normal_mode", bool>(true)) {
                 float percent = customGetProgress();
                 auto numDigits = config::get<int>("level.accuratepercentage.amount", 4);
-                if (numDigits > 1) {
+                if (numDigits > 0) {
                     m_percentageLabel->setString(fmt::format("{:.{}f}%", percent, numDigits).c_str());
                 } else {
                     m_percentageLabel->setString(fmt::format("{}%", static_cast<int>(std::floor(percent))).c_str());
