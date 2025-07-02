@@ -460,14 +460,19 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.showhitboxes.player_color_inner", gui::Color(0, 1, 0.2f));
             config::setIfEmpty("level.showhitboxes.player_color_rotated", gui::Color::YELLOW);
             config::setIfEmpty("level.showhitboxes.other_color", gui::Color::GREEN);
+            config::setIfEmpty("level.showhitboxes.passable_color", gui::Color(0, 1, 1));
+            config::setIfEmpty("level.showhitboxes.triggers_color", gui::Color(1, 0, 0.9f));
 
             toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                 options->addToggle("level.showhitboxes.editor");
                 options->addToggle("level.showhitboxes.hideplayer");
+                options->addToggle("level.showhitboxes.showtriggers");
                 options->addToggle("level.showhitboxes.customcolors")->addOptions([](std::shared_ptr<gui::MenuTab> optionsColor) {
                     optionsColor->addColorComponent("level.showhitboxes.solid_color");
                     optionsColor->addColorComponent("level.showhitboxes.danger_color");
                     optionsColor->addColorComponent("level.showhitboxes.other_color");
+                    optionsColor->addColorComponent("level.showhitboxes.passable_color");
+                    optionsColor->addColorComponent("level.showhitboxes.triggers_color");
                     optionsColor->addColorComponent("level.showhitboxes.player_color");
                     optionsColor->addColorComponent("level.showhitboxes.player_color_inner");
                     optionsColor->addColorComponent("level.showhitboxes.player_color_rotated");
@@ -527,10 +532,10 @@ namespace eclipse::hacks::Level {
         float borderWidth, cocos2d::ccColor4F const& borderColor
     ) {
         std::array vertices = {
-            cocos2d::CCPoint(rect.getMinX(), rect.getMinY()),
-            cocos2d::CCPoint(rect.getMinX(), rect.getMaxY()),
-            cocos2d::CCPoint(rect.getMaxX(), rect.getMaxY()),
-            cocos2d::CCPoint(rect.getMaxX(), rect.getMinY())
+            cocos2d::CCPoint{rect.getMinX(), rect.getMinY()},
+            cocos2d::CCPoint{rect.getMinX(), rect.getMaxY()},
+            cocos2d::CCPoint{rect.getMaxX(), rect.getMaxY()},
+            cocos2d::CCPoint{rect.getMaxX(), rect.getMinY()}
         };
         node->drawPolygon(vertices.data(), vertices.size(), color, borderWidth, borderColor);
     }
@@ -549,7 +554,9 @@ namespace eclipse::hacks::Level {
             if (!parent) return;
 
             auto* drawNode = cocos2d::CCDrawNode::create();
+            drawNode->setBlendFunc({GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA});
             drawNode->setID("hitboxes"_spr);
+            drawNode->m_bUseArea = false;
             parent->addChild(drawNode, 1402);
 
             m_fields->m_drawNode = drawNode;
@@ -560,21 +567,106 @@ namespace eclipse::hacks::Level {
         }
 
         void visitHitboxes() {
-            if (!config::get<"level.showhitboxes", bool>(false)) return;
-
             auto* drawNode = m_fields->m_drawNode;
             if (!drawNode) return;
 
             drawNode->clear();
+
+            if (!config::get<"level.showhitboxes", bool>(false)) return;
+
             auto solidColor = config::get<"level.showhitboxes.solid_color", gui::Color>(gui::Color(0, 0.247, 1));
             auto dangerColor = config::get<"level.showhitboxes.danger_color", gui::Color>(gui::Color(1, 0, 0));
+            auto passableColor = config::get<"level.showhitboxes.passable_color", gui::Color>(gui::Color(0, 1, 1));
+            auto otherColor = config::get<"level.showhitboxes.other_color", gui::Color>(gui::Color(0, 1, 0));
+            auto triggersColor = config::get<"level.showhitboxes.triggers_color", gui::Color>(gui::Color(1, 0, 0.9f));
+
+            auto fillAlpha = config::get<"level.showhitboxes.fillalpha", float>(0.25f);
+            auto fillAlphaToggle = config::get<"level.showhitboxes.fillalpha.toggle", bool>(true);
+            auto solidColorFill = gui::Color(solidColor, fillAlphaToggle ? fillAlpha : 0.f);
+            auto dangerColorFill = gui::Color(dangerColor, fillAlphaToggle ? fillAlpha : 0.f);
+            auto passableColorFill = gui::Color(passableColor, fillAlphaToggle ? fillAlpha : 0.f);
+            auto otherColorFill = gui::Color(otherColor, fillAlphaToggle ? fillAlpha : 0.f);
+            auto triggersColorFill = gui::Color(triggersColor, fillAlphaToggle ? fillAlpha : 0.f);
+
             auto borderSize = config::get<"level.showhitboxes.bordersize", float>(0.25f);
+            auto renderTriggers = config::get<"level.showhitboxes.showtriggers", bool>(false);
 
             forEachObject(this, [&](GameObject* obj) {
+                // skip objects that don't have a hitbox or are not activated
+                if (obj->m_objectType == GameObjectType::Decoration || !obj->m_isActivated || obj->m_isGroupDisabled)
+                    return;
+
                 switch (obj->m_objectType) {
+                    default: { // pretty much everything (portals, orbs, etc.)
+                        constexpr auto drawFunc = [](
+                            cocos2d::CCDrawNode* node, GameObject* obj,
+                            cocos2d::ccColor4F const& colorFill, float borderWidth,
+                            cocos2d::ccColor4F const& color
+                        ) {
+                            if (obj->m_shouldUseOuterOb) {
+                                auto orientedBox = obj->getOrientedBox();
+                                node->drawPolygon(
+                                    orientedBox->m_corners.data(), 4,
+                                    colorFill, borderWidth, color
+                                );
+                            } else {
+                                drawRect(node, obj->getObjectRect(), colorFill, borderWidth, color);
+                            }
+                        };
+
+                        if (obj->m_objectType == GameObjectType::Modifier) {
+                            if (!renderTriggers || !static_cast<EffectGameObject*>(obj)->m_isTouchTriggered) return;
+                            return drawFunc(
+                                drawNode, obj,
+                                triggersColorFill, borderSize,
+                                triggersColor
+                            );
+                        }
+
+                        drawFunc(
+                            drawNode, obj,
+                            otherColorFill, borderSize,
+                            otherColor
+                        );
+                        break;
+                    }
                     case GameObjectType::Solid: {
-                        if (!obj->m_isActivated) break;
-                        drawRect(drawNode, obj->getObjectRect(), solidColor, borderSize, solidColor);
+                        auto& objColor = obj->m_isPassable ? passableColor : solidColor;
+                        auto& objColorFill = obj->m_isPassable ? passableColorFill : solidColorFill;
+                        drawRect(
+                            drawNode, obj->getObjectRect(),
+                            objColorFill, borderSize,
+                            objColor
+                        );
+                        break;
+                    }
+                    case GameObjectType::Slope: {
+                        auto rect = obj->getObjectRect();
+                        std::array vertices = {
+                            cocos2d::CCPoint{rect.getMinX(), rect.getMinY()}, // Bottom left
+                            cocos2d::CCPoint{rect.getMinX(), rect.getMaxY()}, // Top left
+                            cocos2d::CCPoint{rect.getMaxX(), rect.getMinY()}, // Bottom right
+                        };
+
+                        cocos2d::CCPoint topRight{rect.getMaxX(), rect.getMaxY()};
+                        switch (obj->m_slopeDirection) {
+                            case 0: case 7:
+                                vertices[1] = topRight;
+                                break;
+                            case 1: case 5:
+                                vertices[0] = topRight;
+                                break;
+                            case 3: case 6:
+                                vertices[2] = topRight;
+                                break;
+                            default: break;
+                        }
+
+                        drawNode->drawPolygon(
+                            vertices.data(), vertices.size(),
+                            obj->m_isPassable ? passableColorFill : solidColorFill,
+                            borderSize, obj->m_isPassable ? passableColor : solidColor
+                        );
                         break;
                     }
                     case GameObjectType::AnimatedHazard:
@@ -583,16 +675,18 @@ namespace eclipse::hacks::Level {
                         if (auto radius = getObjectRadius(obj); radius > 0) {
                             drawNode->drawCircle(
                                 obj->getPosition(), radius,
-                                dangerColor, borderSize,
+                                dangerColorFill, borderSize,
                                 dangerColor, 16
                             );
                         } else {
-                            drawRect(drawNode, obj->getObjectRect(), dangerColor, borderSize, dangerColor);
+                            drawRect(
+                                drawNode, obj->getObjectRect(),
+                                dangerColorFill, borderSize,
+                                dangerColor
+                            );
                         }
                         break;
                     }
-
-                    default: break;
                 }
             });
         }

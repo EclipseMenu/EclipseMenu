@@ -26,6 +26,7 @@ namespace eclipse::gui {
         Color() : r(0), g(0), b(0), a(1.0f) {}
         Color(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a) {}
         Color(const Color& other) = default;
+        Color(const Color& other, float a) : r(other.r), g(other.g), b(other.b), a(a) {}
         explicit Color(const cocos2d::ccColor4F& other) : r(other.r), g(other.g), b(other.b), a(other.a) {}
         explicit Color(const cocos2d::ccColor4B& other) : r(other.r / 255.0f), g(other.g / 255.0f), b(other.b / 255.0f), a(other.a / 255.0f) {}
 
