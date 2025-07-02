@@ -83,7 +83,7 @@ namespace eclipse::utils {
             m_levelLength = playLayer->m_levelLength;
             m_resetActiveObjects = playLayer->m_resetActiveObjects;
             m_isTestMode = playLayer->m_isTestMode;
-            m_unk3229 = playLayer->m_unk3229;
+            m_freezeStartCamera = playLayer->m_freezeStartCamera;
             m_unk322a = playLayer->m_unk322a;
             m_cameraUnzoomedHeightOffset = playLayer->m_cameraUnzoomedHeightOffset;
             m_targetCameraHeightOffset = playLayer->m_targetCameraHeightOffset;
@@ -509,7 +509,7 @@ namespace eclipse::utils {
             playLayer->m_levelLength = m_levelLength;
             playLayer->m_resetActiveObjects = m_resetActiveObjects;
             playLayer->m_isTestMode = m_isTestMode;
-            playLayer->m_unk3229 = m_unk3229;
+            playLayer->m_freezeStartCamera = m_freezeStartCamera;
             playLayer->m_unk322a = m_unk322a;
             playLayer->m_cameraUnzoomedHeightOffset = m_cameraUnzoomedHeightOffset;
             playLayer->m_targetCameraHeightOffset = m_targetCameraHeightOffset;
@@ -933,7 +933,7 @@ namespace eclipse::utils {
         float m_levelLength;
         bool m_resetActiveObjects;
         bool m_isTestMode;
-        bool m_unk3229;
+        bool m_freezeStartCamera;
         bool m_unk322a;
         float m_cameraUnzoomedHeightOffset;
         float m_targetCameraHeightOffset;
@@ -1369,8 +1369,8 @@ namespace eclipse::utils {
             m_lastSpiderFlipTime = player->m_lastSpiderFlipTime;
             m_unkBool5 = player->m_unkBool5;
             m_maybeIsVehicleGlowing = player->m_maybeIsVehicleGlowing;
-            m_gv0096 = player->m_gv0096;
-            m_gv0100 = player->m_gv0100;
+            m_switchWaveTrailColor = player->m_switchWaveTrailColor;
+            m_practiceDeathEffect = player->m_practiceDeathEffect;
             m_accelerationOrSpeed = player->m_accelerationOrSpeed;
             m_snapDistance = player->m_snapDistance;
             m_ringJumpRelated = player->m_ringJumpRelated;
@@ -1526,9 +1526,9 @@ namespace eclipse::utils {
             m_isOutOfBounds = player->m_isOutOfBounds;
             m_fallStartY = player->m_fallStartY;
             m_disablePlayerSqueeze = player->m_disablePlayerSqueeze;
-            m_robotHasRun3 = player->m_robotHasRun3;
-            m_robotHasRun2 = player->m_robotHasRun2;
-            m_item20 = player->m_item20;
+            m_robotAnimation1Enabled = player->m_robotAnimation1Enabled;
+            m_robotAnimation2Enabled = player->m_robotAnimation2Enabled;
+            m_spiderAnimationEnabled = player->m_spiderAnimationEnabled;
             m_ignoreDamage = player->m_ignoreDamage;
             m_enable22Changes = player->m_enable22Changes;
 
@@ -1632,8 +1632,8 @@ namespace eclipse::utils {
             player->m_lastSpiderFlipTime = m_lastSpiderFlipTime;
             player->m_unkBool5 = m_unkBool5;
             player->m_maybeIsVehicleGlowing = m_maybeIsVehicleGlowing;
-            player->m_gv0096 = m_gv0096;
-            player->m_gv0100 = m_gv0100;
+            player->m_switchWaveTrailColor = m_switchWaveTrailColor;
+            player->m_practiceDeathEffect = m_practiceDeathEffect;
             player->m_accelerationOrSpeed = m_accelerationOrSpeed;
             player->m_snapDistance = m_snapDistance;
             player->m_ringJumpRelated = m_ringJumpRelated;
@@ -1788,9 +1788,9 @@ namespace eclipse::utils {
             player->m_isOutOfBounds = m_isOutOfBounds;
             player->m_fallStartY = m_fallStartY;
             player->m_disablePlayerSqueeze = m_disablePlayerSqueeze;
-            player->m_robotHasRun3 = m_robotHasRun3;
-            player->m_robotHasRun2 = m_robotHasRun2;
-            player->m_item20 = m_item20;
+            player->m_robotAnimation1Enabled = m_robotAnimation1Enabled;
+            player->m_robotAnimation2Enabled = m_robotAnimation2Enabled;
+            player->m_spiderAnimationEnabled = m_spiderAnimationEnabled;
             player->m_ignoreDamage = m_ignoreDamage;
             player->m_enable22Changes = m_enable22Changes;
 
@@ -1831,7 +1831,7 @@ namespace eclipse::utils {
         double m_dashStartTime;
         double m_slopeStartTime;
         bool m_justPlacedStreak;
-        GameObject* m_maybeLastGroundObject;
+        cocos2d::CCNode* m_maybeLastGroundObject;
         int m_lastCollisionBottom;
         int m_lastCollisionTop;
         int m_lastCollisionLeft;
@@ -1897,8 +1897,8 @@ namespace eclipse::utils {
         double m_lastSpiderFlipTime;
         bool m_unkBool5;
         bool m_maybeIsVehicleGlowing;
-        bool m_gv0096;
-        bool m_gv0100;
+        bool m_switchWaveTrailColor;
+        bool m_practiceDeathEffect;
         double m_accelerationOrSpeed;
         double m_snapDistance;
         bool m_ringJumpRelated;
@@ -2054,9 +2054,9 @@ namespace eclipse::utils {
         bool m_isOutOfBounds;
         float m_fallStartY;
         bool m_disablePlayerSqueeze;
-        bool m_robotHasRun3;
-        bool m_robotHasRun2;
-        bool m_item20;
+        bool m_robotAnimation1Enabled;
+        bool m_robotAnimation2Enabled;
+        bool m_spiderAnimationEnabled;
         bool m_ignoreDamage;
         bool m_enable22Changes;
 
