@@ -33,9 +33,23 @@ namespace eclipse::hacks::Global {
     static TicksType g_expectedTicks = 0;
 
     class $hack(TPSBypass) {
-    public:
+        static void forceDisable() {
+            config::set("global.tpsbypass.toggle", false);
+            // add a safeguard to disable tps bypass if it gets enabled
+            config::addDelegate("global.tpsbypass.toggle", []() {
+                if (config::get<bool>("global.tpsbypass.toggle", false))
+                    config::set("global.tpsbypass.toggle", false);
+            });
+        }
+
         void init() override {
             config::setIfEmpty("global.tpsbypass", 240.f);
+
+        #ifdef GEODE_IS_IOS
+            if (geode::Loader::get()->isPatchless()) {
+                return forceDisable();
+            }
+        #endif
 
             auto base = reinterpret_cast<uint8_t*>(geode::base::get());
             auto baseSize = utils::getBaseSize();
@@ -118,13 +132,7 @@ namespace eclipse::hacks::Global {
 
             if (addr == sinaps::not_found || bytes.empty()) {
                 geode::log::error("TPS Bypass: Failed to find patch address or bytes");
-                config::set("global.tpsbypass.toggle", false);
-                // add a safeguard to disable tps bypass if it gets enabled
-                config::addDelegate("global.tpsbypass.toggle", []() {
-                    if (config::get<bool>("global.tpsbypass.toggle", false))
-                        config::set("global.tpsbypass.toggle", false);
-                });
-                return;
+                return forceDisable();
             }
 
             geode::Patch* patch = nullptr;
@@ -138,13 +146,7 @@ namespace eclipse::hacks::Global {
             // patch toggler
             if (!patch) {
                 geode::log::error("TPS Bypass: Failed to patch GJBaseGameLayer::update");
-                config::set("global.tpsbypass.toggle", false);
-                // add a safeguard to disable tps bypass if it gets enabled
-                config::addDelegate("global.tpsbypass.toggle", []() {
-                    if (config::get<bool>("global.tpsbypass.toggle", false))
-                        config::set("global.tpsbypass.toggle", false);
-                });
-                return;
+                return forceDisable();
             }
 
             // toggle the patch if enabled
@@ -164,13 +166,7 @@ namespace eclipse::hacks::Global {
             auto res = setupModifiedDeltaPatches();
             if (!res) {
                 geode::log::error("TPSBypass: {}", res.unwrapErr());
-                config::set("global.tpsbypass.toggle", false);
-                // add a safeguard to disable tps bypass if it gets enabled
-                config::addDelegate("global.tpsbypass.toggle", []() {
-                    if (config::get<bool>("global.tpsbypass.toggle", false))
-                        config::set("global.tpsbypass.toggle", false);
-                });
-                return;
+                return forceDisable();
             }
             #endif
 
