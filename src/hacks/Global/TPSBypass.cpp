@@ -5,9 +5,6 @@
 #include <modules/utils/assembler.hpp>
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
-#include <Geode/modify/GJEffectManager.hpp>
-#include <Geode/modify/HardStreak.hpp>
-#include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 
 #include <sinaps.hpp>
