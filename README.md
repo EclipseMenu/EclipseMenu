@@ -26,10 +26,17 @@
 <br>
 
 ## Tabbed Style
-<img src="screenshots/image1.png" alt="Tabbed Style">
+<img src="screenshots/tabbed1.jpg" alt="Tabbed Style">
+<img src="screenshots/tabbed2.jpg" alt="Tabbed Style">
+
+## Cocos UI
+<img src="screenshots/cocos1.jpg" alt="Cocos Style">
 
 ## Panel Style 
-<img src="screenshots/image2.png" alt="Panel Style">
+<img src="screenshots/panel1.jpg" alt="Panel Style">
+
+## Sidebar Style 
+<img src="screenshots/sidebar1.jpg" alt="Sidebar Style">
 
 ## How to install
 1. Install [Geode](https://geode-sdk.org) if you haven't already!

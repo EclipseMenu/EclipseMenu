@@ -24,7 +24,7 @@ set(RIFT_INCLUDE_MATJSON ON)
 CPMAddPackage("gh:EclipseMenu/rift#0c452b1")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
 CPMAddPackage("gh:prevter/AdvancedLabel#c830a4f")
-CPMAddPackage("gh:prevter/sinaps#1663e86")
+CPMAddPackage("gh:prevter/sinaps#2541d6d")
 CPMAddPackage(
     NAME nlohmann_json
     GITHUB_REPOSITORY nlohmann/json
@@ -34,7 +34,6 @@ CPMAddPackage(
 # Fix debug build
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
     target_compile_definitions(discord-rpc PRIVATE _ITERATOR_DEBUG_LEVEL=0)
-    target_compile_definitions(simdutf PRIVATE _ITERATOR_DEBUG_LEVEL=0)
     target_compile_definitions(rift PRIVATE _HAS_ITERATOR_DEBUGGING=0)
 endif()
 

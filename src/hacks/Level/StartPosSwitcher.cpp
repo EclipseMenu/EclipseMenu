@@ -8,11 +8,14 @@
 
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/UILayer.hpp>
+#include <Geode/cocos/actions/CCActionInterval.h>
+#include <Geode/utils/cocos.hpp>
 #include <modules/labels/variables.hpp>
 
 namespace eclipse::hacks::Level {
     static std::vector<StartPosObject*> startPosObjects;
     static int32_t currentStartPosIndex = 0;
+    static cocos2d::CCSequence* startPosSwitcherSequence = nullptr;
 
     class $hack(StartPosSwitcher) {
     public:
@@ -37,6 +40,7 @@ namespace eclipse::hacks::Level {
                    options->addKeybind("level.startpos_switcher.next", "level.startpos_switcher.next")
                           ->setInternal()->setDefaultKey(keybinds::Keys::E);
                    options->addToggle("level.startpos_switcher.reset_camera");
+                   options->addInputFloat("level.startpos_switcher.delay", 0.f, 10.f, "%.2fs");
                    options->addToggle("level.startpos_switcher.label")
                           ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                               options->addInputFloat("label.startpos_switcher.scale", 0.1f, 2.f, "%.2fx");
@@ -73,19 +77,34 @@ namespace eclipse::hacks::Level {
                 index = count - 1;
 
             currentStartPosIndex = index;
-            playLayer->m_currentCheckpoint = nullptr;
+            auto func = [index] {
+                startPosSwitcherSequence = nullptr;
+                PlayLayer* playLayer = utils::get<PlayLayer>();
+                playLayer->m_currentCheckpoint = nullptr;
 
-            auto* startPos = index >= 0 ? startPosObjects[index] : nullptr;
-            playLayer->setStartPosObject(startPos);
-            playLayer->m_isTestMode = index >= 0;
+                auto* startPos = index >= 0 ? startPosObjects[index] : nullptr;
+                playLayer->setStartPosObject(startPos);
+                playLayer->m_isTestMode = index >= 0;
 
-            if (playLayer->m_isPracticeMode)
-                playLayer->resetLevelFromStart();
-            else
-                playLayer->resetLevel();
+                if (playLayer->m_isPracticeMode)
+                    playLayer->resetLevelFromStart();
+                else
+                    playLayer->resetLevel();
 
-            playLayer->startMusic();
-            playLayer->updateTestModeLabel();
+                playLayer->startMusic();
+                playLayer->updateTestModeLabel();
+            };
+
+            float delay = config::get<float>("level.startpos_switcher.delay", 0.f);
+            if(delay <= 0.f) return func();
+
+            if(startPosSwitcherSequence) playLayer->stopAction(startPosSwitcherSequence);
+
+            startPosSwitcherSequence = cocos2d::CCSequence::createWithTwoActions(
+                cocos2d::CCDelayTime::create(delay),
+                geode::cocos::CallFuncExt::create(func)
+            );
+            playLayer->runAction(startPosSwitcherSequence);
         }
 
         [[nodiscard]] const char* getId() const override { return "StartPos Switcher"; }
