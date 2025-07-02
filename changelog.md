@@ -2,14 +2,22 @@
 
 ## v.1.x.x (Nightly)
 **Additions**:
+* <cg>JIT-less</c> support for <cl>iOS</c> (Physics Bypass is not supported on JIT-less due to technical limitations)
 * Added <cg>two new themes</c> <cg>Gruvbox</c> (thanks fleeym) and <cg>OpenHack</c>
 * Removed no longer required dependencies to reduce mod size
+* Added <cg>DPI Scaling</c> setting to toggle scaling UI with screen resolution
+* Added delay setting for <co>StartPos Switcher</c>
 
 **Fixes**:
+* <cg>Improved</c> <co>Physics Bypass</c> performance and accuracy
+* <cg>Fixed</c> <co>Accurate Percentage</c> rounding to nearest, instead of down
+* <co>P1/P2 Jump Keybinds</c> can no longer be bound to default jump keys to prevent issues
+* <cg>Improved</c> replay bot recording accuracy</c>
 * <cg>Fixed</c> crash that could happen with <co>Only Show Death Object</c>
 * <cg>Fixed</c> crash with <co>Legacy Trail</c> after changing resolution
 * <cg>Fixed</c> menu popping up for few frames on launch
 * <cg>Fixed</c> crash when using <co>Ghost Trail</c> hacks with editors
+* <cg>Fixed</c> <co>Solid Wave Trail</c> incompatibility with some mods
 
 ## v1.2.2
 **Additions**:
