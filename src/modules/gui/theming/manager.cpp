@@ -272,6 +272,8 @@ namespace eclipse::gui {
         auto ret = m_uiScale * imgui::DEFAULT_SCALE;
         if (config::get<"interface.dpi-scaling", bool>()) {
             ret *= config::getTemp<"ui.scale", float>(1.f);
+        } else {
+            GEODE_MACOS(ret /= geode::utils::getDisplayFactor();)
         }
         return ret;
     }
