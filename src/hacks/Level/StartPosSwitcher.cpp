@@ -224,12 +224,13 @@ namespace eclipse::hacks::Level {
         }
 
         void resetLevel() {
-            auto spSwitcherMod = config::get<bool>("level.startpos_switcher", true);
-            auto spSwitcherResetCameraMod = config::get<bool>("level.startpos_switcher.reset_camera", true);
-            if (spSwitcherMod && spSwitcherResetCameraMod) {
-                for (StartPosObject* obj : startPosObjects)
-                     obj->m_startSettings->m_resetCamera = true;
+            if (!config::get<"level.startpos_switcher", bool>() || !config::get<"level.startpos_switcher.reset_camera", bool>()) {
+                PlayLayer::resetLevel();
+                return;
             }
+
+            for (auto* obj : startPosObjects)
+                obj->m_startSettings->m_resetCamera = true;
 
             PlayLayer::resetLevel();
         }
