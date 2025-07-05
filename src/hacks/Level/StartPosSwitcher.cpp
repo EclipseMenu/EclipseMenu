@@ -243,11 +243,15 @@ namespace eclipse::hacks::Level {
         }
 
         void resetLevel() {
-            PlayLayer::resetLevel();
+            if (!config::get<"level.startpos_switcher", bool>() || !config::get<"level.startpos_switcher.reset_camera", bool>()) {
+                PlayLayer::resetLevel();
+                return;
+            }
 
-            // Reset camera
-            if (currentStartPosIndex >= 0 && config::get<bool>("level.startpos_switcher.reset_camera", true))
-                this->resetCamera();
+            for (auto* obj : startPosObjects)
+                obj->m_startSettings->m_resetCamera = true;
+
+            PlayLayer::resetLevel();
         }
 
         void addObject(GameObject* object) {
