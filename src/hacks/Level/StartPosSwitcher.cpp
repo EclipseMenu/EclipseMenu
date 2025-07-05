@@ -187,8 +187,8 @@ namespace eclipse::hacks::Level {
         }
 
         void update(float dt) override {
-            if (!config::get<bool>("level.startpos_switcher", false) ||
-                !config::get<bool>("level.startpos_switcher.label", true)) {
+            if (!config::get<"level.startpos_switcher", bool>() ||
+                !config::get<"level.startpos_switcher.label", bool>(true)) {
                 setVisibility(false);
                 m_timeSinceAction = 0.f;
                 return;
@@ -198,8 +198,8 @@ namespace eclipse::hacks::Level {
             m_timeSinceAction += dt;
 
             // Update scale and color
-            auto scale = config::get<float>("label.startpos_switcher.scale", 0.7f);
-            auto color = config::get<gui::Color>("label.startpos_switcher.color", gui::Color(1.f, 1.f, 1.f, 0.6f));
+            auto scale = config::get<"label.startpos_switcher.scale", float>(0.7f);
+            auto color = config::get<"label.startpos_switcher.color", gui::Color>(gui::Color(1.f, 1.f, 1.f, 0.6f));
             this->setScale(scale);
             m_label->setColor(color.toCCColor3B());
 
@@ -208,7 +208,7 @@ namespace eclipse::hacks::Level {
             if (m_timeSinceAction < 3.f) {
                 this->setOpacity(color.a * 255);
             } else {
-                auto opacityMod = 1.f - config::get<float>("label.startpos_switcher.alpha_mod", 0.4f);
+                auto opacityMod = 1.f - config::get<"label.startpos_switcher.alpha_mod", float>(0.4f);
                 auto clampedTime = std::clamp(m_timeSinceAction - 3.f, 0.f, animationTime) / animationTime;
                 auto modifier = 1.f - (clampedTime * opacityMod);
                 this->setOpacity(color.a * 255 * modifier);
@@ -258,7 +258,7 @@ namespace eclipse::hacks::Level {
             PlayLayer::addObject(object);
 
             if (object->m_objectID == 31)
-                startPosObjects.push_back(geode::cast::typeinfo_cast<StartPosObject*>(object));
+                startPosObjects.push_back(static_cast<StartPosObject*>(object));
         }
 
         void createObjectsFromSetupFinished() {
