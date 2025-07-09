@@ -1,6 +1,6 @@
 # Eclipse Menu
 
-## v.1.x.x (Nightly)
+## v.1.3.0
 **Additions**:
 * <cg>JIT-less</c> support for <cl>iOS</c> (Physics Bypass is not supported on JIT-less due to technical limitations)
 * Added <cg>two new themes</c> <cg>Gruvbox</c> (thanks fleeym) and <cg>OpenHack</c>
@@ -22,6 +22,7 @@
 * <cg>Fixed</c> crash when using <co>Ghost Trail</c> hacks with editors
 * <cg>Fixed</c> <co>Solid Wave Trail</c> incompatibility with some mods
 * <cg>Fixed</c> camera related issues with <co>StartPos Switcher</c> (#205 by @UserIsntAvailable)
+* <cg>Fixed</c> inverted Delete/Backspace keys on <cl>macOS</c>
 
 ## v1.2.2
 **Additions**:
