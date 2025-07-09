@@ -8,6 +8,7 @@
 * Added <cg>DPI Scaling</c> setting to toggle scaling UI with screen resolution
 * Added delay setting for <co>StartPos Switcher</c>
 * <cy>New</c> label variable: `levelRating`
+* Added ability to <cg>change menu keybind</c> from Geode mod settings
 
 **Fixes**:
 * <cg>Improved</c> <co>Physics Bypass</c> performance and accuracy

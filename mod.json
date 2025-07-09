@@ -70,6 +70,12 @@
 			"name": "Reset theme?",
 			"description": "Reset the theme to the default one.",
 			"default": "Reset"
+		},
+		"menu-keybind": {
+			"type": "custom:keybind",
+			"name": "Menu Keybind",
+			"description": "The keybind to open the Eclipse menu.",
+			"platforms": ["win", "mac"]
 		}
 	}
 }

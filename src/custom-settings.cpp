@@ -2,6 +2,7 @@
 #include <Geode/loader/Mod.hpp>
 #include <Geode/loader/SettingV3.hpp>
 #include <Geode/ui/Popup.hpp>
+#include <modules/gui/cocos/components/KeybindComponent.hpp>
 #include <modules/gui/theming/manager.hpp>
 
 using namespace geode::prelude;
@@ -106,4 +107,81 @@ SettingNodeV3* CustomButton::createNode(float width) {
     );
 }
 
-$execute { (void) Mod::get()->registerCustomSettingType("custom-btn", &CustomButton::parse); }
+class KeybindSetting : public SettingV3 {
+public:
+    static Result<std::shared_ptr<SettingV3>> parse(std::string const& key, std::string const& modID, matjson::Value const& json) {
+        auto res = std::make_shared<KeybindSetting>();
+        auto root = checkJson(json, "KeybindSetting");
+
+        res->init(key, modID, root);
+        res->parseNameAndDescription(root);
+        res->parseEnableIf(root);
+
+        root.checkUnknownKeys();
+        return root.ok(std::static_pointer_cast<SettingV3>(res));
+    }
+
+    bool load(matjson::Value const& json) override { return true; }
+    bool save(matjson::Value& json) const override { return true; }
+    bool isDefaultValue() const override { return true; }
+
+    void reset() override {}
+
+    SettingNodeV3* createNode(float width) override;
+};
+
+class KeybindSettingNode : public SettingNodeV3 {
+protected:
+    bool init(const std::shared_ptr<KeybindSetting>& setting, float width) {
+        if (!SettingNodeV3::init(setting, width))
+            return false;
+
+        using namespace eclipse;
+        using namespace eclipse::gui;
+        auto keybindComponent = Component::find(keybinds::Manager::get()->getMenuKeybindUID());
+        auto node = gui::cocos::KeybindComponentNode::create(keybindComponent, 240);
+        node->getChildByID("label"_spr)->setVisible(false);
+
+        this->getButtonMenu()->addChildAtPosition(node, Anchor::Center);
+        this->getButtonMenu()->setContentWidth(240);
+        this->getButtonMenu()->updateLayout();
+
+        this->updateState(nullptr);
+
+        return true;
+    }
+
+    void onCommit() override {}
+
+    void onResetToDefault() override {}
+
+public:
+    static KeybindSettingNode* create(const std::shared_ptr<KeybindSetting>& setting, float width) {
+        auto ret = new KeybindSettingNode;
+        if (ret->init(setting, width)) {
+            ret->autorelease();
+            return ret;
+        }
+        delete ret;
+        return nullptr;
+    }
+
+    bool hasUncommittedChanges() const override { return false; }
+    bool hasNonDefaultValue() const override { return false; }
+
+    std::shared_ptr<KeybindSetting> getSetting() const {
+        return std::static_pointer_cast<KeybindSetting>(SettingNodeV3::getSetting());
+    }
+};
+
+SettingNodeV3* KeybindSetting::createNode(float width) {
+    return KeybindSettingNode::create(
+        std::static_pointer_cast<KeybindSetting>(shared_from_this()),
+        width
+    );
+}
+
+$execute {
+    (void) Mod::get()->registerCustomSettingType("custom-btn", &CustomButton::parse);
+    (void) Mod::get()->registerCustomSettingType("keybind", &KeybindSetting::parse);
+}

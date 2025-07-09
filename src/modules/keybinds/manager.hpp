@@ -184,10 +184,14 @@ namespace eclipse::keybinds {
         /// @note This function is called from the key callback hook.
         void registerKeyRelease(Keys key);
 
+        /// @brief Get the unique ID for the menu keybind component.
+        [[nodiscard]] size_t getMenuKeybindUID() const { return m_menuKeybindUID; }
+
     private:
         std::vector<Keybind> m_keybinds;
         std::unordered_map<Keys, bool> m_keyStates;
         std::unordered_map<Keys, bool> m_lastKeyStates;
+        size_t m_menuKeybindUID = 0;
         bool m_initialized = false;
 
         Keybind& registerKeybindInternal(const std::string& id, const std::string& title, const std::function<void(bool)>& callback, bool internal);

@@ -88,6 +88,7 @@ namespace eclipse::gui::cocos {
             auto label = TranslatedLabel::create(m_component->getTitle());
             label->setAnchorPoint({ 0, 0.5f });
             label->limitLabelWidth(width * 0.5f, 1.f, 0.1f);
+            label->setID("label"_spr);
             this->addChildAtPosition(label, geode::Anchor::Left, { 5.f, 0.f });
 
             auto offset = 0.f;
@@ -145,6 +146,7 @@ namespace eclipse::gui::cocos {
                 }
             );
             btn->m_scaleMultiplier = 1.1f;
+            btn->setID("keybind"_spr);
             this->addChildAtPosition(btn, geode::Anchor::Right, { offset - 5.f, 0.f });
             offset -= btnWidth / 2;
 

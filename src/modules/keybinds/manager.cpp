@@ -350,7 +350,7 @@ namespace eclipse::keybinds {
         #ifndef GEODE_IS_MOBILE
         auto tab = gui::MenuTab::find("tab.keybinds");
 
-        tab->addKeybind("keybinds.open-menu", "menu.toggleKey")->callback(
+        m_menuKeybindUID = tab->addKeybind("keybinds.open-menu", "menu.toggleKey")->callback(
             [](Keys key) {
                 if (key == Keys::MouseLeft) {
                     // Reset it back to the default keybind (LMB softlocks the menu)
@@ -361,7 +361,7 @@ namespace eclipse::keybinds {
                 if (auto keybind = Manager::get()->getKeybind("menu.toggle"); keybind.has_value())
                     keybind->get().setKey(key);
             }
-        )->setDefaultKey(Keys::Tab);
+        )->setDefaultKey(Keys::Tab)->getUID();
 
         tab->addToggle("keybinds.in-game-only")
            ->setDescription();
