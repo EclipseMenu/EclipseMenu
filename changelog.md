@@ -12,6 +12,7 @@
 
 **Fixes**:
 * <cg>Improved</c> <co>Physics Bypass</c> performance and accuracy
+* Reworked <co>Show Hitboxes</c>, fixing bugs and improving performance
 * <cg>Fixed</c> <co>Accurate Percentage</c> rounding to nearest, instead of down
 * <co>P1/P2 Jump Keybinds</c> can no longer be bound to default jump keys to prevent issues
 * <cg>Improved</c> replay bot recording accuracy</c>
@@ -20,6 +21,7 @@
 * <cg>Fixed</c> menu popping up for few frames on launch
 * <cg>Fixed</c> crash when using <co>Ghost Trail</c> hacks with editors
 * <cg>Fixed</c> <co>Solid Wave Trail</c> incompatibility with some mods
+* <cg>Fixed</c> camera related issues with <co>StartPos Switcher</c> (#205 by @UserIsntAvailable)
 
 ## v1.2.2
 **Additions**:
