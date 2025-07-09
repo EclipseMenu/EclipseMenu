@@ -387,6 +387,7 @@ This list will be split into categories, each having a separate table.
 | `speedhack`      | Check whether speedhack is enabled.           | Boolean |
 | `speedhackSpeed` | Selected speedhack speed.                     | Float   |
 | `framestepper`   | Check whether frame stepper is active.        | Boolean |
+| `cbf`            | Check wether Click Between Frames is enabled  | Boolean |
 
 ### Level information
 > Note: these values are only available when playing/editing the level
