@@ -45,6 +45,8 @@ If you have already scrolled to the variables list, you might have noticed there
 - **Float** - a number with decimal places, representing real numbers (e.g., `1.0`, `3.14`)
 - **String** - contains text (`"Hello"`, `'Single quotes also work'`, etc.);
 - **Boolean** - type that is either `true` or `false`. Booleans can be used in conditions where true is treated as 1 and false as 0.
+- **Array** - a collection of values, which can be of any type. You can access elements in an array using an index, like `array[0]` for the first element.
+- **Dictionary** - a collection of key-value pairs, where each key is unique. You can access values using their keys, like `dict["key"]` or `dict.key`.
 
 ### 3. Comparisons
 
@@ -270,6 +272,15 @@ RIFT includes many built-in functions for manipulating strings, numbers, and per
 { middlePad("1", 5, '-') } // "--1--"
 ```
 
+In addition to these functions, Eclipse Menu also provides a function to access built-in config properties:
+```
+{ cfg("creator.leveledit") }
+```
+In this example, the function will return the value of the `creator.leveledit` property from the config file, which represents whether "Level Edit" hack is enabled or not.
+
+There's no full list of config properties, as it would be too long and hard to maintain. However, you can always check the source code or read your config file to see what properties are available.
+
+
 ### 5. Precedence Rules
 
 RIFT follows general mathematical precedence, ensuring that expressions are evaluated in a logical order. Operators are applied based on their priority, unless overridden by parentheses. The precedence rules allow for more complex expressions while ensuring correct evaluation.
@@ -309,16 +320,16 @@ This list will be split into categories, each having a separate table.
 
 ### General values
 
-| Name          | Description                             | Type    | Remarks                     |
-|---------------|-----------------------------------------|---------|-----------------------------|
-| `modVersion`  | Current Eclipse Menu version.           | String  | `v.1.0.0-alpha.1`           |
-| `platform`    | Platform you're currently running on.   | String  | `Windows`/`macOS`/`Android` |
-| `gameVersion` | Current Geometry Dash version.          | String  | `2.206`                     |
-| `totalMods`   | Total count of Geode mods installed.     | Integer |                             |
-| `enabledMods` | Count of only enabled mods.             | Integer |                             |
-| `fps`         | Current average FPS.                    | Float   |                             |
-| `realFps`     | FPS based on time taken for last frame. | Float   |                             |
-| `username`    | Your current account name.              | String  |                             |
+| Name           | Description                             | Type    | Remarks                           |
+|----------------|-----------------------------------------|---------|-----------------------------------|
+| `modVersion`   | Current Eclipse Menu version.           | String  | `v.1.0.0-alpha.1`                 |
+| `platform`     | Platform you're currently running on.   | String  | `Windows`/`macOS`/`Android`/`iOS` |
+| `geodeVersion` | Current Geode version.                  | String  | `4.6.3`                           |
+| `gameVersion`  | Current Geometry Dash version.          | String  | `2.206`                           |
+| `totalMods`    | Total count of Geode mods installed.    | Integer |                                   |
+| `enabledMods`  | Count of only enabled mods.             | Integer |                                   |
+| `fps`          | Current average FPS.                    | Float   |                                   |
+| `realFps`      | FPS based on time taken for last frame. | Float   |                                   |
 
 ### Emojis
 > Note: Some emojis look different in-game than the ones shown on this page.
@@ -357,12 +368,24 @@ This list will be split into categories, each having a separate table.
 > Some can be arrays or values. If they are arrays, use [index] to select one of the emojis.
 > Example usage: `emojis.userCoin[1]` or `emojis.practice`
 
-| Name                         | Values |
-|------------------------------|--------|
-| `emojis.userCoin`            | <img src="resources/Emojis/1f6de.png" width=24 alt="emojis.userCoin[0]">,<img src="resources/Emojis/1f535.png" width=24 alt="emojis.userCoin[1]">      |
-| `emojis.secretCoin`          | <img src="resources/Emojis/1f6de.png" width=24 alt="emojis.secretCoin[0]">,<img src="resources/Emojis/1f7e1.png" width=24 alt="emojis.secretCoin[1]">    |
-| `emojis.startPos`            | <img src="resources/Emojis/1f9ff.png" width=24 alt="emojis.startPos">    |
-| `emojis.practice`            | <img src="resources/Emojis/2666.png" width=24 alt="emojis.practice">    |
+| Name                | Values                                                                                                                                                |
+|---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `emojis.userCoin`   | <img src="resources/Emojis/1f6de.png" width=24 alt="emojis.userCoin[0]">,<img src="resources/Emojis/1f535.png" width=24 alt="emojis.userCoin[1]">     |
+| `emojis.secretCoin` | <img src="resources/Emojis/1f6de.png" width=24 alt="emojis.secretCoin[0]">,<img src="resources/Emojis/1f7e1.png" width=24 alt="emojis.secretCoin[1]"> |
+| `emojis.startPos`   | <img src="resources/Emojis/1f9ff.png" width=24 alt="emojis.startPos">                                                                                 |
+| `emojis.practice`   | <img src="resources/Emojis/2666.png" width=24 alt="emojis.practice">                                                                                  |
+
+### Regional Indicators 
+These are stored as a dictionary called `ri`, where the key is the letter.
+Numbers are stored in `ri.num` dictionary, where the key is the number.
+
+Example:
+```
+{ ri['h'] + ri['e'] + ri['l'] + ri['l'] + ri['o'] }
+{ ri.num[0] + ri.num[1] + ri.num[2] + ri.num[3] + ri.num[4] + ri.num[5] }
+```
+Would result in `🇭🇪🇱🇱🇴` and `0️⃣1️⃣2️⃣3️⃣4️⃣5️⃣`
+
 
 ### Time & Date
 
@@ -380,13 +403,70 @@ This list will be split into categories, each having a separate table.
 
 ### Hacks
 
-| Name             | Description                                   | Type    |
-|------------------|-----------------------------------------------|---------|
-| `isCheating`     | Has the current state of the cheat indicator. | Boolean |
-| `noclip`         | Check whether noclip is enabled.              | Boolean |
-| `speedhack`      | Check whether speedhack is enabled.           | Boolean |
-| `speedhackSpeed` | Selected speedhack speed.                     | Float   |
-| `framestepper`   | Check whether frame stepper is active.        | Boolean |
+| Name             | Description                                         | Type    |
+|------------------|-----------------------------------------------------|---------|
+| `isCheating`     | Has the current state of the cheat indicator.       | Boolean |
+| `noclip`         | Check whether noclip is enabled.                    | Boolean |
+| `speedhack`      | Check whether speedhack is enabled.                 | Boolean |
+| `speedhackSpeed` | Selected speedhack speed.                           | Float   |
+| `framestepper`   | Check whether frame stepper is active.              | Boolean |
+| `cbf`            | Check whether CBF (Click Between Frames) is active. | Boolean |
+
+### Player information
+
+| Name          | Description                                     | Type       | Remarks                                         |
+|---------------|-------------------------------------------------|------------|-------------------------------------------------|
+| `username`    | Your current account name.                      | String     |                                                 |
+| `cubeIcon`    | Current cube icon ID.                           | Integer    |                                                 |
+| `shipIcon`    | Current ship icon ID.                           | Integer    |                                                 |
+| `ballIcon`    | Current ball icon ID.                           | Integer    |                                                 |
+| `ufoIcon`     | Current ufo icon ID.                            | Integer    |                                                 |
+| `waveIcon`    | Current wave icon ID.                           | Integer    |                                                 |
+| `robotIcon`   | Current robot icon ID.                          | Integer    |                                                 |
+| `spiderIcon`  | Current spider icon ID.                         | Integer    |                                                 |
+| `swingIcon`   | Current swing icon ID.                          | Integer    |                                                 |
+| `paths`       | Dictionary containing progress of each path.    | Dictionary | Key is path name, value is amount of stars.     |
+| `shards`      | Dictionary containing the amount of each shard. | Dictionary | Key is shard name, value is amount of shards.   |
+| `currentPath` | The name of the currently selected path.        | String     | Value can be used as key for `paths` dictionary |
+
+> Note: `paths` and `shards` share the same key names:
+> - `fire`
+> - `ice`
+> - `poison`
+> - `shadow`
+> - `lava`
+> - `earth`
+> - `blood`
+> - `metal`
+> - `light`
+> - `soul`
+
+In addition, there's also a `stats` dictionary which contains various player statistics:
+
+| Name                    | Description                                                 | Type    |
+|-------------------------|-------------------------------------------------------------|---------|
+| `totalJumps`            | Total amount of jumps between all levels.                   | Integer |
+| `totalAttempts`         | Total amount of attempts between all levels.                | Integer |
+| `completedLevels`       | Total amount of completed official levels.                  | Integer |
+| `completedOnlineLevels` | Total amount of completed online levels.                    | Integer |
+| `demons`                | Total amount of demons completed.                           | Integer |
+| `stars`                 | Total amount of stars collected.                            | Integer |
+| `completedMapPacks`     | Total amount of completed map packs.                        | Integer |
+| `goldCoins`             | Total amount of secret (gold) coins collected.              | Integer |
+| `playersDestroyed`      | Total amount of players killed on the main menu background. | Integer |
+| `likedLevels`           | Total amount of levels you have liked.                      | Integer |
+| `ratedLevels`           | Total amount of levels you have rated.                      | Integer |
+| `userCoins`             | Total amount of user coins collected.                       | Integer |
+| `diamonds`              | Total amount of diamonds collected.                         | Integer |
+| `orbs`                  | Current amount of orbs.                                     | Integer |
+| `dailies`               | Total amount of daily levels completed.                     | Integer |
+| `keys`                  | Current amount keys.                                        | Integer |
+| `totalOrbs`             | Total amount of orbs collected.                             | Integer |
+| `moons`                 | Total amount of moons collected.                            | Integer |
+| `diamondShards`         | Amount of spendable diamonds available.                     | Integer |
+| `gauntlets`             | Total amount of gauntlets completed.                        | Integer |
+| `lists`                 | Total amount of lists you have completed.                   | Integer |
+
 
 ### Level information
 > Note: these values are only available when playing/editing the level
@@ -406,36 +486,61 @@ This list will be split into categories, each having a separate table.
 | `bestPercent`     | Normal mode record percent.                                                                    | Integer          |                                     |
 | `bestTime`        | Best level completion time.                                                                    | Float            |                                     |
 | `best`            | In platformer mode: formatted best time (HH:MM:SS.mmm). In normal mode: same as `bestPercent`. | String / Integer |                                     |
+| `totalLevelOrbs`  | Maximum amount of orbs you can collect from this level.                                        | Integer          |                                     |
+| `levelOrbs`       | Amount of orbs you have collected in this level.                                               | Integer          |                                     |
 
 ### Gameplay
 > Note: these values are only available when playing/editing the level
 
-| Name             | Description                                            | Type    |
-|------------------|--------------------------------------------------------|---------|
-| `playerX`        | Current player X position.                             | Float   |
-| `playerY`        | Current player Y position.                             | Float   |
-| `player2X`       | Second player X position.                              | Float   |
-| `player2Y`       | Second player Y position.                              | Float   |
-| `attempt`        | Current session attempt.                               | Integer |
-| `isTestMode`     | Whether playing from a StartPos object.                | Boolean |
-| `isPracticeMode` | Whether currently in practice mode.                    | Boolean |
-| `isPlatformer`   | Whether the player is in platformer mode.              | Boolean |
-| `levelTime`      | Current attempt time in seconds.                       | Float   |
-| `levelLength`    | Level length in block units.                           | Float   |
-| `levelDuration`  | Level duration in seconds.                             | Float   |
-| `time`           | Formatted attempt time (HH:MM:SS.mmm).                 | String  |
-| `frame`          | Current frame number.                                  | Integer |
-| `isDead`         | Whether the player is currently dead.                  | Boolean |
-| `noclipDeaths`   | How many times you have "died" in noclip.              | Integer |
-| `noclipAccuracy` | Displays a ratio of alive/dead frames in noclip.       | Float   |
-| `progress`       | Current progress in the level.                         | Float   |
-| `realProgress`   | Original level progress, without 0% startpos bug fix.  | Float   |
-| `editorMode`     | Whether you're currently in editor mode.               | Boolean |
-| `objects`        | Total objects count in the level.                      | Integer |
-| `runFrom`        | Percentage at which your best run started.             | Float   |
-| `bestRun`        | Percentage at which your best run ended.               | Float   |
-| `lastDeath`      | Progress of your last attempt (null on first attempt). | Float   |
-
+| Name                     | Description                                                                                               | Type    |
+|--------------------------|-----------------------------------------------------------------------------------------------------------|---------|
+| `playerX`                | Current player X position.                                                                                | Float   |
+| `playerY`                | Current player Y position.                                                                                | Float   |
+| `player2X`               | Second player X position.                                                                                 | Float   |
+| `player2Y`               | Second player Y position.                                                                                 | Float   |
+| `attempt`                | Current session attempt.                                                                                  | Integer |
+| `isTestMode`             | Whether playing from a StartPos object.                                                                   | Boolean |
+| `isPracticeMode`         | Whether currently in practice mode.                                                                       | Boolean |
+| `isPlatformer`           | Whether the player is in platformer mode.                                                                 | Boolean |
+| `isDualMode`             | Whether the player is in dual mode.                                                                       | Boolean |
+| `levelTime`              | Current attempt time in seconds.                                                                          | Float   |
+| `levelLength`            | Level length in block units.                                                                              | Float   |
+| `levelDuration`          | Level duration in seconds.                                                                                | Float   |
+| `time`                   | Formatted attempt time (HH:MM:SS.mmm).                                                                    | String  |
+| `frame`                  | Current frame number.                                                                                     | Integer |
+| `isDead`                 | Whether the player is currently dead.                                                                     | Boolean |
+| `noclipDeaths`           | How many times you have "died" in noclip.                                                                 | Integer |
+| `noclipAccuracy`         | Displays a ratio of alive/dead frames in noclip.                                                          | Float   |
+| `progress`               | Current progress in the level.                                                                            | Float   |
+| `realProgress`           | Original level progress, without 0% startpos bug fix.                                                     | Float   |
+| `editorMode`             | Whether you're currently in editor mode.                                                                  | Boolean |
+| `objects`                | Total objects count in the level.                                                                         | Integer |
+| `runFrom`                | Percentage at which your best run started.                                                                | Float   |
+| `bestRun`                | Percentage at which your best run ended.                                                                  | Float   |
+| `lastDeath`              | Progress of your last attempt (null on first attempt).                                                    | Float   |
+| `tps`                    | Current ticks per second.                                                                                 | Float   |
+| `timeWarp`               | Current time warp multiplier.                                                                             | Float   |
+| `gravity`                | Current gravity multiplier.                                                                               | Float   |
+| `activeObjects`          | Amount of currently active objects in the level.                                                          | Integer |
+| `gradients`              | Amount of activated gradient triggers in the level.                                                       | Integer |
+| `particleCount`          | Amount of particles in the level.                                                                         | Integer |
+| `songsCount`             | Amount of currently playing songs in the level.                                                           | Integer |
+| `sfxCount`               | Amount of currently playing sound effects in the level.                                                   | Integer |
+| `moveTriggerCount`       | Amount of currently active move triggers in the level.                                                    | Integer |
+| `rotateTriggerCount`     | Amount of currently active rotate triggers in the level.                                                  | Integer |
+| `scaleTriggerCount`      | Amount of currently active scale triggers in the level.                                                   | Integer |
+| `followTriggerCount`     | Amount of currently active follow triggers in the level.                                                  | Integer |
+| `areaMoveTrigger`        | Amount of currently active area move triggers in the level.                                               | Integer |
+| `areaMoveTriggerTotal`   | Total amount of area move triggers in the level.                                                          | Integer |
+| `areaRotateTrigger`      | Amount of currently active area rotate triggers in the level.                                             | Integer |
+| `areaRotateTriggerTotal` | Total amount of area rotate triggers in the level.                                                        | Integer |
+| `areaScaleTrigger`       | Amount of currently active area scale triggers in the level.                                              | Integer |
+| `areaScaleTriggerTotal`  | Total amount of area scale triggers in the level.                                                         | Integer |
+| `areaColOpTrigger`       | Amount of currently active area color/opacity triggers in the level.                                      | Integer |
+| `areaColOpTriggerTotal`  | Total amount of area color/opacity triggers in the level.                                                 | Integer |
+| `coins`                  | Array with states of coins in the level. 0 - uncollected, 1 - collected on current attempt, 2 - collected | Array   |
+| `gamemode`               | Current game mode.                                                                                        | String  |
+| `playerIcon`             | Current player icon ID (for current game mode).                                                           | Integer |
 
 ### Clicks information
 > Note: these values are only available when playing/editing the level
