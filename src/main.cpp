@@ -176,6 +176,7 @@ $on_mod(Loaded) {
            ->callback([](float value) {
                ThemeManager::get()->setUIScale(value);
            })->disableSaving()->setFlags(ComponentFlags::DisableCocos);
+        config::setIfEmpty("interface.dpi-scaling", true);
         tab->addToggle("interface.dpi-scaling")
            ->setDescription()
            ->setFlags(ComponentFlags::DisableCocos);
