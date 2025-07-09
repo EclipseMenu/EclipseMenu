@@ -391,20 +391,21 @@ This list will be split into categories, each having a separate table.
 ### Level information
 > Note: these values are only available when playing/editing the level
 
-| Name              | Description                                                                                    | Type             | Remarks                           |
-|-------------------|------------------------------------------------------------------------------------------------|------------------|-----------------------------------|
-| `levelID`         | Current level ID.                                                                              | Integer          |                                   |
-| `levelName`       | Current level name.                                                                            | String           |                                   |
-| `author`          | Level author username.                                                                         | String           |                                   |
-| `isRobtopLevel`   | Check whether current level is an official one.                                                | Boolean          |                                   |
-| `levelAttempts`   | Total level attempts count.                                                                    | Integer          |                                   |
-| `levelStars`      | Level stars/moons count.                                                                       | Integer          |                                   |
-| `difficulty`      | Difficulty name.                                                                               | String           | "Easy", "Hard Demon", "N/A", etc. |
-| `difficultyKey`   | Difficulty name, but in URL safe format.                                                       | String           | Used for Discord RPC icons.       |
-| `practicePercent` | Practice mode record percent.                                                                  | Integer          |                                   |
-| `bestPercent`     | Normal mode record percent.                                                                    | Integer          |                                   |
-| `bestTime`        | Best level completion time.                                                                    | Float            |                                   |
-| `best`            | In platformer mode: formatted best time (HH:MM:SS.mmm). In normal mode: same as `bestPercent`. | String / Integer |                                   |
+| Name              | Description                                                                                    | Type             | Remarks                             |
+|-------------------|------------------------------------------------------------------------------------------------|------------------|-------------------------------------|
+| `levelID`         | Current level ID.                                                                              | Integer          |                                     |
+| `levelName`       | Current level name.                                                                            | String           |                                     |
+| `author`          | Level author username.                                                                         | String           |                                     |
+| `isRobtopLevel`   | Check whether current level is an official one.                                                | Boolean          |                                     |
+| `levelAttempts`   | Total level attempts count.                                                                    | Integer          |                                     |
+| `levelStars`      | Level stars/moons count.                                                                       | Integer          |                                     |
+| `levelRating`     | Rating given to the level                                                                      | String           | "Unrated", "Featured", "Epic", etc. |
+| `difficulty`      | Difficulty name.                                                                               | String           | "Easy", "Hard Demon", "N/A", etc.   |
+| `difficultyKey`   | Difficulty name, but in URL safe format.                                                       | String           | Used for Discord RPC icons.         |
+| `practicePercent` | Practice mode record percent.                                                                  | Integer          |                                     |
+| `bestPercent`     | Normal mode record percent.                                                                    | Integer          |                                     |
+| `bestTime`        | Best level completion time.                                                                    | Float            |                                     |
+| `best`            | In platformer mode: formatted best time (HH:MM:SS.mmm). In normal mode: same as `bestPercent`. | String / Integer |                                     |
 
 ### Gameplay
 > Note: these values are only available when playing/editing the level

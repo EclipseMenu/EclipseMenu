@@ -7,6 +7,7 @@
 * Removed no longer required dependencies to reduce mod size
 * Added <cg>DPI Scaling</c> setting to toggle scaling UI with screen resolution
 * Added delay setting for <co>StartPos Switcher</c>
+* <cy>New</c> label variable: `levelRating`
 
 **Fixes**:
 * <cg>Improved</c> <co>Physics Bypass</c> performance and accuracy
@@ -21,12 +22,14 @@
 
 ## v1.2.2
 **Additions**:
-* Added <cg>Click Between Frames</c> toggle for <co>all platforms</c>
+* Added <cg>Click Between Frames</c> toggle for <co>all platforms</c> (If you have the CBF mod installed)
 
 **Fixes**:
 * <cg>Fixed</c> <co>Hitbox Trails</c> not clearing in Editor
 * <cg>Disabled</c> <co>Always Show Coins</c> on Mac OS to prevent crashing
 * <cg>Fixed</c> <co>Startpos Switcher</c> crashing on Mac OS
+* <cg>Fixed</c> menu sometimes going unstable for Windows & Mac OS
+* <cg>Fixed</c> bronze coins not being removed when uncompleting a level
 
 ## v1.2.1
 **Fixes**:

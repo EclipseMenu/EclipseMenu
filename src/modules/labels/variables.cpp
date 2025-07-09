@@ -204,6 +204,26 @@ namespace eclipse::labels {
         }
     }
 
+    const char* getLevelRatingString(GJGameLevel* level) {
+        if (!level) return "Unknown";
+        int featured = level->m_featured;
+        int epic = level->m_isEpic;
+        switch (epic) {
+            default: // Not epic (featured, rated, unrated)
+                if (level->m_stars.value() == 0 && featured <= 0) {
+                    return "Unrated";
+                } else {
+                    return (featured <= 0) ? "Rated" : "Featured";
+                }
+            case 1: // Epic
+                return "Epic";
+            case 2: // Legendary
+                return "Legendary";
+            case 3: // Mythic
+                return "Mythic";
+        }
+    }
+
     const char* getLevelDifficultyString(LevelDifficulty diff) {
         switch (diff) {
             case LevelDifficulty::NA: return "N/A";
@@ -485,7 +505,7 @@ namespace eclipse::labels {
             // Reset all level variables
             constexpr std::array keys = {
                 "levelID", "levelName", "levelDescription", "author",
-                "isRobtopLevel", "levelAttempts", "levelStars",
+                "isRobtopLevel", "levelAttempts", "levelStars", "levelRating",
                 "difficulty", "difficultyKey", "practicePercent",
                 "bestPercent", "bestTime", "best"
             };
@@ -505,6 +525,7 @@ namespace eclipse::labels {
         m_variables["isRobtopLevel"] = isRobtopLevel;
         m_variables["levelAttempts"] = level->m_attempts.value();
         m_variables["levelStars"] = level->m_stars.value();
+        m_variables["levelRating"] = getLevelRatingString(level);
         m_variables["difficulty"] = getLevelDifficultyString(levelDifficulty);
         m_variables["difficultyKey"] = getLevelDifficultyKey(levelDifficulty);
         m_variables["practicePercent"] = level->m_practicePercent;
