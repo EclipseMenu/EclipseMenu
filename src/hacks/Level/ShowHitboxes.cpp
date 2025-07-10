@@ -62,14 +62,12 @@ namespace eclipse::hacks::Level {
         }
 
         [[nodiscard]] bool isCheating() const override {
-            auto enabled = config::get<"level.showhitboxes", bool>();
-            auto onDeath = config::get<"level.showhitboxes.ondeath", bool>();
-            if (onDeath)
-                return false; // on-death hitboxes are fine
-
-            if (auto* pl = utils::get<PlayLayer>())
-                // if not in practice with enabled hitboxes
-                    return enabled && !pl->m_isPracticeMode;
+            if (config::get<"level.showhitboxes", bool>()) {
+                if (auto* pl = utils::get<PlayLayer>()) {
+                    // if not in practice with enabled hitboxes
+                    return !pl->m_isPracticeMode;
+                }
+            }
 
             return false;
         }
