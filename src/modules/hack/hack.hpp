@@ -6,6 +6,33 @@
 constexpr int32_t SAFE_HOOK_PRIORITY = 0x500000;
 constexpr int32_t FIRST_HOOK_PRIORITY = -0x500000;
 
+namespace eclipse::hack {
+    void safeHooksAll(std::map<std::string, std::shared_ptr<geode::Hook>>& hooks);
+    void safeHooks(
+        std::map<std::string, std::shared_ptr<geode::Hook>>& hooks,
+        std::string_view className,
+        std::initializer_list<std::string_view> funcs
+    );
+
+    void firstHooksAll(std::map<std::string, std::shared_ptr<geode::Hook>>& hooks);
+    void firstHooks(
+        std::map<std::string, std::shared_ptr<geode::Hook>>& hooks,
+        std::string_view className,
+        std::initializer_list<std::string_view> funcs
+    );
+
+    void setupTogglesAll(
+        std::string_view id,
+        std::map<std::string, std::shared_ptr<geode::Hook>>& hooks
+    );
+    void setupToggles(
+        std::string_view id,
+        std::map<std::string, std::shared_ptr<geode::Hook>>& hooks,
+        std::string_view className,
+        std::initializer_list<std::string_view> funcs
+    );
+}
+
 #define SAFE_SET_PRIO(name, prio) do { \
     if (!self.setHookPriority(name, prio)) { \
         geode::log::warn("Failed to set {} hook priority!", name); \
@@ -16,84 +43,22 @@ constexpr int32_t FIRST_HOOK_PRIORITY = -0x500000;
 #define FIRST_PRIORITY(name) SAFE_SET_PRIO(name, FIRST_HOOK_PRIORITY)
 
 // Sets specified hooks priority to SAFE_HOOK_PRIORITY
-#define SAFE_HOOKS(class, ...)\
-do {\
-    std::array funcs = { __VA_ARGS__ };\
-    for (auto& func : funcs) {\
-        auto name = fmt::format(#class "::{}", func);\
-        SAFE_PRIORITY(name);\
-    }\
-} while (0)
+#define SAFE_HOOKS(class, ...) eclipse::hack::safeHooks(self.m_hooks, #class, { __VA_ARGS__ })
 
 // Sets all hooks priority to SAFE_HOOK_PRIORITY
-#define SAFE_HOOKS_ALL()\
-do {\
-    for (auto& [name, hook] : self.m_hooks) {\
-        hook->setPriority(SAFE_HOOK_PRIORITY);\
-    }\
-} while (0)
+#define SAFE_HOOKS_ALL() eclipse::hack::safeHooksAll(self.m_hooks)
 
 // Sets specified hooks priority to FIRST_HOOK_PRIORITY
-#define FIRST_HOOKS(class, ...)\
-do {\
-    std::array funcs = { __VA_ARGS__ };\
-    for (auto& func : funcs) {\
-        auto name = fmt::format(#class "::{}", func);\
-        FIRST_PRIORITY(name);\
-    }\
-} while (0)
+#define FIRST_HOOKS(class, ...) eclipse::hack::firstHooks(self.m_hooks, #class, { __VA_ARGS__ })
 
 // Sets all hooks priority to FIRST_HOOK_PRIORITY
-#define FIRST_HOOKS_ALL()\
-do {\
-    for (auto& [name, hook] : self.m_hooks) {\
-        hook->setPriority(FIRST_HOOK_PRIORITY);\
-    }\
-} while (0)
+#define FIRST_HOOKS_ALL() eclipse::hack::firstHooksAll(self.m_hooks)
 
 // Adds a delegate toggle for specified methods in the modify class
-#define HOOKS_TOGGLE(id, class, ...)\
-do {\
-    std::array funcs = { __VA_ARGS__ };\
-    std::vector<geode::Hook*> hooks;\
-    for (auto& f : funcs) {\
-        auto res = self.getHook(fmt::format(#class "::{}", f));\
-        if (res.isErr()) {\
-            geode::log::warn("Hook '{}' not found in " #class, f);\
-            continue;\
-        }\
-        auto hook = res.unwrap();\
-        hooks.push_back(hook);\
-    }\
-    auto value = config::get(id, false);\
-    for (auto h : hooks) {\
-        h->setAutoEnable(value);\
-    }\
-    config::addDelegate(id, [hooks] {\
-        auto value = config::get(id, false);\
-        for (auto h : hooks)\
-            (void)(value ? h->enable() : h->disable());\
-    });\
-} while (0)
+#define HOOKS_TOGGLE(id, class, ...) eclipse::hack::setupToggles(id, self.m_hooks, #class, { __VA_ARGS__ })
 
 // Adds a delegate toggle for all hooks in the modify class
-#define HOOKS_TOGGLE_ALL(id)\
-do {\
-    std::vector<geode::Hook*> hooks;\
-    for (auto& [name, hook] : self.m_hooks) {\
-        hooks.push_back(hook.get());\
-    }\
-    auto value = config::get(id, false);\
-    for (auto h : hooks) {\
-        h->setAutoEnable(value);\
-    }\
-    config::addDelegate(id, [hooks] {\
-        auto value = config::get(id, false);\
-        for (auto h : hooks) {\
-            (void)(value ? h->enable() : h->disable());\
-        }\
-    });\
-} while (0)
+#define HOOKS_TOGGLE_ALL(id) eclipse::hack::setupTogglesAll(id, self.m_hooks)
 
 // Creates an onModify method with hooks set to SAFE_PRIORITY
 #define ENABLE_SAFE_HOOKS(class, ...)\
