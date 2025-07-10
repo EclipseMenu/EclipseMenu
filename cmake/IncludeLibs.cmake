@@ -23,7 +23,7 @@ CPMAddPackage("gh:maxnut/GDR-converter#55c5321")
 set(RIFT_INCLUDE_MATJSON ON)
 CPMAddPackage("gh:EclipseMenu/rift#0c452b1")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
-CPMAddPackage("gh:prevter/AdvancedLabel#c830a4f")
+CPMAddPackage("gh:prevter/AdvancedLabel#d78d7f8")
 CPMAddPackage("gh:prevter/sinaps#2541d6d")
 CPMAddPackage(
     NAME nlohmann_json
