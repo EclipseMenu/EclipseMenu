@@ -1,6 +1,12 @@
 # Eclipse Menu
 
-## v.1.3.0
+## v1.3.1
+**Fixes**:
+* <cg>Fixed</c> cheat indicator not working with <co>Show Hitboxes</c>
+* <cg>Fixed</c> a regression with <co>Show Hitboxes</c> (duplicate hitboxes and sometimes crash)
+* <cg>Fixed</c> a crash with Discord RPC if you had empty fields in button settings
+
+## v1.3.0
 **Additions**:
 * <cg>JIT-less</c> support for <cl>iOS</c> (Physics Bypass is not supported on JIT-less due to technical limitations)
 * Added <cg>two new themes</c> <cg>Gruvbox</c> (thanks fleeym) and <cg>OpenHack</c>
@@ -15,7 +21,7 @@
 * Reworked <co>Show Hitboxes</c>, fixing bugs and improving performance
 * <cg>Fixed</c> <co>Accurate Percentage</c> rounding to nearest, instead of down
 * <co>P1/P2 Jump Keybinds</c> can no longer be bound to default jump keys to prevent issues
-* <cg>Improved</c> replay bot recording accuracy</c>
+* <cg>Improved</c> replay bot recording accuracy
 * <cg>Fixed</c> crash that could happen with <co>Only Show Death Object</c>
 * <cg>Fixed</c> crash with <co>Legacy Trail</c> after changing resolution
 * <cg>Fixed</c> menu popping up for few frames on launch
