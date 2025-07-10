@@ -2,9 +2,10 @@
 
 ## v1.3.1
 **Fixes**:
-* <cg>Fixed</c> cheat indicator not working with <co>Show Hitboxes</c>
-* <cg>Fixed</c> a regression with <co>Show Hitboxes</c> (duplicate hitboxes and sometimes crash)
-* <cg>Fixed</c> a crash with Discord RPC if you had empty fields in button settings
+* <cg>Fixed</c> cheat indicator not showing when <co>Show Hitboxes</c> was enabled
+* <cg>Fixed</c> a regression in <co>Show Hitboxes</c> that caused duplicate hitboxes and occasional crashes
+* <cg>Fixed</c> a crash in Discord RPC when button fields were left empty
+* <cg>Fixed</c> ghost label bug when text becomes empty
 
 ## v1.3.0
 **Additions**:
