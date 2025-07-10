@@ -88,7 +88,7 @@ namespace eclipse::hacks::Level {
                 auto section = leftSection->at(j);
                 if (!section) continue;
 
-                auto sectionSize = section->size();
+                auto sectionSize = game->m_sectionSizes[i]->at(j);
                 for (int k = 0; k < sectionSize; ++k) {
                     auto obj = section->at(k);
                     if (!obj) continue;
