@@ -11,11 +11,6 @@ namespace eclipse::utils {
 
         FixPlayLayerCheckpoint(PlayLayer* playLayer) {
             //GJBaseGameLayer
-            m_playbackMode = playLayer->m_playbackMode;
-            m_lowDetailMode = playLayer->m_lowDetailMode;
-            m_extraLDM = playLayer->m_extraLDM;
-            m_ignoreDamage = playLayer->m_ignoreDamage;
-            m_enable22Changes = playLayer->m_enable22Changes;
             m_allowStaticRotate = playLayer->m_allowStaticRotate;
             m_fixNegativeScale = playLayer->m_fixNegativeScale;
             m_startingFromBeginning = playLayer->m_startingFromBeginning;
@@ -47,16 +42,11 @@ namespace eclipse::utils {
             m_increasedLayerCapacity = playLayer->m_increasedLayerCapacity;
             m_enterEasingValuesIndex = playLayer->m_enterEasingValuesIndex;
             m_dualTouchTrigger = playLayer->m_dualTouchTrigger;
-            m_clicks = playLayer->m_clicks;
-            m_attempts = playLayer->m_attempts;
-            m_jumping = playLayer->m_jumping;
             m_leftSectionIndex = playLayer->m_leftSectionIndex;
             m_rightSectionIndex = playLayer->m_rightSectionIndex;
             m_bottomSectionIndex = playLayer->m_bottomSectionIndex;
             m_topSectionIndex = playLayer->m_topSectionIndex;
-            m_isEditor = playLayer->m_isEditor;
             m_blending = playLayer->m_blending;
-            m_isPlatformer = playLayer->m_isPlatformer;
             m_player1CollisionBlock = playLayer->m_player1CollisionBlock;
             m_player2CollisionBlock = playLayer->m_player2CollisionBlock;
             m_particleCount = playLayer->m_particleCount;
@@ -82,7 +72,6 @@ namespace eclipse::utils {
             m_updateGroundShadows = playLayer->m_updateGroundShadows;
             m_levelLength = playLayer->m_levelLength;
             m_resetActiveObjects = playLayer->m_resetActiveObjects;
-            m_isTestMode = playLayer->m_isTestMode;
             m_freezeStartCamera = playLayer->m_freezeStartCamera;
             m_unk322a = playLayer->m_unk322a;
             m_cameraUnzoomedHeightOffset = playLayer->m_cameraUnzoomedHeightOffset;
@@ -101,7 +90,6 @@ namespace eclipse::utils {
             m_cameraObb2 = playLayer->m_cameraObb2;
             m_activeObjectsCount = playLayer->m_activeObjectsCount;
             m_activeObjectsIndex = playLayer->m_activeObjectsIndex;
-            m_backgroundColor = playLayer->m_backgroundColor;
             m_resumeTimer = playLayer->m_resumeTimer;
             m_recordInputs = playLayer->m_recordInputs;
             m_unk32a1 = playLayer->m_unk32a1;
@@ -124,7 +112,6 @@ namespace eclipse::utils {
             m_keyframeGroup = playLayer->m_keyframeGroup;
             m_uiLayer = playLayer->m_uiLayer;
             m_uiTriggerUI = playLayer->m_uiTriggerUI;
-            m_timePlayed = playLayer->m_timePlayed;
             m_levelEndAnimationStarted = playLayer->m_levelEndAnimationStarted;
             m_points = playLayer->m_points;
             m_calcNonEffectObjectsSize = playLayer->m_calcNonEffectObjectsSize;
@@ -240,9 +227,6 @@ namespace eclipse::utils {
             m_timeWarpRelated = playLayer->m_gameState.m_timeWarpRelated;
             m_currentChannel = playLayer->m_gameState.m_currentChannel;
             m_rotateChannel = playLayer->m_gameState.m_rotateChannel;
-            m_totalTime = playLayer->m_gameState.m_totalTime;
-            m_levelTime = playLayer->m_gameState.m_levelTime;
-            m_unkDouble3 = playLayer->m_gameState.m_unkDouble3;
             m_unkUint2 = playLayer->m_gameState.m_unkUint2;
             m_unkUint3 = playLayer->m_gameState.m_unkUint3;
             m_currentProgress = playLayer->m_gameState.m_currentProgress;
@@ -346,7 +330,6 @@ namespace eclipse::utils {
             m_showLeaderboardPercentage = playLayer->m_showLeaderboardPercentage;
             m_hasCompletedLevel = playLayer->m_hasCompletedLevel;
             m_inResetDelay = playLayer->m_inResetDelay;
-            m_lastAttemptPercent = playLayer->m_lastAttemptPercent;
             m_endLayerStars = playLayer->m_endLayerStars;
             m_orbs = playLayer->m_orbs;
             m_diamonds = playLayer->m_diamonds;
@@ -358,16 +341,11 @@ namespace eclipse::utils {
             m_unk38c8 = playLayer->m_unk38c8;
             m_unk38cc = playLayer->m_unk38cc;
             m_unk38d0 = playLayer->m_unk38d0;
-            m_attemptTime = playLayer->m_attemptTime;
-            m_bestAttemptTime = playLayer->m_bestAttemptTime;
-            m_pauseTime = playLayer->m_pauseTime;
-            m_currentTime = playLayer->m_currentTime;
             m_pauseDelta = playLayer->m_pauseDelta;
             m_unk3900 = playLayer->m_unk3900;
             m_glitterEnabled = playLayer->m_glitterEnabled;
             m_effectsDisabled = playLayer->m_effectsDisabled;
             m_unk3906 = playLayer->m_unk3906;
-            m_isPaused = playLayer->m_isPaused;
             m_disableGravityEffect = playLayer->m_disableGravityEffect;
             m_unk3918 = playLayer->m_unk3918;
             m_unk3920 = playLayer->m_unk3920;
@@ -437,11 +415,6 @@ namespace eclipse::utils {
 
         void apply(PlayLayer* playLayer) {
             //GJBaseGameLayer
-            playLayer->m_playbackMode = m_playbackMode;
-            playLayer->m_lowDetailMode = m_lowDetailMode;
-            playLayer->m_extraLDM = m_extraLDM;
-            playLayer->m_ignoreDamage = m_ignoreDamage;
-            playLayer->m_enable22Changes = m_enable22Changes;
             playLayer->m_allowStaticRotate = m_allowStaticRotate;
             playLayer->m_fixNegativeScale = m_fixNegativeScale;
             playLayer->m_startingFromBeginning = m_startingFromBeginning;
@@ -473,16 +446,11 @@ namespace eclipse::utils {
             playLayer->m_increasedLayerCapacity = m_increasedLayerCapacity;
             playLayer->m_enterEasingValuesIndex = m_enterEasingValuesIndex;
             playLayer->m_dualTouchTrigger = m_dualTouchTrigger;
-            playLayer->m_clicks = m_clicks;
-            playLayer->m_attempts = m_attempts;
-            playLayer->m_jumping = m_jumping;
             playLayer->m_leftSectionIndex = m_leftSectionIndex;
             playLayer->m_rightSectionIndex = m_rightSectionIndex;
             playLayer->m_bottomSectionIndex = m_bottomSectionIndex;
             playLayer->m_topSectionIndex = m_topSectionIndex;
-            playLayer->m_isEditor = m_isEditor;
             playLayer->m_blending = m_blending;
-            playLayer->m_isPlatformer = m_isPlatformer;
             playLayer->m_player1CollisionBlock = m_player1CollisionBlock;
             playLayer->m_player2CollisionBlock = m_player2CollisionBlock;
             playLayer->m_particleCount = m_particleCount;
@@ -508,7 +476,6 @@ namespace eclipse::utils {
             playLayer->m_updateGroundShadows = m_updateGroundShadows;
             playLayer->m_levelLength = m_levelLength;
             playLayer->m_resetActiveObjects = m_resetActiveObjects;
-            playLayer->m_isTestMode = m_isTestMode;
             playLayer->m_freezeStartCamera = m_freezeStartCamera;
             playLayer->m_unk322a = m_unk322a;
             playLayer->m_cameraUnzoomedHeightOffset = m_cameraUnzoomedHeightOffset;
@@ -527,7 +494,6 @@ namespace eclipse::utils {
             playLayer->m_cameraObb2 = m_cameraObb2;
             playLayer->m_activeObjectsCount = m_activeObjectsCount;
             playLayer->m_activeObjectsIndex = m_activeObjectsIndex;
-            playLayer->m_backgroundColor = m_backgroundColor;
             playLayer->m_resumeTimer = m_resumeTimer;
             playLayer->m_recordInputs = m_recordInputs;
             playLayer->m_unk32a1 = m_unk32a1;
@@ -550,7 +516,6 @@ namespace eclipse::utils {
             playLayer->m_keyframeGroup = m_keyframeGroup;
             playLayer->m_uiLayer = m_uiLayer;
             playLayer->m_uiTriggerUI = m_uiTriggerUI;
-            playLayer->m_timePlayed = m_timePlayed;
             playLayer->m_levelEndAnimationStarted = m_levelEndAnimationStarted;
             playLayer->m_points = m_points;
             playLayer->m_calcNonEffectObjectsSize = m_calcNonEffectObjectsSize;
@@ -666,9 +631,6 @@ namespace eclipse::utils {
             playLayer->m_gameState.m_timeWarpRelated = m_timeWarpRelated;
             playLayer->m_gameState.m_currentChannel = m_currentChannel;
             playLayer->m_gameState.m_rotateChannel = m_rotateChannel;
-            playLayer->m_gameState.m_totalTime = m_totalTime;
-            playLayer->m_gameState.m_levelTime = m_levelTime;
-            playLayer->m_gameState.m_unkDouble3 = m_unkDouble3;
             playLayer->m_gameState.m_unkUint2 = m_unkUint2;
             playLayer->m_gameState.m_unkUint3 = m_unkUint3;
             playLayer->m_gameState.m_currentProgress = m_currentProgress;
@@ -772,7 +734,6 @@ namespace eclipse::utils {
             playLayer->m_showLeaderboardPercentage = m_showLeaderboardPercentage;
             playLayer->m_hasCompletedLevel = m_hasCompletedLevel;
             playLayer->m_inResetDelay = m_inResetDelay;
-            playLayer->m_lastAttemptPercent = m_lastAttemptPercent;
             playLayer->m_endLayerStars = m_endLayerStars;
             playLayer->m_orbs = m_orbs;
             playLayer->m_diamonds = m_diamonds;
@@ -784,16 +745,11 @@ namespace eclipse::utils {
             playLayer->m_unk38c8 = m_unk38c8;
             playLayer->m_unk38cc = m_unk38cc;
             playLayer->m_unk38d0 = m_unk38d0;
-            playLayer->m_attemptTime = m_attemptTime;
-            playLayer->m_bestAttemptTime = m_bestAttemptTime;
-            playLayer->m_pauseTime = m_pauseTime;
-            playLayer->m_currentTime = m_currentTime;
             playLayer->m_pauseDelta = m_pauseDelta;
             playLayer->m_unk3900 = m_unk3900;
             playLayer->m_glitterEnabled = m_glitterEnabled;
             playLayer->m_effectsDisabled = m_effectsDisabled;
             playLayer->m_unk3906 = m_unk3906;
-            playLayer->m_isPaused = m_isPaused;
             playLayer->m_disableGravityEffect = m_disableGravityEffect;
             playLayer->m_unk3918 = m_unk3918;
             playLayer->m_unk3920 = m_unk3920;
@@ -861,11 +817,6 @@ namespace eclipse::utils {
 
         private:
         //GJBaseGameLayer
-        PlaybackMode m_playbackMode;
-        bool m_lowDetailMode;
-        bool m_extraLDM;
-        bool m_ignoreDamage;
-        bool m_enable22Changes;
         bool m_allowStaticRotate;
         bool m_fixNegativeScale;
         bool m_startingFromBeginning;
@@ -897,16 +848,11 @@ namespace eclipse::utils {
         bool m_increasedLayerCapacity;
         int m_enterEasingValuesIndex;
         bool m_dualTouchTrigger;
-        int m_clicks;
-        int m_attempts;
-        bool m_jumping;
         int m_leftSectionIndex;
         int m_rightSectionIndex;
         int m_bottomSectionIndex;
         int m_topSectionIndex;
-        bool m_isEditor;
         bool m_blending;
-        bool m_isPlatformer;
         GameObject* m_player1CollisionBlock;
         GameObject* m_player2CollisionBlock;
         int m_particleCount;
@@ -932,7 +878,6 @@ namespace eclipse::utils {
         bool m_updateGroundShadows;
         float m_levelLength;
         bool m_resetActiveObjects;
-        bool m_isTestMode;
         bool m_freezeStartCamera;
         bool m_unk322a;
         float m_cameraUnzoomedHeightOffset;
@@ -951,7 +896,6 @@ namespace eclipse::utils {
         OBB2D* m_cameraObb2;
         int m_activeObjectsCount;
         int m_activeObjectsIndex;
-        cocos2d::ccColor3B m_backgroundColor;
         int m_resumeTimer;
         bool m_recordInputs;
         bool m_unk32a1;
@@ -974,7 +918,6 @@ namespace eclipse::utils {
         int m_keyframeGroup;
         UILayer* m_uiLayer;
         cocos2d::CCNode* m_uiTriggerUI;
-        double m_timePlayed;
         bool m_levelEndAnimationStarted;
         int m_points;
         int m_calcNonEffectObjectsSize;
@@ -1090,9 +1033,6 @@ namespace eclipse::utils {
         float m_timeWarpRelated;
         int m_currentChannel;
         int m_rotateChannel;
-        double m_totalTime;
-        double m_levelTime;
-        double m_unkDouble3;
         int m_unkUint2;
         float m_unkUint3;
         int m_currentProgress;
@@ -1196,7 +1136,6 @@ namespace eclipse::utils {
         bool m_showLeaderboardPercentage;
         bool m_hasCompletedLevel;
         bool m_inResetDelay;
-        int m_lastAttemptPercent;
         bool m_endLayerStars;
         int m_orbs;
         int m_diamonds;
@@ -1208,16 +1147,11 @@ namespace eclipse::utils {
         bool m_unk38c8;
         float m_unk38cc;
         int m_unk38d0;
-        double m_attemptTime;
-        double m_bestAttemptTime;
-        double m_pauseTime;
-        double m_currentTime;
         double m_pauseDelta;
         float m_unk3900;
         bool m_glitterEnabled;
         bool m_effectsDisabled;
         bool m_unk3906;
-        bool m_isPaused;
         bool m_disableGravityEffect;
         cocos2d::CCPoint m_unk3918;
         cocos2d::CCPoint m_unk3920;
@@ -1464,7 +1398,6 @@ namespace eclipse::utils {
             m_playerColor2 = player->m_playerColor2;
             m_isSecondPlayer = player->m_isSecondPlayer;
             m_unkA99 = player->m_unkA99;
-            m_totalTime = player->m_totalTime;
             m_isBeingSpawnedByDualPortal = player->m_isBeingSpawnedByDualPortal;
             m_unkAAC = player->m_unkAAC;
             m_unkAngle1 = player->m_unkAngle1;
@@ -1506,7 +1439,6 @@ namespace eclipse::utils {
             m_isSlidingRight = player->m_isSlidingRight;
             m_maybeChangedDirectionAngle = player->m_maybeChangedDirectionAngle;
             m_unkUnused2 = player->m_unkUnused2;
-            m_isPlatformer = player->m_isPlatformer;
             m_stateNoAutoJump = player->m_stateNoAutoJump;
             m_stateDartSlide = player->m_stateDartSlide;
             m_stateHitHead = player->m_stateHitHead;
@@ -1529,8 +1461,6 @@ namespace eclipse::utils {
             m_robotAnimation1Enabled = player->m_robotAnimation1Enabled;
             m_robotAnimation2Enabled = player->m_robotAnimation2Enabled;
             m_spiderAnimationEnabled = player->m_spiderAnimationEnabled;
-            m_ignoreDamage = player->m_ignoreDamage;
-            m_enable22Changes = player->m_enable22Changes;
 
             m_position = player->m_position;
             m_rotation = player->getRotation();
@@ -1727,7 +1657,6 @@ namespace eclipse::utils {
             player->m_playerColor2 = m_playerColor2;
             player->m_isSecondPlayer = m_isSecondPlayer;
             player->m_unkA99 = m_unkA99;
-            player->m_totalTime = m_totalTime;
             player->m_isBeingSpawnedByDualPortal = m_isBeingSpawnedByDualPortal;
             player->m_unkAAC = m_unkAAC;
             player->m_unkAngle1 = m_unkAngle1;
@@ -1769,7 +1698,6 @@ namespace eclipse::utils {
             player->m_isSlidingRight = m_isSlidingRight;
             player->m_maybeChangedDirectionAngle = m_maybeChangedDirectionAngle;
             player->m_unkUnused2 = m_unkUnused2;
-            player->m_isPlatformer = m_isPlatformer;
             player->m_stateNoAutoJump = m_stateNoAutoJump;
             player->m_stateDartSlide = m_stateDartSlide;
             player->m_stateHitHead = m_stateHitHead;
@@ -1791,8 +1719,6 @@ namespace eclipse::utils {
             player->m_robotAnimation1Enabled = m_robotAnimation1Enabled;
             player->m_robotAnimation2Enabled = m_robotAnimation2Enabled;
             player->m_spiderAnimationEnabled = m_spiderAnimationEnabled;
-            player->m_ignoreDamage = m_ignoreDamage;
-            player->m_enable22Changes = m_enable22Changes;
 
             player->m_position = m_position;
             player->setPosition(m_position);
@@ -1992,7 +1918,6 @@ namespace eclipse::utils {
         cocos2d::ccColor3B m_playerColor2;
         bool m_isSecondPlayer;
         bool m_unkA99;
-        double m_totalTime;
         bool m_isBeingSpawnedByDualPortal;
         float m_unkAAC;
         float m_unkAngle1;
@@ -2034,7 +1959,6 @@ namespace eclipse::utils {
         bool m_isSlidingRight;
         double m_maybeChangedDirectionAngle;
         double m_unkUnused2;
-        bool m_isPlatformer;
         int m_stateNoAutoJump;
         int m_stateDartSlide;
         int m_stateHitHead;
@@ -2057,8 +1981,6 @@ namespace eclipse::utils {
         bool m_robotAnimation1Enabled;
         bool m_robotAnimation2Enabled;
         bool m_spiderAnimationEnabled;
-        bool m_ignoreDamage;
-        bool m_enable22Changes;
 
         // these dont work well on android
         // (P.S. robtop pls update NDK)
