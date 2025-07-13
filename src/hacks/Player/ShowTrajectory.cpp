@@ -238,6 +238,7 @@ namespace eclipse::hacks::Player {
 
             config::addDelegate("player.showtrajectory", [] {
                 auto value = config::get<bool>("player.showtrajectory", false);
+                s_simulation.getDrawNode()->clear();
                 s_simulation.getDrawNode()->setVisible(value);
             });
         }
