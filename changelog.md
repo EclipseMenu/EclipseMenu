@@ -1,5 +1,11 @@
 # Eclipse Menu
 
+## v1.3.2
+**Fixes**:
+* <cg>Fixed</c> rotated danger hitboxes being incorrect
+* <cg>Fixed</c> hitboxes not updating when toggled if game is paused
+* <cg>Fixed</c> <co>Practice Fix</c> locking attempts count 
+
 ## v1.3.1
 **Fixes**:
 * <cg>Fixed</c> cheat indicator not showing when <co>Show Hitboxes</c> was enabled
