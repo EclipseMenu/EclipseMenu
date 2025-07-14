@@ -18,65 +18,6 @@ namespace eclipse::hacks::Level {
     static GameObject* s_collisionObject = nullptr;
     static std::deque<std::pair<cocos2d::CCRect, cocos2d::CCRect>> s_playerTrail1, s_playerTrail2;
 
-    class $hack(ShowHitboxes) {
-        void init() override {
-            auto tab = gui::MenuTab::find("tab.level");
-            auto toggle = tab->addToggle("level.showhitboxes")->handleKeybinds()->setDescription();
-
-            config::setIfEmpty("level.showhitboxes.editor", true);
-            config::setIfEmpty("level.showhitboxes.bordersize", 0.25f);
-            config::setIfEmpty("level.showhitboxes.fillalpha", 0.25f);
-            config::setIfEmpty("level.showhitboxes.traillength", 240.0f);
-            config::setIfEmpty("level.showhitboxes.fillalpha.toggle", true);
-            config::setIfEmpty("level.showhitboxes.solid_color", gui::Color(0, 0.247, 1));
-            config::setIfEmpty("level.showhitboxes.danger_color", gui::Color::RED);
-            config::setIfEmpty("level.showhitboxes.player_color", gui::Color::RED);
-            config::setIfEmpty("level.showhitboxes.player_color_inner", gui::Color(0, 1, 0.2f));
-            config::setIfEmpty("level.showhitboxes.player_color_rotated", gui::Color::YELLOW);
-            config::setIfEmpty("level.showhitboxes.other_color", gui::Color::GREEN);
-            config::setIfEmpty("level.showhitboxes.passable_color", gui::Color(0, 1, 1));
-            config::setIfEmpty("level.showhitboxes.triggers_color", gui::Color(1, 0, 0.9f));
-
-            toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                options->addToggle("level.showhitboxes.editor");
-                options->addToggle("level.showhitboxes.hideplayer");
-                options->addToggle("level.showhitboxes.showtriggers");
-                options->addToggle("level.showhitboxes.customcolors")->addOptions([](std::shared_ptr<gui::MenuTab> optionsColor) {
-                    optionsColor->addColorComponent("level.showhitboxes.solid_color");
-                    optionsColor->addColorComponent("level.showhitboxes.danger_color");
-                    optionsColor->addColorComponent("level.showhitboxes.other_color");
-                    optionsColor->addColorComponent("level.showhitboxes.passable_color");
-                    optionsColor->addColorComponent("level.showhitboxes.triggers_color");
-                    optionsColor->addColorComponent("level.showhitboxes.player_color");
-                    optionsColor->addColorComponent("level.showhitboxes.player_color_inner");
-                    optionsColor->addColorComponent("level.showhitboxes.player_color_rotated");
-                });
-                options->addInputFloat("level.showhitboxes.bordersize", 0.01f, 10.f, "%.2f");
-                options->addFloatToggle("level.showhitboxes.fillalpha", 0.f, 1.f);
-                options->addFloatToggle("level.showhitboxes.traillength", 1.f, 2000.f, "%.0f");
-            });
-
-            tab->addToggle("level.showhitboxes.ondeath")->handleKeybinds()->addOptions([](std::shared_ptr<gui::MenuTab> optionsOnDeath) {
-                optionsOnDeath->addToggle("level.showhitboxes.ondeath.player");
-            });
-        }
-
-        [[nodiscard]] bool isCheating() const override {
-            if (config::get<"level.showhitboxes", bool>()) {
-                if (auto* pl = utils::get<PlayLayer>()) {
-                    // if not in practice with enabled hitboxes
-                    return !pl->m_isPracticeMode;
-                }
-            }
-
-            return false;
-        }
-
-        [[nodiscard]] const char* getId() const override { return "Show Hitboxes"; }
-    };
-
-    REGISTER_HACK(ShowHitboxes)
-
     static void forEachObject(GJBaseGameLayer const* game, std::function<void(GameObject*)> const& callback) {
         int count = game->m_sections.empty() ? -1 : game->m_sections.size();
         for (int i = game->m_leftSectionIndex; i <= game->m_rightSectionIndex && i < count; ++i) {
@@ -120,6 +61,10 @@ namespace eclipse::hacks::Level {
         struct Fields {
             cocos2d::CCDrawNode* m_drawNode;
         };
+
+        static ShowHitboxesGJBGLHook* get() {
+            return static_cast<ShowHitboxesGJBGLHook*>(utils::get<GJBaseGameLayer>());
+        }
 
         void createDrawNode() {
             auto* parent = m_debugDrawNode->getParent();
@@ -450,4 +395,69 @@ namespace eclipse::hacks::Level {
             s_playerTrail2.clear();
         }
     };
+
+    class $hack(ShowHitboxes) {
+        void init() override {
+            auto tab = gui::MenuTab::find("tab.level");
+            auto toggle = tab->addToggle("level.showhitboxes")->handleKeybinds()->setDescription();
+
+            config::setIfEmpty("level.showhitboxes.editor", true);
+            config::setIfEmpty("level.showhitboxes.bordersize", 0.25f);
+            config::setIfEmpty("level.showhitboxes.fillalpha", 0.25f);
+            config::setIfEmpty("level.showhitboxes.traillength", 240.0f);
+            config::setIfEmpty("level.showhitboxes.fillalpha.toggle", true);
+            config::setIfEmpty("level.showhitboxes.solid_color", gui::Color(0, 0.247, 1));
+            config::setIfEmpty("level.showhitboxes.danger_color", gui::Color::RED);
+            config::setIfEmpty("level.showhitboxes.player_color", gui::Color::RED);
+            config::setIfEmpty("level.showhitboxes.player_color_inner", gui::Color(0, 1, 0.2f));
+            config::setIfEmpty("level.showhitboxes.player_color_rotated", gui::Color::YELLOW);
+            config::setIfEmpty("level.showhitboxes.other_color", gui::Color::GREEN);
+            config::setIfEmpty("level.showhitboxes.passable_color", gui::Color(0, 1, 1));
+            config::setIfEmpty("level.showhitboxes.triggers_color", gui::Color(1, 0, 0.9f));
+
+            toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                options->addToggle("level.showhitboxes.editor");
+                options->addToggle("level.showhitboxes.hideplayer");
+                options->addToggle("level.showhitboxes.showtriggers");
+                options->addToggle("level.showhitboxes.customcolors")->addOptions([](std::shared_ptr<gui::MenuTab> optionsColor) {
+                    optionsColor->addColorComponent("level.showhitboxes.solid_color");
+                    optionsColor->addColorComponent("level.showhitboxes.danger_color");
+                    optionsColor->addColorComponent("level.showhitboxes.other_color");
+                    optionsColor->addColorComponent("level.showhitboxes.passable_color");
+                    optionsColor->addColorComponent("level.showhitboxes.triggers_color");
+                    optionsColor->addColorComponent("level.showhitboxes.player_color");
+                    optionsColor->addColorComponent("level.showhitboxes.player_color_inner");
+                    optionsColor->addColorComponent("level.showhitboxes.player_color_rotated");
+                });
+                options->addInputFloat("level.showhitboxes.bordersize", 0.01f, 10.f, "%.2f");
+                options->addFloatToggle("level.showhitboxes.fillalpha", 0.f, 1.f);
+                options->addFloatToggle("level.showhitboxes.traillength", 1.f, 2000.f, "%.0f");
+            });
+
+            tab->addToggle("level.showhitboxes.ondeath")->handleKeybinds()->addOptions([](std::shared_ptr<gui::MenuTab> optionsOnDeath) {
+                optionsOnDeath->addToggle("level.showhitboxes.ondeath.player");
+            });
+
+            config::addDelegate("level.showhitboxes", []() {
+                if (auto hitbox = ShowHitboxesGJBGLHook::get()) {
+                    hitbox->visitHitboxes();
+                }
+            });
+        }
+
+        [[nodiscard]] bool isCheating() const override {
+            if (config::get<"level.showhitboxes", bool>()) {
+                if (auto* pl = utils::get<PlayLayer>()) {
+                    // if not in practice with enabled hitboxes
+                    return !pl->m_isPracticeMode;
+                }
+            }
+
+            return false;
+        }
+
+        [[nodiscard]] const char* getId() const override { return "Show Hitboxes"; }
+    };
+
+    REGISTER_HACK(ShowHitboxes)
 }
