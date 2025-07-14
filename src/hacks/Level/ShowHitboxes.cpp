@@ -272,12 +272,17 @@ namespace eclipse::hacks::Level {
                                 dangerColorFill, borderSize,
                                 dangerColor, 16
                             );
-                        } else {
-                            drawRect(
-                                drawNode, obj->getObjectRect(),
-                                dangerColorFill, borderSize,
-                                dangerColor
+                        } else if (auto orientedBox = obj->m_orientedBox) {
+                            drawNode->drawPolygon(
+                                orientedBox->m_corners.data(), 4,
+                                dangerColorFill, borderSize, dangerColor
                             );
+                        } else {
+                            auto isObjectRectDirty = obj->m_isObjectRectDirty;
+                            auto boxOffsetCalculated = obj->m_boxOffsetCalculated;
+                            drawRect(drawNode, obj->getObjectRect(), dangerColorFill, borderSize, dangerColor);
+                            obj->m_isObjectRectDirty = isObjectRectDirty;
+                            obj->m_boxOffsetCalculated = boxOffsetCalculated;
                         }
                         break;
                     }
