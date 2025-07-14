@@ -97,12 +97,14 @@ namespace eclipse::config {
     /// @brief Registers a delegate which is called when a specific value in config is changed
     /// @param key Key of the value which should have a delegate
     /// @param callback Callback to call when value is changed
-    void addDelegate(std::string_view key, std::function<void()> callback);
+    /// @param first If true, the delegate will be added to the front of the list
+    void addDelegate(std::string_view key, std::function<void()>&& callback, bool first = false);
 
     /// @brief Registers a delegate which is called when a specific value in temp is changed
     /// @param key Key of the value which should have a delegate
     /// @param callback Callback to call when value is changed
-    void addTempDelegate(std::string_view key, std::function<void()> callback);
+    /// @param first If true, the delegate will be added to the front of the list
+    void addTempDelegate(std::string_view key, std::function<void()>&& callback, bool first = false);
 
     /// @brief Check if a key exists in the temporary storage.
     /// @param key Key to check.
@@ -149,7 +151,7 @@ namespace eclipse::config {
     T get(const T& defaultValue = T{}) {
         static T value = (addDelegate(key, [] {
             value = get<T>(key, T{});
-        }), get<T>(key, defaultValue));
+        }, true), get<T>(key, defaultValue));
         return value;
     }
 
@@ -158,7 +160,7 @@ namespace eclipse::config {
     T getTemp(const T& defaultValue = T{}) {
         static T value = (addTempDelegate(key, [] {
             value = getTemp<T>(key, T{});
-        }), getTemp<T>(key, defaultValue));
+        }, true), getTemp<T>(key, defaultValue));
         return value;
     }
 }

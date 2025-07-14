@@ -82,14 +82,18 @@ namespace eclipse::config {
         }
     }
 
-    void addDelegate(std::string_view key, std::function<void()> callback) {
+    void addDelegate(std::string_view key, std::function<void()>&& callback, bool first) {
         auto& callbacks = getCallbacks();
-        callbacks[key].push_back(std::move(callback));
+        auto& existingCallbacks = callbacks[key];
+        first ? void(existingCallbacks.insert(existingCallbacks.begin(), std::move(callback))) :
+                void(existingCallbacks.push_back(std::move(callback)));
     }
 
-    void addTempDelegate(std::string_view key, std::function<void()> callback) {
+    void addTempDelegate(std::string_view key, std::function<void()>&& callback, bool first) {
         auto& callbacks = getTempCallbacks();
-        callbacks[key].push_back(std::move(callback));
+        auto& existingCallbacks = callbacks[key];
+        first ? void(existingCallbacks.insert(existingCallbacks.begin(), std::move(callback))) :
+                void(existingCallbacks.push_back(std::move(callback)));
     }
 
     bool hasTemp(std::string_view key) {
