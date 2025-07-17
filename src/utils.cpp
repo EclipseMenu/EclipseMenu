@@ -234,20 +234,21 @@ namespace eclipse::utils {
 
             #elif defined(GEODE_IS_ANDROID)
 
-            struct dl_phdr_info info;
-            if (dl_iterate_phdr([](struct dl_phdr_info *info, size_t, void *data) {
-                if (info->dlpi_name[0] == '\0') { // Main executable
-                    *reinterpret_cast<size_t*>(data) = info->dlpi_phnum > 0
-                        ? info->dlpi_phdr[info->dlpi_phnum - 1].p_vaddr + info->dlpi_phdr[info->dlpi_phnum - 1].p_memsz
-                        : 0;
-                    return 1;
-                }
-                return 0;
-            }, &info) == 1) {
-                return info.dlpi_phnum > 0
-                    ? info.dlpi_phdr[info.dlpi_phnum - 1].p_vaddr + info.dlpi_phdr[info.dlpi_phnum - 1].p_memsz
-                    : 0;
-            }
+            // this can apparently crash for some people
+            // struct dl_phdr_info info;
+            // if (dl_iterate_phdr([](struct dl_phdr_info *info, size_t, void *data) {
+            //     if (info->dlpi_name[0] == '\0') { // Main executable
+            //         *reinterpret_cast<size_t*>(data) = info->dlpi_phnum > 0
+            //             ? info->dlpi_phdr[info->dlpi_phnum - 1].p_vaddr + info->dlpi_phdr[info->dlpi_phnum - 1].p_memsz
+            //             : 0;
+            //         return 1;
+            //     }
+            //     return 0;
+            // }, &info) == 1) {
+            //     return info.dlpi_phnum > 0
+            //         ? info.dlpi_phdr[info.dlpi_phnum - 1].p_vaddr + info.dlpi_phdr[info.dlpi_phnum - 1].p_memsz
+            //         : 0;
+            // }
             return 0;
 
             #else
