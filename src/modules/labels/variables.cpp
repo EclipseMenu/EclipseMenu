@@ -544,7 +544,7 @@ namespace eclipse::labels {
         if (!player) {
             // Reset all player variables
             constexpr std::array keys = {
-                "playerX", "playerY", "player2X", "player2Y"
+                "playerX", "playerY", "player2X", "player2Y", "playerXVelocity", "playerYVelocity", "player2XVelocity", "player2YVelocity"
             };
             for (const auto& key : keys) {
                 removeVariable(key);
@@ -559,6 +559,9 @@ namespace eclipse::labels {
 
         m_variables[isPlayer2 ? "player2X" : "playerX"] = player->m_position.x;
         m_variables[isPlayer2 ? "player2Y" : "playerY"] = player->m_position.y;
+
+        m_variables[isPlayer2 ? "player2XVelocity" : "playerXVelocity"] = player->m_isPlatformer ? player->m_platformerXVelocity : player->m_playerSpeed;
+        m_variables[isPlayer2 ? "player2YVelocity" : "playerYVelocity"] = player->m_yVelocity;
 
         if (!isPlayer2) {
             auto gamemode = utils::getGameMode(player);
