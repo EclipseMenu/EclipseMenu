@@ -19,30 +19,37 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(SolidWaveTrail)
 
-    static bool s_insideUpdateStroke = false;
-
-    class $modify(SolidWaveTrailCCDNHook, cocos2d::CCDrawNode) {
-        ALL_DELEGATES_AND_SAFE_PRIO("player.solidwavetrail")
-
-        bool drawPolygon(cocos2d::CCPoint* p0, unsigned int p1, const cocos2d::ccColor4F& p2, float p3, const cocos2d::ccColor4F& p4) {
-            if (!s_insideUpdateStroke) return CCDrawNode::drawPolygon(p0, p1, p2, p3, p4);
-
-            if (p2.r == 1.F && p2.g == 1.F && p2.b == 1.F && p2.a != 1.F) return true;
-
-            this->setBlendFunc({ CC_BLEND_SRC, CC_BLEND_DST });
-            this->setZOrder(-1);
-
-            return CCDrawNode::drawPolygon(p0, p1, p2, p3, p4);
-        }
-    };
-
     class $modify(SolidWaveTrailHSHook, HardStreak) {
-        ALL_DELEGATES_AND_SAFE_PRIO("player.solidwavetrail")
+        ENABLE_SAFE_HOOKS_ALL()
 
-        void updateStroke(float p0) {
-            s_insideUpdateStroke = true;
-            HardStreak::updateStroke(p0);
-            s_insideUpdateStroke = false;
-        }
+        struct Fields {
+            std::optional<bool> m_prevIsSolid = std::nullopt;
+        };
+
+        void updateStroke(float dt) {
+          // the first call to updateStroke has a dt of 0
+          // the game sets the blending function after the first call to updateStroke
+          // so delay the below code for that update so that gd doesn't override the blending function
+          // if you enter a level while having solid wave trail on
+          if (dt == 0) return HardStreak::updateStroke(dt);
+          bool solidWaveTrailIsOn = config::get<bool>("player.solidwavetrail", false);
+          bool shouldChangeBlend = false;
+          if (solidWaveTrailIsOn && !m_fields->m_prevIsSolid) {
+              // solid wave trail was just turned on
+              m_fields->m_prevIsSolid = m_isSolid;
+              m_isSolid = true;
+              shouldChangeBlend = true;
+          }  else if (!solidWaveTrailIsOn && m_fields->m_prevIsSolid) {
+              // solid wave trail was just turned off
+              m_isSolid = *m_fields->m_prevIsSolid;
+              m_fields->m_prevIsSolid = std::nullopt;
+              shouldChangeBlend = true;
+          }
+          HardStreak::updateStroke(dt);
+          if (shouldChangeBlend) {
+            if (m_isSolid) setBlendFunc({GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA});
+            else setBlendFunc({GL_SRC_ALPHA, GL_ONE});
+          }
+      }
     };
 }
