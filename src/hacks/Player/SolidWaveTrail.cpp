@@ -4,52 +4,57 @@
 #include <modules/hack/hack.hpp>
 
 #include <Geode/Geode.hpp>
-#include <Geode/modify/CCDrawNode.hpp>
-#include <Geode/modify/HardStreak.hpp>
+#include <Geode/modify/PlayerObject.hpp>
 
 namespace eclipse::hacks::Player {
+    class $modify(SolidWaveTrailPOHook, PlayerObject) {
+        ALL_DELEGATES_AND_SAFE_PRIO("player.solidwavetrail")
+
+        struct Fields {
+            std::optional<bool> m_wasSolidOriginally = std::nullopt;
+        };
+
+        void toggle(bool enable) {
+            auto* fields = m_fields.self();
+            if (!fields->m_wasSolidOriginally.has_value()) {
+                fields->m_wasSolidOriginally = m_waveTrail->m_isSolid;
+            }
+
+            m_waveTrail->m_isSolid = enable || *fields->m_wasSolidOriginally;
+            m_waveTrail->setBlendFunc(
+                enable ? cocos2d::ccBlendFunc{GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA}
+                       : cocos2d::ccBlendFunc{GL_SRC_ALPHA, GL_ONE}
+            );
+        }
+
+        void setupStreak() {
+            PlayerObject::setupStreak();
+            this->toggle(true);
+        }
+    };
+
     class $hack(SolidWaveTrail) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
             tab->addToggle("player.solidwavetrail")->setDescription()->handleKeybinds();
+            config::addDelegate("player.solidwavetrail", []() {
+                auto enabled = config::get<"player.solidwavetrail", bool>(false);
+                if (auto* gjbgl = utils::get<GJBaseGameLayer>()) {
+                    static_cast<SolidWaveTrailPOHook*>(gjbgl->m_player1)->toggle(enabled);
+                    static_cast<SolidWaveTrailPOHook*>(gjbgl->m_player2)->toggle(enabled);
+                } else if (auto* ml = utils::get<MenuLayer>()) {
+                    using namespace geode::prelude;
+                    for (auto node : CCArrayExt<CCNode*>(ml->m_menuGameLayer->getChildren())) {
+                        if (auto player = typeinfo_cast<PlayerObject*>(node)) {
+                            static_cast<SolidWaveTrailPOHook*>(player)->toggle(enabled);
+                        }
+                    }
+                }
+            });
         }
 
         [[nodiscard]] const char* getId() const override { return "Solid Wave Trail"; }
     };
 
     REGISTER_HACK(SolidWaveTrail)
-
-    class $modify(SolidWaveTrailHSHook, HardStreak) {
-        ENABLE_SAFE_HOOKS_ALL()
-
-        struct Fields {
-            std::optional<bool> m_prevIsSolid = std::nullopt;
-        };
-
-        void updateStroke(float dt) {
-          // the first call to updateStroke has a dt of 0
-          // the game sets the blending function after the first call to updateStroke
-          // so delay the below code for that update so that gd doesn't override the blending function
-          // if you enter a level while having solid wave trail on
-          if (dt == 0) return HardStreak::updateStroke(dt);
-          bool solidWaveTrailIsOn = config::get<bool>("player.solidwavetrail", false);
-          bool shouldChangeBlend = false;
-          if (solidWaveTrailIsOn && !m_fields->m_prevIsSolid) {
-              // solid wave trail was just turned on
-              m_fields->m_prevIsSolid = m_isSolid;
-              m_isSolid = true;
-              shouldChangeBlend = true;
-          }  else if (!solidWaveTrailIsOn && m_fields->m_prevIsSolid) {
-              // solid wave trail was just turned off
-              m_isSolid = *m_fields->m_prevIsSolid;
-              m_fields->m_prevIsSolid = std::nullopt;
-              shouldChangeBlend = true;
-          }
-          HardStreak::updateStroke(dt);
-          if (shouldChangeBlend) {
-            if (m_isSolid) setBlendFunc({GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA});
-            else setBlendFunc({GL_SRC_ALPHA, GL_ONE});
-          }
-      }
-    };
 }
