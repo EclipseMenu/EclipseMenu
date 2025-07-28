@@ -57,6 +57,10 @@
 		"id": "eclipse.ffmpeg-api",
 		"version": ">=1.2.0",
 		"importance": "suggested"
+	}, {
+		"id": "dankmeme.globed2",
+		"version": ">=1.8.5",
+		"importance": "suggested"
 	}],
 	"settings": {
 		"legacy-render": {

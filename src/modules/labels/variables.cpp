@@ -16,6 +16,8 @@
 
 #include <rift/config.hpp>
 
+#include <dankmeme.globed2/include/globed.hpp>
+
 namespace eclipse::labels {
     static std::vector<EffectGameObject*> s_coins;
 
@@ -662,6 +664,25 @@ namespace eclipse::labels {
         fetchPlayerData(gameLayer->m_player2, true);
     }
 
+    void fetchGlobedData(rift::Object& variables) {
+        auto& globed = variables["globed"];
+        globed[std::string("enabled")] = geode::Loader::get()->isModLoaded("dankmeme.globed2");
+        if (globed[std::string("enabled")]) {
+            // net
+            globed[std::string("isConnected")] = globed::net::isConnected().unwrapOrDefault();
+            globed[std::string("ping")] = (int)globed::net::getPing().unwrapOrDefault();
+            globed[std::string("tps")] = (int)globed::net::getServerTps().unwrapOrDefault();
+
+            // suggestion for daniel meme to add:
+            // serverName
+            // roomName
+            // roomId
+            // other room things
+            globed[std::string("playersOnline")] = (int)globed::player::playersOnline().unwrapOrDefault();
+            globed[std::string("playersOnLevel")] = (int)globed::player::playersOnLevel().unwrapOrDefault();
+        }
+    }
+
     void VariableManager::refetch() {
         // Game variables
         fetchGeneralData();
@@ -674,6 +695,9 @@ namespace eclipse::labels {
 
         // Game state
         fetchGameplayData(utils::get<GJBaseGameLayer>());
+
+        // Globed
+        fetchGlobedData(m_variables);
     }
 
     class $modify(LabelsGJBGLHook, GJBaseGameLayer) {
