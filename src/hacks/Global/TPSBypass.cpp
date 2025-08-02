@@ -57,16 +57,13 @@ namespace eclipse::hacks::Global {
                 using namespace assembler::arm64;
                 g_expectedTicksPtr = std::bit_cast<TicksType*>(g_jitlessSpace);
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "TPS Bypass: JIT-less patch is only supported for GD 2.2074");
-                constexpr uintptr_t patchAddr = 0x200C30;
-                constexpr auto jitlessPatch = Builder()
+                GEODE_MOD_STATIC_PATCH(0x200C30, Builder()
                     .mov(Register::x9, g_jitlessSpace)
                     .ldr(FloatRegister::s0, Register::x9)
                     .pad_nops(20)
-                    .build_array<20>();
-
-                GEODE_MOD_STATIC_PATCH(patchAddr, jitlessPatch);
-                goto CREATE_UI_TOGGLE;
-            }
+                    .build_array<20>());
+            } else {
+                // we can do normal patches with JIT
         #endif
 
             auto base = reinterpret_cast<uint8_t*>(geode::base::get());
@@ -188,7 +185,10 @@ namespace eclipse::hacks::Global {
             }
             #endif
 
-        CREATE_UI_TOGGLE:
+            #ifdef GEODE_IS_IOS
+            } // closes the `if (geode::Loader::get()->isPatchless()) { ... } else {` block
+            #endif
+
             auto tab = gui::MenuTab::find("tab.global");
             tab->addFloatToggle("global.tpsbypass", MIN_TPS, MAX_TPS, "%.2f TPS")
                ->setDescription()
