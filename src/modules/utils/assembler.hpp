@@ -348,22 +348,22 @@ namespace eclipse::assembler {
 
         class Builder {
         public:
-            Builder() = default;
-            explicit Builder(uintptr_t baseAddress) : m_baseAddress(baseAddress) {}
+            constexpr Builder() = default;
+            explicit constexpr Builder(uintptr_t baseAddress) : m_baseAddress(baseAddress) {}
 
-            Builder& movz(Register dst, uint16_t imm, uint8_t shift = 0) {
+            constexpr Builder& movz(Register dst, uint16_t imm, uint8_t shift = 0) {
                 auto bytes = arm64::movz(dst, imm, shift);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            Builder& movk(Register dst, uint16_t imm, uint8_t shift = 0) {
+            constexpr Builder& movk(Register dst, uint16_t imm, uint8_t shift = 0) {
                 auto bytes = arm64::movk(dst, imm, shift);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            Builder& mov(Register dst, uint64_t imm) {
+            constexpr Builder& mov(Register dst, uint64_t imm) {
                 auto bytes = arm64::movz(dst, static_cast<uint16_t>(imm & 0xFFFF));
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 if (imm > 0xFFFF) {
@@ -381,19 +381,19 @@ namespace eclipse::assembler {
                 return *this;
             }
 
-            Builder& ldr(FloatRegister rt, Register rn, uint16_t imm = 0) {
+            constexpr Builder& ldr(FloatRegister rt, Register rn, uint16_t imm = 0) {
                 auto bytes = arm64::ldr(rt, rn, imm);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            Builder& ldr(Register rt, Register rn, uint16_t imm = 0) {
+            constexpr Builder& ldr(Register rt, Register rn, uint16_t imm = 0) {
                 auto bytes = arm64::ldr(rt, rn, imm);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            Builder& b(int32_t offset, bool relative = false) {
+            constexpr Builder& b(int32_t offset, bool relative = false) {
                 // If relative is true, offset is the absolute address, and we calculate the relative jump.
                 if (relative) offset -= m_baseAddress + m_bytes.size() + 4;
                 auto bytes = arm64::b(offset);
@@ -401,7 +401,7 @@ namespace eclipse::assembler {
                 return *this;
             }
 
-            Builder& nop(size_t count = 1) {
+            constexpr Builder& nop(size_t count = 1) {
                 for (size_t i = 0; i < count; ++i) {
                     auto bytes = arm64::nop();
                     m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
@@ -410,7 +410,7 @@ namespace eclipse::assembler {
             }
 
             /// @brief Adds NOP instructions to make the total size of bytes equal to `byteCount`.
-            Builder& pad_nops(size_t byteCount) {
+            constexpr Builder& pad_nops(size_t byteCount) {
                 size_t currentSize = m_bytes.size();
                 if (currentSize < byteCount) {
                     size_t nopsToAdd = (byteCount - currentSize + 3) / 4; // Each NOP is 4 bytes
@@ -419,7 +419,17 @@ namespace eclipse::assembler {
                 return *this;
             }
 
-            std::vector<uint8_t> build() { return std::move(m_bytes); }
+            constexpr std::vector<uint8_t> build() { return std::move(m_bytes); }
+
+            template <size_t N>
+            consteval std::array<uint8_t, N> build_array() {
+                if (m_bytes.size() != N) {
+                    throw std::runtime_error("Size mismatch: expected " + std::to_string(N) + ", got " + std::to_string(m_bytes.size()));
+                }
+                std::array<uint8_t, N> result{};
+                std::copy(m_bytes.begin(), m_bytes.end(), result.begin());
+                return result;
+            }
 
         private:
             uintptr_t m_baseAddress = 0;

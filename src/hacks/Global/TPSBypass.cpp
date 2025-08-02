@@ -28,6 +28,16 @@ namespace eclipse::hacks::Global {
         GEODE_INTEL_MAC(float);
 
     static TicksType g_expectedTicks = 0;
+    #ifdef GEODE_IS_IOS
+    // iOS launcher has a secret space to store data, and it's located at 0x8b8000
+    // 8 bytes are reserved for geode itself, so we can just skip 8 bytes
+    constexpr uintptr_t g_jitlessSpace = 0x8b8008; // omg boob :o
+    static TicksType* g_expectedTicksPtr = &g_expectedTicks;
+
+    TicksType& expectedTicks() { return *g_expectedTicksPtr; }
+    #else
+    TicksType& expectedTicks() { return g_expectedTicks; }
+    #endif
 
     class $hack(TPSBypass) {
         static void forceDisable() {
@@ -44,7 +54,18 @@ namespace eclipse::hacks::Global {
 
         #ifdef GEODE_IS_IOS
             if (geode::Loader::get()->isPatchless()) {
-                return forceDisable();
+                using namespace assembler::arm64;
+                g_expectedTicksPtr = std::bit_cast<TicksType*>(g_jitlessSpace);
+                static_assert(GEODE_COMP_GD_VERSION == 22074, "TPS Bypass: JIT-less patch is only supported for GD 2.2074");
+                constexpr uintptr_t patchAddr = 0x200C30;
+                constexpr auto jitlessPatch = Builder()
+                    .mov(Register::x9, g_jitlessSpace)
+                    .ldr(FloatRegister::s0, Register::x9)
+                    .pad_nops(20)
+                    .build_array<20>();
+
+                GEODE_MOD_STATIC_PATCH(patchAddr, jitlessPatch);
+                goto CREATE_UI_TOGGLE;
             }
         #endif
 
@@ -167,6 +188,7 @@ namespace eclipse::hacks::Global {
             }
             #endif
 
+        CREATE_UI_TOGGLE:
             auto tab = gui::MenuTab::find("tab.global");
             tab->addFloatToggle("global.tpsbypass", MIN_TPS, MAX_TPS, "%.2f TPS")
                ->setDescription()
@@ -303,7 +325,22 @@ namespace eclipse::hacks::Global {
     REGISTER_HACK(TPSBypass)
 
     class $modify(TPSBypassGJBGLHook, GJBaseGameLayer) {
-        ALL_DELEGATES_AND_SAFE_PRIO("global.tpsbypass.toggle")
+        static void onModify(auto& self) {
+            hack::safeHooksAll(self.m_hooks);
+
+            #ifdef GEODE_IS_IOS
+            using il = std::initializer_list<std::string_view>;
+            hack::setupToggles(
+                "global.tpsbypass.toggle", self.m_hooks,
+                "GJBaseGameLayer",
+                geode::Loader::get()->isPatchless()
+                    ? il{ "getModifiedDelta" }
+                    : il{ "getModifiedDelta", "update" }
+            );
+            #else
+            hack::setupTogglesAll("global.tpsbypass.toggle", self.m_hooks);
+            #endif
+        }
 
         struct Fields {
             double m_extraDelta = 0.0;
@@ -337,12 +374,19 @@ namespace eclipse::hacks::Global {
 
             // calculate number of steps based on the new TPS
             auto timeWarp = std::min(m_gameState.m_timeWarp, 1.f);
+
+            #ifdef GEODE_IS_IOS
+            // on iOS, since the hook is always active, we also check if tpsbypass is enabled
+            auto newTPS = utils::getTPS() / timeWarp;
+            #else
             auto newTPS = config::get<"global.tpsbypass", float>(240.f) / timeWarp;
+            #endif
+
             auto spt = 1.0 / newTPS;
             auto steps = std::round(fields->m_extraDelta / spt);
             auto totalDelta = steps * spt;
             fields->m_extraDelta -= totalDelta;
-            g_expectedTicks = steps;
+            expectedTicks() = steps;
 
             GJBaseGameLayer::update(totalDelta);
         }
