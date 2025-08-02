@@ -55,10 +55,12 @@ namespace eclipse::hacks::Global {
         #ifdef GEODE_IS_IOS
             if (geode::Loader::get()->isPatchless()) {
                 using namespace assembler::arm64;
-                g_expectedTicksPtr = std::bit_cast<TicksType*>(g_jitlessSpace);
+                g_expectedTicksPtr = std::bit_cast<TicksType*>(geode::base::get() + g_jitlessSpace);
                 static_assert(GEODE_COMP_GD_VERSION == 22074, "TPS Bypass: JIT-less patch is only supported for GD 2.2074");
-                GEODE_MOD_STATIC_PATCH(0x200C30, Builder()
-                    .mov(Register::x9, g_jitlessSpace)
+                #define PATCH_ADDR 0x200C30
+                GEODE_MOD_STATIC_PATCH(PATCH_ADDR, Builder()
+                    .adrp(Register::x9, g_jitlessSpace - ((PATCH_ADDR >> 12) << 12))
+                    .add(Register::x9, Register::x9, 0x8)
                     .ldr(FloatRegister::s0, Register::x9)
                     .pad_nops(20)
                     .build_array<20>());
