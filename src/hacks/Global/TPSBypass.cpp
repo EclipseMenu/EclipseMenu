@@ -60,8 +60,7 @@ namespace eclipse::hacks::Global {
                 #define PATCH_ADDR 0x200C30
                 GEODE_MOD_STATIC_PATCH(PATCH_ADDR, Builder()
                     .adrp(Register::x9, g_jitlessSpace - ((PATCH_ADDR >> 12) << 12))
-                    .add(Register::x9, Register::x9, 0x8)
-                    .ldr(FloatRegister::s0, Register::x9)
+                    .ldr(FloatRegister::s0, Register::x9, 0x8)
                     .pad_nops(20)
                     .build_array<20>());
             } else {
