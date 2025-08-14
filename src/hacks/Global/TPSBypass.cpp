@@ -328,20 +328,9 @@ namespace eclipse::hacks::Global {
     class $modify(TPSBypassGJBGLHook, GJBaseGameLayer) {
         static void onModify(auto& self) {
             hack::safeHooksAll(self.m_hooks);
-
-            #ifdef GEODE_IS_IOS
-            using il = std::initializer_list<std::string_view>;
             if (!geode::Loader::get()->isPatchless()) {
-                hack::setupToggles(
-                    "global.tpsbypass.toggle", self.m_hooks,
-                    "GJBaseGameLayer",
-                    il{ "getModifiedDelta", "update" }
-                );
+                hack::setupTogglesAll("global.tpsbypass.toggle", self.m_hooks);
             }
-            
-            #else
-            hack::setupTogglesAll("global.tpsbypass.toggle", self.m_hooks);
-            #endif
         }
 
         struct Fields {
@@ -366,7 +355,11 @@ namespace eclipse::hacks::Global {
 
         #ifndef REQUIRE_MODIFIED_DELTA_PATCH
         float getModifiedDelta(float dt) {
+            #ifdef GEODE_IS_IOS
+            return getCustomDelta(dt, utils::getTPS());
+            #else
             return getCustomDelta(dt, config::get<"global.tpsbypass", float>(240.f));
+            #endif
         }
         #endif
 
