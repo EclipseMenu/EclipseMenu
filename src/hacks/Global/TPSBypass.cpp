@@ -355,11 +355,11 @@ namespace eclipse::hacks::Global {
 
         #ifndef REQUIRE_MODIFIED_DELTA_PATCH
         float getModifiedDelta(float dt) {
-            if (geode::Loader::get()->isPatchless()) {
-                return getCustomDelta(dt, utils::getTPS());
-            } else {
-                return getCustomDelta(dt, config::get<"global.tpsbypass", float>(240.f));
-            }
+            #ifdef GEODE_IS_IOS
+            return getCustomDelta(dt, utils::getTPS());
+            #else
+            return getCustomDelta(dt, config::get<"global.tpsbypass", float>(240.f));
+            #endif
         }
         #endif
 
