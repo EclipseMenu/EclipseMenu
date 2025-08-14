@@ -331,13 +331,14 @@ namespace eclipse::hacks::Global {
 
             #ifdef GEODE_IS_IOS
             using il = std::initializer_list<std::string_view>;
-            hack::setupToggles(
-                "global.tpsbypass.toggle", self.m_hooks,
-                "GJBaseGameLayer",
-                geode::Loader::get()->isPatchless()
-                    ? il{ "getModifiedDelta" }
-                    : il{ "getModifiedDelta", "update" }
-            );
+            if (!geode::Loader::get()->isPatchless()) {
+                hack::setupToggles(
+                    "global.tpsbypass.toggle", self.m_hooks,
+                    "GJBaseGameLayer",
+                    il{ "getModifiedDelta", "update" }
+                );
+            }
+            
             #else
             hack::setupTogglesAll("global.tpsbypass.toggle", self.m_hooks);
             #endif
