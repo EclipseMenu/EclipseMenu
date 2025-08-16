@@ -53,6 +53,12 @@ namespace eclipse::hacks::Shortcuts {
                     i18n::get_("shortcuts.uncomplete-level.error")
                 );
 
+            if (level->m_levelType != GJLevelType::Saved)
+                return Popup::create(
+                    i18n::get_("common.error"),
+                    i18n::get_("shortcuts.uncomplete-level.error")
+                );
+
             Popup::create(
                 i18n::get_("shortcuts.uncomplete-level.title"),
                 i18n::format("shortcuts.uncomplete-level.msg", level->m_levelName),
