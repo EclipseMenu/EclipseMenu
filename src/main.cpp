@@ -27,6 +27,8 @@
 #include <modules/gui/components/toggle.hpp>
 #include <modules/gui/imgui/animation/easing.hpp>
 
+#include "Crashlog-Api/main.hpp"
+
 using namespace eclipse;
 
 static bool s_isInitialized = false;
@@ -130,6 +132,21 @@ public:
 };
 
 $on_mod(Loaded) {
+     ExtraCrashData::waitforMod([=] {
+        geode::prelude::Loader::get()->queueInMainThread([] {
+            ExtraCrashData::CrashlogEvent(
+                [] { 
+                    std::stringstream stream(std::string(""));
+                    for (const auto& hack : eclipse::hack::getHacks()) {
+                        const char *id = hack->getId();
+                        stream << fmt::format("{}: {}\n",id, config::get(id, false) ? "Enabled" : "Disabled");
+                    };
+                    return stream.str();
+                },
+                ExtraCrashData::Message::AfterMod)
+                .post();
+        });
+	});
     // Allow user to change disable VBO (resolves issues on older hardware)
     auto* mod = geode::Mod::get();
     ImGuiCocos::get().setForceLegacy(mod->getSettingValue<bool>("legacy-render"));
