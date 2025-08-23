@@ -1,5 +1,5 @@
 {
-	"geode": "4.6.2",
+	"geode": "4.7.1",
 	"gd": {
 		"win": "2.2074",
 		"mac": "2.2074",
@@ -56,6 +56,10 @@
 	"dependencies": [{
 		"id": "eclipse.ffmpeg-api",
 		"version": ">=1.2.0",
+		"importance": "suggested"
+	}, {
+		"id": "dankmeme.globed2",
+		"version": ">=1.8.5",
 		"importance": "suggested"
 	}],
 	"settings": {

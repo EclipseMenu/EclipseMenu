@@ -33,6 +33,17 @@ namespace eclipse::hacks::Player {
 
     REGISTER_HACK(AlwaysTrail)
 
+    class $hack(NoWaveTrailBehind) {
+        void init() override {
+            auto tab = gui::MenuTab::find("tab.player");
+            tab->addToggle("player.nowavetrailbehind")->handleKeybinds()->setDescription();
+        }
+
+        [[nodiscard]] const char* getId() const override { return "No Wave Trail Behind"; }
+    };
+
+    REGISTER_HACK(NoWaveTrailBehind)
+
     // CCMotionStreak functions are too small to be hooked on ARM
     #ifdef GEODE_IS_ARM
     class $modify(NoTrailPOHook, PlayerObject) {
@@ -75,4 +86,30 @@ namespace eclipse::hacks::Player {
         void stopStroke() {}
     };
     #endif
+
+    class $modify(NoWaveTrailBehindPOHook, PlayerObject) {
+        ADD_HOOKS_DELEGATE("player.nowavetrailbehind")
+        void toggleDartMode(bool p0, bool p1) {
+            PlayerObject::toggleDartMode(p0,p1);
+            if (this->m_isDart && this->m_regularTrail) {
+                this->m_regularTrail->stopStroke();
+            }
+        }
+
+        void activateStreak() {
+            if (!this->m_isDart) return PlayerObject::activateStreak();
+            if (this->levelFlipping()) return;
+            if (utils::get<GameManager>()->m_editorEnabled) return;
+            if (this->m_isHidden) return;
+
+            this->m_fadeOutStreak = true;
+            if (this->m_isDart) {
+                auto pos = this->getPosition();
+                this->m_waveTrail->m_currentPoint = pos;
+                this->m_waveTrail->stopAllActions();
+                this->m_waveTrail->setOpacity(255);
+                this->m_waveTrail->resumeStroke();
+            }
+        }
+    };
 }

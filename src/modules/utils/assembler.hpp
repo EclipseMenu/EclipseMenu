@@ -20,9 +20,9 @@ namespace eclipse::assembler {
         };
 
         enum class XmmRegister : uint8_t {
-            xmm0  = 0, xmm1  = 1, xmm2  = 2, xmm3  = 3,
-            xmm4  = 4, xmm5  = 5, xmm6  = 6, xmm7  = 7,
-            xmm8  = 8, xmm9  = 9, xmm10 = 10, xmm11 = 11,
+            xmm0  = 0, xmm1   = 1, xmm2   = 2, xmm3   = 3,
+            xmm4  = 4, xmm5   = 5, xmm6   = 6, xmm7   = 7,
+            xmm8  = 8, xmm9   = 9, xmm10  = 10, xmm11 = 11,
             xmm12 = 12, xmm13 = 13, xmm14 = 14, xmm15 = 15,
         };
 
@@ -212,6 +212,52 @@ namespace eclipse::assembler {
         constexpr int operator&(FloatRegister dst, int rhs) { return static_cast<int>(dst) & rhs; }
         constexpr int operator|(int lhs, FloatRegister dst) { return lhs | static_cast<int>(dst); }
 
+        /// @brief Form PC Relative Address:
+        /// Adds an immediate that is shifted left by 12 bits to the PC value.
+        constexpr std::array<uint8_t, 4> adrp(Register dst, uint64_t addr) {
+            uint32_t page = static_cast<uint32_t>(addr >> 12);
+            uint32_t immlo = page & 0x3;
+            uint32_t immhi = (page >> 2) & 0x7FFFF;
+            uint8_t rd = dst & 0x1F;
+
+            return {
+                static_cast<uint8_t>(rd | ((immhi & 0x7) << 5)),
+                static_cast<uint8_t>((immhi >> 3) & 0xFF),
+                static_cast<uint8_t>((immhi >> 11) & 0xFF),
+                static_cast<uint8_t>(0x90 | ((immlo & 0x3) << 5))
+            };
+        }
+
+        /// @brief Add
+        /// Adds an immediate value to a register and stores the result in a destination register.
+        constexpr std::array<uint8_t, 4> add(Register dst, Register src, uint64_t imm) {
+            uint8_t rn = src & 0b11111;
+            uint8_t sf = is_w(dst) ? 0 : 1;
+            uint8_t sh = 0;
+            uint16_t imm12;
+
+            if (imm <= 0xFFF) {
+                // number fits in 12 bits
+                imm12 = static_cast<uint16_t>(imm);
+                sh = 0;
+            } else if ((imm & 0xFFF) == 0 && (imm >> 12) <= 0xFFF) {
+                // number can be represented as a 12-bit immediate with a shift
+                imm12 = static_cast<uint16_t>(imm >> 12);
+                sh = 1;
+            } else {
+                // number doesn't fit, idk just use the lower 12 bits for now
+                imm12 = static_cast<uint16_t>(imm & 0xFFF);
+                sh = 0;
+            }
+
+            return {
+                static_cast<uint8_t>((dst & 0b11111) | (rn << 5)),
+                static_cast<uint8_t>((rn >> 3) | ((imm12 & 0x3F) << 2)),
+                static_cast<uint8_t>(((imm12 >> 6) & 0x3F) | (sh << 6)),
+                static_cast<uint8_t>(0x91 | (sf << 7))
+            };
+        }
+
         /// @brief Move with Zero:
         /// Move a 16-bit immediate value to a register, with a left shift.
         constexpr std::array<uint8_t, 4> movz(Register dst, uint16_t imm, uint8_t shift = 0) {
@@ -348,22 +394,34 @@ namespace eclipse::assembler {
 
         class Builder {
         public:
-            Builder() = default;
-            explicit Builder(uintptr_t baseAddress) : m_baseAddress(baseAddress) {}
+            constexpr Builder() = default;
+            explicit constexpr Builder(uintptr_t baseAddress) : m_baseAddress(baseAddress) {}
 
-            Builder& movz(Register dst, uint16_t imm, uint8_t shift = 0) {
+            constexpr Builder& adrp(Register dst, uint64_t addr) {
+                auto bytes = arm64::adrp(dst, addr);
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                return *this;
+            }
+
+            constexpr Builder& add(Register dst, Register src, uint64_t imm) {
+                auto bytes = arm64::add(dst, src, imm);
+                m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
+                return *this;
+            }
+
+            constexpr Builder& movz(Register dst, uint16_t imm, uint8_t shift = 0) {
                 auto bytes = arm64::movz(dst, imm, shift);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            Builder& movk(Register dst, uint16_t imm, uint8_t shift = 0) {
+            constexpr Builder& movk(Register dst, uint16_t imm, uint8_t shift = 0) {
                 auto bytes = arm64::movk(dst, imm, shift);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            Builder& mov(Register dst, uint64_t imm) {
+            constexpr Builder& mov(Register dst, uint64_t imm) {
                 auto bytes = arm64::movz(dst, static_cast<uint16_t>(imm & 0xFFFF));
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 if (imm > 0xFFFF) {
@@ -381,19 +439,19 @@ namespace eclipse::assembler {
                 return *this;
             }
 
-            Builder& ldr(FloatRegister rt, Register rn, uint16_t imm = 0) {
+            constexpr Builder& ldr(FloatRegister rt, Register rn, uint16_t imm = 0) {
                 auto bytes = arm64::ldr(rt, rn, imm);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            Builder& ldr(Register rt, Register rn, uint16_t imm = 0) {
+            constexpr Builder& ldr(Register rt, Register rn, uint16_t imm = 0) {
                 auto bytes = arm64::ldr(rt, rn, imm);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            Builder& b(int32_t offset, bool relative = false) {
+            constexpr Builder& b(int32_t offset, bool relative = false) {
                 // If relative is true, offset is the absolute address, and we calculate the relative jump.
                 if (relative) offset -= m_baseAddress + m_bytes.size() + 4;
                 auto bytes = arm64::b(offset);
@@ -401,7 +459,7 @@ namespace eclipse::assembler {
                 return *this;
             }
 
-            Builder& nop(size_t count = 1) {
+            constexpr Builder& nop(size_t count = 1) {
                 for (size_t i = 0; i < count; ++i) {
                     auto bytes = arm64::nop();
                     m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
@@ -410,7 +468,7 @@ namespace eclipse::assembler {
             }
 
             /// @brief Adds NOP instructions to make the total size of bytes equal to `byteCount`.
-            Builder& pad_nops(size_t byteCount) {
+            constexpr Builder& pad_nops(size_t byteCount) {
                 size_t currentSize = m_bytes.size();
                 if (currentSize < byteCount) {
                     size_t nopsToAdd = (byteCount - currentSize + 3) / 4; // Each NOP is 4 bytes
@@ -419,7 +477,16 @@ namespace eclipse::assembler {
                 return *this;
             }
 
-            std::vector<uint8_t> build() { return std::move(m_bytes); }
+            constexpr std::vector<uint8_t> build() { return std::move(m_bytes); }
+
+            template <size_t N>
+            consteval std::array<uint8_t, N> build_array() {
+                if (m_bytes.size() != N) throw std::runtime_error("Size mismatch!");
+
+                std::array<uint8_t, N> result{};
+                std::copy(m_bytes.begin(), m_bytes.end(), result.begin());
+                return result;
+            }
 
         private:
             uintptr_t m_baseAddress = 0;
@@ -429,10 +496,10 @@ namespace eclipse::assembler {
 
     namespace armv7 {
         enum class Register : uint8_t {
-            r0 = 0, r1 = 1, r2 = 2, r3 = 3,
-            r4 = 4, r5 = 5, r6 = 6, r7 = 7,
-            r8 = 8, r9 = 9, r10 = 10, r11 = 11,
-            r12 = 12, sp = 13, lr = 14, pc = 15
+            r0  = 0, r1  = 1, r2  = 2, r3   = 3,
+            r4  = 4, r5  = 5, r6  = 6, r7   = 7,
+            r8  = 8, r9  = 9, r10 = 10, r11 = 11,
+            r12 = 12, sp = 13, lr = 14, pc  = 15
         };
 
         /// @brief NOP instruction for Thumb-2 (ARMv7). 2 bytes.

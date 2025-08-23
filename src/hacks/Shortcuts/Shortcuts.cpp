@@ -53,6 +53,12 @@ namespace eclipse::hacks::Shortcuts {
                     i18n::get_("shortcuts.uncomplete-level.error")
                 );
 
+            if (level->m_levelType != GJLevelType::Saved)
+                return Popup::create(
+                    i18n::get_("common.error"),
+                    i18n::get_("shortcuts.uncomplete-level.error")
+                );
+
             Popup::create(
                 i18n::get_("shortcuts.uncomplete-level.title"),
                 i18n::format("shortcuts.uncomplete-level.msg", level->m_levelName),
@@ -212,7 +218,6 @@ namespace eclipse::hacks::Shortcuts {
         }
     #endif
 
-
         static int getSecretCoinsRange(int min, int max) {
             auto glm = utils::get<GameLevelManager>();
             auto gsm = utils::get<GameStatsManager>();
@@ -230,7 +235,6 @@ namespace eclipse::hacks::Shortcuts {
             return secretCoins;
         }
         static void recountSecretCoins() {
-
             auto am = AchievementManager::sharedState();
             auto glm = utils::get<GameLevelManager>();
             auto gsm = utils::get<GameStatsManager>();
@@ -283,6 +287,34 @@ namespace eclipse::hacks::Shortcuts {
             );
         }
 
+        static void showLevelPassword() {
+            auto scene = utils::get<cocos2d::CCScene>();
+            if (!scene) return; // sometimes people frget CCScene can sometimes be nullptr for no reason
+            GJGameLevel* level = nullptr;
+
+            // try to find it from either PlayLayer or LevelInfoLayer
+            if (auto* pl = utils::get<PlayLayer>()) {
+                level = pl->m_level;
+            } else if (auto* lil = scene->getChildByType<LevelInfoLayer>(0)) {
+                level = lil->m_level;
+            }
+            if (!level)
+                return Popup::create(
+                    i18n::get_("common.error"),
+                    i18n::get_("shortcuts.uncomplete-level.error")
+                );
+            if (level->m_password.value() == 0 || level->m_password.value() == 1) {
+                Popup::create(i18n::get_("common.error"), i18n::get_("shortcuts.show-level-password.error"));
+            } else {
+                auto parsedPass = std::to_string(level->m_password.value());
+                parsedPass.erase(0, 1);
+                Popup::create(
+                    i18n::get_("common.info"),
+                    i18n::format("shortcuts.show-level-password.msg", parsedPass)
+                );
+            }
+        }
+
         constexpr static bool isJumpKey(keybinds::Keys key) {
             return key == keybinds::Keys::Space || key == keybinds::Keys::Up ||
                    key == keybinds::Keys::W || key == keybinds::Keys::MouseLeft;
@@ -318,6 +350,7 @@ namespace eclipse::hacks::Shortcuts {
             tab->addButton("shortcuts.reset-bg-volume")->setDescription()->callback(resetBGVolume)->handleKeybinds();
             tab->addButton("shortcuts.reset-sfx-volume")->setDescription()->callback(resetSFXVolume)->handleKeybinds();
             tab->addButton("shortcuts.recount-secret-coins")->setDescription()->callback(recountSecretCoins)->handleKeybinds();
+            tab->addButton("shortcuts.show-level-password")->setDescription()->callback(showLevelPassword)->handleKeybinds();
 
             auto manager = keybinds::Manager::get();
             manager->addListener("shortcut.p1jump", [](bool down) {
