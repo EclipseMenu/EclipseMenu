@@ -62,11 +62,12 @@ namespace eclipse::gui::cocos {
 
     bool TabMenu::init(Tabs const& tabs, std::function<void(int)> const& callback) {
         if (!CCMenu::init()) return false;
+        const auto tm = ThemeManager::get();
         this->setID("tab-menu"_spr);
 
-        auto upSpr = cocos2d::CCSprite::createWithSpriteFrameName("GJ_chatBtn_01_001.png");
+        auto upSpr = cocos2d::CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
+        upSpr->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
         upSpr->setScale(1.5F);
-        upSpr->setFlipY(true);
         m_upArrow = geode::cocos::CCMenuItemExt::createSpriteExtra(upSpr, [this](auto caller){
             m_currentPage--;
             regenTabs();
@@ -94,7 +95,8 @@ namespace eclipse::gui::cocos {
             tabButton->setVisible(false);
             m_tabs.push_back(tabButton);
         }
-        auto downSpr = cocos2d::CCSprite::createWithSpriteFrameName("GJ_chatBtn_01_001.png");
+        auto downSpr = cocos2d::CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
+        downSpr->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
         downSpr->setScale(1.5F);
         m_downArrow = geode::cocos::CCMenuItemExt::createSpriteExtra(downSpr, [this](auto caller){
             m_currentPage++;

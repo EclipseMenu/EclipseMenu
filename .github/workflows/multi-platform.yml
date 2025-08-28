@@ -45,7 +45,7 @@ jobs:
         with:
           bindings: EclipseMenu/bindings
           bindings-ref: main
-          sdk: nightly
+          #sdk: nightly
           combine: true
           export-pdb: true
           target: ${{ matrix.config.target }}
