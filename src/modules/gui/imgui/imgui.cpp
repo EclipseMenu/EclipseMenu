@@ -124,15 +124,31 @@ namespace eclipse::gui::imgui {
 
     void FontManager::FontMetadata::load() {
         auto fontSize = ThemeManager::get()->getFontSize() * DEFAULT_SCALE;
-        auto res = geode::utils::file::readBinary(m_path);
-        if (res.isErr()) {
-            geode::log::error("Failed to load font {}: {}", m_path, std::move(res).unwrapErr());
+        std::ifstream file(m_path, std::ios::binary);
+        if (!file.is_open()) {
+            geode::log::error("Failed to open font file: {}", m_path);
             return;
         }
 
-        auto data = std::move(res).unwrap();
+        file.seekg(0, std::ios::end);
+        auto size = file.tellg();
+        file.seekg(0, std::ios::beg);
+        if (size <= 0) {
+            geode::log::error("Font file is empty: {}", m_path);
+            return;
+        }
+
+        auto data = new uint8_t[size]; // ImGui takes ownership
+        file.read(reinterpret_cast<char*>(data), size);
+        if (!file) {
+            geode::log::error("Failed to read font file: {}", m_path);
+            delete[] data;
+            return;
+        }
+        file.close();
+
         m_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(
-            data.data(), static_cast<int>(data.size()), fontSize,
+            data, size, fontSize,
             nullptr, getGlyphRange(i18n::getRequiredGlyphRanges())
         );
     }
