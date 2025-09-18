@@ -6,7 +6,7 @@
 		"android": "2.2074",
 		"ios": "2.2074"
 	},
-	"version": "v1.3.2",
+	"version": "v1.4.0",
 	"id": "eclipse.eclipse-menu",
 	"name": "Eclipse",
 	"links": {
@@ -19,23 +19,19 @@
 	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev"],
 	"description": "A next-generation mod menu for Geometry Dash.",
 	"early-load": true,
-	"incompatibilities": [
-		{
-			"id": "prevter.openhack",
-			"version": "*",
-			"importance": "superseded"
-		},
-		{
-			"id": "maxnu.gd_mega_overlay",
-			"version": "*",
-			"importance": "superseded"
-		},
-		{
-			"id": "ninxout.crystal_client",
-			"version": "*",
-			"importance": "superseded"
-		}
-	],
+	"incompatibilities": [{
+		"id": "prevter.openhack",
+		"version": "*",
+		"importance": "superseded"
+	}, {
+		"id": "maxnu.gd_mega_overlay",
+		"version": "*",
+		"importance": "superseded"
+	}, {
+		"id": "ninxout.crystal_client",
+		"version": "*",
+		"importance": "superseded"
+	}],
 	"resources": {
 		"files": [
 			"resources/Blur/*.glsl",

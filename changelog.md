@@ -1,5 +1,23 @@
 # Eclipse Menu
 
+## v1.4.0
+**Additions**:
+* Added <cg>Physics Bypass</c> for <cy>JIT-less</c> iOS
+* Added <cg>No Wave Trail Behind</c>
+* Added <cg>Show Level Password</c> shortcut
+* Added <cy>Globed</c> label variables: `globed.enabled`, `globed.isConnected`, `globed.ping`, `globed.tps`, `globed.playersOnline`, `globed.playersOnLevel`
+* <co>Discord RPC</c> now supports <cy>Wine</c> (only Wine Staging 10.2+ is supported for now)
+* Added <cy>API</c> for loading macros
+* <cy>Menu Arrows</c> now change colors based on the current theme (on <cl>mobile</c> UI)
+
+**Fixes**:
+* <cg>Fixed</c> a bunch of issues related to <cl>Windows</c> paths and added more error handling
+* <cg>Fixed</c> random startup crashes on <cl>Android</c> due to <co>Physics Bypass</c> patching
+* <cg>Fixed</c> a few issues with <co>Practice Fix</c> (hopefully)
+* <cg>Fixed</c> <co>Solid Wave Trail</c> compatibility with other mods and made it toggleable at any time
+* <cg>Fixed</c> problems with <co>Discord RPC</c> not updating status properly
+* <cg>Fixed</c> <co>Uncomplete Level</c> corrupting editor levels
+
 ## v1.3.2
 **Fixes**:
 * <cg>Fixed</c> rotated danger hitboxes being incorrect
