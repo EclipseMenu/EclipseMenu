@@ -480,7 +480,7 @@ namespace eclipse::labels {
 
         cocos2d::CCDictionary* currencyScores;
         if (dailyId <= 0) {
-            if (level->m_levelType == GJLevelType::Local) {
+            if (level->m_levelType == GJLevelType::Main) {
                 currencyScores = gsm->m_mainCurrencyScores;
             } else if (level->m_gauntletLevel) {
                 currencyScores = gsm->m_gauntletCurrencyScores;
@@ -633,7 +633,7 @@ namespace eclipse::labels {
             auto coinKey = gameLayer->m_level->getCoinKey(i + 1);
             bool saved = false;
 
-            if (gameLayer->m_level->m_levelType == GJLevelType::Local) {
+            if (gameLayer->m_level->m_levelType == GJLevelType::Main) {
                 saved = utils::get<GameStatsManager>()->hasSecretCoin(coinKey);
             } else {
                 saved = utils::get<GameStatsManager>()->hasUserCoin(coinKey);

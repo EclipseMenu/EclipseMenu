@@ -236,7 +236,7 @@ namespace eclipse::utils {
             m_isSecondPlayer = player->m_isSecondPlayer;
             m_unkA99 = player->m_unkA99;
             m_isBeingSpawnedByDualPortal = player->m_isBeingSpawnedByDualPortal;
-            m_unkAAC = player->m_unkAAC;
+            m_audioScale = player->m_audioScale;
             m_unkAngle1 = player->m_unkAngle1;
             m_yVelocityRelated3 = player->m_yVelocityRelated3;
             m_defaultMiniIcon = player->m_defaultMiniIcon;
@@ -495,7 +495,7 @@ namespace eclipse::utils {
             player->m_isSecondPlayer = m_isSecondPlayer;
             player->m_unkA99 = m_unkA99;
             player->m_isBeingSpawnedByDualPortal = m_isBeingSpawnedByDualPortal;
-            player->m_unkAAC = m_unkAAC;
+            player->m_audioScale = m_audioScale;
             player->m_unkAngle1 = m_unkAngle1;
             player->m_yVelocityRelated3 = m_yVelocityRelated3;
             player->m_defaultMiniIcon = m_defaultMiniIcon;
@@ -756,7 +756,7 @@ namespace eclipse::utils {
         bool m_isSecondPlayer;
         bool m_unkA99;
         bool m_isBeingSpawnedByDualPortal;
-        float m_unkAAC;
+        float m_audioScale;
         float m_unkAngle1;
         float m_yVelocityRelated3;
         bool m_defaultMiniIcon;

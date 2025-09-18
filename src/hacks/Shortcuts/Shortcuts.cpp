@@ -72,7 +72,7 @@ namespace eclipse::hacks::Shortcuts {
                         int levelid = level->m_levelID.value();
                         // Delete completion
                         gsm->setStat("4", gsm->getStat("4") - 1); // completed levels
-                        auto levelKey = getLevelKey(level->m_levelID, level->m_levelType != GJLevelType::Local, level->m_dailyID > 0, level->m_gauntletLevel, level->m_dailyID > 200000);
+                        auto levelKey = getLevelKey(level->m_levelID, level->m_levelType != GJLevelType::Main, level->m_dailyID > 0, level->m_gauntletLevel, level->m_dailyID > 200000);
                         geode::log::debug("Deleting level key {} from completed levels", levelKey);
                         gsm->m_completedLevels->removeObjectForKey(levelKey);
                         if (level->m_stars > 0) {
@@ -114,7 +114,7 @@ namespace eclipse::hacks::Shortcuts {
                     level->m_newNormalPercent2 = 0;
                     level->m_orbCompletion = 0;
                     level->m_54 = 0;
-                    level->m_k111 = 0;
+                    level->m_platformerSeed = 0;
                     level->m_bestPoints = 0;
                     level->m_bestTime = 0;
 
