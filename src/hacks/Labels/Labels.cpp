@@ -459,7 +459,8 @@ namespace eclipse::hacks::Labels {
                 s_listener.bind([this](FileEvent::Event* event) {
                     if (auto value = event->getValue()) {
                         auto path = value->unwrapOr("");
-                        if (path.empty() || !std::filesystem::exists(path))
+                        std::error_code ec;
+                        if (path.empty() || !std::filesystem::exists(path, ec))
                             return;
 
                         gui::Engine::queueAfterDrawing([this, path] {

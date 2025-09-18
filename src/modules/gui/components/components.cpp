@@ -281,9 +281,10 @@ namespace eclipse::gui {
     void FilesystemComboComponent::globFiles() {
         m_items.clear();
 
-        if (!std::filesystem::exists(m_directory)) return;
+        std::error_code ec;
+        if (!std::filesystem::exists(m_directory, ec)) return;
 
-        for (const auto& entry : std::filesystem::recursive_directory_iterator(m_directory)) {
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(m_directory, ec)) {
             m_items.push_back(entry.path());
         }
     }

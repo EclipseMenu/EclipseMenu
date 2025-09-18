@@ -56,9 +56,11 @@ namespace eclipse::i18n {
                 }
 
                 auto data = value->data();
-                std::ofstream file(path, std::ios::binary);
-                file.write(reinterpret_cast<const char *>(data.data()), data.size());
-                file.close();
+                auto res = file::writeBinary(path, data);
+                if (res.isErr()) {
+                    this->handleError(-1);
+                    return;
+                }
 
                 this->m_filesDownloaded++;
                 this->handleFileDownloaded(); // begin next download or close
@@ -85,7 +87,7 @@ namespace eclipse::i18n {
 
         auto url = fmt::format(
             "https://raw.githubusercontent.com/EclipseMenu/EclipseMenu/refs/heads/main/resources/BitmapFonts/{}",
-            path.filename().string()
+            path.filename()
         );
         this->startDownloadFile(path, url);
     }

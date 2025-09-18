@@ -124,8 +124,15 @@ namespace eclipse::gui::imgui {
 
     void FontManager::FontMetadata::load() {
         auto fontSize = ThemeManager::get()->getFontSize() * DEFAULT_SCALE;
-        m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(
-            m_path.string().c_str(), fontSize,
+        auto res = geode::utils::file::readBinary(m_path);
+        if (res.isErr()) {
+            geode::log::error("Failed to load font {}: {}", m_path, std::move(res).unwrapErr());
+            return;
+        }
+
+        auto data = std::move(res).unwrap();
+        m_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(
+            data.data(), static_cast<int>(data.size()), fontSize,
             nullptr, getGlyphRange(i18n::getRequiredGlyphRanges())
         );
     }
@@ -133,12 +140,20 @@ namespace eclipse::gui::imgui {
     std::vector<FontManager::FontMetadata> FontManager::fetchAvailableFonts() {
         std::vector<FontMetadata> result;
         auto globFonts = [&](std::filesystem::path const& path) {
-            std::filesystem::create_directories(path);
-            for (auto& entry : std::filesystem::directory_iterator(path)) {
+            std::error_code ec;
+            std::filesystem::create_directories(path, ec);
+            if (ec) {
+                geode::log::warn("Failed to create fonts directory {}: {}", path, ec.message());
+                return;
+            }
+            for (auto& entry : std::filesystem::directory_iterator(path, ec)) {
                 if (entry.path().extension() != ".ttf") continue;
-                auto filename = entry.path().stem().string();
+                auto filename = geode::utils::string::pathToString(entry.path().stem());
                 FontMetadata font{filename, entry.path()};
                 result.push_back(font);
+            }
+            if (ec) {
+                geode::log::warn("Failed to list fonts in {}: {}", path, ec.message());
             }
         };
 

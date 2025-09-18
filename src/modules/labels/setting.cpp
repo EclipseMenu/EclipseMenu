@@ -82,9 +82,11 @@ namespace eclipse::labels {
                 // ensure the file has the correct extension
                 if (path.extension() != ".ecl") path.replace_extension(".ecl");
 
-                std::ofstream file(path);
-                file << nlohmann::json(*this).dump(4, ' ', false, nlohmann::detail::error_handler_t::ignore);
-                file.close();
+                auto data = nlohmann::json(*this).dump(4, ' ', false, nlohmann::detail::error_handler_t::ignore);
+                auto res = geode::utils::file::writeString(path, data);
+                if (res.isErr()) {
+                    geode::log::error("Failed to save label file: {}", res.unwrapErr());
+                }
             }
         });
 

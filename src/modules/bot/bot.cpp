@@ -35,7 +35,7 @@ namespace eclipse::bot {
 
         if (m_replay.inputs[m_inputIndex].frame <= frame)
             return m_replay.inputs[m_inputIndex++];
-        
+
         return std::nullopt;
     }
 
@@ -56,51 +56,43 @@ namespace eclipse::bot {
         m_replay.platformer = platformer;
     }
 
-    geode::Result<> Bot::save(const std::filesystem::path& path) {
+    Result<> Bot::save(const std::filesystem::path& path) {
         m_replay.author = utils::get<GJAccountManager>()->m_username;
-        m_replay.duration = m_replay.inputs.size() > 0 ? m_replay.inputs[m_replay.inputs.size() - 1].frame / m_replay.framerate : 0;
+        m_replay.duration = !m_replay.inputs.empty() ? m_replay.inputs[m_replay.inputs.size() - 1].frame / m_replay.framerate : 0;
 
         auto res = m_replay.exportData();
 
         if(res.isErr())
-            return geode::Err(res.unwrapErr());
-        geode::ByteVector data = res.unwrap();
+            return Err(std::move(res).unwrapErr());
 
-        std::ofstream file(path, std::ios::binary);
-        file.write(reinterpret_cast<const char*>(data.data()), data.size());
-        file.close();
-        return geode::Ok();
+        auto data = std::move(res).unwrap();
+        return file::writeBinarySafe(path, data);
     }
 
     Result<> Bot::load(const std::filesystem::path& path) {
-        std::ifstream f(path, std::ios::binary);
+        auto res = file::readBinary(path);
+        if (res.isErr())
+            return Err(std::move(res).unwrapErr());
 
-        if (!f) {
-            f.close();
-            return Err("Failed to open file");
-        }
+        auto fileData = std::move(res).unwrap();
+        return load(fileData);
+    }
 
-        f.seekg(0, std::ios::end);
-        size_t fileSize = f.tellg();
-        f.seekg(0, std::ios::beg);
-
-        geode::ByteVector data(fileSize);
-        f.read(reinterpret_cast<char*>(data.data()), fileSize);
-        f.close();
+    Result<> Bot::load(std::span<uint8_t> data) {
+        if (data.size() < 3)
+            return Err("Data is too small to be a valid replay");
 
         gdr::Result<BotReplay> res = gdr::Err<BotReplay>("");
-
         if(std::equal(data.begin(), data.begin() + 3, "GDR"))
             res = BotReplay::importData(data);
         else
             res = gdr::convert<BotReplay, gdr::Input<>>(data);
 
         if (res.isErr())
-            return geode::Err(res.unwrapErr());
+            return Err(std::move(res).unwrapErr());
 
-        m_replay = res.unwrap();
+        m_replay = std::move(res).unwrap();
 
         return Ok();
     }
-
 }

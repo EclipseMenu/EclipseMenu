@@ -36,11 +36,11 @@ namespace eclipse::gui::blur {
         auto vertexSource = geode::utils::file::readString(vertexPath);
 
         if (!vertexSource)
-            return geode::Err("failed to read vertex shader at path {}: {}", vertexPath.string(), vertexSource.unwrapErr());
+            return geode::Err("failed to read vertex shader at path {}: {}", vertexPath, std::move(vertexSource).unwrapErr());
 
         auto fragmentSource = geode::utils::file::readString(fragmentPath);
         if (!fragmentSource)
-            return geode::Err("failed to read fragment shader at path {}: {}", fragmentPath.string(), fragmentSource.unwrapErr());
+            return geode::Err("failed to read fragment shader at path {}: {}", fragmentPath, std::move(fragmentSource).unwrapErr());
 
         auto getShaderLog = [](GLuint id) -> std::string {
             GLint length, written;

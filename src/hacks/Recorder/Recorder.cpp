@@ -129,8 +129,16 @@ namespace eclipse::hacks::Recorder {
 
         std::filesystem::path renderDirectory = geode::Mod::get()->getSaveDir() / "renders" / STR(trimmedLevelName);
 
-        if (!std::filesystem::exists(renderDirectory))
-            std::filesystem::create_directories(renderDirectory);
+        std::error_code ec;
+        if (!std::filesystem::exists(renderDirectory, ec)) {
+            std::filesystem::create_directories(renderDirectory, ec);
+            if (ec) {
+                return Popup::create(
+                    i18n::get_("common.error"),
+                    ec.message()
+                );
+            }
+        }
 
         s_recorder.m_renderSettings.m_bitrate = static_cast<int>(config::get<float>("recorder.bitrate", 30.f)) * 1000000;
         s_recorder.m_renderSettings.m_fps = static_cast<int>(config::get<float>("recorder.fps", 60.f));

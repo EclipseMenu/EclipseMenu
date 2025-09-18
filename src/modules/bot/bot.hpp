@@ -56,6 +56,10 @@ namespace eclipse::bot {
         /// @param path Path to load the replay from.
         geode::Result<> load(const std::filesystem::path& path);
 
+        /// @brief Loads a replay from a data buffer.
+        /// @param data Data to load the replay from.
+        geode::Result<> load(std::span<uint8_t> data);
+
         /// @brief Sets the level info.
         /// @param levelInfo The level info.
         void setLevelInfo(const gdr::Level& levelInfo);

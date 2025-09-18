@@ -19,7 +19,7 @@ namespace eclipse::gui::cocos {
                 m_valueLabel->setString("");
                 return;
             }
-            m_valueLabel->setString(m_component->getItems()[m_index].filename().string());
+            m_valueLabel->setString(geode::utils::string::pathToString(m_component->getItems()[m_index].filename()));
             m_valueLabel->limitLabelWidth(70.f, 1.5f, 0.25f);
         }
 
@@ -83,7 +83,7 @@ namespace eclipse::gui::cocos {
             arrowBtn2->setTag(-1);
             this->addChildAtPosition(arrowBtn2, geode::Anchor::Right, { -115.f, 0.f });
 
-            m_valueLabel = TranslatedLabel::createRaw(m_component->getValue().filename().string());
+            m_valueLabel = TranslatedLabel::createRaw(geode::utils::string::pathToString(m_component->getValue().filename()));
             m_valueLabel->setColor(tm->getForegroundColor().toCCColor3B());
             this->addChildAtPosition(m_valueLabel, geode::Anchor::Right, { -70.f, 0.f });
 

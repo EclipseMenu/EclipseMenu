@@ -103,7 +103,8 @@ namespace eclipse::gui {
     }
 
     bool ThemeManager::loadTheme(const std::filesystem::path& path) {
-        if (!std::filesystem::exists(path)) return false;
+        std::error_code ec;
+        if (!std::filesystem::exists(path, ec)) return false;
         std::ifstream file(path);
         if (!file.is_open()) return false;
 
@@ -189,14 +190,13 @@ namespace eclipse::gui {
     }
 
     void ThemeManager::saveTheme(const std::filesystem::path& path) const {
-        std::ofstream file(path);
-        if (!file.is_open()) return;
-
         nlohmann::json json;
-        applyValues(json);
+        this->applyValues(json);
 
-        file << json.dump(4);
-        file.close();
+        auto res = geode::utils::file::writeString(path, json.dump(4));
+        if (res.isErr()) {
+            geode::log::error("Failed to save theme file: {}", res.unwrapErr());
+        }
     }
 
     void ThemeManager::saveTheme() const {
@@ -279,7 +279,8 @@ namespace eclipse::gui {
     }
 
     std::optional<ThemeMeta> ThemeManager::checkTheme(const std::filesystem::path& path) {
-        if (!std::filesystem::exists(path)) return std::nullopt;
+        std::error_code ec;
+        if (!std::filesystem::exists(path, ec)) return std::nullopt;
         std::ifstream file(path);
         if (!file.is_open()) return std::nullopt;
 
@@ -296,11 +297,19 @@ namespace eclipse::gui {
     std::vector<ThemeMeta> ThemeManager::listAvailableThemes() {
         std::vector<ThemeMeta> themes;
         auto globThemes = [&](std::filesystem::path const& path) {
-            std::filesystem::create_directories(path);
-            for (auto& entry : std::filesystem::directory_iterator(path)) {
+            std::error_code ec;
+            std::filesystem::create_directories(path, ec);
+            if (ec) {
+                geode::log::warn("Failed to create themes directory {}: {}", path, ec.message());
+                return;
+            }
+            for (auto& entry : std::filesystem::directory_iterator(path, ec)) {
                 if (entry.path().extension() != ".json") continue;
                 if (auto theme = checkTheme(entry.path()))
                     themes.push_back(*theme);
+            }
+            if (ec) {
+                geode::log::warn("Failed to list themes in {}: {}", path, ec.message());
             }
         };
 

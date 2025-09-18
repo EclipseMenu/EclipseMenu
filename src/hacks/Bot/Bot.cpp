@@ -52,15 +52,23 @@ namespace eclipse::hacks::Bot {
     void saveReplay() {
         std::filesystem::path replayDirectory = Mod::get()->getSaveDir() / "replays";
 
-        if (!std::filesystem::exists(replayDirectory))
-            std::filesystem::create_directory(replayDirectory);
+        std::error_code ec;
+        if (!std::filesystem::exists(replayDirectory, ec)) {
+            std::filesystem::create_directory(replayDirectory, ec);
+            if (ec) {
+                return Popup::create(
+                    i18n::get_("common.error"),
+                    ec.message()
+                );
+            }
+        }
 
-        std::filesystem::path replayPath = config::get<std::filesystem::path>("bot.selectedreplay", "temp");
+        auto replayPath = config::get<std::filesystem::path>("bot.selectedreplay", "temp");
 
-        if (std::filesystem::exists(replayPath)) {
+        if (std::filesystem::exists(replayPath, ec)) {
             return Popup::create(
                 i18n::get_("common.warning"),
-                i18n::format("bot.overwrite", replayPath.filename().stem().string()),
+                i18n::format("bot.overwrite", string::pathToString(replayPath.filename().stem())),
                 i18n::get_("common.yes"),
                 i18n::get_("common.no"),
                 [&](bool result) {
@@ -70,16 +78,15 @@ namespace eclipse::hacks::Bot {
                     auto confirmReplayDirectory = config::get<std::filesystem::path>("bot.selectedreplay", "temp");
 
                     auto res = s_bot.save(confirmReplayDirectory);
-
                     if(res.isErr()) {
-                        Popup::create(i18n::get_("common.error"), res.unwrapErr());
+                        Popup::create(i18n::get_("common.error"), std::move(res).unwrapErr());
                         return;
                     }
 
                     Popup::create(
                         i18n::get_("bot.saved"),
                         i18n::format(
-                            "bot.saved.msg", confirmReplayDirectory.filename().stem().string(), s_bot.getInputCount()
+                            "bot.saved.msg", confirmReplayDirectory.filename().stem(), s_bot.getInputCount()
                         )
                     );
 
@@ -95,7 +102,7 @@ namespace eclipse::hacks::Bot {
         }
         Popup::create(
             i18n::get_("bot.saved"),
-            i18n::format("bot.saved.msg", replayPath.filename().stem().string(), s_bot.getInputCount())
+            i18n::format("bot.saved.msg", replayPath.filename().stem(), s_bot.getInputCount())
         );
         config::set("bot.selectedreplay", replayPath);
     }
@@ -139,13 +146,14 @@ namespace eclipse::hacks::Bot {
 
     void deleteReplay() {
         std::filesystem::path replayPath = config::get<std::string>("bot.selectedreplay", "");
-        if (!std::filesystem::exists(replayPath)) {
+        std::error_code ec;
+        if (!std::filesystem::exists(replayPath, ec)) {
             return Popup::create(
                 i18n::get_("bot.delete-invalid"),
                 i18n::get_("bot.delete-invalid.msg")
             );
         }
-        std::string replayName = replayPath.filename().stem().string();
+        auto replayName = string::pathToString(replayPath.filename().stem());
         Popup::create(
             i18n::get_("common.warning"),
             i18n::format("bot.confirm-delete", replayName),
@@ -153,12 +161,19 @@ namespace eclipse::hacks::Bot {
             i18n::get_("common.no"),
             [replayPath, replayName](bool result) {
                 if (!result) return;
-                if (std::filesystem::exists(replayPath)) {
+                std::error_code ec;
+                if (std::filesystem::exists(replayPath, ec)) {
                     Popup::create(
                         i18n::get_("bot.deleted"),
                         i18n::format("bot.deleted.msg", replayName)
                     );
-                    std::filesystem::remove(replayPath);
+                    std::filesystem::remove(replayPath, ec);
+                    if (ec) {
+                        return Popup::create(
+                            i18n::get_("common.error"),
+                            ec.message()
+                        );
+                    }
                     // apparently i cannot put the Popup below here otherwise some memory corruption happens, WHY? its not even a pointer!!
                     config::set("bot.selectedreplay", "");
 
@@ -225,10 +240,10 @@ namespace eclipse::hacks::Bot {
 
             tab->addToggle("bot.ignore-inputs")->handleKeybinds()->setDescription();
 
-            tab->addButton("common.new")->callback(newReplay);
-            tab->addButton("common.save")->callback(saveReplay);
-            tab->addButton("common.load")->callback(loadReplay);
-            tab->addButton("common.delete")->callback(deleteReplay);
+            tab->addButton("common.new")->handleKeybinds()->callback(newReplay);
+            tab->addButton("common.save")->handleKeybinds()->callback(saveReplay);
+            tab->addButton("common.load")->handleKeybinds()->callback(loadReplay);
+            tab->addButton("common.delete")->handleKeybinds()->callback(deleteReplay);
         }
 
         [[nodiscard]] bool isCheating() const override {

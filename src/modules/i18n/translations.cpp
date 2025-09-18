@@ -26,13 +26,14 @@ namespace eclipse::i18n {
         return std::string(get(key));
     }
 
-    std::string_view stringExtension(std::string_view filename) {
+    static std::string stringExtension(std::filesystem::path const& filename) {
         // turns "en_US.lang.json" into "en_US"
-        auto pos = filename.find_first_of('.');
-        return filename.substr(0, pos);
+        auto filenameStr = geode::utils::string::pathToString(filename);
+        auto pos = filenameStr.find_first_of('.');
+        return filenameStr.substr(0, pos);
     }
 
-    void updateLanguageCode(nlohmann::json& json, std::string const& filename) {
+    static void updateLanguageCode(nlohmann::json& json, std::filesystem::path const& filename) {
         json["language-code"] = stringExtension(filename);
     }
 
@@ -76,7 +77,7 @@ namespace eclipse::i18n {
         if (json.is_discarded()) return;
 
         g_fallback = json;
-        updateLanguageCode(g_fallback, it->path.filename().string());
+        updateLanguageCode(g_fallback, it->path.filename());
     }
 
     bool setLanguage(std::string_view code) {
@@ -94,7 +95,7 @@ namespace eclipse::i18n {
         if (json.is_discarded()) return false;
 
         g_translations = json;
-        updateLanguageCode(g_translations, it->path.filename().string());
+        updateLanguageCode(g_translations, it->path.filename());
         config::setTemp<uint64_t>("language.index", std::distance(langs.begin(), it));
 
         // check if current fallback is the same as the new language
@@ -144,7 +145,7 @@ namespace eclipse::i18n {
 
         return LanguageMetadata{
             json["language-name"].get<std::string>(),
-            std::string(stringExtension(path.filename().string())),
+            std::string(stringExtension(path.filename())),
             fallback,
             charset,
             path
@@ -157,9 +158,14 @@ namespace eclipse::i18n {
 
         std::vector<LanguageMetadata> result;
         auto globLangs = [&](std::filesystem::path const& path) {
-            std::filesystem::create_directories(path);
-            for (auto& entry : std::filesystem::directory_iterator(path)) {
-                auto filename = entry.path().filename().string();
+            std::error_code ec;
+            std::filesystem::create_directories(path, ec);
+            if (ec) {
+                geode::log::warn("Failed to create languages directory {}: {}", path, ec.message());
+                return;
+            }
+            for (auto& entry : std::filesystem::directory_iterator(path, ec)) {
+                auto filename = geode::utils::string::pathToString(entry.path().filename());
                 if (filename.size() < 10 || filename.substr(filename.size() - 10) != ".lang.json") continue;
 
                 auto code = filename.substr(0, filename.size() - 10);
@@ -173,6 +179,9 @@ namespace eclipse::i18n {
 
                 result.push_back(std::move(*name));
             }
+            if (ec) {
+                geode::log::warn("Failed to list languages in {}: {}", path, ec.message());
+            }
         };
 
         globLangs(langsPath);
@@ -185,10 +194,11 @@ namespace eclipse::i18n {
         if (font == "default") return true;
 
         static auto fontsPath = geode::Mod::get()->getConfigDir() / "bmfonts" / GEODE_MOD_ID;
-        if (!std::filesystem::exists(fontsPath))
+        std::error_code ec;
+        if (!std::filesystem::exists(fontsPath, ec))
             return false;
 
-        if (!std::filesystem::exists(fontsPath / fmt::format("font_{}.fnt", font)))
+        if (!std::filesystem::exists(fontsPath / fmt::format("font_{}.fnt", font), ec))
             return false;
 
         return true;
@@ -211,17 +221,20 @@ namespace eclipse::i18n {
                     return;
                 }
 
-                std::filesystem::create_directories(langsPath);
-
-                auto path = langsPath / fmt::format("{}.lang.json", code);
-                std::ofstream file(path);
-                if (!file) {
-                    geode::log::warn("Failed to save language file: {}", path.string());
+                std::error_code ec;
+                std::filesystem::create_directories(langsPath, ec);
+                if (ec) {
+                    geode::log::warn("Failed to create languages directory: {}", ec.message());
                     return;
                 }
 
-                file << content;
-                file.close();
+                auto path = langsPath / fmt::format("{}.lang.json", code);
+                auto res = file::writeString(path, content);
+                if (!res) {
+                    geode::log::warn("Failed to save language file: {}", path);
+                    return;
+                }
+
                 geode::log::debug("Downloaded language file: {}", code);
             });
     }

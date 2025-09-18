@@ -164,11 +164,12 @@ namespace eclipse::hacks::Shortcuts {
             m_listener.bind([](FileEvent::Event* event) {
                 if (auto value = event->getValue()) {
                     auto path = value->unwrapOr("");
-                    if (path.empty() || !std::filesystem::exists(path))
+                    std::error_code ec;
+                    if (path.empty() || !std::filesystem::exists(path, ec))
                         return;
 
                     geode::log::warn("Injecting DLL: {}", path);
-                    HMODULE module = LoadLibraryA(path.string().c_str());
+                    HMODULE module = LoadLibraryW(path.native().c_str());
                     if (!module) return geode::log::error("Failed to inject DLL: {}", path);
 
                     // Call DLLMain with DLL_PROCESS_ATTACH
