@@ -113,7 +113,7 @@ namespace eclipse::config {
     /// @param path Path to save the config file
     void saveFile(const std::filesystem::path& path) {
         auto data = getStorage().dump(4, ' ', false, nlohmann::detail::error_handler_t::ignore);
-        auto res = geode::utils::file::writeStringSafe(path, data));
+        auto res = geode::utils::file::writeStringSafe(path, data);
         if (res.isErr()) {
             geode::log::error("Failed to save config file: {}", res.unwrapErr());
         }
