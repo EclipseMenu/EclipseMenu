@@ -746,10 +746,38 @@ namespace eclipse::labels {
             return true;
         }
 
+        bool shouldSave() {
+            bool safeMode = config::get<bool>("global.safemode", false);
+            bool autoSafeMode = config::get<bool>("global.autosafemode", false);
+            bool freezeBestRun = config::get<bool>("global.safemode.freeze_best_run", false);
+            auto trippedLastAttempt = config::getTemp<bool>("trippedSafeMode");
+            auto hasCheats = config::getTemp<bool>("hasCheats");
+
+            if((autoSafeMode && freezeBestRun && ((hasCheats.isOk() && hasCheats.unwrap()) || (trippedLastAttempt.isOk() && trippedLastAttempt.unwrap())))
+                || (safeMode && freezeBestRun)) return false;
+
+            if(config::get<bool>("player.noclip", false) && !m_levelEndAnimationStarted && !m_hasCompletedLevel) {
+                if (config::get<bool>("player.noclip.acclimit.toggle", false)) {
+                    float acc = config::getTemp<float>("noclipAccuracy", 100.f);
+                    float limit = config::get<float>("player.noclip.acclimit", 95.f);
+                    if (acc >= limit)
+                        return false;
+                }
+                if (config::get<bool>("player.noclip.deathlimit.toggle", false)) {
+                    int deaths = config::getTemp<int>("noclipDeaths", 0);
+                    int limit = config::get<int>("player.noclip.deathlimit", 2);
+                    if (deaths < limit)
+                        return false;
+                }
+            }
+            
+            return true;
+        }
+
         void saveBestRun() {
             auto fields = m_fields.self();
             fields->m_bestRun = utils::getActualProgress(this);
-            if ((fields->m_bestRun - fields->m_runFrom) >= (fields->m_lastBestRun - fields->m_lastRunFrom)) {
+            if (shouldSave() && (fields->m_bestRun - fields->m_runFrom) >= (fields->m_lastBestRun - fields->m_lastRunFrom)) {
                 fields->m_lastBestRun = fields->m_bestRun;
                 fields->m_lastRunFrom = fields->m_runFrom;
                 auto& manager = VariableManager::get();

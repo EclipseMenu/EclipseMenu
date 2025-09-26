@@ -111,11 +111,13 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.safemode", false);
             config::setIfEmpty("global.safemode.freeze_attempts", true);
             config::setIfEmpty("global.safemode.freeze_jumps", true);
+            config::setIfEmpty("global.safemode.freeze_best_run", false);
 
             tab->addToggle("global.safemode")->handleKeybinds()->setDescription()
                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
                    options->addToggle("global.safemode.freeze_attempts");
                    options->addToggle("global.safemode.freeze_jumps");
+                   options->addToggle("global.safemode.freeze_best_run");
                });
         }
 
