@@ -20,9 +20,11 @@ namespace eclipse::hacks::Shortcuts {
         }
 
         static void openGraphicSettings() {
+            #ifndef GEODE_IS_MACOS
             if (auto* options = VideoOptionsLayer::create()) {
                 options->show();
             }
+            #endif
         }
 
         // recreation since im not sure if i can even use fmt::format in bindings
@@ -358,7 +360,9 @@ namespace eclipse::hacks::Shortcuts {
             tab->addButton("shortcuts.reset-sfx-volume")->setDescription()->callback(resetSFXVolume)->handleKeybinds();
             tab->addButton("shortcuts.recount-secret-coins")->setDescription()->callback(recountSecretCoins)->handleKeybinds();
             tab->addButton("shortcuts.show-level-password")->setDescription()->callback(showLevelPassword)->handleKeybinds();
+            #ifndef GEODE_IS_MACOS
             tab->addButton("shortcuts.show-graphic-settings")->setDescription()->callback(openGraphicSettings)->handleKeybinds();
+            #endif
 
             auto manager = keybinds::Manager::get();
             manager->addListener("shortcut.p1jump", [](bool down) {
