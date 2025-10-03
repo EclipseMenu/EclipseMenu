@@ -19,6 +19,12 @@ namespace eclipse::hacks::Shortcuts {
             }
         }
 
+        static void openGraphicSettings() {
+            if (auto* options = VideoOptionsLayer::create()) {
+                options->show();
+            }
+        }
+
         // recreation since im not sure if i can even use fmt::format in bindings
         static std::string getLevelKey(int levelID, bool isOnline, bool isDaily, bool isGauntlet, bool isEvent) {
             /*
@@ -352,6 +358,7 @@ namespace eclipse::hacks::Shortcuts {
             tab->addButton("shortcuts.reset-sfx-volume")->setDescription()->callback(resetSFXVolume)->handleKeybinds();
             tab->addButton("shortcuts.recount-secret-coins")->setDescription()->callback(recountSecretCoins)->handleKeybinds();
             tab->addButton("shortcuts.show-level-password")->setDescription()->callback(showLevelPassword)->handleKeybinds();
+            tab->addButton("shortcuts.show-graphic-settings")->setDescription()->callback(openGraphicSettings)->handleKeybinds();
 
             auto manager = keybinds::Manager::get();
             manager->addListener("shortcut.p1jump", [](bool down) {
