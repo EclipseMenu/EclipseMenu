@@ -224,7 +224,9 @@ namespace eclipse::hacks::Bot {
 
                 if (state == 0) {
                     restorePreBotSettings();
+                    return;
                 }
+                Bot::applySettings();
             };
 
             config::set("bot.state", 0);
