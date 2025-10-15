@@ -20,7 +20,7 @@ namespace eclipse::hacks::Level {
     class $modify(NoEndShakePLHook, PlayLayer) {
         ADD_HOOKS_DELEGATE("level.noendshake")
 
-        void showCompleteEffect() override {
+        void showCompleteEffect() {
           float orig = this->m_gameState.m_cameraShakeFactor;
           this->m_gameState.m_cameraShakeFactor = 0.0f;
           PlayLayer::showCompleteEffect();
