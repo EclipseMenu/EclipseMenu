@@ -20,11 +20,20 @@ namespace eclipse::hacks::Level {
     class $modify(NoEndShakePLHook, PlayLayer) {
         ADD_HOOKS_DELEGATE("level.noendshake")
 
+
         void showCompleteEffect() {
-          float orig = this->m_gameState.m_cameraShakeFactor;
-          this->m_gameState.m_cameraShakeFactor = 0.0f;
+          // TODO: change member var names if the names get changed in bindings
+          auto unkUint64_1 = m_gameState.m_unkUint64_1;
+          auto cameraShakeFactor = m_gameState.m_cameraShakeFactor;
+          auto unkPoint34 = m_gameState.m_unkPoint34;
+          auto unkUint16 = m_gameState.m_unkUint16;
+          auto unkUint15 = m_gameState.m_unkUint15;
           PlayLayer::showCompleteEffect();
-          this->m_gameState.m_cameraShakeFactor = orig;
+          m_gameState.m_unkUint64_1 = unkUint64_1;
+          m_gameState.m_cameraShakeFactor = cameraShakeFactor;
+          m_gameState.m_unkPoint34 = unkPoint34;
+          m_gameState.m_unkUint16 = unkUint16;
+          m_gameState.m_unkUint15 = unkUint15;
         }
     };
 }
