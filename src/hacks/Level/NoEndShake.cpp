@@ -20,9 +20,7 @@ namespace eclipse::hacks::Level {
     class $modify(NoEndShakePLHook, PlayLayer) {
         ADD_HOOKS_DELEGATE("level.noendshake")
 
-
         void showCompleteEffect() {
-          // TODO: change member var names if the names get changed in bindings
           auto unkUint64_1 = m_gameState.m_unkUint64_1;
           auto cameraShakeFactor = m_gameState.m_cameraShakeFactor;
           auto unkPoint34 = m_gameState.m_unkPoint34;
