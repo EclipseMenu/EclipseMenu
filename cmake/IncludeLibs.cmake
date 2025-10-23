@@ -14,11 +14,12 @@ target_sources(imgui INTERFACE
     ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
 )
 set(HAS_IMGUI ON)
+set(IMGUI_HOOK_EARLY OFF)
 
 if (NOT ANDROID AND NOT IOS)
     CPMAddPackage("gh:EclipseMenu/discord-presence#59a3ba7")
 endif()
-CPMAddPackage("gh:matcool/gd-imgui-cocos#47ff1d6")
+CPMAddPackage("gh:matcool/gd-imgui-cocos#b748f07")
 CPMAddPackage("gh:maxnut/GDR-converter#55c5321")
 set(RIFT_INCLUDE_MATJSON ON)
 CPMAddPackage("gh:EclipseMenu/rift#0c452b1")
