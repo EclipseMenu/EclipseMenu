@@ -31,14 +31,28 @@ namespace eclipse::hacks::Bot {
                 if (!result)
                     return;
 
-                auto res = s_bot.save(Mod::get()->getSaveDir() / "replays" / (name + ".gdr2"));
+                auto replaysDir = Mod::get()->getSaveDir() / "replays";
+                auto replayPath = replaysDir / (name + ".gdr2");
+
+                std::error_code ec;
+                if (!std::filesystem::exists(replaysDir, ec)) {
+                    std::filesystem::create_directory(replaysDir, ec);
+                    if (ec) {
+                        return Popup::create(
+                            i18n::get_("common.error"),
+                            ec.message()
+                        );
+                    }
+                }
+
+                auto res = s_bot.save(replayPath);
 
                 if(res.isErr()) {
                     Popup::create(i18n::get_("common.error"), res.unwrapErr());
                     return;
                 }
 
-                config::set("bot.selectedreplay", Mod::get()->getSaveDir() / "replays" / (name + ".gdr2"));
+                config::set("bot.selectedreplay", replayPath);
 
                 // refresh cocos ui page
                 if (auto cocos = gui::cocos::CocosRenderer::get())
