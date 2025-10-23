@@ -19,22 +19,28 @@ namespace eclipse::hacks::Player {
     REGISTER_HACK(Shipcopter)
 
     class $modify(SCPlayerObjectHook, PlayerObject) {
+        ADD_HOOKS_DELEGATE("player.shipcopter")
+
         bool pushButton(PlayerButton p0) {
-            if (!this->m_gameLayer) return PlayerObject::pushButton(p0);
-            if (PlayerObject::pushButton(p0) && m_isSwing) {
-                this->flipGravity(this->m_isUpsideDown, true);
-                return true;
+            if (!m_gameLayer) return PlayerObject::pushButton(p0);
+
+            bool ret = PlayerObject::pushButton(p0);
+            if (ret && m_isSwing) {
+                this->flipGravity(m_isUpsideDown, true);
             }
-            return false;
+
+            return ret;
         }
 
         bool releaseButton(PlayerButton p0) {
-            if (!this->m_gameLayer) return PlayerObject::releaseButton(p0);
-            if (PlayerObject::releaseButton(p0) && m_isSwing) {
-                this->flipGravity(!this->m_isUpsideDown, true);
-                return true;
+            if (!m_gameLayer) return PlayerObject::releaseButton(p0);
+
+            bool ret = PlayerObject::releaseButton(p0);
+            if (ret && m_isSwing) {
+                this->flipGravity(!m_isUpsideDown, true);
             }
-            return false;
+
+            return ret;
         }
     };
 }
