@@ -98,4 +98,4 @@ include(${CMAKE_SOURCE_DIR}/cmake/Translations.cmake)
 target_link_libraries(${PROJECT_NAME} third_party)
 
 # Setup Geode
-setup_geode_mod(${PROJECT_NAME})
+setup_geode_mod(${PROJECT_NAME} EXTERNALS eclipse.ffmpeg-api:1.2.0 dankmeme.globed2:1.8.6)
