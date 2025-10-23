@@ -16,7 +16,7 @@ target_sources(imgui INTERFACE
 set(HAS_IMGUI ON)
 
 if (NOT ANDROID AND NOT IOS)
-    CPMAddPackage("gh:EclipseMenu/discord-presence#a4646fb")
+    CPMAddPackage("gh:EclipseMenu/discord-presence#59a3ba7")
 endif()
 CPMAddPackage("gh:matcool/gd-imgui-cocos#47ff1d6")
 CPMAddPackage("gh:maxnut/GDR-converter#55c5321")
