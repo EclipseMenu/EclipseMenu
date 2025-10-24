@@ -76,6 +76,18 @@
 			"name": "Menu Keybind",
 			"description": "The keybind to open the Eclipse menu.",
 			"platforms": ["win", "mac"]
+		},
+		"menu-style": {
+			"name": "Menu Style",
+			"description": "Choose the style of the Eclipse menu.",
+			"type": "string",
+			"one-of": ["ImGui", "Cocos"],
+			"default": {
+				"win": "ImGui",
+				"mac": "ImGui",
+				"android": "Cocos",
+				"ios": "Cocos"
+			}
 		}
 	}
 }

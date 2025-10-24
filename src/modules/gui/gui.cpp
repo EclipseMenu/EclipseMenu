@@ -1,7 +1,9 @@
 #include "gui.hpp"
 
 #include <algorithm>
+#include <modules/config/config.hpp>
 
+#include "blur/blur.hpp"
 #include "cocos/cocos.hpp"
 #include "imgui/imgui.hpp"
 #include "theming/manager.hpp"
@@ -226,25 +228,32 @@ namespace eclipse::gui {
     std::shared_ptr<MenuTab> MenuTab::find(std::string_view name) { return Engine::get()->findTab(name); }
 
     void Engine::setRenderer(RendererType type) {
-        const auto tm = ThemeManager::get();
+        // technical debt: think about how to better handle renderer switching
+        type = geode::getMod()->getSettingValue<std::string>("menu-style") == "ImGui"
+            ? RendererType::ImGui
+            : RendererType::Cocos2d;
+
+        auto tm = ThemeManager::get();
         if (m_renderer && type == m_renderer->getType()) return;
         if (m_renderer) m_renderer->shutdown();
 
         switch (type) {
             default:
-            #if !defined(GEODE_IS_MOBILE) || defined(ECLIPSE_DEBUG_BUILD)
             case RendererType::ImGui:
                 m_renderer = std::make_shared<imgui::ImGuiRenderer>();
                 break;
-            #endif
-            #if !defined(GEODE_IS_DESKTOP) || defined(ECLIPSE_DEBUG_BUILD)
             case RendererType::Cocos2d:
                 m_renderer = std::make_shared<cocos::CocosRenderer>();
                 break;
-            #endif
         }
 
         m_renderer->init();
+
+        // update blur state
+        blur::toggle(
+            config::getTemp("blurEnabled", false)
+            && type != RendererType::Cocos2d
+        );
     }
 
     RendererType Engine::getRendererType() {

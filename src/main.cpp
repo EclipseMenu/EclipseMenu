@@ -52,18 +52,18 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
     bool init() override {
         if (!MenuLayer::init()) return false;
 
-        #ifdef ECLIPSE_DEBUG_BUILD
-        {
-            auto menu = this->getChildByID("bottom-menu");
-            auto rendererSwitchButton = CCMenuItemSpriteExtra::create(
-                cocos2d::CCSprite::createWithSpriteFrameName("GJ_editModeBtn_001.png"),
-                this, menu_selector(EclipseButtonMLHook::onToggleRenderer)
-            );
-            rendererSwitchButton->setID("render-switch"_spr);
-            menu->addChild(rendererSwitchButton);
-            menu->updateLayout();
-        }
-        #endif
+        // #ifdef ECLIPSE_DEBUG_BUILD
+        // {
+        //     auto menu = this->getChildByID("bottom-menu");
+        //     auto rendererSwitchButton = CCMenuItemSpriteExtra::create(
+        //         cocos2d::CCSprite::createWithSpriteFrameName("GJ_editModeBtn_001.png"),
+        //         this, menu_selector(EclipseButtonMLHook::onToggleRenderer)
+        //     );
+        //     rendererSwitchButton->setID("render-switch"_spr);
+        //     menu->addChild(rendererSwitchButton);
+        //     menu->updateLayout();
+        // }
+        // #endif
 
         if (s_isInitialized) return true;
 
@@ -90,24 +90,20 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         return true;
     }
 
-    void onToggleRenderer(CCObject* sender) {
-        auto type = gui::Engine::getRendererType() == gui::RendererType::ImGui
-                        ? gui::RendererType::Cocos2d
-                        : gui::RendererType::ImGui;
-        gui::ThemeManager::get()->setRenderer(type);
-    }
+    // void onToggleRenderer(CCObject* sender) {
+    //     auto type = gui::Engine::getRendererType() == gui::RendererType::ImGui
+    //                     ? gui::RendererType::Cocos2d
+    //                     : gui::RendererType::ImGui;
+    //     gui::ThemeManager::get()->setRenderer(type);
+    // }
 };
 
 class HackUpdater : public cocos2d::CCObject {
 public:
     static HackUpdater* create() {
         auto ret = new HackUpdater();
-        if (ret) {
-            ret->autorelease();
-            return ret;
-        }
-        CC_SAFE_DELETE(ret);
-        return nullptr;
+        ret->autorelease();
+        return ret;
     }
 
     void update(float dt) override {
@@ -348,4 +344,10 @@ $on_mod(Loaded) {
         schedule_selector(HackUpdater::update),
         HackUpdater::create(), 0.f, false
     );
+
+    geode::listenForSettingChanges<std::string>("menu-style", [](std::string const& style) {
+        gui::Engine::get()->setRenderer(
+            style == "ImGui" ? gui::RendererType::ImGui : gui::RendererType::Cocos2d
+        );
+    });
 }
