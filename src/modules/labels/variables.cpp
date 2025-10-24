@@ -747,23 +747,23 @@ namespace eclipse::labels {
         }
 
         bool shouldSave() {
-            bool safeMode = config::get<bool>("global.safemode", false);
-            bool autoSafeMode = config::get<bool>("global.autosafemode", false);
-            bool freezeBestRun = config::get<bool>("global.safemode.freeze_best_run", false);
-            auto trippedLastAttempt = config::getTemp<bool>("trippedSafeMode");
-            auto hasCheats = config::getTemp<bool>("hasCheats");
+            bool safeMode = config::get<"global.safemode", bool>(false);
+            bool autoSafeMode = config::get<"global.autosafemode", bool>(false);
+            bool freezeBestRun = config::get<"global.safemode.freeze_best_run", bool>(false);
+            auto trippedLastAttempt = config::getTemp<bool>("trippedSafeMode", false);
+            auto hasCheats = config::getTemp<bool>("hasCheats", false);
 
-            if((autoSafeMode && freezeBestRun && ((hasCheats.isOk() && hasCheats.unwrap()) || (trippedLastAttempt.isOk() && trippedLastAttempt.unwrap())))
+            if((autoSafeMode && freezeBestRun && (hasCheats || trippedLastAttempt))
                 || (safeMode && freezeBestRun)) return false;
 
-            if(config::get<bool>("player.noclip", false) && !m_levelEndAnimationStarted && !m_hasCompletedLevel) {
-                if (config::get<bool>("player.noclip.acclimit.toggle", false)) {
+            if(config::get<"player.noclip", bool>(false) && !m_levelEndAnimationStarted && !m_hasCompletedLevel) {
+                if (config::get<"player.noclip.acclimit.toggle", bool>(false)) {
                     float acc = config::getTemp<float>("noclipAccuracy", 100.f);
-                    float limit = config::get<float>("player.noclip.acclimit", 95.f);
+                    float limit = config::get<"player.noclip.acclimit", float>(95.f);
                     if (acc >= limit)
                         return false;
                 }
-                if (config::get<bool>("player.noclip.deathlimit.toggle", false)) {
+                if (config::get<"player.noclip.deathlimit.toggle", bool>(false)) {
                     int deaths = config::getTemp<int>("noclipDeaths", 0);
                     int limit = config::get<int>("player.noclip.deathlimit", 2);
                     if (deaths < limit)
