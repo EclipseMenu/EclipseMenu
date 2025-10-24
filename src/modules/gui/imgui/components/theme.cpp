@@ -46,7 +46,7 @@ std::pair<std::string, float> truncateString(std::string_view str, float availWi
         return {
             fmt::format("{}...", str.substr(0, labelEnd)),
             labelMaxWidth
-        };    
+        };
     }
 
     return { std::string(str), labelMaxWidth };

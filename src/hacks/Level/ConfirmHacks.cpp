@@ -53,7 +53,7 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(ConfirmFullReset)
     REGISTER_HACK(ConfirmPractice)
 
-    class $modify(ConfirmRestartPauseLayerHook, PauseLayer) {	
+    class $modify(ConfirmRestartPauseLayerHook, PauseLayer) {
         ADD_HOOKS_DELEGATE("level.confirmrestart")
 
 	    struct Fields {

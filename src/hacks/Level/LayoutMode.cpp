@@ -76,5 +76,5 @@ namespace eclipse::hacks::Level {
             }
         }
     };
-    
+
 }

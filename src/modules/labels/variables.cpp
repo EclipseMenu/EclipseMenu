@@ -770,7 +770,7 @@ namespace eclipse::labels {
                         return false;
                 }
             }
-            
+
             return true;
         }
 

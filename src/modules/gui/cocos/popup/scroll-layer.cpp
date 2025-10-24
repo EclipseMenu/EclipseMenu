@@ -130,7 +130,7 @@ namespace eclipse::gui::cocos {
             else {
                 glEnable(GL_SCISSOR_TEST);
             }
-                
+
             if (this->getParent()) {
                 auto const bottomLeft = this->convertToWorldSpace(ccp(0, 0));
                 auto const topRight = this->convertToWorldSpace(this->getContentSize());

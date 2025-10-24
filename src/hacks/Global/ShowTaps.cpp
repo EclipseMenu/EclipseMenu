@@ -22,7 +22,7 @@ namespace eclipse::hacks::Global {
         auto color = config::get<gui::Color>("global.show-taps.color", gui::Color::WHITE).toCCColor3B();
 
         int stroke = config::get<int>("global.show-taps.stroke", 0);
-        
+
         /*if (!fill) { // this definitely is a good idea
             glEnable(GL_LINE_SMOOTH);
             glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);

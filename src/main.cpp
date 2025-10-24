@@ -225,26 +225,26 @@ $on_mod(Loaded) {
         config::setIfEmpty("menu.animationEasingMode", animation::EasingMode::EaseInOut);
         auto animateToggle = tab->addToggle("menu.animateWindows")->setDescription();
         animateToggle->addOptions([](auto opt) {
-                opt->addInputFloat("menu.animationDuration", 0.f, 10.f, "%.3f s");
-                opt->addCombo("menu.animationEasingType", {
-                    i18n::get_("menu.animationEasingType.0"),
-                    i18n::get_("menu.animationEasingType.1"),
-                    i18n::get_("menu.animationEasingType.2"),
-                    i18n::get_("menu.animationEasingType.3"),
-                    i18n::get_("menu.animationEasingType.4"),
-                    i18n::get_("menu.animationEasingType.5"),
-                    i18n::get_("menu.animationEasingType.6"),
-                    i18n::get_("menu.animationEasingType.7"),
-                    i18n::get_("menu.animationEasingType.8"),
-                    i18n::get_("menu.animationEasingType.9"),
-                    i18n::get_("menu.animationEasingType.10"),
-                }, 2);
-                opt->addCombo("menu.animationEasingMode", {
-                    i18n::get_("menu.animationEasingMode.0"),
-                    i18n::get_("menu.animationEasingMode.1"),
-                    i18n::get_("menu.animationEasingMode.2"),
-                }, 2);
-            });
+            opt->addInputFloat("menu.animationDuration", 0.f, 10.f, "%.3f s");
+            opt->addCombo("menu.animationEasingType", {
+                i18n::get_("menu.animationEasingType.0"),
+                i18n::get_("menu.animationEasingType.1"),
+                i18n::get_("menu.animationEasingType.2"),
+                i18n::get_("menu.animationEasingType.3"),
+                i18n::get_("menu.animationEasingType.4"),
+                i18n::get_("menu.animationEasingType.5"),
+                i18n::get_("menu.animationEasingType.6"),
+                i18n::get_("menu.animationEasingType.7"),
+                i18n::get_("menu.animationEasingType.8"),
+                i18n::get_("menu.animationEasingType.9"),
+                i18n::get_("menu.animationEasingType.10"),
+            }, 2);
+            opt->addCombo("menu.animationEasingMode", {
+                i18n::get_("menu.animationEasingMode.0"),
+                i18n::get_("menu.animationEasingMode.1"),
+                i18n::get_("menu.animationEasingMode.2"),
+            }, 2);
+        });
         animateToggle->setFlags(ComponentFlags::OnlyTabbed);
 
     #ifdef ECLIPSE_USE_FLOATING_BUTTON
@@ -321,15 +321,15 @@ $on_mod(Loaded) {
                         for (auto& component : tab->getComponents())
                             component->removeFlag(ComponentFlags::SearchedFor);
                     }
-                    
+
                     hasSearched = false;
                 }
             } else {
                 hasSearched = true;
-                
+
                 for (auto& tab : Engine::get()->getTabs()) {
                     bool hasFoundComponent = false;
-                    
+
                     for (auto& component : tab->getComponents()) {
                         if (utils::matchesStringFuzzy(i18n::get(component->getTitle()), input)) {
                             component->addFlag(ComponentFlags::SearchedFor);

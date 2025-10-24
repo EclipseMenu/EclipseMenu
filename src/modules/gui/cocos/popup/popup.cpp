@@ -44,7 +44,7 @@ namespace eclipse::gui::cocos {
         m_contentBG->setID("content-bg"_spr);
         m_mainLayer->addChild(m_contentBG);
 
-        // Tab menu BG 
+        // Tab menu BG
         auto bgTab = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
         bgTab->setAnchorPoint({0, 0.5});
         bgTab->setContentSize({115, 260});

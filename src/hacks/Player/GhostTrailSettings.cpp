@@ -32,7 +32,7 @@ namespace eclipse::hacks::Player {
                 if (pl->m_gameState.m_isDualMode) p2->toggleGhostEffect(p2->m_fields->m_curGhostType);
             });
         }
-      
+
         [[nodiscard]] const char* getId() const override { return "Force Ghost Trail"; }
     };
 
@@ -51,7 +51,7 @@ namespace eclipse::hacks::Player {
                 if (pl->m_gameState.m_isDualMode) p2->toggleGhostEffect(p2->m_fields->m_curGhostType);
             });
         }
-      
+
         [[nodiscard]] const char* getId() const override { return "No Ghost Trail"; }
     };
 
