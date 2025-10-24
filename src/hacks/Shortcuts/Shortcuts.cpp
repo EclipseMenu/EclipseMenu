@@ -5,6 +5,8 @@
 #include <modules/hack/hack.hpp>
 #include <modules/i18n/translations.hpp>
 
+struct ToggleDevToolsEvent : geode::Event { ToggleDevToolsEvent() {} };
+
 namespace eclipse::hacks::Shortcuts {
     class $hack(Shortcuts) {
         using FileEvent = geode::Task<geode::Result<std::filesystem::path>>;
@@ -219,13 +221,15 @@ namespace eclipse::hacks::Shortcuts {
             FMODAudioEngine::sharedEngine()->setEffectsVolume(1.F);
         }
 
-    #ifdef GEODE_IS_MOBILE
         static void openDevtools() {
+            // OLD:
             // simple hack that will call onMoreGames, which should open devtools
             // calling it on CCScene just to make sure hook will not actually crash on nullptr in case someone else hooked it
-            reinterpret_cast<MenuLayer*>(utils::get<cocos2d::CCScene>())->onMoreGames(nullptr);
+            // reinterpret_cast<MenuLayer*>(utils::get<cocos2d::CCScene>())->onMoreGames(nullptr);
+
+            // DevTools now has an event to open it
+            ToggleDevToolsEvent().post();
         }
-    #endif
 
         static int getSecretCoinsRange(int min, int max) {
             auto glm = utils::get<GameLevelManager>();
@@ -377,7 +381,7 @@ namespace eclipse::hacks::Shortcuts {
             });
         }
 
-        GEODE_ANDROID(void lateInit() override {
+        void lateInit() override {
             auto devtools = geode::Loader::get()->getLoadedMod("geode.devtools");
             if (devtools) {
                 gui::MenuTab::find("tab.shortcuts")
@@ -386,7 +390,7 @@ namespace eclipse::hacks::Shortcuts {
                     ->callback(openDevtools)
                     ->handleKeybinds();
             }
-        })
+        }
 
         [[nodiscard]] const char* getId() const override { return "Shortcuts"; }
     };
