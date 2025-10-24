@@ -1,5 +1,22 @@
 # Eclipse Menu
 
+## v1.5.0
+**Additions**:
+* Added <cg>Freeze Best Run</c> for <co>Safe Mode</c>
+* Added <cg>Show Graphics Settings</c> shortcut
+* Added <cg>Shipcopter</c> (#248 by @Beat)
+* Added <cg>No End Shake</c> (#247 by @slideglide)
+* Added toggle to switch between <cg>ImGui</c> and <cg>Cocos</c> UI modes in mod settings
+* Made <cg>Open DevTools</c> shortcut available on all platforms
+
+**Fixes**:
+* <cg>Fixed</c> <co>Checkpoint Delay</c> not being applied when starting recording mid-attempt
+* <cg>Fixed</c> <co>Bot</c> reporting an error when creating a macro with missing directory
+* <cg>Fixed</c> <co>Discord RPC</c> not connecting for some users
+* <cg>Improved</c> support for <cl>DevTools</c> mouse cursor
+* <cr>Removed</c> <co>Comment History Bypass</c> due to server-side patch
+* Small performance improvements in <co>Show Hitboxes</c>
+
 ## v1.4.0
 **Additions**:
 * Added <cg>Physics Bypass</c> for <cy>JIT-less</c> iOS
