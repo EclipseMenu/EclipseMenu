@@ -100,7 +100,7 @@ namespace eclipse::utils {
             m_isCollidingWithSlope = player->m_isCollidingWithSlope;
             m_isBallRotating = player->m_isBallRotating;
             m_unk669 = player->m_unk669;
-            m_currentSlope3 = player->m_currentSlope3;
+            m_currentPotentialSlope = player->m_currentPotentialSlope;
             m_currentSlope = player->m_currentSlope;
             unk_584 = player->unk_584;
             m_collidingWithSlopeId = player->m_collidingWithSlopeId;
@@ -304,13 +304,13 @@ namespace eclipse::utils {
 
             #ifndef GEODE_IS_ANDROID
 
-            m_rotateObjectsRelated = player->m_rotateObjectsRelated;     // unordered_map<int, GJPointDouble>
-            m_maybeRotatedObjectsMap = player->m_maybeRotatedObjectsMap; // unordered_map<int, GameObject*>
-            m_ringRelatedSet = player->m_ringRelatedSet;                 // unordered_set<int>
-            m_touchedRings = player->m_touchedRings;                     // unordered_set<int>
+            m_rotateObjectsRelated = player->m_rotateObjectsRelated; // unordered_map<int, GJPointDouble>
+            m_potentialSlopeMap = player->m_potentialSlopeMap;       // unordered_map<int, GameObject*>
+            m_ringRelatedSet = player->m_ringRelatedSet;             // unordered_set<int>
+            m_touchedRings = player->m_touchedRings;                 // unordered_set<int>
 
-            m_jumpPadRelated = player->m_jumpPadRelated;                 // map<int, bool>
-            m_playerFollowFloats = player->m_playerFollowFloats;         // vector<float>
+            m_jumpPadRelated = player->m_jumpPadRelated;             // map<int, bool>
+            m_playerFollowFloats = player->m_playerFollowFloats;     // vector<float>
 
             m_currentRobotAnimation = player->m_currentRobotAnimation;
 
@@ -359,7 +359,7 @@ namespace eclipse::utils {
             player->m_isCollidingWithSlope = m_isCollidingWithSlope;
             player->m_isBallRotating = m_isBallRotating;
             player->m_unk669 = m_unk669;
-            player->m_currentSlope3 = m_currentSlope3;
+            player->m_currentPotentialSlope = m_currentPotentialSlope;
             player->m_currentSlope = m_currentSlope;
             player->unk_584 = unk_584;
             player->m_collidingWithSlopeId = m_collidingWithSlopeId;
@@ -564,7 +564,7 @@ namespace eclipse::utils {
             #ifndef GEODE_IS_ANDROID
 
             player->m_rotateObjectsRelated = m_rotateObjectsRelated;
-            player->m_maybeRotatedObjectsMap = m_maybeRotatedObjectsMap;
+            player->m_potentialSlopeMap = m_potentialSlopeMap;
             player->m_ringRelatedSet = m_ringRelatedSet;
             player->m_touchedRings = m_touchedRings;
 
@@ -620,7 +620,7 @@ namespace eclipse::utils {
         bool m_isCollidingWithSlope;
         bool m_isBallRotating;
         bool m_unk669;
-        GameObject* m_currentSlope3;
+        GameObject* m_currentPotentialSlope;
         GameObject* m_currentSlope;
         double unk_584;
         int m_collidingWithSlopeId;
@@ -823,7 +823,7 @@ namespace eclipse::utils {
         // (P.S. robtop pls update NDK)
         #ifndef GEODE_IS_ANDROID
         std::unordered_map<int, GJPointDouble> m_rotateObjectsRelated;
-        std::unordered_map<int, GameObject*> m_maybeRotatedObjectsMap;
+        std::unordered_map<int, GameObject*> m_potentialSlopeMap;
         std::unordered_set<int> m_ringRelatedSet;
         std::unordered_set<int> m_touchedRings;
         std::map<int, bool> m_jumpPadRelated;

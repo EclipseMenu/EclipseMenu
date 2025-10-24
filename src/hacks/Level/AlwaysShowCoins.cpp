@@ -17,26 +17,26 @@ namespace eclipse::hacks::Level {
         auto* GM = utils::get<GameManager>();
 
         if (!uncollectedSecretCoin)
-            uncollectedSecretCoin = GM->m_unkAnimationDict->objectForKey(-142)->copy();
+            uncollectedSecretCoin = GM->m_mainFramesForAnimation->objectForKey(-142)->copy();
 
         if (!uncollectedUserCoin)
-            uncollectedUserCoin = GM->m_unkAnimationDict->objectForKey(-1329)->copy();
+            uncollectedUserCoin = GM->m_mainFramesForAnimation->objectForKey(-1329)->copy();
 
         if (state) {
             uncollectedSecretCoin->retain();
             uncollectedUserCoin->retain();
 
-            GM->m_unkAnimationDict->removeObjectForKey(-142);
-            GM->m_unkAnimationDict->removeObjectForKey(-1329);
+            GM->m_mainFramesForAnimation->removeObjectForKey(-142);
+            GM->m_mainFramesForAnimation->removeObjectForKey(-1329);
 
-            GM->m_unkAnimationDict->setObject(GM->m_unkAnimationDict->objectForKey(142)->copy(), -142);
-            GM->m_unkAnimationDict->setObject(GM->m_unkAnimationDict->objectForKey(1329)->copy(), -1329);
+            GM->m_mainFramesForAnimation->setObject(GM->m_mainFramesForAnimation->objectForKey(142)->copy(), -142);
+            GM->m_mainFramesForAnimation->setObject(GM->m_mainFramesForAnimation->objectForKey(1329)->copy(), -1329);
         } else if (uncollectedSecretCoin && uncollectedUserCoin) {
-            GM->m_unkAnimationDict->removeObjectForKey(-142);
-            GM->m_unkAnimationDict->removeObjectForKey(-1329);
+            GM->m_mainFramesForAnimation->removeObjectForKey(-142);
+            GM->m_mainFramesForAnimation->removeObjectForKey(-1329);
 
-            GM->m_unkAnimationDict->setObject(uncollectedSecretCoin, -142);
-            GM->m_unkAnimationDict->setObject(uncollectedUserCoin, -1329);
+            GM->m_mainFramesForAnimation->setObject(uncollectedSecretCoin, -142);
+            GM->m_mainFramesForAnimation->setObject(uncollectedUserCoin, -1329);
         }
     }
 

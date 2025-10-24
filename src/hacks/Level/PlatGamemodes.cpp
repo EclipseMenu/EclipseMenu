@@ -47,9 +47,9 @@ namespace eclipse::hacks::Level {
                 player->m_lastPortalPos = obj->getPosition();
                 player->m_lastActivatedPortal = obj;
                 auto* portalObj = obj;
-                if (m_gameState.m_isDualMode && m_gameState.m_unkGameObjPtr2)
-                    portalObj = m_gameState.m_unkGameObjPtr2;
-                m_gameState.m_unkGameObjPtr1 = portalObj;
+                if (m_gameState.m_isDualMode && m_gameState.m_lastActivatedPortal2)
+                    portalObj = m_gameState.m_lastActivatedPortal2;
+                m_gameState.m_lastActivatedPortal1 = portalObj;
 
                 if (obj->m_objectType == GameObjectType::WavePortal)
                     player->toggleDartMode(true, portalObj->m_hasNoEffects);
