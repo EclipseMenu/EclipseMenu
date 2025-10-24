@@ -18,7 +18,7 @@ namespace eclipse::hacks::Level {
     static GameObject* s_collisionObject = nullptr;
     static std::deque<std::pair<cocos2d::CCRect, cocos2d::CCRect>> s_playerTrail1, s_playerTrail2;
 
-    static void forEachObject(GJBaseGameLayer const* game, std::function<void(GameObject*)> const& callback) {
+    static void forEachObject(GJBaseGameLayer const* game, auto&& callback) {
         int count = game->m_sections.empty() ? -1 : game->m_sections.size();
         for (int i = game->m_leftSectionIndex; i <= game->m_rightSectionIndex && i < count; ++i) {
             auto leftSection = game->m_sections[i];
