@@ -21,12 +21,20 @@ namespace eclipse::hacks::Player {
     class $modify(SCPlayerObjectHook, PlayerObject) {
         ADD_HOOKS_DELEGATE("player.shipcopter")
 
+        struct Fields {
+            bool m_doReleaseFlip = true;
+        };
+
         bool pushButton(PlayerButton p0) {
             if (!m_gameLayer) return PlayerObject::pushButton(p0);
 
             bool ret = PlayerObject::pushButton(p0);
             if (ret && m_isSwing) {
-                this->flipGravity(m_isUpsideDown, true);
+                if (m_touchedRing && !m_isDashing) {
+                    m_fields->m_doReleaseFlip = false;
+                } else {
+                    this->flipGravity(m_isUpsideDown, true);
+                }
             }
 
             return ret;
@@ -37,7 +45,11 @@ namespace eclipse::hacks::Player {
 
             bool ret = PlayerObject::releaseButton(p0);
             if (ret && m_isSwing) {
-                this->flipGravity(!m_isUpsideDown, true);
+                if (m_fields->m_doReleaseFlip) {
+                    this->flipGravity(!m_isUpsideDown, true);
+                } else {
+                    m_fields->m_doReleaseFlip = true;
+                }
             }
 
             return ret;
