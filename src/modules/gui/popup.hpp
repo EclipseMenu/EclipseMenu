@@ -7,31 +7,31 @@ namespace eclipse {
     class Popup {
     public:
         using PopupCallback = std::function<void(bool)>;
-        using PromptCallback = std::function<void(bool, const std::string&)>;
+        using PromptCallback = std::function<void(bool, std::string const&)>;
 
 
         static void create(
-            const std::string& title, const std::string& message, const std::string& button1,
-            const std::string& button2, const PopupCallback& callback
+            std::string title, std::string message, std::string button1,
+            std::string button2, PopupCallback callback
         );
         static void create(
-            const std::string& title, const std::string& message, const std::string& button1,
-            const PopupCallback& callback
+            std::string title, std::string message, std::string button1,
+            PopupCallback callback
         );
-        static void create(const std::string& title, const std::string& message);
+        static void create(std::string title, std::string message);
 
 
         static void prompt(
-            const std::string& title, const std::string& message, const PromptCallback& callback,
-            const std::string& defaultValue = ""
+            std::string title, std::string message, PromptCallback callback,
+            std::string defaultValue = ""
         );
         static void prompt(
-            const std::string& title, const std::string& message, const PromptCallback& callback,
-            const std::string& button1, const std::string& button2, const std::string& defaultValue = ""
+            std::string title, std::string message, PromptCallback callback,
+            std::string button1, std::string button2, std::string defaultValue = ""
         );
         static void prompt(
-            const std::string& title, const std::string& message, const PromptCallback& callback,
-            const std::string& button1, const std::string& defaultValue = ""
+            std::string title, std::string message, PromptCallback callback,
+            std::string button1, std::string defaultValue = ""
         );
 
         [[nodiscard]] size_t getId() const { return m_id; }

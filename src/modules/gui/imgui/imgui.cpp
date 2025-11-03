@@ -99,7 +99,7 @@ namespace eclipse::gui::imgui {
         return m_font;
     }
 
-    const ImWchar* getDefaultRange() {
+    ImWchar const* getDefaultRange() {
         static constexpr ImWchar ranges[] = {
             0x0020, 0x00FF, // Basic Latin + Latin Supplement
             0x0100, 0x017F, // Latin Extended-A
@@ -108,7 +108,7 @@ namespace eclipse::gui::imgui {
         return &ranges[0];
     }
 
-    const ImWchar* getGlyphRange(i18n::GlyphRange range) {
+    ImWchar const* getGlyphRange(i18n::GlyphRange range) {
         switch (range) {
             case i18n::GlyphRange::Greek: return ImGui::GetIO().Fonts->GetGlyphRangesGreek();
             case i18n::GlyphRange::Korean: return ImGui::GetIO().Fonts->GetGlyphRangesKorean();
@@ -183,7 +183,7 @@ namespace eclipse::gui::imgui {
         m_availableFonts = fetchAvailableFonts();
     }
 
-    const std::vector<FontManager::FontMetadata>& FontManager::getAvailableFonts() {
+    std::vector<FontManager::FontMetadata> const& FontManager::getAvailableFonts() {
         return m_availableFonts;
     }
 
@@ -279,7 +279,7 @@ namespace eclipse::gui::imgui {
         return m_isOpened;
     }
 
-    const std::unique_ptr<Layout>& ImGuiRenderer::getLayout() const {
+    std::unique_ptr<Layout> const& ImGuiRenderer::getLayout() const {
         return m_layout;
     }
 
@@ -317,32 +317,32 @@ namespace eclipse::gui::imgui {
         if (m_theme && theme == m_theme->getTheme()) return;
         switch (theme) {
             case ComponentTheme::ImGui:
-                m_theme = std::make_unique<Theme>();
+                m_theme = &themes::DEFAULT_THEME;
                 break;
             case ComponentTheme::MegaHack:
             default:
-                m_theme = std::make_unique<themes::Megahack>();
+                m_theme = &themes::MEGAHACK_THEME;
                 break;
             case ComponentTheme::MegaOverlay:
-                m_theme = std::make_unique<themes::MegaOverlay>();
+                m_theme = &themes::MEGAOVERLAY_THEME;
                 break;
             case ComponentTheme::Gruvbox:
-                m_theme = std::make_unique<themes::Gruvbox>();
+                m_theme = &themes::GRUVBOX_THEME;
                 break;
             case ComponentTheme::OpenHack:
-                m_theme = std::make_unique<themes::OpenHack>();
+                m_theme = &themes::OPENHACK_THEME;
                 break;
         }
         if (s_initialized) m_theme->init();
     }
 
-    void ImGuiRenderer::visitComponent(const std::shared_ptr<Component>& component) const {
+    void ImGuiRenderer::visitComponent(std::shared_ptr<Component> const& component) const {
         if (!m_theme) return;
         component->onUpdate();
         m_theme->visit(component);
     }
 
-    bool ImGuiRenderer::beginWindow(const std::string& title) const {
+    bool ImGuiRenderer::beginWindow(std::string const& title) const {
         if (!m_theme) {
             geode::log::error("beginWindow called without initialized theme");
             return false;
@@ -359,17 +359,17 @@ namespace eclipse::gui::imgui {
         ImGuiCocos::get().reload();
     }
 
-    void ImGuiRenderer::queueAfterDrawing(const std::function<void()>& func) {
-        m_runAfterDrawingQueue.push_back(func);
+    void ImGuiRenderer::queueAfterDrawing(std::function<void()>&& func) {
+        m_runAfterDrawingQueue.push_back(std::move(func));
     }
 
-    void ImGuiRenderer::showPopup(const Popup& popup) {
-        m_popups.push_back(popup);
+    void ImGuiRenderer::showPopup(Popup&& popup) {
+        m_popups.push_back(std::move(popup));
         refreshDisplayState();
     }
 
     void ImGuiRenderer::drawFinished() {
-        for (const auto& f : m_runAfterDrawingQueue) {
+        for (auto const& f : m_runAfterDrawingQueue) {
             f();
         }
         m_runAfterDrawingQueue.clear();
@@ -476,7 +476,7 @@ namespace eclipse::gui::imgui {
         }
 
         // remove all popups that are done (compare by id)
-        m_popups.erase(std::ranges::remove_if(m_popups, [&](const Popup& p) {
+        m_popups.erase(std::ranges::remove_if(m_popups, [&](Popup const& p) {
             for (auto* r : toRemove) {
                 if (r->getId() == p.getId()) return true;
             }

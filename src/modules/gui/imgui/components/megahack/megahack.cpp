@@ -7,7 +7,7 @@
 
 namespace eclipse::gui::imgui::themes {
     bool Megahack::checkbox(
-        const std::string& label, bool& value, bool isSearchedFor, const std::function<void()>& postDraw
+        std::string const& label, bool& value, bool isSearchedFor, std23::function_ref<void()> postDraw
     ) const {
         auto tm = ThemeManager::get();
         auto textColor = value ? tm->getCheckboxForegroundColor() : tm->getButtonDisabledForeground();
@@ -42,10 +42,10 @@ namespace eclipse::gui::imgui::themes {
     }
 
     bool Megahack::checkboxWithSettings(
-        const std::string& label, bool& value, bool isSearchedFor,
-        const std::function<void()>& callback,
-        const std::function<void()>& postDraw,
-        const std::string& popupId
+        std::string const& label, bool& value, bool isSearchedFor,
+        std23::function_ref<void()> callback,
+        std23::function_ref<void()> postDraw,
+        std::string const& popupId
     ) const {
         auto tm = ThemeManager::get();
         auto textColor = value ? tm->getCheckboxForegroundColor() : tm->getButtonDisabledForeground();
@@ -62,7 +62,7 @@ namespace eclipse::gui::imgui::themes {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
 
         auto availWidth = ImGui::GetContentRegionAvail().x;
-        const auto arrowWidth = availWidth * 0.1f;
+        auto const arrowWidth = availWidth * 0.1f;
         auto buttonSize = ImVec2(availWidth - arrowWidth, 0);
         auto arrowSize = ImVec2(arrowWidth, 0);
 
@@ -104,7 +104,7 @@ namespace eclipse::gui::imgui::themes {
         return toggled;
     }
 
-    bool Megahack::button(const std::string& text, bool isSearchedFor) const {
+    bool Megahack::button(std::string const& text, bool isSearchedFor) const {
         ImGui::PushItemWidth(-1);
 
         auto tm = ThemeManager::get();

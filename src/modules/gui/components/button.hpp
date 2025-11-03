@@ -12,11 +12,11 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        ButtonComponent* callback(const std::function<void()>& func);
+        ButtonComponent* callback(std::function<void()>&& func);
 
-        [[nodiscard]] const std::string& getId() const override;
+        [[nodiscard]] std::string const& getId() const override;
 
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
 
         ButtonComponent* setDescription(std::string description) override;
 

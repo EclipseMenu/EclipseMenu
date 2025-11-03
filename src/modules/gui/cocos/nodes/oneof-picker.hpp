@@ -6,13 +6,13 @@ namespace eclipse::gui::cocos {
     class OneOfPicker : public cocos2d::CCMenu {
     public:
         static OneOfPicker* create(
-            std::span<std::string> options,
-            const std::function<void(int)>& callback,
+            std::vector<std::string>&& options,
+            std::function<void(int)>&& callback,
             size_t index = 0
         );
         static OneOfPicker* create(
-            std::span<const char*> options,
-            const std::function<void(int)>& callback,
+            std::span<char const*> options,
+            std::function<void(int)>&& callback,
             size_t index = 0
         );
 
@@ -21,8 +21,8 @@ namespace eclipse::gui::cocos {
 
     protected:
         bool init(
-            std::span<std::string> options,
-            const std::function<void(int)>& callback,
+            std::vector<std::string>&& options,
+            std::function<void(int)>&& callback,
             size_t index
         );
         void onArrowClick(CCObject* sender);

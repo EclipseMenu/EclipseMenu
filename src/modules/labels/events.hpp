@@ -93,13 +93,13 @@ namespace eclipse::labels {
     public:
         static EventManager& get();
 
-        void queueEvent(const LabelEvent& event, LabelSettings* label);
-        void dequeueEvent(const LabelEvent& event, const LabelSettings* label);
+        void queueEvent(LabelEvent const& event, LabelSettings* label);
+        void dequeueEvent(LabelEvent const& event, LabelSettings const* label);
 
         /// @brief Remove all events for a label. Call this when the label is deleted.
-        void removeEvents(const LabelSettings* label);
+        void removeEvents(LabelSettings const* label);
         /// @brief Remove a specific event.
-        void removeEvent(const LabelEvent* event);
+        void removeEvent(LabelEvent const* event);
 
         Event* getEvent(size_t labelId, size_t eventId);
         void processEvents();

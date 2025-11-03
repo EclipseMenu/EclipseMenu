@@ -8,7 +8,7 @@
 
 namespace eclipse::gui::imgui::themes {
     bool MegaOverlay::checkbox(
-        const std::string& label, bool& value, bool isSearchedFor, const std::function<void()>& postDraw
+        std::string const& label, bool& value, bool isSearchedFor, std23::function_ref<void()> postDraw
     ) const {
         auto tm = ThemeManager::get();
         auto textColor = value ? tm->getCheckboxForegroundColor() : tm->getDisabledColor();
@@ -16,7 +16,7 @@ namespace eclipse::gui::imgui::themes {
 
         using namespace ImGui;
         ImGuiIO& io = ImGui::GetIO();
-        const float cc_sz = 3.0f * io.FontGlobalScale;
+        float const cc_sz = 3.0f * io.FontGlobalScale;
         constexpr float cc_pad = 10.0f;
 
         ImGuiWindow* window = GetCurrentWindow();
@@ -24,11 +24,11 @@ namespace eclipse::gui::imgui::themes {
             return false;
 
         ImGuiContext& g = *GImGui;
-        const ImGuiStyle& style = g.Style;
-        const ImGuiID id = window->GetID(label.c_str());
-        const ImVec2 label_size = CalcTextSize(label.c_str(), nullptr, true);
+        ImGuiStyle const& style = g.Style;
+        ImGuiID const id = window->GetID(label.c_str());
+        ImVec2 const label_size = CalcTextSize(label.c_str(), nullptr, true);
 
-        const ImRect check_bb(
+        ImRect const check_bb(
             window->DC.CursorPos,
             ImVec2(
                 label_size.y + style.FramePadding.y * 2 + window->DC.CursorPos.x,
@@ -40,7 +40,7 @@ namespace eclipse::gui::imgui::themes {
         ImRect total_bb = check_bb;
         if (label_size.x > 0)
             SameLine(0, style.ItemInnerSpacing.x);
-        const ImRect text_bb(
+        ImRect const text_bb(
             ImVec2(window->DC.CursorPos.x, window->DC.CursorPos.y + style.FramePadding.y),
             ImVec2(
                 label_size.x + window->DC.CursorPos.x,

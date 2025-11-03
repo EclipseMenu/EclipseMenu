@@ -12,9 +12,9 @@ namespace eclipse::gui {
 
         void setText(std::string text);
 
-        [[nodiscard]] const std::string& getId() const override;
+        [[nodiscard]] std::string const& getId() const override;
 
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
 
         LabelComponent* setDescription(std::string description) override;
 

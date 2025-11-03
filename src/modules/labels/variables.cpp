@@ -153,21 +153,21 @@ namespace eclipse::labels {
         refetch();
     }
 
-    void VariableManager::setVariable(const std::string& name, const rift::Value& value) {
-        m_variables[name] = value;
+    void VariableManager::setVariable(std::string name, rift::Value&& value) {
+        m_variables[std::move(name)] = std::move(value);
     }
 
-    rift::Value VariableManager::getVariable(const std::string& name) const {
+    rift::Value VariableManager::getVariable(std::string const& name) const {
         auto it = m_variables.find(name);
         if (it == m_variables.end()) return {};
         return it->second;
     }
 
-    bool VariableManager::hasVariable(const std::string& name) const {
+    bool VariableManager::hasVariable(std::string const& name) const {
         return m_variables.contains(name);
     }
 
-    void VariableManager::removeVariable(const std::string& name) {
+    void VariableManager::removeVariable(std::string const& name) {
         m_variables.erase(name);
     }
 
@@ -206,7 +206,7 @@ namespace eclipse::labels {
         }
     }
 
-    const char* getLevelRatingString(GJGameLevel* level) {
+    static std::string_view getLevelRatingString(GJGameLevel* level) {
         if (!level) return "Unknown";
         int featured = level->m_featured;
         int epic = level->m_isEpic;
@@ -226,7 +226,7 @@ namespace eclipse::labels {
         }
     }
 
-    const char* getLevelDifficultyString(LevelDifficulty diff) {
+    static std::string_view getLevelDifficultyString(LevelDifficulty diff) {
         switch (diff) {
             case LevelDifficulty::NA: return "N/A";
             case LevelDifficulty::Auto: return "Auto";
@@ -244,7 +244,7 @@ namespace eclipse::labels {
         }
     }
 
-    const char* getLevelDifficultyKey(LevelDifficulty diff) {
+    static std::string_view getLevelDifficultyKey(LevelDifficulty diff) {
         switch (diff) {
             case LevelDifficulty::NA: return "na";
             case LevelDifficulty::Auto: return "auto";
@@ -299,11 +299,11 @@ namespace eclipse::labels {
 
     constexpr int FIRST_PATH = 30;
     constexpr int LAST_PATH = 39;
-    static const std::array<std::string, 10> PATH_NAMES = {
+    static std::array<std::string, 10> const PATH_NAMES = {
         "fire", "ice", "poison", "shadow", "lava",
         "earth", "blood", "metal", "light", "soul"
     };
-    static const std::array<std::string, 15> STAT_NAMES_1 = {
+    static std::array<std::string, 15> const STAT_NAMES_1 = {
         "totalJumps", "totalAttempts", "completedLevels", "completedOnlineLevels",
         "demons", "stars", "completedMapPacks", "goldCoins", "playersDestroyed",
         "likedLevels", "ratedLevels", "userCoins", "diamonds", "orbs", "dailies",
@@ -445,7 +445,7 @@ namespace eclipse::labels {
         m_variables["framestepper"] = config::get("player.framestepper", false);
     }
 
-    static std::string const& cachedBase64Decode(const std::string& str) {
+    static std::string const& cachedBase64Decode(std::string const& str) {
         static std::string s_lastStr;
         static std::string s_lastDecoded;
         if (str == s_lastStr) return s_lastDecoded;
@@ -511,7 +511,7 @@ namespace eclipse::labels {
                 "difficulty", "difficultyKey", "practicePercent",
                 "bestPercent", "bestTime", "best"
             };
-            for (const auto& key : keys) {
+            for (auto const& key : keys) {
                 removeVariable(key);
             }
             return;
@@ -548,7 +548,7 @@ namespace eclipse::labels {
             constexpr std::array keys = {
                 "playerX", "playerY", "player2X", "player2Y"
             };
-            for (const auto& key : keys) {
+            for (auto const& key : keys) {
                 removeVariable(key);
             }
             if (!isPlayer2) {
@@ -578,7 +578,7 @@ namespace eclipse::labels {
                 "isDead", "isDualMode", "noclipDeaths", "noclipAccuracy", "progress",
                 "editorMode", "realProgress", "objects"
             };
-            for (const auto& key : keys) {
+            for (auto const& key : keys) {
                 removeVariable(key);
             }
 

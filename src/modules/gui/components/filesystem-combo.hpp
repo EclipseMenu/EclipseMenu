@@ -15,13 +15,13 @@ namespace eclipse::gui {
         void onUpdate() override;
 
         /// @brief Set a callback function to be called when the component value changes.
-        FilesystemComboComponent* callback(const std::function<void(int)>& func);
+        FilesystemComboComponent* callback(std::function<void(int)>&& func);
 
         /// @brief Get the combo value.
         [[nodiscard]] std::filesystem::path getValue() const;
 
         /// @brief Get the combo items.
-        [[nodiscard]] const std::vector<std::filesystem::path>& getItems() const;
+        [[nodiscard]] std::vector<std::filesystem::path> const& getItems() const;
 
         /// @brief Set the combo value.
         void setValue(std::filesystem::path path) const;
@@ -29,9 +29,9 @@ namespace eclipse::gui {
         /// @brief Set the combo value.
         void setValue(int index) const;
 
-        [[nodiscard]] const std::string& getId() const override;
+        [[nodiscard]] std::string const& getId() const override;
 
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
 
         [[nodiscard]] std::string* getSearchBuffer();
 

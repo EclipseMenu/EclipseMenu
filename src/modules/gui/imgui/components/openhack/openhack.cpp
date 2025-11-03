@@ -34,14 +34,14 @@ namespace eclipse::gui::imgui::themes {
     }
 
     bool OpenHack::checkbox(
-        const std::string& label, bool& value, bool isSearchedFor, const std::function<void()>& postDraw
+        std::string const& label, bool& value, bool isSearchedFor,std23::function_ref<void()> postDraw
     ) const {
         return ModernCheckbox(label, value, isSearchedFor, false, postDraw);
     }
 
     bool OpenHack::checkboxWithSettings(
-        const std::string& label, bool& value, bool isSearchedFor, const std::function<void()>& callback,
-        const std::function<void()>& postDraw, const std::string& popupId
+        std::string const& label, bool& value, bool isSearchedFor, std23::function_ref<void()> callback,
+        std23::function_ref<void()> postDraw, std::string const& popupId
     ) const {
         auto tm = ThemeManager::get();
 
@@ -75,7 +75,7 @@ namespace eclipse::gui::imgui::themes {
         return result;
     }
 
-    bool OpenHack::button(const std::string& text, bool isSearchedFor) const {
+    bool OpenHack::button(std::string const& text, bool isSearchedFor) const {
         ImGui::PushItemWidth(-1);
 
         auto tm = ThemeManager::get();
@@ -102,7 +102,7 @@ namespace eclipse::gui::imgui::themes {
         return pressed;
     }
 
-    void OpenHack::init() {
+    void OpenHack::init() const {
         auto& style = ImGui::GetStyle();
         style.WindowTitleAlign = ImVec2(0.0f, 0.5f);
         style.WindowMenuButtonPosition = ImGuiDir_Right;
@@ -125,31 +125,31 @@ namespace eclipse::gui::imgui::themes {
         drawList->AddLine(ImVec2(cursorPos.x, cursorPos.y + 24 * scale), ImVec2(cursorPos.x + width, cursorPos.y + 24 * scale), color);
     }
 
-    void OpenHack::visitInputText(const std::shared_ptr<InputTextComponent>& inputText) const {
+    void OpenHack::visitInputText(std::shared_ptr<InputTextComponent> const& inputText) const {
         prepareInput(0.5f);
         Theme::visitInputText(inputText);
         ImGui::PopStyleColor(3);
     }
 
-    void OpenHack::visitInputFloat(const std::shared_ptr<InputFloatComponent>& inputFloat) const {
+    void OpenHack::visitInputFloat(std::shared_ptr<InputFloatComponent> const& inputFloat) const {
         prepareInput(0.35f);
         Theme::visitInputFloat(inputFloat);
         ImGui::PopStyleColor(3);
     }
 
-    void OpenHack::visitInputInt(const std::shared_ptr<InputIntComponent>& inputInt) const {
+    void OpenHack::visitInputInt(std::shared_ptr<InputIntComponent> const& inputInt) const {
         prepareInput(0.35f);
         Theme::visitInputInt(inputInt);
         ImGui::PopStyleColor(3);
     }
 
-    void OpenHack::visitFloatToggle(const std::shared_ptr<FloatToggleComponent>& floatToggle) const {
+    void OpenHack::visitFloatToggle(std::shared_ptr<FloatToggleComponent> const& floatToggle) const {
         prepareInput(0.35f);
         Theme::visitFloatToggle(floatToggle);
         ImGui::PopStyleColor(3);
     }
 
-    void OpenHack::visitIntToggle(const std::shared_ptr<IntToggleComponent>& intToggle) const {
+    void OpenHack::visitIntToggle(std::shared_ptr<IntToggleComponent> const& intToggle) const {
         prepareInput(0.35f);
         Theme::visitIntToggle(intToggle);
         ImGui::PopStyleColor(3);

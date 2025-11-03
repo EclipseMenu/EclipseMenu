@@ -25,7 +25,7 @@ namespace eclipse::gui::animation {
     };
 
     /// @brief Easing names.
-    const std::array<const char*, 11> EASING_NAMES = {
+    constexpr std::array<const char*, 11> EASING_NAMES = {
         "Linear",
         "Sine",
         "Quadratic",
@@ -39,7 +39,7 @@ namespace eclipse::gui::animation {
         "Bounce",
     };
 
-    const size_t EASING_COUNT = EASING_NAMES.size();
+    constexpr size_t EASING_COUNT = EASING_NAMES.size();
 
     /// @brief Easing modes.
     enum class EasingMode {
@@ -49,7 +49,7 @@ namespace eclipse::gui::animation {
     };
 
     /// @brief Easing mode names.
-    const std::array<const char*, 3> EASING_MODE_NAMES = {
+    constexpr std::array<const char*, 3> EASING_MODE_NAMES = {
         "EaseIn",
         "EaseOut",
         "EaseInOut",
@@ -257,7 +257,7 @@ namespace eclipse::gui::animation {
     /// @brief Easing functions pointers.
     /// Rows are `Easing` types and columns are `EasingMode`.
     /// @example EASING_FUNCTIONS[Easing::Sine][EasingMode::EaseOut] == easing::easeOutSine;
-    const EasingFunction EASING_FUNCTIONS[][3] = {
+    constexpr EasingFunction EASING_FUNCTIONS[][3] = {
         {easing::linear,        easing::linear,         easing::linear},
         {easing::easeInSine,    easing::easeOutSine,    easing::easeInOutSine},
         {easing::easeInQuad,    easing::easeOutQuad,    easing::easeInOutQuad},

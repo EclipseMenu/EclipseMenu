@@ -6,9 +6,9 @@
 #include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::cocos {
-    TabMenu* TabMenu::create(Tabs const& tabs, std::function<void(int)> const& callback) {
+    TabMenu* TabMenu::create(Tabs const& tabs, std::function<void(int)>&& callback) {
         auto ret = new TabMenu();
-        if (ret->init(tabs, callback)) {
+        if (ret->init(tabs, std::move(callback))) {
             ret->autorelease();
             return ret;
         }
@@ -16,7 +16,7 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    TabButton* TabButton::create(const std::string& name, const cocos2d::CCSize& size) {
+    TabButton* TabButton::create(std::string_view name, cocos2d::CCSize const& size) {
         auto ret = new TabButton();
         if (ret->init(name, size)) {
             ret->autorelease();
@@ -26,7 +26,15 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    TabMenu::~TabMenu() {}
+    TabMenu::~TabMenu() = default;
+
+    void TabMenu::onPageButton(CCObject* sender) {
+        auto tag = sender->getTag();
+        this->setActiveTab(tag);
+        m_callback(tag);
+        // this is so dumb
+        m_hasActivatedTab = true;
+    }
 
     void TabMenu::setActiveTab(int idx) {
         if (idx < 0 || idx >= m_tabs.size()) return;
@@ -60,10 +68,12 @@ namespace eclipse::gui::cocos {
         this->updateLayout();
     }
 
-    bool TabMenu::init(Tabs const& tabs, std::function<void(int)> const& callback) {
+    bool TabMenu::init(Tabs const& tabs, std::function<void(int)>&& callback) {
         if (!CCMenu::init()) return false;
-        const auto tm = ThemeManager::get();
+        auto const tm = ThemeManager::get();
         this->setID("tab-menu"_spr);
+
+        m_callback = std::move(callback);
 
         auto upSpr = cocos2d::CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
         upSpr->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
@@ -77,24 +87,18 @@ namespace eclipse::gui::cocos {
         int i = 0;
         constexpr float width = 120.f;
         constexpr float height = 28.f;
+
+        m_tabs.reserve(tabs.size());
         for (auto const& tab : tabs) {
             auto tabName = tab->getTitle();
             auto tabSpr = TabButton::create(tabName, {width, height});
-            auto tabButton = geode::cocos::CCMenuItemExt::createSpriteExtra(
-                tabSpr,
-                [this, callback](auto caller) {
-                    auto tag = caller->getTag();
-                    this->setActiveTab(tag);
-                    callback(tag);
-                    // this is so dumb
-                    m_hasActivatedTab = true;
-                }
-            );
+            auto tabButton = CCMenuItemSpriteExtra::create(tabSpr, this, menu_selector(TabMenu::onPageButton));
             tabButton->setTag(i++);
             this->addChild(tabButton);
             tabButton->setVisible(false);
             m_tabs.push_back(tabButton);
         }
+
         auto downSpr = cocos2d::CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
         downSpr->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
         downSpr->setScale(1.5F);
@@ -127,7 +131,7 @@ namespace eclipse::gui::cocos {
     }
 
     inline cocos2d::CCSprite* getTabIcon(std::string_view name) {
-        static const std::unordered_map<std::string_view, const char*> emojis = {
+        static std::unordered_map<std::string_view, char const*> const emojis = {
             {"tab.global", "tab_global.png"_spr},
             {"tab.level", "tab_level.png"_spr},
             {"tab.bypass", "tab_bypass.png"_spr},
@@ -149,7 +153,7 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    bool TabButton::init(std::string name, cocos2d::CCSize size) {
+    bool TabButton::init(std::string_view name, cocos2d::CCSize size) {
         if (!CCNode::init()) return false;
         this->setScale(0.9F);
         this->setID(fmt::format("tab-button-{}"_spr, name));
@@ -177,7 +181,7 @@ namespace eclipse::gui::cocos {
     void TabButton::setState(bool active) const {
         // this definitely won't be a problem in the future
         if (m_bgSprite == nullptr || m_label == nullptr) return;
-        const auto tm = ThemeManager::get();
+        auto const tm = ThemeManager::get();
         auto colorLbl = (!active) ? tm->getButtonForegroundColor() : tm->getButtonActivatedForeground();
         auto colorBG = (!active) ? tm->getButtonBackgroundColor() : tm->getButtonActivatedBackground();
         m_bgSprite->setColor(colorBG.toCCColor3B());

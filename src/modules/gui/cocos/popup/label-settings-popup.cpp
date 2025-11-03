@@ -16,7 +16,7 @@ namespace eclipse::gui::cocos {
 
     class PopupTab : public CCMenuItemSpriteExtra {
     public:
-        static PopupTab* create(const std::string& text, size_t page, LabelSettingsPopup* popup) {
+        static PopupTab* create(std::string_view text, size_t page, LabelSettingsPopup* popup) {
             auto ret = new PopupTab();
             if (ret->init(text, page, popup)) {
                 ret->autorelease();
@@ -27,8 +27,11 @@ namespace eclipse::gui::cocos {
         }
 
         void setState(bool active) {
-            const auto tm = ThemeManager::get();
-            m_background->setColor(active ? tm->getButtonActivatedBackground().toCCColor3B() : tm->getButtonActivatedBackground().darken(0.1F).toCCColor3B());
+            auto const tm = ThemeManager::get();
+            m_background->setColor(
+                active ? tm->getButtonActivatedBackground().toCCColor3B()
+                       : tm->getButtonActivatedBackground().darken(0.1F).toCCColor3B()
+            );
             setEnabled(!active);
         }
 
@@ -37,21 +40,21 @@ namespace eclipse::gui::cocos {
             m_popup->selectTab(m_page);
         }
 
-        bool init(const std::string& text, size_t page, LabelSettingsPopup* popup) {
-            const auto tm = ThemeManager::get();
+        bool init(std::string_view text, size_t page, LabelSettingsPopup* popup) {
+            auto const tm = ThemeManager::get();
 
             m_background = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
             m_background->setContentSize({ 100.f, 32.f });
             m_background->setScale(0.7f);
             m_background->setColor(tm->getButtonActivatedBackground().toCCColor3B());
 
-            static Label::EmojiMap s_emojis = {
+            static Label::EmojiMap const s_emojis = {
                 {U"⚙️", "settings.png"_spr},
                 {U"⚡", "script_icon.png"_spr},
                 {U"🕔", "event_icon.png"_spr},
                 {U"👁️", "preview_icon.png"_spr},
             };
-            static std::unordered_map<std::string, std::string_view> s_emojisMap = {
+            static std::unordered_map<std::string_view, std::string_view> s_emojisMap = {
                 {"labels.settings", "⚙️"},
                 {"labels.text", "⚡"},
                 {"labels.events", "🕔"},
@@ -80,9 +83,9 @@ namespace eclipse::gui::cocos {
 
     class FontPicker : public cocos2d::CCMenu {
     public:
-        static FontPicker* create(std::string const& font, std::function<void(std::string const&)> const& callback) {
+        static FontPicker* create(std::string font, std::function<void(std::string const&)>&& callback) {
             auto ret = new FontPicker();
-            if (ret->init(font, callback)) {
+            if (ret->init(std::move(font), std::move(callback))) {
                 ret->autorelease();
                 return ret;
             }
@@ -96,27 +99,27 @@ namespace eclipse::gui::cocos {
             m_preview->limitLabelWidth(getContentWidth() * 0.66f, 1.f, 0.1f);
         }
 
-        void setFont(std::string const& font) {
-            m_font = font;
+        void setFont(std::string font) {
             m_page = labels::getFontIndex(font);
+            m_font = std::move(font);
             updatePreview();
         }
 
     protected:
-        bool init(std::string const& font, std::function<void(std::string const&)> const& callback) {
+        bool init(std::string&& font, std::function<void(std::string const&)>&& callback) {
             if (!CCMenu::init()) return false;
 
-            m_callback = callback;
-            m_font = font;
+            m_callback = std::move(callback);
             m_page = labels::getFontIndex(font);
+            m_font = std::move(font);
 
             m_preview = Label::create("", font);
             this->addChildAtPosition(m_preview, geode::Anchor::Center);
 
             this->updatePreview();
 
-            const auto createArrowBtn = [](bool flip) {
-                const auto tm = ThemeManager::get();
+            auto const createArrowBtn = [](bool flip) {
+                auto const tm = ThemeManager::get();
                 auto arrow = cocos2d::CCSprite::createWithSpriteFrameName("arrow.png"_spr);
                 arrow->setRotation(90);
                 if (flip) arrow->setFlipY(true);
@@ -169,7 +172,7 @@ namespace eclipse::gui::cocos {
             m_font = labels::fontFiles[index];
 
             updatePreview();
-            m_callback(labels::fontFiles[index]);
+            m_callback(m_font);
         }
 
     protected:
@@ -179,11 +182,11 @@ namespace eclipse::gui::cocos {
         size_t m_page = 0;
     };
 
-    bool LabelSettingsPopup::setup(labels::LabelSettings* settings, std::function<void(CallbackEvent)> const& callback) {
-        const auto tm = ThemeManager::get();
+    bool LabelSettingsPopup::setup(labels::LabelSettings* settings, std::function<void(CallbackEvent)>&& callback) {
+        auto const tm = ThemeManager::get();
 
         m_settings = settings;
-        m_callback = callback;
+        m_callback = std::move(callback);
 
         // The behind background for the entire popup to get the outline
         auto bgBehind = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
@@ -254,7 +257,7 @@ namespace eclipse::gui::cocos {
     }
 
     cocos2d::CCSprite* createButton(cocos2d::CCSprite* inner, float scale = 0.4f) {
-        const auto tm = ThemeManager::get();
+        auto const tm = ThemeManager::get();
         auto box = cocos2d::CCSprite::createWithSpriteFrameName("rectangle.png"_spr);
         box->setScale(scale);
         if (inner) {
@@ -266,8 +269,8 @@ namespace eclipse::gui::cocos {
         return box;
     }
 
-    cocos2d::CCSprite* createToggle(const char* innerFrameName, float scale = 0.4f) {
-        const auto tm = ThemeManager::get();
+    cocos2d::CCSprite* createToggle(char const* innerFrameName, float scale = 0.4f) {
+        auto const tm = ThemeManager::get();
         auto box = cocos2d::CCSprite::createWithSpriteFrameName("rectangle.png"_spr);
         box->setScale(scale);
         if (innerFrameName) {
@@ -279,7 +282,7 @@ namespace eclipse::gui::cocos {
         return box;
     }
 
-    cocos2d::CCSprite* createButtonSprite(const char* frame, float scale = 0.4f, std::optional<float> innerScale = std::nullopt) {
+    cocos2d::CCSprite* createButtonSprite(char const* frame, float scale = 0.4f, std::optional<float> innerScale = std::nullopt) {
         if (frame) {
             auto inner = cocos2d::CCSprite::createWithSpriteFrameName(frame);
             if (innerScale) { inner->setScale(*innerScale); }
@@ -289,7 +292,7 @@ namespace eclipse::gui::cocos {
     }
 
     cocos2d::CCSprite* createAlignButton(BMFontAlignment align) {
-        const char* frame = nullptr;
+        char const* frame = nullptr;
         switch (align) {
             case BMFontAlignment::Left: frame = "falign_left.png"_spr; break;
             case BMFontAlignment::Center: frame = "falign_center.png"_spr; break;
@@ -300,7 +303,7 @@ namespace eclipse::gui::cocos {
     }
 
     cocos2d::CCSprite* createAlignButton(labels::LabelsContainer::Alignment align) {
-        const char* frame = nullptr;
+        char const* frame = nullptr;
         switch (align) {
             default: break;
             case labels::LabelsContainer::Alignment::TopLeft:
@@ -347,14 +350,14 @@ namespace eclipse::gui::cocos {
 
     /// Helper function to create a grid of buttons with a single callback
     template <typename... Args>
-    std::pair<cocos2d::CCMenu*, std::array<cocos2d::CCSprite*, sizeof...(Args)>> createCompactMenu(
-        float width, std::function<void(CCMenuItemSpriteExtra*)> const& callback, Args... args
+    static std::pair<cocos2d::CCMenu*, std::array<cocos2d::CCSprite*, sizeof...(Args)>> createCompactMenu(
+        float width, std::function<void(CCMenuItemSpriteExtra*)>&& callback, Args... args
     ) {
         auto menu = cocos2d::CCMenu::create();
         menu->setContentSize({ width, 28.f });
 
         size_t index = 0;
-        for (auto& button : { geode::cocos::CCMenuItemExt::createSpriteExtra(args, callback)... }) {
+        for (auto& button : { geode::cocos::CCMenuItemExt::createSpriteExtra(args, std::move(callback))... }) {
             button->setTag(index++);
             menu->addChild(button);
         }
@@ -369,15 +372,15 @@ namespace eclipse::gui::cocos {
         return { menu, { args... } };
     }
 
-    auto createLabel(const char* text) {
+    auto createLabel(char const* text) {
         auto label = TranslatedLabel::create(text);
         label->setAnchorPoint({0, 1});
         label->limitLabelWidth(110.f, 1.f, 0.1f);
         return label;
     }
 
-    auto createLabelButton(const char* text, float width, std::function<void(CCMenuItemSpriteExtra*)> const& callback) {
-        const auto tm = ThemeManager::get();
+    auto createLabelButton(char const* text, float width, std::function<void(CCMenuItemSpriteExtra*)> const& callback) {
+        auto const tm = ThemeManager::get();
         auto label = TranslatedLabel::create(text);
         label->limitLabelWidth(width * 0.8f, 1.f, 0.1f);
         label->setColor(tm->getButtonForegroundColor().toCCColor3B());
@@ -575,22 +578,30 @@ namespace eclipse::gui::cocos {
         return std::max((CARD_HEIGHT + 2.5f) * count + 42.f, 200.f);
     }
 
-    cocos2d::CCNode* createEventCard(labels::LabelEvent& event, std::function<void(CallbackEvent)> const& callback, std::function<void()> const& removeCallback);
+    cocos2d::CCNode* createEventCard(labels::LabelEvent& event, std::function<void(CallbackEvent)>&& callback, std::function<void()>&& removeCallback);
 
-    cocos2d::CCNode* createEventAddButton(labels::LabelSettings* settings, cocos2d::CCNode* contentLayer, std::function<void(CallbackEvent)> const& callback, std::function<void(size_t)> const& removeCallback) {
-        auto addEventBtn = createLabelButton("labels.events.add", 120.f, [settings, contentLayer, callback, removeCallback](auto) {
-            settings->events.emplace_back();
-            callback(CallbackEvent::Update);
+    template <typename Func1, typename Func2>
+    static cocos2d::CCNode* createEventAddButton(labels::LabelSettings* settings, cocos2d::CCNode* contentLayer, Func1&& callback, Func2&& removeCallback) {
+        auto addEventBtn = createLabelButton(
+            "labels.events.add", 120.f,
+            [settings, contentLayer, callback = std::forward<Func1>(callback), removeCallback = std::forward<Func2>(removeCallback)](auto) {
+                settings->events.emplace_back();
+                callback(CallbackEvent::Update);
 
-            auto index = settings->events.size() - 1;
+                auto index = settings->events.size() - 1;
 
-            // Add a new card
-            contentLayer->addChild(createEventCard(settings->events.back(), callback, [removeCallback, index] {
-                removeCallback(index);
-            }));
-            contentLayer->setContentSize({ 385.f, getEventContainerHeight(settings->events.size()) });
-            contentLayer->updateLayout();
-        });
+                // Add a new card
+                contentLayer->addChild(createEventCard(
+                    settings->events.back(),
+                    std::move(callback),
+                    [removeCallback = std::move(removeCallback), index] {
+                        removeCallback(index);
+                    })
+                );
+                contentLayer->setContentSize({ 385.f, getEventContainerHeight(settings->events.size()) });
+                contentLayer->updateLayout();
+            }
+        );
         addEventBtn->setID("add-event-btn"_spr);
 
         auto menu = cocos2d::CCMenu::create();
@@ -613,10 +624,13 @@ namespace eclipse::gui::cocos {
         menu->addChildAtPosition(cardBackground, geode::Anchor::Center);
 
         // Pickers
-        auto colorPicker = ColorPicker::create(event.color.value_or(gui::Color{1.f, 1.f, 1.f}), false, [&, callback](gui::Color const& color) {
-            event.color = color;
-            callback(CallbackEvent::Update);
-        });
+        auto colorPicker = ColorPicker::create(
+            event.color.value_or(gui::Color{1.f, 1.f, 1.f}), false,
+            [&, callback](gui::Color const& color) {
+                event.color = color;
+                callback(CallbackEvent::Update);
+            }
+        );
         colorPicker->setID("color-picker"_spr);
         colorPicker->setVisible(event.color.has_value());
         menu->addChildAtPosition(colorPicker, geode::Anchor::TopLeft, { 137.5f, -73.f });
@@ -800,7 +814,7 @@ namespace eclipse::gui::cocos {
         menu->addChildAtPosition(modifyOpacityToggle, geode::Anchor::TopLeft, { 198.5f, -73.f });
 
         // Labels
-        const auto createLabel = [menu](const char* text, float width, float x, float y) {
+        auto const createLabel = [menu](char const* text, float width, float x, float y) {
             auto label = TranslatedLabel::create(text);
             label->setAnchorPoint({0, 0.5f});
             label->limitLabelWidth(width, 1.f, 0.1f);
@@ -838,7 +852,7 @@ namespace eclipse::gui::cocos {
         scrollLayer->setID("events-scroll"_spr);
         layer->addChildAtPosition(scrollLayer, geode::Anchor::Center, { -385.f / 2, -200.f / 2 });
 
-        const auto contentLayer = scrollLayer->m_contentLayer;
+        auto const contentLayer = scrollLayer->m_contentLayer;
         for (auto& event : m_settings->events) {
             size_t index = &event - &m_settings->events.front();
             contentLayer->addChild(createEventCard(event, m_callback, [this, index] {
@@ -872,12 +886,12 @@ namespace eclipse::gui::cocos {
         auto layer = CCLayer::create();
 
         m_previewLabel = hacks::Labels::SmartLabel::create(m_settings->text, m_settings->font);
-        m_previewLabel->setScale(m_settings->scale);
-        m_previewLabel->setColor(m_settings->color.toCCColor3B());
-        m_previewLabel->setOpacity(m_settings->color.getAlphaByte());
-        m_previewLabel->setAlignment(m_settings->fontAlignment);
-        // m_previewLabel->setVisible(m_settings->visible);
+        m_previewLabel->setSettings(m_settings);
+
+        auto origVisible = m_settings->visible;
+        m_settings->visible = true;
         m_previewLabel->update();
+        m_settings->visible = origVisible;
 
         layer->addChildAtPosition(m_previewLabel, geode::Anchor::Center);
         this->schedule(schedule_selector(LabelSettingsPopup::updatePreview));
@@ -886,16 +900,10 @@ namespace eclipse::gui::cocos {
     }
 
     void LabelSettingsPopup::updatePreview(float) {
-        if (m_settings->hasEvents()) {
-            auto [visible, scale, color, font] = m_settings->processEvents();
-            m_previewLabel->setFont(font);
-            m_previewLabel->setScale(scale);
-            m_previewLabel->setColor(color.toCCColor3B());
-            m_previewLabel->setOpacity(color.getAlphaByte());
-            // m_previewLabel->setVisible(visible);
-        }
-
+        auto origVisible = m_settings->visible;
+        m_settings->visible = true;
         m_previewLabel->update();
+        m_settings->visible = origVisible;
     }
 
     void LabelSettingsPopup::selectTab(size_t index) {
@@ -921,9 +929,9 @@ namespace eclipse::gui::cocos {
         m_contentBG->addChildAtPosition(m_currentTab, geode::Anchor::Center);
     }
 
-    LabelSettingsPopup* LabelSettingsPopup::create(labels::LabelSettings* settings, std::function<void(CallbackEvent)> const& callback) {
+    LabelSettingsPopup* LabelSettingsPopup::create(labels::LabelSettings* settings, std::function<void(CallbackEvent)>&& callback) {
         auto ret = new LabelSettingsPopup;
-        if (ret->initAnchored(400.f, 240.f, settings, callback)) {
+        if (ret->initAnchored(400.f, 240.f, settings, std::move(callback))) {
             ret->autorelease();
             return ret;
         }

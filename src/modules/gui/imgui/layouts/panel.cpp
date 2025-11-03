@@ -11,6 +11,7 @@ namespace eclipse::gui::imgui {
         m_tabs.clear();
 
         auto& tabs = Engine::get()->getTabs();
+        m_tabs.reserve(tabs.size());
         for (auto& tab : tabs) {
             m_tabs.emplace_back(tab->getTitle(), [tab] {
                 for (auto& component : tab->getComponents()) {

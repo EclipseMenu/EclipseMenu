@@ -14,14 +14,14 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        InputFloatComponent* callback(const std::function<void(float)>& func);
+        InputFloatComponent* callback(std::function<void(float)>&& func);
 
-        [[nodiscard]] const std::string& getId() const override;
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getId() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
 
         [[nodiscard]] float getMin() const;
         [[nodiscard]] float getMax() const;
-        [[nodiscard]] const std::string& getFormat() const;
+        [[nodiscard]] std::string const& getFormat() const;
 
         void setMin(float min);
         void setMax(float max);

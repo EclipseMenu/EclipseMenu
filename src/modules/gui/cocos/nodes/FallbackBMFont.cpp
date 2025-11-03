@@ -51,11 +51,11 @@ namespace eclipse::gui::cocos {
     };
 
     template <EmojiToHexConverter S>
-    constexpr std::pair<std::u32string_view, const char*> operator""_emoji() {
+    constexpr std::pair<std::u32string_view, char const*> operator""_emoji() {
         return { std::u32string_view(S.value, S.length), S.filename };
     }
 
-    static const Label::EmojiMap g_emojis = {
+    static Label::EmojiMap const g_emojis = {
         // Twemoji emojis
         U"💯"_emoji, U"🤫"_emoji, U"🐻"_emoji, U"💔"_emoji, U"🐱"_emoji,
         U"🐶"_emoji, U"🦊"_emoji, U"🔫"_emoji, U"🤨"_emoji, U"🗿"_emoji,

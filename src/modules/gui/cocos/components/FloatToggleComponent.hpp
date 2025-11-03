@@ -15,7 +15,7 @@ namespace eclipse::gui::cocos {
     public:
         bool init(float width) {
             if (!CCMenu::init()) return false;
-            const auto tm = ThemeManager::get();
+            auto const tm = ThemeManager::get();
 
             this->setID(fmt::format("toggle-{}"_spr, m_component->getId()));
             this->setContentSize({ width, 28.f });
@@ -34,9 +34,12 @@ namespace eclipse::gui::cocos {
             auto labelSize = (width * 0.6f) - 35.f;
 
             if (!m_component->getDescription().empty()) {
-                m_infoButton = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 0.5f, [this](auto) {
-                    this->openDescriptionPopup();
-                });
+                auto spr = cocos2d::CCSprite::createWithSpriteFrameName("info.png"_spr);
+                spr->setScale(0.35f);
+                m_infoButton = CCMenuItemSpriteExtra::create(
+                    spr, this,
+                    menu_selector(BaseComponentNode::openDescriptionPopup)
+                );
                 m_infoButton->setAnchorPoint({ 0.5, 0.5f });
                 m_infoButton->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
                 this->addChildAtPosition(m_infoButton, geode::Anchor::Right, { -10.f, 0.f });
@@ -60,13 +63,13 @@ namespace eclipse::gui::cocos {
             return true;
         }
 
-        virtual void textChanged(CCTextInputNode* input) override {
+        void textChanged(CCTextInputNode* input) override {
             geode::Result<float> valueOpt = geode::utils::numFromString<float>(input->getString());
             if(!valueOpt)
                 return;
 
             float value = std::clamp(*valueOpt, m_component->getMin(), m_component->getMax());
-            
+
             m_component->setValue(value);
             m_component->triggerCallback(value);
         }

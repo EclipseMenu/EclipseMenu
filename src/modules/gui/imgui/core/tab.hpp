@@ -17,7 +17,7 @@ namespace eclipse::gui::imgui {
         /// @brief Create new instance of `Tab` with set title and draw callback
         /// @param title Title of the Tab
         /// @param onDraw Callback which will be called when the Tab is drawn
-        Tab(const std::string& title, std::function<void()> onDraw);
+        Tab(std::string title, std::function<void()> onDraw);
 
         /// @brief Draw the Tab
         void draw();
@@ -30,8 +30,8 @@ namespace eclipse::gui::imgui {
         /// @param open Whether the Tab should be opened
         void setOpen(bool open);
 
-        [[nodiscard]] const std::string& getTitle() const;
-        void setTitle(const std::string& title);
+        [[nodiscard]] std::string const& getTitle() const;
+        void setTitle(std::string title);
 
     private:
         std::string m_title; // Tab title

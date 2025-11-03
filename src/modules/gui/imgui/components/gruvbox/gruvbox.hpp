@@ -2,12 +2,14 @@
 #include <modules/gui/imgui/components/theme.hpp>
 
 namespace eclipse::gui::imgui::themes {
-    class Gruvbox : public Theme {
+    class Gruvbox final : public Theme {
         bool checkbox(
-            const std::string& label, bool& value, bool isSearchedFor,
-            const std::function<void()>& postDraw
+            std::string const& label, bool& value, bool isSearchedFor,
+            std23::function_ref<void()> postDraw
         ) const override;
 
         ComponentTheme getTheme() const override { return ComponentTheme::Gruvbox; }
     };
+
+    inline static constexpr Gruvbox GRUVBOX_THEME;
 }

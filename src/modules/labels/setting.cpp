@@ -10,7 +10,7 @@ namespace eclipse::labels {
     size_t LabelSettings::instanceCount = 0;
 
     // Handle the event based on the type and condition
-    Event* handleEvent(const LabelEvent& event, const LabelSettings* label) {
+    Event* handleEvent(LabelEvent const& event, LabelSettings const* label) {
         if (!event.enabled) return nullptr;
 
         // check if the condition is met
@@ -55,7 +55,7 @@ namespace eclipse::labels {
             .font = font,
         };
 
-        for (const auto& event : events) {
+        for (auto const& event : events) {
             auto eventState = handleEvent(event, this);
             if (!eventState) continue;
             eventState->processState(state);
@@ -96,7 +96,7 @@ namespace eclipse::labels {
         ));
     }
 
-    void from_json(const nlohmann::json& json, LabelSettings& settings) {
+    void from_json(nlohmann::json const& json, LabelSettings& settings) {
         settings.name = json.value("name", fmt::format("New label {}", settings.id));
         settings.text = json.value("text", "");
         settings.font = json.value("font", "bigFont.fnt");
@@ -111,7 +111,7 @@ namespace eclipse::labels {
         settings.events = json.value("events", std::vector<LabelEvent>());
     }
 
-    void to_json(nlohmann::json& json, const LabelSettings& settings) {
+    void to_json(nlohmann::json& json, LabelSettings const& settings) {
         json = nlohmann::json{
             {"name", settings.name},
             {"text", settings.text},
@@ -131,7 +131,7 @@ namespace eclipse::labels {
     #define READ_OPTIONAL(key) if (json.contains(#key)) event.key = json.at(#key).get<decltype(event.key)::value_type>()
     #define STORE_OPTIONAL(key) if (event.key.has_value()) json[#key] = event.key.value()
 
-    void from_json(const nlohmann::json& json, LabelEvent& event) {
+    void from_json(nlohmann::json const& json, LabelEvent& event) {
         event.enabled = json.value("enabled", true);
         event.type = static_cast<LabelEvent::Type>(json.value("type", 1));
         event.condition = json.value("condition", "");
@@ -146,7 +146,7 @@ namespace eclipse::labels {
         READ_OPTIONAL(font);
     }
 
-    void to_json(nlohmann::json& json, const LabelEvent& event) {
+    void to_json(nlohmann::json& json, LabelEvent const& event) {
         json = nlohmann::json{
             {"enabled", event.enabled},
             {"type", static_cast<int>(event.type)},

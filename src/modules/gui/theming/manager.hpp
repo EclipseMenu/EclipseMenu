@@ -14,7 +14,8 @@ public: type const& get##name() const { return member; }
 void set##name(type value) { member = value; }
 
 #define CR_PROPERTY(type, member, name) CR_PROPERTY_CS(type, member, name) \
-void set##name(type const& value) { member = value; }
+void set##name(type const& value) { member = value; }\
+void set##name(type&& value) { member = std::move(value); }
 
 #define COLOR_PROPERTY(member, name) CR_PROPERTY(Color, member, name)
 
@@ -114,7 +115,7 @@ namespace eclipse::gui {
 
         /// [ImGui] Font file name
         CR_PROPERTY_CS(std::string, m_selectedFont, SelectedFont)
-        void setSelectedFont(const std::string& value);
+        void setSelectedFont(std::string value);
         void setSelectedFont(int index);
         static std::vector<std::string> getFontNames();
         /// [ImGui] Font size

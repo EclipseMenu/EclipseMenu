@@ -118,9 +118,9 @@ namespace eclipse::hacks::Labels {
         this->updateLayout(false);
     }
 
-    void LabelsContainer::addLabel(SmartLabel* label, const std::function<void(SmartLabel*)>& update) {
+    void LabelsContainer::addLabel(SmartLabel* label) {
         label->setParentContainer(this);
-        m_labels.emplace_back(label, update);
+        m_labels.emplace_back(label);
 
         // set anchor point
         switch (m_alignment) {
@@ -157,8 +157,8 @@ namespace eclipse::hacks::Labels {
     }
 
     void LabelsContainer::removeLabel(SmartLabel* label) {
-        auto it = std::ranges::find_if(m_labels, [label](const auto& pair) {
-            return pair.first == label;
+        auto it = std::ranges::find_if(m_labels, [label](SmartLabel* l) {
+            return l == label;
         });
 
         if (it != m_labels.end()) {
@@ -170,8 +170,7 @@ namespace eclipse::hacks::Labels {
     void LabelsContainer::update() {
         if (!isVisible()) return;
 
-        for (auto& [label, updater] : m_labels) {
-            updater(label);
+        for (auto label : m_labels) {
             label->update();
         }
 

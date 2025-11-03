@@ -8,7 +8,7 @@ namespace eclipse::gui::blur {
         GLuint fragment = 0;
         GLuint program = 0;
 
-        geode::Result<std::string> compile(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath);
+        geode::Result<std::string> compile(std::filesystem::path const& vertexPath, std::filesystem::path const& fragmentPath);
         geode::Result<std::string> link();
         void cleanup();
     };

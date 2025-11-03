@@ -13,15 +13,15 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        ComboComponent* callback(const std::function<void(int)>& func);
+        ComboComponent* callback(std::function<void(int)>&& func);
 
         /// @brief Get the combo value (selected item index).
         [[nodiscard]] int getValue() const;
 
         /// @brief Get the combo items.
-        [[nodiscard]] const std::vector<std::string>& getItems() const;
+        [[nodiscard]] std::vector<std::string> const& getItems() const;
 
-        void setItems(const std::vector<std::string>& items);
+        void setItems(std::vector<std::string> const& items);
 
         /// @brief Set the combo value (selected item index).
         void setValue(int value) const;
@@ -29,9 +29,9 @@ namespace eclipse::gui {
         /// @brief Set the combo value if empty (selected item index).
         void setValueIfEmpty(int value) const;
 
-        [[nodiscard]] const std::string& getId() const override;
+        [[nodiscard]] std::string const& getId() const override;
 
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
 
         ComboComponent* setDescription(std::string description) override;
 

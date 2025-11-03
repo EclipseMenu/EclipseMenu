@@ -1,12 +1,13 @@
 #include "Label.hpp"
 
+#include <modules/config/config.hpp>
 #include <modules/labels/variables.hpp>
 #include "LabelContainer.hpp"
 
 namespace eclipse::hacks::Labels {
 
-    bool SmartLabel::init(const std::string& text, const std::string& font) {
-        if (!EmojiLabel::init("", font.c_str()))
+    bool SmartLabel::init(std::string_view text, std::string const& font) {
+        if (!EmojiLabel::init("", font))
             return false;
 
         auto res = rift::compile(text);
@@ -20,20 +21,50 @@ namespace eclipse::hacks::Labels {
         return true;
     }
 
-    void SmartLabel::setScript(const std::string& script) {
-        if (script == m_text) return;
-        m_text = script;
+    static void updateCheatIndicator(SmartLabel* label) {
+        bool visible = config::get<"labels.cheat-indicator.visible">(false);
 
-        auto res = rift::compile(script);
-        if (res.isErr()) {
-            m_error = res.unwrapErr().message();
-            m_script = nullptr;
-        } else {
-            m_script = std::move(res.unwrap());
+        if (!visible) {
+            label->setVisible(false);
+            return;
         }
+
+        bool isCheating = config::getTemp<"hasCheats">(false);
+        bool hasTripped = config::getTemp<"trippedSafeMode">(false);
+        bool showOnlyCheating = config::get<"labels.cheat-indicator.only-cheating">(false);
+
+        if (showOnlyCheating && !(isCheating || hasTripped)) {
+            label->setVisible(false);
+            return;
+        }
+
+        label->setVisible(true);
+        label->setScale(config::get<"labels.cheat-indicator.scale", float>(0.5f));
+        label->setOpacity(
+            static_cast<GLubyte>(config::get<"labels.cheat-indicator.opacity", float>(0.35f) * 255)
+        );
+
+        // Cheating - Red, Tripped - Orange, Normal - Green
+        auto color = isCheating ? gui::Color::RED : hasTripped
+                                ? gui::Color{0.72f, 0.37f, 0.f}
+                                : gui::Color::GREEN;
+        label->setColor(color.toCCColor3B());
     }
 
     void SmartLabel::update() {
+        if (m_settings) {
+            if (m_settings->hasEvents()) {
+                auto [visible, scale, color, font] = m_settings->processEvents();
+                this->setFont(font);
+                this->setScale(scale);
+                this->setColor(color.toCCColor3B());
+                this->setOpacity(color.getAlphaByte());
+                this->setVisible(visible);
+            }
+        } else {
+            updateCheatIndicator(this);
+        }
+
         if (!isVisible()) {
             if (m_wasVisible) {
                 m_wasVisible = false;

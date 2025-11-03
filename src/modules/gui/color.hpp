@@ -8,34 +8,34 @@
 #endif
 
 struct ImVec4;
-typedef unsigned int ImU32;
+using ImU32 = unsigned int;
 
 namespace eclipse::gui {
     struct Color {
-        static const Color WHITE;
-        static const Color BLACK;
-        static const Color RED;
-        static const Color GREEN;
-        static const Color BLUE;
-        static const Color YELLOW;
-        static const Color CYAN;
-        static const Color MAGENTA;
+        static Color const WHITE;
+        static Color const BLACK;
+        static Color const RED;
+        static Color const GREEN;
+        static Color const BLUE;
+        static Color const YELLOW;
+        static Color const CYAN;
+        static Color const MAGENTA;
 
         float r, g, b, a;
 
         Color() : r(0), g(0), b(0), a(1.0f) {}
         Color(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a) {}
-        Color(const Color& other) = default;
-        Color(const Color& other, float a) : r(other.r), g(other.g), b(other.b), a(a) {}
-        explicit Color(const cocos2d::ccColor4F& other) : r(other.r), g(other.g), b(other.b), a(other.a) {}
-        explicit Color(const cocos2d::ccColor4B& other) : r(other.r / 255.0f), g(other.g / 255.0f), b(other.b / 255.0f), a(other.a / 255.0f) {}
+        Color(Color const& other) = default;
+        Color(Color const& other, float a) : r(other.r), g(other.g), b(other.b), a(a) {}
+        explicit Color(cocos2d::ccColor4F const& other) : r(other.r), g(other.g), b(other.b), a(other.a) {}
+        explicit Color(cocos2d::ccColor4B const& other) : r(other.r / 255.0f), g(other.g / 255.0f), b(other.b / 255.0f), a(other.a / 255.0f) {}
 
         Color(Color&& other) noexcept : r(other.r), g(other.g), b(other.b), a(other.a) {
             other.r = other.g = other.b = 0;
             other.a = 1.0f;
         }
 
-        Color& operator=(const Color& other);
+        Color& operator=(Color const& other);
 
         Color& operator=(Color&& other) noexcept;
 
@@ -45,7 +45,7 @@ namespace eclipse::gui {
         /// @brief Converts the color to ImU32
         operator ImU32() const;
 
-        Color& operator=(const ImVec4& col2);
+        Color& operator=(ImVec4 const& col2);
 
         operator cocos2d::ccColor4F() const;
         operator cocos2d::ccColor4B() const;
@@ -67,7 +67,7 @@ namespace eclipse::gui {
         /// @brief Creates a new color from HSV values
         /// @param hsv HSV values
         /// @return New color
-        static Color fromHSV(const ImVec4& hsv);
+        static Color fromHSV(ImVec4 const& hsv);
 
         enum class IntType {
             RGBA, ARGB,
@@ -89,7 +89,7 @@ namespace eclipse::gui {
         /// @param color String color in proper format
         /// @param type Integer type to convert from
         /// @return New color
-        static Color fromString(const std::string& color, IntType type = IntType::RGBA);
+        static Color fromString(std::string_view color, IntType type = IntType::RGBA);
 
         /// @brief Converts the color to a string
         /// @param type Integer type to convert to
@@ -110,16 +110,16 @@ namespace eclipse::gui {
 
             HSL() : h(0), s(0), l(0) {}
             HSL(float h, float s, float l) : h(h), s(s), l(l) {}
-            HSL(const HSL& other) = default;
+            HSL(HSL const& other) = default;
 
-            static HSL fromColor(const Color& color);
-            static Color toColor(const HSL& hsl);
+            static HSL fromColor(Color const& color);
+            static Color toColor(HSL const& hsl);
 
             operator Color() const { return toColor(*this); }
         };
 
         [[nodiscard]] HSL toHSL() const;
-        [[nodiscard]] Color fromHSL(const HSL& hsl) const;
+        [[nodiscard]] Color fromHSL(HSL const& hsl) const;
 
         /// @brief Gets the luminance of the color (0-1)
         [[nodiscard]] float luminance() const;
@@ -128,6 +128,6 @@ namespace eclipse::gui {
         [[nodiscard]] Color lighten(float factor) const;
     };
 
-    void to_json(nlohmann::json& j, const Color& e);
-    void from_json(const nlohmann::json& j, Color& e);
+    void to_json(nlohmann::json& j, Color const& e);
+    void from_json(nlohmann::json const& j, Color& e);
 }

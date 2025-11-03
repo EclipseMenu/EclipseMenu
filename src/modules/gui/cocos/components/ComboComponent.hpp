@@ -27,7 +27,7 @@ namespace eclipse::gui::cocos {
         }
 
         void generateSelector() {
-            const auto tm = ThemeManager::get();
+            auto const tm = ThemeManager::get();
 
             auto const scrollHeight = std::min<float>(m_component->getItems().size(), 3.5f) * 80.f;
             m_scrollLayer = ScrollLayer::create({365.f * 0.3f, scrollHeight * 0.3f});
@@ -49,7 +49,7 @@ namespace eclipse::gui::cocos {
             scrollBlock->setContentSize({365.f, scrollHeight});
             scrollBlock->setZOrder(-100);
             scrollBlock->registerWithTouchDispatcher();
-            
+
             auto scrollBlockButton = CCMenuItemSpriteExtra::create(
                 cocos2d::CCSprite::create("GJ_button_01.png"),
                 nullptr,
@@ -70,7 +70,7 @@ namespace eclipse::gui::cocos {
             scrollBackground->setColor(tm->getFrameBackground().toCCColor3B());
             scrollBackground->setZOrder(-2);
             m_scrollLayer->addChildAtPosition(scrollBackground, geode::Anchor::Center);
-            
+
             for (size_t i = 0; auto const& component : m_component->getItems()) {
                 auto menu = cocos2d::CCMenu::create();
                 // menu->registerWithTouchDispatcher();
@@ -127,7 +127,7 @@ namespace eclipse::gui::cocos {
 
             if (s_activeCombo) {
                 s_activeCombo->closeSelector(nullptr);
-            } 
+            }
             s_activeCombo = this;
 
             if (globalBottom.y > m_scrollLayer->getContentHeight() + 20.f) {
@@ -177,7 +177,7 @@ namespace eclipse::gui::cocos {
 
         bool init(float width) {
             if (!CCMenu::init()) return false;
-            const auto tm = ThemeManager::get();
+            auto const tm = ThemeManager::get();
 
             this->setID(fmt::format("combo-{}"_spr, m_component->getId()));
             this->setContentSize({ width, 28.f });
@@ -185,9 +185,12 @@ namespace eclipse::gui::cocos {
             auto labelSize = (width * 0.6f) - 35.f;
 
             if (!m_component->getDescription().empty()) {
-                m_infoButton = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName("info.png"_spr, 0.35f, [this](auto) {
-                    this->openDescriptionPopup();
-                });
+                auto spr = cocos2d::CCSprite::createWithSpriteFrameName("info.png"_spr);
+                spr->setScale(0.35f);
+                m_infoButton = CCMenuItemSpriteExtra::create(
+                    spr, this,
+                    menu_selector(BaseComponentNode::openDescriptionPopup)
+                );
                 m_infoButton->setAnchorPoint({ 0.5, 0.5f });
                 m_infoButton->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
                 this->addChildAtPosition(m_infoButton, geode::Anchor::Right, { -10.f, 0.f });

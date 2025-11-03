@@ -20,7 +20,7 @@
 #include "scroll-layer.hpp"
 
 namespace eclipse::gui::cocos {
-    ContentView* ContentView::create(cocos2d::CCSize const& size, const std::shared_ptr<MenuTab>& tab) {
+    ContentView* ContentView::create(cocos2d::CCSize const& size, std::shared_ptr<MenuTab> const& tab) {
         auto ret = new ContentView();
         if (ret->init(size, tab)) {
             ret->autorelease();
@@ -30,12 +30,12 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    void ContentView::setContent(const std::shared_ptr<MenuTab>& tab, bool resetScroll) const {
+    void ContentView::setContent(std::shared_ptr<MenuTab> const& tab, bool resetScroll) const {
         this->loadContent(tab);
         if (resetScroll) m_contentLayer->scrollToTop();
     }
 
-    bool ContentView::init(cocos2d::CCSize const& size, const std::shared_ptr<MenuTab>& tab) {
+    bool ContentView::init(cocos2d::CCSize const& size, std::shared_ptr<MenuTab> const& tab) {
         if (!CCNode::init()) return false;
         //m_contentLayer = geode::ScrollLayer::create(size);
         m_contentLayer = ScrollLayer::create(size);
@@ -50,8 +50,8 @@ namespace eclipse::gui::cocos {
     }
 
     template <ComponentType Type>
-    std::optional<std::shared_ptr<Component>> peekComponent(
-        const std::vector<std::shared_ptr<Component>>& components, size_t index
+    static std::optional<std::shared_ptr<Component>> peekComponent(
+        std::vector<std::shared_ptr<Component>> const& components, size_t index
     ) {
         if (index >= components.size()) return std::nullopt;
         auto& component = components[index];
@@ -59,7 +59,7 @@ namespace eclipse::gui::cocos {
         return component;
     }
 
-    void ContentView::loadContent(const std::shared_ptr<MenuTab>& tab) const {
+    void ContentView::loadContent(std::shared_ptr<MenuTab> const& tab) const {
         auto layer = m_contentLayer->m_contentLayer;
         layer->removeAllChildrenWithCleanup(true);
 

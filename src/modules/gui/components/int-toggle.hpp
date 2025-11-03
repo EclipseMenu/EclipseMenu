@@ -12,9 +12,9 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        IntToggleComponent* toggleCallback(const std::function<void()>& func);
+        IntToggleComponent* toggleCallback(std::function<void()>&& func);
 
-        IntToggleComponent* valueCallback(const std::function<void(int)>& func);
+        IntToggleComponent* valueCallback(std::function<void(int)>&& func);
 
         /// @brief Set toggle description.
         IntToggleComponent* setDescription(std::string description) override;
@@ -22,8 +22,8 @@ namespace eclipse::gui {
         /// @brief Allows to set keybinds for the toggle.
         IntToggleComponent* handleKeybinds();
 
-        [[nodiscard]] const std::string& getId() const override;
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getId() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
         [[nodiscard]] bool hasKeybind() const;
 
         [[nodiscard]] int getMin() const;

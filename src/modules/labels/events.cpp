@@ -93,7 +93,7 @@ namespace eclipse::labels {
         return instance;
     }
 
-    void EventManager::queueEvent(const LabelEvent& event, LabelSettings* label) {
+    void EventManager::queueEvent(LabelEvent const& event, LabelSettings* label) {
         // check if the event is already queued
         if (auto* existing = getEvent(label->id, event.id)) {
             // if it has ended, recreate it
@@ -110,7 +110,7 @@ namespace eclipse::labels {
         e.start();
     }
 
-    void EventManager::dequeueEvent(const LabelEvent& event, const LabelSettings* label) {
+    void EventManager::dequeueEvent(LabelEvent const& event, LabelSettings const* label) {
         if (auto* e = getEvent(label->id, event.id)) {
             e->end();
             if (e->hasEnded()) {
@@ -119,14 +119,14 @@ namespace eclipse::labels {
         }
     }
 
-    void EventManager::removeEvents(const LabelSettings* label) {
-        std::erase_if(m_events, [label](const Event& event) {
+    void EventManager::removeEvents(LabelSettings const* label) {
+        std::erase_if(m_events, [label](Event const& event) {
             return event.settings == label;
         });
     }
 
-    void EventManager::removeEvent(const LabelEvent* event) {
-        std::erase_if(m_events, [event](const Event& e) {
+    void EventManager::removeEvent(LabelEvent const* event) {
+        std::erase_if(m_events, [event](Event const& e) {
             return e.event == event;
         });
     }

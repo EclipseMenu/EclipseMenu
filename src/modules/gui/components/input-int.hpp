@@ -12,10 +12,10 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        InputIntComponent* callback(const std::function<void(int)>& func);
+        InputIntComponent* callback(std::function<void(int)>&& func);
 
-        [[nodiscard]] const std::string& getId() const override;
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getId() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
 
         [[nodiscard]] int getMin() const;
         [[nodiscard]] int getMax() const;

@@ -2,12 +2,12 @@
 
 #include <Geode/Geode.hpp>
 
+#include <functional>
 #include <memory>
+#include <optional>
+#include <unordered_map>
 #include <utility>
 #include <vector>
-#include <unordered_map>
-#include <functional>
-#include <optional>
 
 namespace eclipse::keybinds {
     enum class Keys {
@@ -85,27 +85,32 @@ namespace eclipse::keybinds {
         /// @param title The title of the keybind.
         /// @param callback The callback to execute when the keybind is pressed.
         /// @param internal Whether the keybind is internal or not.
-        Keybind(Keys key, std::string id, std::string title, std::function<void(bool)> callback, bool internal = false)
+        Keybind(Keys key, std::string id, std::string title, std::function<void(bool)>&& callback, bool internal = false)
             : m_key(key), m_id(std::move(id)), m_title(std::move(title)), m_callback(std::move(callback)),
               m_internal(internal) {}
+
+        Keybind(Keybind&&) = default;
+        Keybind& operator=(Keybind&&) = default;
+        Keybind(Keybind const&) = delete;
+        Keybind& operator=(Keybind const&) = delete;
 
         /// @brief Get the key of the keybind.
         [[nodiscard]] Keys getKey() const { return m_key; }
 
         /// @brief Execute the keybind's callback with the given state.
-        void execute(bool down) const { m_callback(down); }
+        void execute(bool down) { m_callback(down); }
 
         /// @brief Execute the pressed callback.
-        void push() const { execute(true); }
+        void push() { execute(true); }
 
         /// @brief Execute the released callback.
-        void release() const { execute(false); }
+        void release() { execute(false); }
 
         /// @brief Get the ID of the keybind.
-        [[nodiscard]] const std::string& getId() const { return m_id; }
+        [[nodiscard]] std::string const& getId() const { return m_id; }
 
         /// @brief Get the title of the keybind.
-        [[nodiscard]] const std::string& getTitle() const { return m_title; }
+        [[nodiscard]] std::string const& getTitle() const { return m_title; }
 
         /// @brief Check if the keybind is initialized.
         [[nodiscard]] bool isInitialized() const { return m_initialized; }
@@ -141,17 +146,17 @@ namespace eclipse::keybinds {
         /// @param id The ID of the keybind.
         /// @param title The title of the keybind.
         /// @param callback The callback to execute when the keybind is pressed.
-        Keybind& registerKeybind(const std::string& id, const std::string& title, const std::function<void(bool)>& callback);
+        Keybind& registerKeybind(std::string id, std::string title, std::function<void(bool)>&& callback);
 
         /// @brief Register a keybind without adding it to the keybinds UI tab. Useful for internal keybinds.
         /// @param id The ID of the keybind.
         /// @param callback The callback to execute when the keybind is pressed.
-        Keybind& addListener(const std::string& id, const std::function<void(bool)>& callback);
+        Keybind& addListener(std::string id, std::function<void(bool)>&& callback);
 
         /// @brief Unregister a keybind from the manager. This will completely remove it from the configuration.
         /// @param id The ID of the keybind.
         /// @return Whether the keybind was successfully unregistered.
-        bool unregisterKeybind(const std::string& id);
+        bool unregisterKeybind(std::string const& id);
 
         /// @brief Load keybinds from config.
         void init();
@@ -164,7 +169,7 @@ namespace eclipse::keybinds {
 
         /// @brief Get all keybinds.
         /// @return All keybinds.
-        [[nodiscard]] const std::vector<Keybind>& getKeybinds() const { return m_keybinds; }
+        [[nodiscard]] std::vector<Keybind> const& getKeybinds() const { return m_keybinds; }
 
         /// @brief Get a keybind by its ID.
         /// @param id The ID of the keybind.
@@ -194,7 +199,7 @@ namespace eclipse::keybinds {
         size_t m_menuKeybindUID = 0;
         bool m_initialized = false;
 
-        Keybind& registerKeybindInternal(const std::string& id, const std::string& title, const std::function<void(bool)>& callback, bool internal);
+        Keybind& registerKeybindInternal(std::string id, std::string title, std::function<void(bool)>&& callback, bool internal);
 
         friend bool isKeyDown(Keys key);
         friend bool isKeyPressed(Keys key);

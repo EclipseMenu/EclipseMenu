@@ -15,15 +15,15 @@ namespace eclipse::gui {
         void onInit() override {}
         void onUpdate() override {}
 
-        [[nodiscard]] const std::string& getId() const override;
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getId() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
 
         labels::LabelSettings* getSettings() const;
 
-        LabelSettingsComponent* deleteCallback(const std::function<void()>& func);
-        LabelSettingsComponent* editCallback(const std::function<void()>& func);
-        LabelSettingsComponent* moveCallback(const std::function<void(bool)>& func);
-        LabelSettingsComponent* exportCallback(const std::function<void()>& func);
+        LabelSettingsComponent* deleteCallback(std::function<void()>&& func);
+        LabelSettingsComponent* editCallback(std::function<void()>&& func);
+        LabelSettingsComponent* moveCallback(std::function<void(bool)>&& func);
+        LabelSettingsComponent* exportCallback(std::function<void()>&& func);
 
         void triggerDeleteCallback() const;
         void triggerEditCallback() const;

@@ -11,9 +11,9 @@ namespace eclipse::hacks::Labels {
 namespace eclipse::gui::cocos {
     enum class CallbackEvent { Update, Export };
 
-    class LabelSettingsPopup : public geode::Popup<labels::LabelSettings*, std::function<void(CallbackEvent)> const&> {
+    class LabelSettingsPopup : public geode::Popup<labels::LabelSettings*, std::function<void(CallbackEvent)>&&> {
     protected:
-        bool setup(labels::LabelSettings* settings, std::function<void(CallbackEvent)> const& callback) override;
+        bool setup(labels::LabelSettings* settings, std::function<void(CallbackEvent)>&& callback) override;
 
         CCLayer* createSettingsTab();
         CCLayer* createTextTab() const;
@@ -23,7 +23,7 @@ namespace eclipse::gui::cocos {
         void updatePreview(float dt);
 
     public:
-        static LabelSettingsPopup* create(labels::LabelSettings* settings, std::function<void(CallbackEvent)> const& callback);
+        static LabelSettingsPopup* create(labels::LabelSettings* settings, std::function<void(CallbackEvent)>&& callback);
         void selectTab(size_t index);
 
         ~LabelSettingsPopup() override;

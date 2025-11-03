@@ -14,7 +14,7 @@ namespace eclipse::gui::animation {
         /// @param target Target position
         /// @param easing Easing mode (see "easing.hpp")
         /// @return Created `MoveAction` instance
-        static std::shared_ptr<MoveAction> create(double duration, ImVec2* vector, ImVec2 target, EasingFunction easing);
+        static std::unique_ptr<MoveAction> create(double duration, ImVec2* vector, ImVec2 target, EasingFunction easing);
 
         /// @brief Need to be called every frame to update the value
         /// @param deltaTime How much time passed since last update in seconds

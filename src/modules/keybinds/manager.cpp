@@ -32,7 +32,7 @@ namespace eclipse::keybinds {
     }
 
     std::string const& keyToString(Keys key) {
-        static const std::unordered_map<Keys, std::string> names = {
+        static std::unordered_map<Keys, std::string> const names = {
             { Keys::None, "-" },
 
             { Keys::A, "A" }, { Keys::B, "B" }, { Keys::C, "C" }, { Keys::D, "D" },
@@ -127,7 +127,7 @@ namespace eclipse::keybinds {
     }
 
     Keybind& Manager::registerKeybindInternal(
-        const std::string& id, const std::string& title, const std::function<void(bool)>& callback, bool internal
+        std::string id, std::string title, std::function<void(bool)>&& callback, bool internal
     ) {
         // check if this id already exists
         for (auto& keybind : m_keybinds) {
@@ -136,7 +136,7 @@ namespace eclipse::keybinds {
             }
         }
 
-        m_keybinds.emplace_back(Keys::None, id, title, callback, internal);
+        m_keybinds.emplace_back(Keys::None, std::move(id), std::move(title), std::move(callback), internal);
         auto& keybind = m_keybinds.back();
         if (internal) {
             keybind.setKey(getCfgKeyInternal(keybind.getId()));
@@ -150,16 +150,17 @@ namespace eclipse::keybinds {
     }
 
     Keybind& Manager::registerKeybind(
-        const std::string& id, const std::string& title, const std::function<void(bool)>& callback
+        std::string id, std::string title, std::function<void(bool)>&& callback
     ) {
-        return this->registerKeybindInternal(id, title, callback, false);
+        return this->registerKeybindInternal(std::move(id), std::move(title), std::move(callback), false);
     }
 
-    Keybind& Manager::addListener(const std::string& id, const std::function<void(bool)>& callback) {
-        return this->registerKeybindInternal(id, id, callback, true);
+    Keybind& Manager::addListener(std::string id, std::function<void(bool)>&& callback) {
+        std::string title = id;
+        return this->registerKeybindInternal(std::move(id), std::move(title), std::move(callback), true);
     }
 
-    bool Manager::unregisterKeybind(const std::string& id) {
+    bool Manager::unregisterKeybind(std::string const& id) {
         for (auto it = m_keybinds.begin(); it != m_keybinds.end(); ++it) {
             if (it->getId() == id) {
                 // apply disabled state to process the GUI
@@ -208,7 +209,7 @@ namespace eclipse::keybinds {
 
                 auto idStr = std::string(id);
                 gui::Engine::queueAfterDrawing(
-                    [idStr, state, keybind] {
+                    [idStr = std::move(idStr), state, &keybind] {
                         auto tab = gui::MenuTab::find("tab.keybinds");
                         if (state) {
                             // Add the keybind to the GUI

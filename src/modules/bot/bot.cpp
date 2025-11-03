@@ -22,7 +22,7 @@ namespace eclipse::bot {
     }
 
     void Bot::removeInputsAfter(int frame) {
-        std::erase_if(m_replay.inputs, [&](const gdr::Input<>& input) -> bool { return input.frame > frame; });
+        std::erase_if(m_replay.inputs, [&](gdr::Input<> const& input) -> bool { return input.frame > frame; });
     }
 
     void Bot::recordInput(int frame, PlayerButton button, bool player2, bool pressed) {
@@ -48,7 +48,7 @@ namespace eclipse::bot {
         return std::nullopt;
     }
 
-    void Bot::setLevelInfo(const gdr::Level& levelInfo) {
+    void Bot::setLevelInfo(gdr::Level const& levelInfo) {
         m_replay.levelInfo = levelInfo;
     }
 
@@ -56,7 +56,7 @@ namespace eclipse::bot {
         m_replay.platformer = platformer;
     }
 
-    Result<> Bot::save(const std::filesystem::path& path) {
+    Result<> Bot::save(std::filesystem::path const& path) {
         m_replay.author = utils::get<GJAccountManager>()->m_username;
         m_replay.duration = !m_replay.inputs.empty() ? m_replay.inputs[m_replay.inputs.size() - 1].frame / m_replay.framerate : 0;
 
@@ -69,7 +69,7 @@ namespace eclipse::bot {
         return file::writeBinarySafe(path, data);
     }
 
-    Result<> Bot::load(const std::filesystem::path& path) {
+    Result<> Bot::load(std::filesystem::path const& path) {
         auto res = file::readBinary(path);
         if (res.isErr())
             return Err(std::move(res).unwrapErr());

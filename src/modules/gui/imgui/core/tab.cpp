@@ -3,8 +3,8 @@
 
 namespace eclipse::gui::imgui {
 
-    Tab::Tab(const std::string& title, std::function<void()> onDraw) {
-        m_title = title;
+    Tab::Tab(std::string title, std::function<void()> onDraw) {
+        m_title = std::move(title);
         m_drawCallback = std::move(onDraw);
         m_isOpen = false;
     }
@@ -25,7 +25,7 @@ namespace eclipse::gui::imgui {
 
     void Tab::setOpen(bool open) { m_isOpen = open; }
 
-    const std::string& Tab::getTitle() const { return m_title; }
+    std::string const& Tab::getTitle() const { return m_title; }
 
-    void Tab::setTitle(const std::string& title) { m_title = title; }
+    void Tab::setTitle(std::string title) { m_title = std::move(title); }
 }

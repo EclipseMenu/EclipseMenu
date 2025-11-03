@@ -20,11 +20,12 @@ namespace eclipse::gui::cocos {
             auto labelSize = (width * 0.5f) - 35.f;
 
             if (!m_component->getDescription().empty()) {
-                m_infoButton = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName("info.png"_spr, 0.35f, [this](auto) {
-                    FLAlertLayer::create(
-                        m_component->getTitle().c_str(), m_component->getDescription().c_str(), "OK"
-                    )->show();
-                });
+                auto spr = cocos2d::CCSprite::createWithSpriteFrameName("info.png"_spr);
+                spr->setScale(0.35f);
+                m_infoButton = CCMenuItemSpriteExtra::create(
+                    spr, this,
+                    menu_selector(BaseComponentNode::openDescriptionPopup)
+                );
                 m_infoButton->setAnchorPoint({ 0.5, 0.5f });
                 m_infoButton->setColor(ThemeManager::get()->getCheckboxCheckmarkColor().toCCColor3B());
                 this->addChildAtPosition(m_infoButton, geode::Anchor::Right, { -10.f, 0.f });
@@ -47,7 +48,7 @@ namespace eclipse::gui::cocos {
             return true;
         }
 
-        virtual void textChanged(CCTextInputNode* input) override {
+        void textChanged(CCTextInputNode* input) override {
             m_component->setValue(input->getString());
             m_component->triggerCallback(input->getString());
         }

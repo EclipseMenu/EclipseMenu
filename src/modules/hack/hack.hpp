@@ -33,11 +33,7 @@ namespace eclipse::hack {
     );
 }
 
-#define SAFE_SET_PRIO(name, prio) do { \
-    if (!self.setHookPriority(name, prio)) { \
-        geode::log::warn("Failed to set {} hook priority!", name); \
-    } \
-} while (0)
+#define SAFE_SET_PRIO(name, prio) (void) self.setHookPriority(name, prio)
 
 #define SAFE_PRIORITY(name) SAFE_SET_PRIO(name, SAFE_HOOK_PRIORITY)
 #define FIRST_PRIORITY(name) SAFE_SET_PRIO(name, FIRST_HOOK_PRIORITY)

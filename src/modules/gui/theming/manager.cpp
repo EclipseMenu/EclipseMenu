@@ -372,11 +372,11 @@ namespace eclipse::gui {
         m_componentTheme = theme;
     }
 
-    void ThemeManager::setSelectedFont(const std::string& value) {
+    void ThemeManager::setSelectedFont(std::string value) {
         if (auto imgui = imgui::ImGuiRenderer::get()) {
             imgui->getFontManager().setFont(value);
         }
-        m_selectedFont = value;
+        m_selectedFont = std::move(value);
     }
 
     void ThemeManager::setSelectedFont(int index) {

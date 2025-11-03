@@ -13,6 +13,7 @@ namespace eclipse::gui::imgui {
 
         // Load tabs
         auto& tabs = Engine::get()->getTabs();
+        m_windows.reserve(tabs.size());
         for (auto& tab : tabs) {
             m_windows.emplace_back(tab->getTitle(), [tab] {
                 for (auto& component : tab->getComponents()) {
@@ -27,7 +28,7 @@ namespace eclipse::gui::imgui {
             auto windowStates = config::get("windows", std::vector<nlohmann::json>());
             for (auto &windowState: windowStates) {
                 auto title = windowState.at("title").get<std::string>();
-                auto window = std::ranges::find_if(m_windows, [&title](const Window &w) {
+                auto window = std::ranges::find_if(m_windows, [&title](Window const& w) {
                     return w.getTitle() == title;
                 });
                 if (window != m_windows.end()) {
@@ -62,7 +63,7 @@ namespace eclipse::gui::imgui {
                     auto windowStates = config::get("windows", std::vector<nlohmann::json>());
                     for (auto& windowState: windowStates) {
                         auto title = windowState.at("title").get<std::string>();
-                        auto window = std::ranges::find_if(m_windows, [&title](const Window &window) {
+                        auto window = std::ranges::find_if(m_windows, [&title](Window const& window) {
                             return window.getTitle() == title;
                         });
                         if (window != m_windows.end())
@@ -86,16 +87,12 @@ namespace eclipse::gui::imgui {
 
         // Run move actions
         auto deltaTime = ImGui::GetIO().DeltaTime;
-        for (const auto& action : m_actions)
+        for (auto const& action : m_actions)
             action->update(deltaTime);
 
         // Remove finished actions
-        std::erase_if(m_actions, [](auto action) {
-            if (action->isFinished()) {
-                action.reset();
-                return true;
-            }
-            return false;
+        std::erase_if(m_actions, [](auto& action) {
+            return action->isFinished();
         });
 
         if (!shouldRender()) return;
@@ -106,8 +103,8 @@ namespace eclipse::gui::imgui {
         }
 
         // Auto reset window positions
-        auto isDragging = config::getTemp("draggingWindow", false);
-        auto stackEnabled = config::get<bool>("menu.stackWindows", true);
+        auto isDragging = config::getTemp<"draggingWindow">(false);
+        auto stackEnabled = config::get<"menu.stackWindows", bool>(true);
         if (m_actions.empty() && !isDragging && stackEnabled)
             stackWindows();
 
@@ -147,7 +144,7 @@ namespace eclipse::gui::imgui {
     }
 
     /// @brief Calculate a random window position outside the screen.
-    ImVec2 TabbedLayout::randomWindowPosition(const Window& window) {
+    ImVec2 TabbedLayout::randomWindowPosition(Window const& window) {
         // Calculate target position randomly to be outside the screen
         auto screenSize = ImGui::GetIO().DisplaySize;
         auto windowSize = window.getSize();
@@ -182,7 +179,7 @@ namespace eclipse::gui::imgui {
         }
 
         auto tm = ThemeManager::get();
-        const auto scale = tm->getGlobalScale();
+        auto const scale = tm->getGlobalScale();
         auto margin = tm->getWindowMargin() * scale;
         ImVec2 screenSize = ImGui::GetIO().DisplaySize;
 
@@ -195,7 +192,7 @@ namespace eclipse::gui::imgui {
         float x = margin;
         float y = margin;
         for (auto& title : builtInWindows) {
-            auto it = std::ranges::find_if(m_windows, [&title](const Window& window) {
+            auto it = std::ranges::find_if(m_windows, [&title](Window const& window) {
                 return window.getTitle() == title;
             });
 

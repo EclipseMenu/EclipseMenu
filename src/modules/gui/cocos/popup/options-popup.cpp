@@ -9,7 +9,7 @@
 
 namespace eclipse::gui::cocos {
     bool OptionsPopup::setup(std::shared_ptr<MenuTab> const& tab) {
-        const auto tm = ThemeManager::get();
+        auto const tm = ThemeManager::get();
 
         auto title = TranslatedLabel::create(tab->getTitle());
         title->setPosition(200, 225);

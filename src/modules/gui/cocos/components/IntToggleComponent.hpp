@@ -23,10 +23,11 @@ namespace eclipse::gui::cocos {
             m_toggler = geode::cocos::CCMenuItemExt::createToggler(
                 createButton("checkmark.png"_spr), createButton(nullptr),
                 [this](auto) {
-                auto value = !this->m_component->getState();
-                m_component->setState(value);
-                m_component->triggerCallback();
-            });
+                    auto value = !this->m_component->getState();
+                    m_component->setState(value);
+                    m_component->triggerCallback();
+                }
+            );
             m_toggler->setAnchorPoint({ 0.5, 0.5f });
             m_toggler->toggle(m_component->getState());
             this->addChildAtPosition(m_toggler, geode::Anchor::Left, { 15.f, 0.f });
@@ -34,9 +35,12 @@ namespace eclipse::gui::cocos {
             auto labelSize = (width * 0.6f) - 35.f;
 
             if (!m_component->getDescription().empty()) {
-                m_infoButton = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 0.5f, [this](auto) {
-                    this->openDescriptionPopup();
-                });
+                auto spr = cocos2d::CCSprite::createWithSpriteFrameName("info.png"_spr);
+                spr->setScale(0.35f);
+                m_infoButton = CCMenuItemSpriteExtra::create(
+                    spr, this,
+                    menu_selector(BaseComponentNode::openDescriptionPopup)
+                );
                 m_infoButton->setAnchorPoint({ 0.5, 0.5f });
                 m_infoButton->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
                 this->addChildAtPosition(m_infoButton, geode::Anchor::Right, { -10.f, 0.f });

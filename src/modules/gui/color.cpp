@@ -4,20 +4,20 @@
 #include <nlohmann/json.hpp>
 
 namespace eclipse::gui {
-    const Color Color::WHITE = {1, 1, 1};
-    const Color Color::BLACK = {0, 0, 0};
-    const Color Color::RED = {1, 0, 0};
-    const Color Color::GREEN = {0, 1, 0};
-    const Color Color::BLUE = {0, 0, 1};
-    const Color Color::YELLOW = {1, 1, 0};
-    const Color Color::CYAN = {0, 1, 1};
-    const Color Color::MAGENTA = {1, 0, 1};
+    Color const Color::WHITE = {1, 1, 1};
+    Color const Color::BLACK = {0, 0, 0};
+    Color const Color::RED = {1, 0, 0};
+    Color const Color::GREEN = {0, 1, 0};
+    Color const Color::BLUE = {0, 0, 1};
+    Color const Color::YELLOW = {1, 1, 0};
+    Color const Color::CYAN = {0, 1, 1};
+    Color const Color::MAGENTA = {1, 0, 1};
 
     Color::operator ImU32() const {
         return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
     }
 
-    Color& Color::operator=(const Color& other) {
+    Color& Color::operator=(Color const& other) {
         if (this == &other) return *this;
         r = other.r;
         g = other.g;
@@ -41,7 +41,7 @@ namespace eclipse::gui {
         return {r, g, b, a};
     }
 
-    Color& Color::operator=(const ImVec4& col2) {
+    Color& Color::operator=(ImVec4 const& col2) {
         r = col2.x;
         g = col2.y;
         b = col2.z;
@@ -97,7 +97,7 @@ namespace eclipse::gui {
         return {r + m, g + m, b + m, a};
     }
 
-    Color Color::fromHSV(const ImVec4& hsv) {
+    Color Color::fromHSV(ImVec4 const& hsv) {
         return fromHSV(hsv.x, hsv.y, hsv.z, hsv.w);
     }
 
@@ -130,9 +130,8 @@ namespace eclipse::gui {
         }
     }
 
-    Color Color::fromString(const std::string& color, Color::IntType type) {
-        uint32_t c = std::strtoul(color.c_str(), nullptr, 16);
-        return fromInt(c, type);
+    Color Color::fromString(std::string_view color, Color::IntType type) {
+        return fromInt(geode::utils::numFromString<uint32_t>(color, 16).unwrapOr(0), type);
     }
 
     std::string Color::toString(Color::IntType type) const {
@@ -161,7 +160,7 @@ namespace eclipse::gui {
         return p;
     }
 
-    Color::HSL Color::HSL::fromColor(const Color& color) {
+    Color::HSL Color::HSL::fromColor(Color const& color) {
         auto max = std::max({color.r, color.g, color.b});
         auto min = std::min({color.r, color.g, color.b});
         float h, s, l = (max + min) / 2;
@@ -186,7 +185,7 @@ namespace eclipse::gui {
         return {h, s, l};
     }
 
-    Color Color::HSL::toColor(const HSL& hsl) {
+    Color Color::HSL::toColor(HSL const& hsl) {
         float r, g, b;
 
         if (hsl.s == 0.f) {
@@ -206,7 +205,7 @@ namespace eclipse::gui {
         return HSL::fromColor(*this);
     }
 
-    Color Color::fromHSL(const HSL& hsl) const {
+    Color Color::fromHSL(HSL const& hsl) const {
         return HSL::toColor(hsl);
     }
 
@@ -230,12 +229,12 @@ namespace eclipse::gui {
         return rgb;
     }
 
-    void to_json(nlohmann::json& j, const Color& e) {
+    void to_json(nlohmann::json& j, Color const& e) {
         auto str = e.toString();
         j = str;
     }
 
-    void from_json(const nlohmann::json& j, Color& e) {
+    void from_json(nlohmann::json const& j, Color& e) {
         e = Color::fromString(j.get<std::string>());
     }
 }

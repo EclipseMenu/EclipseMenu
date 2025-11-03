@@ -16,7 +16,7 @@ namespace eclipse::recorder {
         bool isRecording() const { return m_recording; }
         std::string getRecordingDuration() const;
 
-        void setCallback(const std::function<void(std::string const&)>& callback) { m_callback = callback; }
+        void setCallback(std::function<void(std::string const&)>&& callback) { m_callback = std::move(callback); }
 
         static std::vector<std::string> getAvailableCodecs();
 

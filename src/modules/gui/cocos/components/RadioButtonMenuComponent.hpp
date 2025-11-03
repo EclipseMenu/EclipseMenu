@@ -12,7 +12,7 @@ namespace eclipse::gui::cocos {
 
     public:
         static cocos2d::CCSprite* createRadioButton(bool check) {
-            const auto tm = ThemeManager::get();
+            auto const tm = ThemeManager::get();
             auto box = cocos2d::CCSprite::createWithSpriteFrameName("circle.png"_spr);
             box->setScale(0.45f);
             if (check) {
@@ -26,7 +26,7 @@ namespace eclipse::gui::cocos {
         }
 
         void addRadioButton(std::shared_ptr<RadioButtonComponent> const& radioButton, float width) {
-            const auto tm = ThemeManager::get();
+            auto const tm = ThemeManager::get();
             constexpr float height = 28.f;
 
             auto node = cocos2d::CCMenu::create();

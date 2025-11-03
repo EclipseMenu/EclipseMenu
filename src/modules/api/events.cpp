@@ -4,9 +4,9 @@
 #include <modules/labels/variables.hpp>
 
 #include <modules/gui/components/button.hpp>
+#include <modules/gui/components/input-float.hpp>
 #include <modules/gui/components/label.hpp>
 #include <modules/gui/components/toggle.hpp>
-#include <modules/gui/components/input-float.hpp>
 
 #include <memory>
 

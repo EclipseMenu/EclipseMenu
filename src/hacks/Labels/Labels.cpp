@@ -186,7 +186,7 @@ namespace eclipse::hacks::Labels {
         struct Fields {
             cocos2d::CCNode* m_mainContainer;
             std::array<LabelsContainer*, 9> m_containers;
-            std::vector<std::pair<SmartLabel*, std::function<void(SmartLabel*)>>> m_absoluteLabels;
+            std::vector<SmartLabel*> m_absoluteLabels;
             bool m_isEditor = false;
         };
 
@@ -212,35 +212,7 @@ namespace eclipse::hacks::Labels {
                 cheatIndicator->setHeightMultiplier(0.37f);
                 cheatIndicator->setID("cheat-indicator"_spr);
                 auto* container = fields->m_containers[config::get<int>("labels.cheat-indicator.alignment", 0)];
-                container->addLabel(cheatIndicator, [](SmartLabel* label) {
-                    bool visible = config::get<bool>("labels.cheat-indicator.visible", false);
-
-                    if (!visible) {
-                        label->setVisible(false);
-                        return;
-                    }
-
-                    bool isCheating = config::getTemp("hasCheats", false);
-                    bool hasTripped = config::getTemp("trippedSafeMode", false);
-                    bool showOnlyCheating = config::get<bool>("labels.cheat-indicator.only-cheating", false);
-
-                    if (showOnlyCheating && !(isCheating || hasTripped)) {
-                        label->setVisible(false);
-                        return;
-                    }
-
-                    label->setVisible(true);
-                    label->setScale(config::get<float>("labels.cheat-indicator.scale", 0.5f));
-                    label->setOpacity(
-                        static_cast<GLubyte>(config::get<float>("labels.cheat-indicator.opacity", 0.35f) * 255)
-                    );
-
-                    // Cheating - Red, Tripped - Orange, Normal - Green
-                    auto color = isCheating ? gui::Color::RED : hasTripped
-                                            ? gui::Color{0.72f, 0.37f, 0.f}
-                                            : gui::Color::GREEN;
-                    label->setColor(color.toCCColor3B());
-                });
+                container->addLabel(cheatIndicator);
             }
 
             // Add the labels
@@ -257,6 +229,7 @@ namespace eclipse::hacks::Labels {
                     label->setOpacity(setting.color.getAlphaByte());
                     label->setVisible(setting.visible);
                     label->setAlignment(setting.fontAlignment);
+                    label->setSettings(&setting);
 
                     if (setting.absolutePosition) {
                         auto offset = setting.offset;
@@ -299,32 +272,10 @@ namespace eclipse::hacks::Labels {
                                 break;
                         }
 
-                        fields->m_absoluteLabels.emplace_back(label, [&setting](SmartLabel* label) {
-                            if (setting.hasEvents()) {
-                                auto [visible, scale, color, font] = setting.processEvents();
-                                label->setFont(font);
-                                label->setScale(scale);
-                                label->setColor(color.toCCColor3B());
-                                label->setOpacity(color.getAlphaByte());
-                                label->setVisible(visible);
-                            }
-
-                            label->update();
-                        });
-
+                        fields->m_absoluteLabels.push_back(label);
                         fields->m_mainContainer->addChild(label);
                     } else {
-                        auto* container = fields->m_containers[static_cast<int>(setting.alignment)];
-                        container->addLabel(label, [&setting](SmartLabel* label) {
-                            if (setting.hasEvents()) {
-                                auto [visible, scale, color, font] = setting.processEvents();
-                                label->setFont(font);
-                                label->setScale(scale);
-                                label->setColor(color.toCCColor3B());
-                                label->setOpacity(color.getAlphaByte());
-                                label->setVisible(visible);
-                            }
-                        });
+                        fields->m_containers[static_cast<int>(setting.alignment)]->addLabel(label);
                     }
                 }
             }
@@ -339,7 +290,7 @@ namespace eclipse::hacks::Labels {
             }
 
             updateLabels(0.f);
-            for (auto& container : m_fields->m_containers) {
+            for (auto* container : m_fields->m_containers) {
                 container->updateLayout(false);
             }
         }
@@ -357,9 +308,9 @@ namespace eclipse::hacks::Labels {
                 container->setVisible(actualVisibility);
                 container->update();
             }
-            for (auto& [label, update] : fields->m_absoluteLabels) {
+            for (auto label : fields->m_absoluteLabels) {
                 label->setVisible(actualVisibility);
-                if (actualVisibility) update(label);
+                if (actualVisibility) label->update();
             }
         }
 

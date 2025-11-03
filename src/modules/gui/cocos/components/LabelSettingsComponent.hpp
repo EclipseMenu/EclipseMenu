@@ -15,7 +15,7 @@ namespace eclipse::gui::cocos {
         bool init(float width) {
             if (!CCMenu::init()) return false;
 
-            const auto tm = ThemeManager::get();
+            auto const tm = ThemeManager::get();
             constexpr auto height = 36.f;
             auto settings = m_component->getSettings();
 
@@ -45,7 +45,7 @@ namespace eclipse::gui::cocos {
             nameTextBox->setString(settings->name);
             nameTextBox->setID("name-textbox");
             nameTextBox->setAnchorPoint({0, 0.5f});
-            nameTextBox->setCallback([this](const std::string& text) {
+            nameTextBox->setCallback([this](std::string const& text) {
                 m_component->getSettings()->name = text;
                 this->m_component->triggerEditCallback();
             });
@@ -75,7 +75,7 @@ namespace eclipse::gui::cocos {
             settingsButton->setID("settings-btn");
             this->addChildAtPosition(settingsButton, geode::Anchor::Right, { -54.f, 0.f });
 
-            const auto createArrowBtn = [&](bool flip) {
+            auto const createArrowBtn = [&](bool flip) {
                 auto arrow = cocos2d::CCSprite::createWithSpriteFrameName("arrow.png"_spr);
                 if (flip) arrow->setFlipY(true);
                 arrow->setScale(0.5f);

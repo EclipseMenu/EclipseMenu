@@ -16,13 +16,13 @@ namespace eclipse::gui::imgui {
 
     public:
         bool shouldRender() const;
-        static ImVec2 randomWindowPosition(const Window& window);
+        static ImVec2 randomWindowPosition(Window const& window);
         std::map<Window*, ImVec2> getStackedPositions();
         void stackWindows();
 
     private:
         std::vector<Window> m_windows;
-        std::vector<std::shared_ptr<animation::MoveAction>> m_actions;
+        std::vector<std::unique_ptr<animation::MoveAction>> m_actions;
         uint8_t m_preloadStep = 0;
     };
 }
