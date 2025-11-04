@@ -2,6 +2,7 @@
 #include "BaseComponentNode.hpp"
 
 #include <modules/config/config.hpp>
+#include <modules/gui/cocos/nodes/CCMenuItemExt.hpp>
 #include <modules/gui/components/keybind.hpp>
 
 namespace eclipse::gui::cocos {
@@ -13,6 +14,8 @@ namespace eclipse::gui::cocos {
         friend class SelectKeybindPopup;
     public:
         bool init(float width);
+
+        void onDelete(CCObject*);
     };
 
     class SelectKeybindPopup : public geode::Popup<keybinds::Keys, KeybindComponentNode*> {
@@ -111,14 +114,9 @@ namespace eclipse::gui::cocos {
 
         auto offset = 0.f;
         if (m_component->canDelete()) {
-            auto deleteBtn = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName(
-                "trashbin.png"_spr, 0.4f,
-                [this](auto) {
-                    config::set(m_component->getId(), keybinds::Keys::None);
-                    m_keyName->setString(keybinds::keyToString(keybinds::Keys::None));
-                    m_component->triggerCallback(keybinds::Keys::None);
-                }
-            );
+            auto spr = cocos2d::CCSprite::createWithSpriteFrameName("trashbin.png"_spr);
+            spr->setScale(0.4f);
+            auto deleteBtn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(KeybindComponentNode::onDelete));
             deleteBtn->setID("delete"_spr);
             offset = -deleteBtn->getContentWidth() / 2;
             this->addChildAtPosition(deleteBtn, geode::Anchor::Right, { offset - 5.f, 0.f });
@@ -141,7 +139,7 @@ namespace eclipse::gui::cocos {
 
         offset -= btnWidth / 2.5;
 
-        auto btn = geode::cocos::CCMenuItemExt::createSpriteExtra(
+        auto btn = createSpriteExtra(
             btnSprite,
             [this](auto) {
                 SelectKeybindPopup::create(
@@ -156,7 +154,7 @@ namespace eclipse::gui::cocos {
         offset -= btnWidth / 2;
 
         if (m_component->getDefaultKey() != keybinds::Keys::None) {
-            m_resetBtn = geode::cocos::CCMenuItemExt::createSpriteExtraWithFrameName(
+            m_resetBtn = createSpriteExtraWithFrame(
                 "reset.png"_spr, 0.3f,
                 [this](auto) {
                     auto key = m_component->getDefaultKey();
@@ -172,5 +170,11 @@ namespace eclipse::gui::cocos {
         }
 
         return true;
+    }
+
+    inline void KeybindComponentNode::onDelete(CCObject*) {
+        config::set(m_component->getId(), keybinds::Keys::None);
+        m_keyName->setString(keybinds::keyToString(keybinds::Keys::None));
+        m_component->triggerCallback(keybinds::Keys::None);
     }
 }

@@ -11,6 +11,7 @@
 #include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/RetryLevelLayer.hpp>
+#include <modules/gui/cocos/nodes/CCMenuItemExt.hpp>
 
 namespace eclipse::hacks::Global {
     enum class SafeModeState {
@@ -212,7 +213,7 @@ namespace eclipse::hacks::Global {
         auto color = AutoSafeMode::hasCheats() ? CheatingColor : s_trippedLastAttempt ? TrippedColor : NormalColor;
         ci->setColor(color.toCCColor3B());
         auto msg = AutoSafeMode::constructMessage();
-        auto btn = geode::cocos::CCMenuItemExt::createSpriteExtra(ci, [msg](auto) {
+        auto btn = gui::cocos::createSpriteExtra(ci, [msg](auto) {
             AutoSafeMode::showPopup(msg);
         });
         btn->setAnchorPoint({0.45f, 0.2f});

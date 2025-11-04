@@ -2,6 +2,7 @@
 #include "BaseComponentNode.hpp"
 
 #include <modules/gui/cocos/cocos.hpp>
+#include <modules/gui/cocos/nodes/CCMenuItemExt.hpp>
 #include <modules/gui/cocos/popup/label-settings-popup.hpp>
 #include <modules/gui/components/label-settings.hpp>
 #include <modules/labels/setting.hpp>
@@ -30,13 +31,14 @@ namespace eclipse::gui::cocos {
             bg->setID("background");
             this->addChildAtPosition(bg, geode::Anchor::Center, {0, 0});
 
-            m_toggler = geode::cocos::CCMenuItemExt::createToggler(
+            m_toggler = createToggler(
                 createButton("checkmark.png"_spr),
                 createButton(nullptr),
                 [this, settings](auto) {
-                settings->visible = !settings->visible;
-                this->m_component->triggerEditCallback();
-            });
+                    settings->visible = !settings->visible;
+                    this->m_component->triggerEditCallback();
+                }
+            );
             m_toggler->setAnchorPoint({ 0.5, 0.5f });
             m_toggler->toggle(m_component->getSettings()->visible);
             this->addChildAtPosition(m_toggler, geode::Anchor::Left, { 20.f, 0.f });
@@ -51,17 +53,21 @@ namespace eclipse::gui::cocos {
             });
             this->addChildAtPosition(nameTextBox, geode::Anchor::Left, { 35.f, 0.f });
 
-            auto deleteButton = geode::cocos::CCMenuItemExt::createSpriteExtra(
-                createButton("trashbin.png"_spr, 0.5f), [this](auto) {
-                this->m_component->triggerDeleteCallback();
-            });
+            auto deleteButton = createSpriteExtra(
+                createButton("trashbin.png"_spr, 0.5f),
+                [this](auto) {
+                    this->m_component->triggerDeleteCallback();
+                }
+            );
             deleteButton->setID("delete-btn");
             this->addChildAtPosition(deleteButton, geode::Anchor::Right, { -21.f, 0.f });
 
-            auto settingsButton = geode::cocos::CCMenuItemExt::createSpriteExtra(
-                createButton("settings.png"_spr, 0.5f), [this](auto) {
-                LabelSettingsPopup::create(m_component)->show();
-            });
+            auto settingsButton = createSpriteExtra(
+                createButton("settings.png"_spr, 0.5f),
+                [this](auto) {
+                    LabelSettingsPopup::create(m_component)->show();
+                }
+            );
             settingsButton->setID("settings-btn");
             this->addChildAtPosition(settingsButton, geode::Anchor::Right, { -54.f, 0.f });
 
@@ -81,17 +87,21 @@ namespace eclipse::gui::cocos {
             moveBg->setID("move-arrows-background");
             this->addChildAtPosition(moveBg, geode::Anchor::Center, {12.5, 0});
 
-            auto moveUpBtn = geode::cocos::CCMenuItemExt::createSpriteExtra(
-                createArrowBtn(false), [this](auto) {
-                this->m_component->triggerMoveCallback(true);
-            });
+            auto moveUpBtn = createSpriteExtra(
+                createArrowBtn(false),
+                [this](auto) {
+                    m_component->triggerMoveCallback(true);
+                }
+            );
             moveUpBtn->setID("move-up-btn");
             this->addChildAtPosition(moveUpBtn, geode::Anchor::Center, { 25.f, 0.f });
 
-            auto moveDownBtn = geode::cocos::CCMenuItemExt::createSpriteExtra(
-                createArrowBtn(true),[this](auto) {
-                this->m_component->triggerMoveCallback(false);
-            });
+            auto moveDownBtn = createSpriteExtra(
+                createArrowBtn(true),
+                [this](auto) {
+                    m_component->triggerMoveCallback(false);
+                }
+            );
             moveDownBtn->setID("move-down-btn");
             this->addChildAtPosition(moveDownBtn, geode::Anchor::Center, { 0.f, 0.f });
 

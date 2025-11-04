@@ -350,13 +350,14 @@ namespace eclipse::gui::cocos {
     /// Helper function to create a grid of buttons with a single callback
     template <typename... Args>
     static std::pair<cocos2d::CCMenu*, std::array<cocos2d::CCSprite*, sizeof...(Args)>> createCompactMenu(
-        float width, StdFunction<void(CCMenuItemSpriteExtra*)> const& callback, Args... args
+        float width, LabelSettingsPopup* self,
+        cocos2d::SEL_MenuHandler callback, Args... args
     ) {
         auto menu = cocos2d::CCMenu::create();
         menu->setContentSize({ width, 28.f });
 
         size_t index = 0;
-        for (auto& button : { geode::cocos::CCMenuItemExt::createSpriteExtra(args, callback)... }) {
+        for (auto& button : { CCMenuItemSpriteExtra::create(args, self, callback)... }) {
             button->setTag(index++);
             menu->addChild(button);
         }
@@ -399,14 +400,8 @@ namespace eclipse::gui::cocos {
         auto* settings = m_component->getSettings();
 
         auto [alignMenu, alignSprites] = createCompactMenu(
-            100.f, [this](auto item) {
-                auto tag = item->getTag();
-                for (size_t i = 0; i < m_alignButtons.size(); ++i) {
-                    m_alignButtons[i]->setOpacity(i == tag ? 255 : DISABLED_OPACITY);
-                }
-                m_component->getSettings()->alignment = static_cast<labels::LabelsContainer::Alignment>(tag);
-                m_component->triggerEditCallback();
-            },
+            100.f, this,
+            menu_selector(LabelSettingsPopup::onAlignButton),
             createAlignButton(labels::LabelsContainer::Alignment::TopLeft),
             createAlignButton(labels::LabelsContainer::Alignment::TopCenter),
             createAlignButton(labels::LabelsContainer::Alignment::TopRight),
@@ -423,14 +418,8 @@ namespace eclipse::gui::cocos {
         layer->addChildAtPosition(alignMenu, geode::Anchor::Center, { 132.f, 42.f });
 
         auto [fontAlignMenu, fontAlignSprites] = createCompactMenu(
-            100.f, [this](auto item) {
-                auto tag = item->getTag();
-                for (size_t i = 0; i < m_fontAlignButtons.size(); ++i) {
-                    m_fontAlignButtons[i]->setOpacity(i == tag ? 255 : DISABLED_OPACITY);
-                }
-                m_component->getSettings()->fontAlignment = static_cast<BMFontAlignment>(tag);
-                m_component->triggerEditCallback();
-            },
+            100.f, this,
+            menu_selector(LabelSettingsPopup::onFontAlignButton),
             createAlignButton(BMFontAlignment::Left),
             createAlignButton(BMFontAlignment::Center),
             createAlignButton(BMFontAlignment::Right)
@@ -511,7 +500,7 @@ namespace eclipse::gui::cocos {
         picker->updatePreview();
         column2->addChild(picker);
 
-        auto absolutePosToggle = geode::cocos::CCMenuItemExt::createToggler(
+        auto absolutePosToggle = createToggler(
             createToggle("checkmark.png"_spr), createToggle(nullptr),
             [this](auto) {
                 m_component->getSettings()->absolutePosition = !m_component->getSettings()->absolutePosition;
@@ -746,59 +735,72 @@ namespace eclipse::gui::cocos {
         menu->addChildAtPosition(easingInput, geode::Anchor::TopLeft, { 322.5f, -132.f });
 
         // Toggles
-        auto enableToggle = geode::cocos::CCMenuItemExt::createToggler(
-        createToggle("checkmark.png"_spr), createToggle(nullptr), [&](auto) {
-            event.enabled = !event.enabled;
-            m_component->triggerEditCallback();
-        });
+        auto enableToggle = createToggler(
+            createToggle("checkmark.png"_spr),
+            createToggle(nullptr),
+            [&](auto) {
+                event.enabled = !event.enabled;
+                m_component->triggerEditCallback();
+            }
+        );
         enableToggle->toggle(event.enabled);
         enableToggle->setID("enable-toggle"_spr);
         menu->addChildAtPosition(enableToggle, geode::Anchor::TopLeft, { 16.f, -16.f });
 
-        auto modifyColorToggle = geode::cocos::CCMenuItemExt::createToggler(
-            createToggle("checkmark.png"_spr), createToggle(nullptr), [&, colorPicker](auto) {
-            if (!event.color.has_value()) event.color = {1.f, 1.f, 1.f};
-            else event.color.reset();
-            colorPicker->setVisible(event.color.has_value());
-            colorPicker->setColor(event.color.value_or(gui::Color{1.f, 1.f, 1.f}));
-            m_component->triggerEditCallback();
-        });
+        auto modifyColorToggle = createToggler(
+            createToggle("checkmark.png"_spr), createToggle(nullptr),
+            [&, colorPicker](auto) {
+                if (!event.color.has_value()) event.color = {1.f, 1.f, 1.f};
+                else event.color.reset();
+                colorPicker->setVisible(event.color.has_value());
+                colorPicker->setColor(event.color.value_or(gui::Color{1.f, 1.f, 1.f}));
+                m_component->triggerEditCallback();
+            }
+        );
         modifyColorToggle->toggle(event.color.has_value());
         modifyColorToggle->setID("modify-color-toggle"_spr);
         menu->addChildAtPosition(modifyColorToggle, geode::Anchor::TopLeft, { 16.f, -73.f });
 
-        auto modifyFontToggle = geode::cocos::CCMenuItemExt::createToggler(
-            createToggle("checkmark.png"_spr), createToggle(nullptr), [&, fontPicker](auto) {
-            if (!event.font.has_value()) event.font = "bigFont.fnt";
-            else event.font.reset();
-            fontPicker->setVisible(event.font.has_value());
-            fontPicker->setFont(event.font.value_or("bigFont.fnt"));
-            m_component->triggerEditCallback();
-        });
+        auto modifyFontToggle = createToggler(
+            createToggle("checkmark.png"_spr), createToggle(nullptr),
+            [&, fontPicker](auto) {
+                if (!event.font.has_value()) event.font = "bigFont.fnt";
+                else event.font.reset();
+                fontPicker->setVisible(event.font.has_value());
+                fontPicker->setFont(event.font.value_or("bigFont.fnt"));
+                m_component->triggerEditCallback();
+            }
+        );
         modifyFontToggle->toggle(event.font.has_value());
         modifyFontToggle->setID("modify-font-toggle"_spr);
         menu->addChildAtPosition(modifyFontToggle, geode::Anchor::TopLeft, { 16.f, -102.f });
 
-        auto modifyScaleToggle = geode::cocos::CCMenuItemExt::createToggler(
-            createToggle("checkmark.png"_spr), createToggle(nullptr), [&, modifyScaleInput](auto) {
-            if (!event.scale.has_value()) event.scale = 1.f;
-            else event.scale.reset();
-            modifyScaleInput->setString(fmt::to_string(event.scale.value_or(1.f)));
-            modifyScaleInput->setVisible(event.scale.has_value());
-            m_component->triggerEditCallback();
-        });
+        auto modifyScaleToggle = createToggler(
+            createToggle("checkmark.png"_spr),
+            createToggle(nullptr),
+            [&, modifyScaleInput](auto) {
+                if (!event.scale.has_value()) event.scale = 1.f;
+                else event.scale.reset();
+                modifyScaleInput->setString(fmt::to_string(event.scale.value_or(1.f)));
+                modifyScaleInput->setVisible(event.scale.has_value());
+                m_component->triggerEditCallback();
+            }
+        );
         modifyScaleToggle->toggle(event.scale.has_value());
         modifyScaleToggle->setID("modify-scale-toggle"_spr);
         menu->addChildAtPosition(modifyScaleToggle, geode::Anchor::TopLeft, { 198.5f, -44.f });
 
-        auto modifyOpacityToggle = geode::cocos::CCMenuItemExt::createToggler(
-            createToggle("checkmark.png"_spr), createToggle(nullptr), [&, modifyOpacityInput](auto) {
-            if (!event.opacity.has_value()) event.opacity = 1.f;
-            else event.opacity.reset();
-            modifyOpacityInput->setString(fmt::to_string(event.opacity.value_or(1.f)));
-            modifyOpacityInput->setVisible(event.opacity.has_value());
-            m_component->triggerEditCallback();
-        });
+        auto modifyOpacityToggle = createToggler(
+            createToggle("checkmark.png"_spr),
+            createToggle(nullptr),
+            [&, modifyOpacityInput](auto) {
+                if (!event.opacity.has_value()) event.opacity = 1.f;
+                else event.opacity.reset();
+                modifyOpacityInput->setString(fmt::to_string(event.opacity.value_or(1.f)));
+                modifyOpacityInput->setVisible(event.opacity.has_value());
+                m_component->triggerEditCallback();
+            }
+        );
         modifyOpacityToggle->toggle(event.opacity.has_value());
         modifyOpacityToggle->setID("modify-opacity-toggle"_spr);
         menu->addChildAtPosition(modifyOpacityToggle, geode::Anchor::TopLeft, { 198.5f, -73.f });
@@ -825,7 +827,7 @@ namespace eclipse::gui::cocos {
         createLabel("labels.events.easing", 64, 188, -132)->setID("easing-label"_spr);
 
         // Delete button
-        auto deleteBtn = geode::cocos::CCMenuItemExt::createSpriteExtra(
+        auto deleteBtn = createSpriteExtra(
             createButtonSprite("trashbin.png"_spr, 0.35f),
             [this, index](auto) {
                 auto settings = m_component->getSettings();
@@ -938,6 +940,24 @@ namespace eclipse::gui::cocos {
         m_eventsContentLayer->addChild(card);
         m_eventsContentLayer->setContentSize({ 385.f, getEventContainerHeight(settings->events.size()) });
         m_eventsContentLayer->updateLayout();
+    }
+
+    void LabelSettingsPopup::onAlignButton(CCObject* sender) {
+        auto tag = sender->getTag();
+        for (size_t i = 0; i < m_alignButtons.size(); ++i) {
+            m_alignButtons[i]->setOpacity(i == tag ? 255 : DISABLED_OPACITY);
+        }
+        m_component->getSettings()->alignment = static_cast<labels::LabelsContainer::Alignment>(tag);
+        m_component->triggerEditCallback();
+    }
+
+    void LabelSettingsPopup::onFontAlignButton(CCObject* sender) {
+        auto tag = sender->getTag();
+        for (size_t i = 0; i < m_fontAlignButtons.size(); ++i) {
+            m_fontAlignButtons[i]->setOpacity(i == tag ? 255 : DISABLED_OPACITY);
+        }
+        m_component->getSettings()->fontAlignment = static_cast<BMFontAlignment>(tag);
+        m_component->triggerEditCallback();
     }
 
     LabelSettingsPopup* LabelSettingsPopup::create(std::shared_ptr<LabelSettingsComponent> component) {

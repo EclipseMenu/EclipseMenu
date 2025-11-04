@@ -34,6 +34,9 @@ namespace eclipse::gui::cocos {
         void onExport(CCObject*);
         void onCreateEvent(CCObject*);
 
+        void onAlignButton(CCObject* sender);
+        void onFontAlignButton(CCObject* sender);
+
         ~LabelSettingsPopup() override;
 
     private:

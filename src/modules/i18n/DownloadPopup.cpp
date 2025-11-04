@@ -98,12 +98,8 @@ namespace eclipse::i18n {
         m_progressLabel->setPositionY(m_progressLabel->getPositionY() + 5.f);
         m_progressBarBG->setVisible(false);
 
-        auto btn = geode::cocos::CCMenuItemExt::createSpriteExtra(
-            ButtonSprite::create("OK", 342, 0, 1.0f, false),
-            [this](auto) {
-                this->onClose(nullptr);
-            }
-        );
+        auto btnSprite = ButtonSprite::create("OK", 120.f, 0, 1.0f, false);
+        auto btn = CCMenuItemSpriteExtra::create(btnSprite, this, menu_selector(DownloadPopup::onClose));
         btn->setID("button"_spr);
 
         auto menu = cocos2d::CCMenu::create();

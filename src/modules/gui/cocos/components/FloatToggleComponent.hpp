@@ -20,13 +20,14 @@ namespace eclipse::gui::cocos {
             this->setID(fmt::format("toggle-{}"_spr, m_component->getId()));
             this->setContentSize({ width, 28.f });
 
-            m_toggler = geode::cocos::CCMenuItemExt::createToggler(
+            m_toggler = createToggler(
                 createButton("checkmark.png"_spr), createButton(nullptr),
                 [this](auto) {
-                auto value = !this->m_component->getState();
-                m_component->setState(value);
-                m_component->triggerCallback();
-            });
+                    auto value = !this->m_component->getState();
+                    m_component->setState(value);
+                    m_component->triggerCallback();
+                }
+            );
             m_toggler->setAnchorPoint({ 0.5, 0.5f });
             m_toggler->toggle(m_component->getState());
             this->addChildAtPosition(m_toggler, geode::Anchor::Left, { 15.f, 0.f });

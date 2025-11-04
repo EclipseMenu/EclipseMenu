@@ -34,7 +34,7 @@ namespace eclipse::gui::cocos {
 
             auto choice = radioButton->getChoice();
             // 0.7
-            auto toggle = geode::cocos::CCMenuItemExt::createToggler(
+            auto toggle = createToggler(
                 createRadioButton(true), createRadioButton(false), [this, radioButton, choice](auto) {
                     radioButton->setValue(choice);
                     radioButton->triggerCallback(choice);

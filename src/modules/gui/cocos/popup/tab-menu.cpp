@@ -36,6 +36,12 @@ namespace eclipse::gui::cocos {
         m_hasActivatedTab = true;
     }
 
+    void TabMenu::onArrowButton(CCObject* sender) {
+        auto tag = sender->getTag();
+        m_currentPage += tag;
+        this->regenTabs();
+    }
+
     void TabMenu::setActiveTab(int idx) {
         if (idx < 0 || idx >= m_tabs.size()) return;
 
@@ -78,10 +84,11 @@ namespace eclipse::gui::cocos {
         auto upSpr = cocos2d::CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
         upSpr->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
         upSpr->setScale(1.5F);
-        m_upArrow = geode::cocos::CCMenuItemExt::createSpriteExtra(upSpr, [this](auto caller){
-            m_currentPage--;
-            regenTabs();
-        });
+        m_upArrow = CCMenuItemSpriteExtra::create(
+            upSpr, this,
+            menu_selector(TabMenu::onArrowButton)
+        );
+        m_upArrow->setTag(-1);
         this->addChild(m_upArrow);
 
         int i = 0;
@@ -102,13 +109,14 @@ namespace eclipse::gui::cocos {
         auto downSpr = cocos2d::CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
         downSpr->setColor(tm->getCheckboxCheckmarkColor().toCCColor3B());
         downSpr->setScale(1.5F);
-        m_downArrow = geode::cocos::CCMenuItemExt::createSpriteExtra(downSpr, [this](auto caller){
-            m_currentPage++;
-            regenTabs();
-        });
+        m_downArrow = CCMenuItemSpriteExtra::create(
+            downSpr, this,
+            menu_selector(TabMenu::onArrowButton)
+        );
+        m_downArrow->setTag(1);
         this->addChild(m_downArrow);
 
-        regenTabs();
+        this->regenTabs();
 
         // setup layout
         auto layout = geode::AxisLayout::create(geode::Axis::Column)

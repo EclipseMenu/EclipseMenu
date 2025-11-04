@@ -1,4 +1,6 @@
 #pragma once
+#include <modules/gui/cocos/nodes/CCMenuItemExt.hpp>
+
 #include "BaseComponentNode.hpp"
 
 #include <modules/gui/components/int-toggle.hpp>
@@ -20,7 +22,7 @@ namespace eclipse::gui::cocos {
             this->setID(fmt::format("toggle-{}"_spr, m_component->getId()));
             this->setContentSize({ width, 28.f });
 
-            m_toggler = geode::cocos::CCMenuItemExt::createToggler(
+            m_toggler = createToggler(
                 createButton("checkmark.png"_spr), createButton(nullptr),
                 [this](auto) {
                     auto value = !this->m_component->getState();

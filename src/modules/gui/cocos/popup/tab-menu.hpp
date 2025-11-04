@@ -18,6 +18,7 @@ namespace eclipse::gui::cocos {
         ~TabMenu() override;
 
         void onPageButton(CCObject* sender);
+        void onArrowButton(CCObject* sender);
 
     public:
         static TabMenu* create(Tabs const& tabs, Function<void(int)>&& callback);
