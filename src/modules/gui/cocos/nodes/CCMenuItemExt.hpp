@@ -18,7 +18,7 @@ namespace eclipse::gui::cocos {
     class CCMenuItemTogglerPro : public CCMenuItemToggler {
     public:
         static CCMenuItemTogglerPro* create(
-            CCNode* offSprite, CCNode* onSprite,
+            CCNode* onSprite, CCNode* offSprite,
             Function<void(CCMenuItemTogglerPro*)>&& callback
         );
 
@@ -63,7 +63,7 @@ namespace eclipse::gui::cocos {
     // == CCMenuItemToggler == //
 
     CCMenuItemTogglerPro* createToggler(
-        cocos2d::CCNode* offSprite, cocos2d::CCNode* onSprite,
+        cocos2d::CCNode* onSprite, cocos2d::CCNode* offSprite,
         Function<void(CCMenuItemTogglerPro*)>&& callback
     );
 }

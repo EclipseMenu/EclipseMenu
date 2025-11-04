@@ -882,6 +882,12 @@ namespace eclipse::gui::cocos {
         m_previewLabel = hacks::Labels::SmartLabel::create(settings->text, settings->font);
         m_previewLabel->setSettings(settings);
 
+        m_previewLabel->setFont(settings->font);
+        m_previewLabel->setScale(settings->scale);
+        m_previewLabel->setColor(settings->color.toCCColor3B());
+        m_previewLabel->setOpacity(settings->color.getAlphaByte());
+        m_previewLabel->setAlignment(settings->fontAlignment);
+
         auto origVisible = settings->visible;
         settings->visible = true;
         m_previewLabel->update();

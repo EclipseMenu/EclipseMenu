@@ -42,6 +42,7 @@ namespace eclipse {
         popup.m_title = std::move(title);
         popup.m_message = std::move(message);
         popup.m_button1 = i18n::get_("common.ok");
+        popup.m_callback = [](bool){};
         gui::Engine::get()->showPopup(std::move(popup));
     }
 

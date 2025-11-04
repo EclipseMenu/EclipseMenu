@@ -20,7 +20,7 @@ namespace eclipse::gui::cocos {
     }
 
     CCMenuItemTogglerPro* CCMenuItemTogglerPro::create(
-        CCNode* offSprite, CCNode* onSprite, Function<void(CCMenuItemTogglerPro*)>&& callback
+        CCNode* onSprite, CCNode* offSprite, Function<void(CCMenuItemTogglerPro*)>&& callback
     ) {
         auto ret = new CCMenuItemTogglerPro();
         if (ret->init(
@@ -84,8 +84,8 @@ namespace eclipse::gui::cocos {
     }
 
     CCMenuItemTogglerPro* createToggler(
-        cocos2d::CCNode* offSprite, cocos2d::CCNode* onSprite, Function<void(CCMenuItemTogglerPro*)>&& callback
+        cocos2d::CCNode* onSprite, cocos2d::CCNode* offSprite, Function<void(CCMenuItemTogglerPro*)>&& callback
     ) {
-        return CCMenuItemTogglerPro::create(offSprite, onSprite, std::move(callback));
+        return CCMenuItemTogglerPro::create(onSprite, offSprite, std::move(callback));
     }
 }
