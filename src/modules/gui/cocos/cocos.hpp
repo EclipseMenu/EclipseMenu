@@ -28,8 +28,8 @@ namespace eclipse::gui::cocos {
 
         [[nodiscard]] Popup* getPopup() const { return m_popup; }
         bool isPartOfPopup(cocos2d::CCNode* node) const;
-        void queueAfterDrawing(const std::function<void()>& func) override;
-        void showPopup(const eclipse::Popup& popup) override;
+        void queueAfterDrawing(Function<void()>&& func) override;
+        void showPopup(eclipse::Popup&& popup) override;
 
         /// @brief Used to refresh the selected page contents in the popup. Use this when you edit components within the page.
         void refreshPage() const;

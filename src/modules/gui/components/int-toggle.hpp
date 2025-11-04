@@ -12,9 +12,9 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        IntToggleComponent* toggleCallback(const std::function<void()>& func);
+        IntToggleComponent* toggleCallback(Function<void()>&& func);
 
-        IntToggleComponent* valueCallback(const std::function<void(int)>& func);
+        IntToggleComponent* valueCallback(Function<void(int)>&& func);
 
         /// @brief Set toggle description.
         IntToggleComponent* setDescription(std::string description) override;
@@ -22,8 +22,8 @@ namespace eclipse::gui {
         /// @brief Allows to set keybinds for the toggle.
         IntToggleComponent* handleKeybinds();
 
-        [[nodiscard]] const std::string& getId() const override;
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getId() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
         [[nodiscard]] bool hasKeybind() const;
 
         [[nodiscard]] int getMin() const;
@@ -34,8 +34,8 @@ namespace eclipse::gui {
         [[nodiscard]] bool getState() const;
         void setState(bool value) const;
 
-        void triggerCallback(int value) const;
-        void triggerCallback() const;
+        void triggerCallback(int value);
+        void triggerCallback();
 
     private:
         std::string m_id;
@@ -43,8 +43,8 @@ namespace eclipse::gui {
         std::string m_description;
         int m_min;
         int m_max;
-        std::function<void(int)> m_valueCallback;
-        std::function<void()> m_toggleCallback;
+        Function<void(int)> m_valueCallback;
+        Function<void()> m_toggleCallback;
         bool m_hasKeybind = false;
     };
 }

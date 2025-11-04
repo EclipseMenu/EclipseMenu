@@ -10,19 +10,23 @@ namespace eclipse::gui::cocos {
         CCMenuItemSpriteExtra* m_upArrow;
         CCMenuItemSpriteExtra* m_downArrow;
         std::vector<CCMenuItemSpriteExtra*> m_tabs;
+        Function<void(int)> m_callback;
         int m_activeTab = 0;
         int m_currentPage = 0;
         bool m_hasActivatedTab = false;
 
-        ~TabMenu();
+        ~TabMenu() override;
+
+        void onPageButton(CCObject* sender);
+        void onArrowButton(CCObject* sender);
 
     public:
-        static TabMenu* create(Tabs const& tabs, std::function<void(int)> const& callback);
+        static TabMenu* create(Tabs const& tabs, Function<void(int)>&& callback);
         void setActiveTab(int idx);
         void regenTabs();
 
     protected:
-        bool init(Tabs const& tabs, std::function<void(int)> const& callback);
+        bool init(Tabs const& tabs, Function<void(int)>&& callback);
     };
 
     /// @brief Tab buttons for both activating and deactivating
@@ -34,9 +38,9 @@ namespace eclipse::gui::cocos {
 
     public:
         void setState(bool active) const;
-        static TabButton* create(const std::string& name, const cocos2d::CCSize& size);
+        static TabButton* create(std::string_view name, cocos2d::CCSize const& size);
 
     protected:
-        bool init(std::string name, cocos2d::CCSize size);
+        bool init(std::string_view name, cocos2d::CCSize size);
     };
 }

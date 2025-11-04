@@ -57,7 +57,7 @@ namespace eclipse::labels {
         "Lo-Sumires", "Gewtymol", "Rubik"
     };
 
-    inline int32_t getFontIndex(const std::string& font) {
+    inline int32_t getFontIndex(std::string_view font) {
         auto it = std::ranges::find(fontFiles, font);
         size_t index = it == fontFiles.end() ? 0 : std::distance(fontFiles.begin(), it);
         return static_cast<int32_t>(index);
@@ -91,8 +91,8 @@ namespace eclipse::labels {
         void promptSave() const;
     };
 
-    void from_json(const nlohmann::json& json, LabelSettings& settings);
-    void to_json(nlohmann::json& json, const LabelSettings& settings);
-    void from_json(const nlohmann::json& json, LabelEvent& event);
-    void to_json(nlohmann::json& json, const LabelEvent& event);
+    void from_json(nlohmann::json const& json, LabelSettings& settings);
+    void to_json(nlohmann::json& json, LabelSettings const& settings);
+    void from_json(nlohmann::json const& json, LabelEvent& event);
+    void to_json(nlohmann::json& json, LabelEvent const& event);
 }

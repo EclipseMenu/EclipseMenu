@@ -1,7 +1,6 @@
 #pragma once
 #include "layout.hpp"
 #include "../core/tab.hpp"
-#include "../animation/move-action.hpp"
 
 namespace eclipse::gui::imgui {
 

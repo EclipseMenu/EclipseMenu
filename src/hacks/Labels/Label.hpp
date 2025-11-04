@@ -3,6 +3,7 @@
 #include <modules/gui/color.hpp>
 #include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 #include <rift.hpp>
+#include <modules/labels/setting.hpp>
 
 namespace eclipse::hacks::Labels {
 
@@ -11,7 +12,7 @@ namespace eclipse::hacks::Labels {
     /// @brief Label with RIFT scripting support.
     class SmartLabel : public gui::cocos::EmojiLabel {
     public:
-        static SmartLabel* create(const std::string& text, const std::string& font) {
+        static SmartLabel* create(std::string_view text, std::string const& font) {
             auto ret = new SmartLabel();
             if (ret->init(text, font)) {
                 ret->autorelease();
@@ -22,7 +23,7 @@ namespace eclipse::hacks::Labels {
         }
 
         /// @brief Initialize the label with the specified text and font.
-        bool init(const std::string& text, const std::string& font);
+        bool init(std::string_view text, std::string const& font);
 
         /// @brief Set the parent container of the label.
         void setParentContainer(LabelsContainer* container) { m_parentContainer = container; }
@@ -33,11 +34,11 @@ namespace eclipse::hacks::Labels {
         /// @brief Set the custom position of the label.
         void setCustomPosition(const cocos2d::CCPoint& position) { m_customPosition = position; }
 
+        /// @brief Set the settings associated with the label.
+        void setSettings(labels::LabelSettings* settings) { m_settings = settings; }
+
         /// @brief Get the custom position of the label.
         [[nodiscard]] cocos2d::CCPoint getCustomPosition() const { return m_customPosition; }
-
-        /// @brief Set the script of the label.
-        void setScript(const std::string& script);
 
         /// @brief Update the label.
         void update();
@@ -46,8 +47,8 @@ namespace eclipse::hacks::Labels {
         cocos2d::CCPoint m_customPosition = {0, 0};
         float m_heightMultiplier = 1.0f;
         std::unique_ptr<rift::Script> m_script = nullptr;
-        std::string m_text;
         std::string m_error;
+        labels::LabelSettings const* m_settings = nullptr;
 
         // Used to check if the label should call updateLayout on the parent container
         float m_lastHeight = 0.f;

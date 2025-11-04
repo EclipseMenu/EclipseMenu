@@ -109,9 +109,9 @@ namespace eclipse::hacks::Player {
     /// @brief A button with callbacks for holding and releasing
     class HoldingMenuItem : public CCMenuItemSpriteExtra {
     public:
-        static HoldingMenuItem* create(cocos2d::CCSprite* sprite, const std::function<void()>& onHold, const std::function<void()>& onRelease) {
+        static HoldingMenuItem* create(cocos2d::CCSprite* sprite, Function<void()>&& onHold, Function<void()>&& onRelease) {
             auto ret = new HoldingMenuItem();
-            if (ret->init(sprite, onHold, onRelease)) {
+            if (ret->init(sprite, std::move(onHold), std::move(onRelease))) {
                 ret->autorelease();
                 return ret;
             }
@@ -119,12 +119,12 @@ namespace eclipse::hacks::Player {
             return nullptr;
         }
 
-        bool init(cocos2d::CCSprite* sprite, const std::function<void()>& onHold, const std::function<void()>& onRelease) {
+        bool init(cocos2d::CCSprite* sprite, Function<void()>&& onHold, Function<void()>&& onRelease) {
             if (!CCMenuItemSpriteExtra::init(sprite, nullptr, nullptr, nullptr))
                 return false;
 
-            m_onHold = onHold;
-            m_onRelease = onRelease;
+            m_onHold = std::move(onHold);
+            m_onRelease = std::move(onRelease);
 
             return true;
         }
@@ -140,8 +140,8 @@ namespace eclipse::hacks::Player {
         }
 
     private:
-        std::function<void()> m_onHold;
-        std::function<void()> m_onRelease;
+        Function<void()> m_onHold;
+        Function<void()> m_onRelease;
     };
 
     class FrameStepControl : public cocos2d::CCMenu {

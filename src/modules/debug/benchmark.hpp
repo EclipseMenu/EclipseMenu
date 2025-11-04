@@ -1,5 +1,7 @@
 #pragma once
 #include <chrono>
+#include <functional.hpp>
+
 #include "utils.hpp"
 
 namespace eclipse::debug {
@@ -61,7 +63,7 @@ namespace eclipse::debug {
     public:
         Benchmark(
             std::string_view name,
-            std::function<void()> func,
+            Function<void()> func,
             size_t maxIterations = 1'000'000'000, // 1 billion
             size_t maxTime = 10'000'000'000       // 10 seconds
         ) : m_name(name), m_func(std::move(func)), m_maxIterations(maxIterations), m_maxTime(maxTime) { run(); }
@@ -84,7 +86,7 @@ namespace eclipse::debug {
 
     private:
         std::string_view m_name;
-        std::function<void()> m_func;
+        Function<void()> m_func;
         size_t m_maxIterations;
         size_t m_maxTime;
     };

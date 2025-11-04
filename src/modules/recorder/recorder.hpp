@@ -1,4 +1,5 @@
 #pragma once
+#include <functional.hpp>
 #include <Geode/platform/platform.hpp>
 #include "ffmpeg-api/events.hpp"
 
@@ -16,7 +17,7 @@ namespace eclipse::recorder {
         bool isRecording() const { return m_recording; }
         std::string getRecordingDuration() const;
 
-        void setCallback(const std::function<void(std::string const&)>& callback) { m_callback = callback; }
+        void setCallback(Function<void(std::string const&)>&& callback) { m_callback = std::move(callback); }
 
         static std::vector<std::string> getAvailableCodecs();
 
@@ -33,6 +34,6 @@ namespace eclipse::recorder {
         RenderTexture m_renderTexture{};
         uint64_t m_recordingDuration = 0;
 
-        std::function<void(std::string const&)> m_callback;
+        Function<void(std::string const&)> m_callback;
     };
 };

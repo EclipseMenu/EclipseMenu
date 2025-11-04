@@ -1,6 +1,6 @@
 #pragma once
 
-#include <functional>
+#include <functional.hpp>
 #include <string>
 #include <vector>
 
@@ -54,7 +54,7 @@ namespace eclipse::config {
     /// @param defaultValue Default value to return if the key does not exist.
     /// @return Value from the configuration or the default value if the key does not exist.
     template<typename T>
-    T get(std::string_view key, const T& defaultValue);
+    T get(std::string_view key, T const& defaultValue);
 
     /// @brief Get a value by key from the configuration.
     /// @note If the key does not exist, it will throw an exception.
@@ -69,7 +69,7 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    void set(std::string_view key, const T& value);
+    void set(std::string_view key, T const& value);
 
     /// @brief Erase a key from the configuration.
     /// @param key Key to erase.
@@ -92,19 +92,19 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    void setIfEmpty(std::string_view key, const T& value);
+    void setIfEmpty(std::string_view key, T const& value);
 
     /// @brief Registers a delegate which is called when a specific value in config is changed
     /// @param key Key of the value which should have a delegate
     /// @param callback Callback to call when value is changed
     /// @param first If true, the delegate will be added to the front of the list
-    void addDelegate(std::string_view key, std::function<void()>&& callback, bool first = false);
+    void addDelegate(std::string_view key, Function<void()>&& callback, bool first = false);
 
     /// @brief Registers a delegate which is called when a specific value in temp is changed
     /// @param key Key of the value which should have a delegate
     /// @param callback Callback to call when value is changed
     /// @param first If true, the delegate will be added to the front of the list
-    void addTempDelegate(std::string_view key, std::function<void()>&& callback, bool first = false);
+    void addTempDelegate(std::string_view key, Function<void()>&& callback, bool first = false);
 
     /// @brief Check if a key exists in the temporary storage.
     /// @param key Key to check.
@@ -117,7 +117,7 @@ namespace eclipse::config {
     /// @param defaultValue Default value to return if the key does not exist.
     /// @return Value from the temporary storage or the default value if the key does not exist.
     template<typename T>
-    T getTemp(std::string_view key, const T& defaultValue);
+    T getTemp(std::string_view key, T const& defaultValue);
 
     /// @brief Get a value by key from the temporary storage.
     /// @note If the key does not exist, it will throw an exception.
@@ -132,23 +132,23 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    void setTemp(std::string_view key, const T& value);
+    void setTemp(std::string_view key, T const& value);
 
     namespace __impl {
         template <size_t N>
         struct Key {
             char data[N];
-            explicit(false) constexpr Key(const char* str) { std::copy_n(str, N, data); }
+            explicit(false) constexpr Key(char const* str) { std::copy_n(str, N, data); }
             constexpr operator std::string_view() const { return {data, N}; }
         };
 
         template <size_t N>
-        Key(const char(&)[N]) -> Key<N - 1>;
+        Key(char const (&)[N]) -> Key<N - 1>;
     }
 
     /// @brief Cached version of get function to avoid multiple lookups.
     template <__impl::Key key, typename T>
-    T get(const T& defaultValue = T{}) {
+    T get(T const& defaultValue = T{}) {
         static T value = (addDelegate(key, [] {
             value = get<T>(key, T{});
         }, true), get<T>(key, defaultValue));
@@ -157,7 +157,7 @@ namespace eclipse::config {
 
     /// @brief Cached version of getTemp function to avoid multiple lookups.
     template <__impl::Key key, typename T>
-    T getTemp(const T& defaultValue = T{}) {
+    T getTemp(T const& defaultValue = T{}) {
         static T value = (addTempDelegate(key, [] {
             value = getTemp<T>(key, T{});
         }, true), getTemp<T>(key, defaultValue));

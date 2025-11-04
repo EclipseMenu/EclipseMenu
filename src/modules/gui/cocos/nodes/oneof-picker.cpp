@@ -5,9 +5,9 @@
 #include "FallbackBMFont.hpp"
 
 namespace eclipse::gui::cocos {
-    OneOfPicker* OneOfPicker::create(std::span<std::string> options, const std::function<void(int)>& callback, size_t index) {
+    OneOfPicker* OneOfPicker::create(std::vector<std::string>&& options, Function<void(int)>&& callback, size_t index) {
         auto ret = new OneOfPicker();
-        if (ret->init(options, callback, index)) {
+        if (ret->init(std::move(options), std::move(callback), index)) {
             ret->autorelease();
             return ret;
         }
@@ -15,13 +15,13 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    OneOfPicker* OneOfPicker::create(std::span<const char*> options, const std::function<void(int)>& callback, size_t index) {
+    OneOfPicker* OneOfPicker::create(std::span<char const*> options, Function<void(int)>&& callback, size_t index) {
         std::vector<std::string> items;
         items.reserve(options.size());
         for (auto& option : options) {
             items.emplace_back(option);
         }
-        return create(items, callback, index);
+        return create(std::move(items), std::move(callback), index);
     }
 
     void OneOfPicker::setSelected(size_t index) {
@@ -40,14 +40,14 @@ namespace eclipse::gui::cocos {
         this->updateValueLabel();
     }
 
-    bool OneOfPicker::init(std::span<std::string> options, const std::function<void(int)>& callback, size_t index) {
+    bool OneOfPicker::init(std::vector<std::string>&& options, Function<void(int)>&& callback, size_t index) {
         if (!CCMenu::init()) return false;
 
-        m_options = std::vector(options.begin(), options.end());
-        m_callback = callback;
+        m_options = std::move(options);
+        m_callback = std::move(callback);
         m_selected = index;
 
-        const auto tm = ThemeManager::get();
+        auto const tm = ThemeManager::get();
 
         this->setContentSize({100.f, 28.f});
         this->setID("oneof-picker"_spr);

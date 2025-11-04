@@ -15,20 +15,20 @@ namespace eclipse::gui {
         void onInit() override {}
         void onUpdate() override {}
 
-        [[nodiscard]] const std::string& getId() const override;
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getId() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
 
         labels::LabelSettings* getSettings() const;
 
-        LabelSettingsComponent* deleteCallback(const std::function<void()>& func);
-        LabelSettingsComponent* editCallback(const std::function<void()>& func);
-        LabelSettingsComponent* moveCallback(const std::function<void(bool)>& func);
-        LabelSettingsComponent* exportCallback(const std::function<void()>& func);
+        LabelSettingsComponent* deleteCallback(Function<void()>&& func);
+        LabelSettingsComponent* editCallback(Function<void()>&& func);
+        LabelSettingsComponent* moveCallback(Function<void(bool)>&& func);
+        LabelSettingsComponent* exportCallback(Function<void()>&& func);
 
-        void triggerDeleteCallback() const;
-        void triggerEditCallback() const;
-        void triggerMoveCallback(bool up) const;
-        void triggerExportCallback() const;
+        void triggerDeleteCallback();
+        void triggerEditCallback();
+        void triggerMoveCallback(bool up);
+        void triggerExportCallback();
 
         /// @brief Allows to set keybinds for the label.
         LabelSettingsComponent* handleKeybinds();
@@ -38,10 +38,10 @@ namespace eclipse::gui {
     private:
         std::string m_id;
         labels::LabelSettings* m_settings;
-        std::function<void()> m_deleteCallback;
-        std::function<void()> m_editCallback;
-        std::function<void(bool)> m_moveCallback;
-        std::function<void()> m_exportCallback;
+        Function<void()> m_deleteCallback;
+        Function<void()> m_editCallback;
+        Function<void(bool)> m_moveCallback;
+        Function<void()> m_exportCallback;
 
         bool m_hasKeybind = false;
     };

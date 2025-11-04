@@ -31,7 +31,7 @@ namespace eclipse::gui::imgui {
         static std::vector<FontMetadata> fetchAvailableFonts();
         void fetchFonts();
         /// @brief Returns a vector of already found fonts, without rescanning
-        const std::vector<FontMetadata>& getAvailableFonts();
+        std::vector<FontMetadata> const& getAvailableFonts();
 
         void init();
         FontMetadata& getFont() { return m_availableFonts[m_selectedFontIndex]; }
@@ -53,10 +53,10 @@ namespace eclipse::gui::imgui {
         void init() override;
         void toggle() override;
         [[nodiscard]] bool isToggled() const override;
-        [[nodiscard]] const std::unique_ptr<Layout>& getLayout() const;
+        [[nodiscard]] std::unique_ptr<Layout> const& getLayout() const;
         void shutdown() override;
-        void queueAfterDrawing(const std::function<void()>& func) override;
-        void showPopup(const Popup& popup) override;
+        void queueAfterDrawing(Function<void()>&& func) override;
+        void showPopup(Popup&& popup) override;
         [[nodiscard]] RendererType getType() const override { return RendererType::ImGui; }
         void updateTabs() override;
 
@@ -65,8 +65,8 @@ namespace eclipse::gui::imgui {
         void setLayoutMode(LayoutMode mode);
         void setComponentTheme(ComponentTheme theme);
 
-        void visitComponent(const std::shared_ptr<Component>& component) const;
-        bool beginWindow(const std::string& title) const;
+        void visitComponent(std::shared_ptr<Component> const& component) const;
+        bool beginWindow(std::string const& title) const;
         void endWindow() const;
         void reload() const;
 
@@ -84,12 +84,12 @@ namespace eclipse::gui::imgui {
 
         FontManager m_fontManager;
 
-        std::unique_ptr<Theme> m_theme;
+        Theme const* m_theme;
         std::unique_ptr<Layout> m_layout;
 
         bool m_insideDraw = false;
         LayoutMode m_queuedMode = LayoutMode::Tabbed;
-        std::vector<std::function<void()>> m_runAfterDrawingQueue;
+        std::vector<Function<void()>> m_runAfterDrawingQueue;
         std::vector<Popup> m_popups;
     };
 }

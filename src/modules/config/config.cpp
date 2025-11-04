@@ -14,7 +14,7 @@
 
 namespace eclipse::config {
 
-    using CallbackMap = std::unordered_map<std::string_view, std::vector<std::function<void()>>>;
+    using CallbackMap = std::unordered_map<std::string_view, std::vector<Function<void()>>>;
 
     CallbackMap& getCallbacks() {
         static CallbackMap callbacks;
@@ -53,7 +53,7 @@ namespace eclipse::config {
     /// @brief Load config file from path
     /// @param path Path to the config file
     /// @return True if the file was loaded successfully
-    bool loadFile(const std::filesystem::path& path) {
+    bool loadFile(std::filesystem::path const& path) {
         std::ifstream file(path);
         if (!file.is_open()) return false;
 
@@ -68,7 +68,7 @@ namespace eclipse::config {
         auto& callbacks = getCallbacks();
         auto it = callbacks.find(name);
         if (it == callbacks.end()) return;
-        for (const auto& callback : it->second) {
+        for (auto& callback : it->second) {
             callback();
         }
     }
@@ -77,19 +77,19 @@ namespace eclipse::config {
         auto& callbacks = getTempCallbacks();
         auto it = callbacks.find(name);
         if (it == callbacks.end()) return;
-        for (const auto& callback : it->second) {
+        for (auto& callback : it->second) {
             callback();
         }
     }
 
-    void addDelegate(std::string_view key, std::function<void()>&& callback, bool first) {
+    void addDelegate(std::string_view key, Function<void()>&& callback, bool first) {
         auto& callbacks = getCallbacks();
         auto& existingCallbacks = callbacks[key];
         first ? void(existingCallbacks.insert(existingCallbacks.begin(), std::move(callback))) :
                 void(existingCallbacks.push_back(std::move(callback)));
     }
 
-    void addTempDelegate(std::string_view key, std::function<void()>&& callback, bool first) {
+    void addTempDelegate(std::string_view key, Function<void()>&& callback, bool first) {
         auto& callbacks = getTempCallbacks();
         auto& existingCallbacks = callbacks[key];
         first ? void(existingCallbacks.insert(existingCallbacks.begin(), std::move(callback))) :
@@ -111,7 +111,7 @@ namespace eclipse::config {
 
     /// @brief Save config file to path
     /// @param path Path to save the config file
-    void saveFile(const std::filesystem::path& path) {
+    void saveFile(std::filesystem::path const& path) {
         auto data = getStorage().dump(4, ' ', false, nlohmann::detail::error_handler_t::ignore);
         auto res = geode::utils::file::writeStringSafe(path, data);
         if (res.isErr()) {
@@ -200,7 +200,7 @@ namespace eclipse::config {
     }
 
     template <typename T>
-    T get(std::string_view key, const T& defaultValue)  {
+    T get(std::string_view key, T const& defaultValue)  {
         if (!has(key))
             return defaultValue;
 
@@ -216,7 +216,7 @@ namespace eclipse::config {
     }
 
     template <typename T>
-    void set(std::string_view key, const T& value) {
+    void set(std::string_view key, T const& value) {
         getStorage()[key] = value;
         executeCallbacks(key);
     }
@@ -241,13 +241,13 @@ namespace eclipse::config {
     }
 
     template <typename T>
-    void setIfEmpty(std::string_view key, const T& value) {
+    void setIfEmpty(std::string_view key, T const& value) {
         if (!has(key))
             set(key, value);
     }
 
     template <typename T>
-    T getTemp(std::string_view key, const T& defaultValue) {
+    T getTemp(std::string_view key, T const& defaultValue) {
         if (!hasTemp(key))
             return defaultValue;
 
@@ -263,7 +263,7 @@ namespace eclipse::config {
     }
 
     template <typename T>
-    void setTemp(std::string_view key, const T& value) {
+    void setTemp(std::string_view key, T const& value) {
         getTempStorage()[key] = value;
         executeTempCallbacks(key);
     }

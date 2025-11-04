@@ -32,7 +32,7 @@ namespace eclipse::hack {
     }
 
     WeakHackPtr find(std::string_view id) {
-        for (auto hack : getHacks()) {
+        for (auto const& hack : getHacks()) {
             if (hack->getId() == id) {
                 return hack;
             }
@@ -54,14 +54,14 @@ namespace eclipse::hack {
             return a->getPriority() < b->getPriority();
         });
 
-        for (const auto hack : hacks)
+        for (auto const& hack : hacks)
             hack->init();
 
         s_lateInit = true;
     }
 
     void lateInitializeHacks() {
-        for (const auto hack : getHacks())
+        for (auto const hack : getHacks())
             hack->lateInit();
     }
 

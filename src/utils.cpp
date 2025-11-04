@@ -28,8 +28,8 @@
 #endif
 
 namespace eclipse::utils {
-    std::random_device& getRng() {
-        static std::random_device rng;
+    std::mt19937_64& getRng() {
+        static std::mt19937_64 rng{std::random_device{}()};
         return rng;
     }
 
@@ -97,11 +97,11 @@ namespace eclipse::utils {
             PlatformToolbox::hideCursor();
     }
 
-    const char* getMonthName(int month) {
-        constexpr std::array months = {
+    std::string_view getMonthName(int month) {
+        constexpr std::array months = std::to_array<std::string_view>({
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
-        };
+        });
         return months.at(month);
     }
 
@@ -153,7 +153,7 @@ namespace eclipse::utils {
         return PlayerMode::Cube;
     }
 
-    const char* gameModeName(PlayerMode mode) {
+    std::string_view gameModeName(PlayerMode mode) {
         switch (mode) {
             case PlayerMode::Cube: return "Cube";
             case PlayerMode::Ship: return "Ship";

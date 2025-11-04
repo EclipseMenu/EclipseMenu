@@ -39,7 +39,7 @@ namespace eclipse::bot {
         /// @brief Removes all inputs from the currently loaded replay, up to the given frame.
         /// @param frame Frame to stop at.
         void removeInputsAfter(int frame);
-        
+
         /// @brief Add an input to the currently loaded replay.
         void recordInput(int frame, PlayerButton button, bool player2, bool pressed);
 
@@ -50,11 +50,11 @@ namespace eclipse::bot {
 
         /// @brief Saves the current replay.
         /// @param path Path to save the replay to.
-        geode::Result<> save(const std::filesystem::path& path);
+        geode::Result<> save(std::filesystem::path const& path);
 
         /// @brief Loads a replay from the given path.
         /// @param path Path to load the replay from.
-        geode::Result<> load(const std::filesystem::path& path);
+        geode::Result<> load(std::filesystem::path const& path);
 
         /// @brief Loads a replay from a data buffer.
         /// @param data Data to load the replay from.
@@ -62,7 +62,7 @@ namespace eclipse::bot {
 
         /// @brief Sets the level info.
         /// @param levelInfo The level info.
-        void setLevelInfo(const gdr::Level& levelInfo);
+        void setLevelInfo(gdr::Level const& levelInfo);
 
         /// @brief Sets platformer.
         /// @param platformer Platformer.

@@ -12,7 +12,7 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        RadioButtonComponent* callback(const std::function<void(int)>& func);
+        RadioButtonComponent* callback(Function<void(int)>&& func);
 
         /// @brief Get the radio button value.
         [[nodiscard]] int getValue() const;
@@ -25,11 +25,11 @@ namespace eclipse::gui {
         /// @brief Allows to set keybinds for the radio button.
         RadioButtonComponent* handleKeybinds();
 
-        [[nodiscard]] const std::string& getId() const override;
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getId() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
         [[nodiscard]] bool hasKeybind() const;
 
-        void triggerCallback(int value) const;
+        void triggerCallback(int value);
 
         RadioButtonComponent* setDescription(std::string description) override;
 
@@ -37,7 +37,7 @@ namespace eclipse::gui {
         std::string m_id;
         std::string m_title;
         int m_value;
-        std::function<void(int)> m_callback;
+        Function<void(int)> m_callback;
         bool m_hasKeybind = false;
     };
 }

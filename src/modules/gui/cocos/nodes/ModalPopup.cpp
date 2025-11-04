@@ -6,9 +6,9 @@
 
 namespace eclipse::gui::cocos {
 
-    ModalPopup* ModalPopup::create(eclipse::Popup const& settings) {
+    ModalPopup* ModalPopup::create(eclipse::Popup&& settings) {
         auto ret = new ModalPopup();
-        if (ret->initAnchored(260.f, 160.f, settings, "GJ_square04.png")) {
+        if (ret->initAnchored(260.f, 160.f, std::move(settings), "GJ_square04.png")) {
             ret->autorelease();
             return ret;
         }
@@ -16,19 +16,19 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    bool ModalPopup::setup(eclipse::Popup const &settings) {
+    bool ModalPopup::setup(eclipse::Popup&& settings) {
         m_closeBtn->setVisible(false);
 
-        m_settings = settings;
+        m_settings = std::move(settings);
         m_bgSprite->setColor({ 100, 100, 100});
 
-        auto title = TranslatedLabel::createRaw(settings.getTitle());
+        auto title = TranslatedLabel::createRaw(m_settings.getTitle());
         title->setID("title"_spr);
         title->limitLabelWidth(m_size.width - 30.f, 1.f, 0.25f);
         title->setColor({ 64, 255, 160 });
         m_mainLayer->addChildAtPosition(title, geode::Anchor::Top, { 0.f, -20.f });
 
-        auto message = TranslatedLabel::createWrappedRaw(settings.getMessage(), m_size.width - 30.f, 0.8f);
+        auto message = TranslatedLabel::createWrappedRaw(m_settings.getMessage(), m_size.width - 30.f, 0.8f);
         message->setID("message"_spr);
         message->setAlignment(BMFontAlignment::Center);
 
@@ -38,11 +38,11 @@ namespace eclipse::gui::cocos {
         m_mainLayer->updateLayout();
 
         if (m_settings.isPrompt()) {
-            auto textBox = geode::TextInput::create(m_size.width - 30.f, settings.getPromptValue(), "font_default.fnt"_spr);
+            auto textBox = geode::TextInput::create(m_size.width - 30.f, m_settings.getPromptValue(), "font_default.fnt"_spr);
             textBox->setID("textbox"_spr);
             textBox->setAnchorPoint({ 0.5f, 0.5f });
-            textBox->setString(settings.getPromptValue());
-            textBox->setCallback([this](const std::string& text) {
+            textBox->setString(m_settings.getPromptValue());
+            textBox->setCallback([this](std::string const& text) {
                 m_settings.getPromptValue() = text;
             });
             m_mainLayer->addChildAtPosition(textBox, geode::Anchor::Center, { 0.f, -10.f });
@@ -56,16 +56,16 @@ namespace eclipse::gui::cocos {
         buttonsMenu->setContentSize({ 200.f, 28.f });
         buttonsMenu->setAnchorPoint({ 0.5f, 0.5f });
         auto btn1 = CCMenuItemSpriteExtra::create(
-            createButtonSprite(settings.getButton1()),
+            createButtonSprite(m_settings.getButton1()),
             this, menu_selector(ModalPopup::onBtn1)
         );
         btn1->setID("button1"_spr);
         buttonsMenu->addChild(btn1);
 
-        if (!settings.getButton2().empty()) {
+        if (!m_settings.getButton2().empty()) {
             m_cancelable = false;
             auto btn2 = CCMenuItemSpriteExtra::create(
-                createButtonSprite(settings.getButton2()),
+                createButtonSprite(m_settings.getButton2()),
                 this, menu_selector(ModalPopup::onBtn2)
             );
             btn2->setID("button2"_spr);
@@ -84,7 +84,7 @@ namespace eclipse::gui::cocos {
             cocos->unregisterModal(this);
     }
 
-    cocos2d::CCNode* ModalPopup::createButtonSprite(std::string const& text) const {
+    cocos2d::CCNode* ModalPopup::createButtonSprite(std::string_view text) const {
         auto label = TranslatedLabel::createRaw(text);
         label->setScale(0.9f);
         auto bg = cocos2d::extension::CCScale9Sprite::create("geode.loader/GE_button_05.png");

@@ -1,9 +1,9 @@
 #include "color-picker.hpp"
 
 namespace eclipse::gui::cocos {
-    bool ColorPicker::init(gui::Color const& original, bool useAlpha, std::function<void(gui::Color const&)> const& callback) {
+    bool ColorPicker::init(gui::Color const& original, bool useAlpha, Function<void(gui::Color const&)>&& callback) {
         m_useAlpha = useAlpha;
-        m_callback = callback;
+        m_callback = std::move(callback);
         m_color = original;
 
         m_colorSprite = ColorChannelSprite::create();

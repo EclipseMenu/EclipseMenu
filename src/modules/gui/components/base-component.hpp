@@ -39,6 +39,12 @@ namespace eclipse::gui {
 
         Component();
 
+        Component(Component&&) = default;
+        Component& operator=(Component&&) = default;
+
+        Component(Component const&) = delete;
+        Component& operator=(Component const&) = delete;
+
         /// @brief Get the component's unique identifier.
         [[nodiscard]] size_t getUID() const { return m_uid; }
 

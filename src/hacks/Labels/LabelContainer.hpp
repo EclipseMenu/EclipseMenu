@@ -28,8 +28,7 @@ namespace eclipse::hacks::Labels {
 
         /// @brief Add a label to the container.
         /// @param label The label to add.
-        /// @param update Custom update function.
-        void addLabel(SmartLabel* label, const std::function<void(SmartLabel*)>& update);
+        void addLabel(SmartLabel* label);
 
         /// @brief Remove a label from the container.
         /// @param label The label to remove.
@@ -60,7 +59,7 @@ namespace eclipse::hacks::Labels {
         /// @brief Performs a layout update.
         void recalculateLayout();
 
-        std::vector<std::pair<SmartLabel*, std::function<void(SmartLabel*)>>> m_labels;
+        std::vector<SmartLabel*> m_labels;
         Alignment m_alignment = Alignment::TopLeft;
         bool m_dirty = false;
     };

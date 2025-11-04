@@ -11,7 +11,7 @@
 
 namespace eclipse::gui::cocos {
     bool Popup::setup(Tabs const& tabs) {
-        const auto tm = ThemeManager::get();
+        auto const tm = ThemeManager::get();
         auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
         this->setTitle("");
         m_buttonMenu->setContentSize(winSize);

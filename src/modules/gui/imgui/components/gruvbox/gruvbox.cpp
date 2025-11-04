@@ -7,7 +7,7 @@
 
 namespace eclipse::gui::imgui::themes {
     bool Gruvbox::checkbox(
-        const std::string& label, bool& value, bool isSearchedFor, const std::function<void()>& postDraw
+        std::string const& label, bool& value, bool isSearchedFor, FunctionRef<void()> postDraw
     ) const {
         auto tm = ThemeManager::get();
         auto* drawList = ImGui::GetWindowDrawList();

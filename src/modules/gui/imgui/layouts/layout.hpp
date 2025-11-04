@@ -19,7 +19,7 @@ namespace eclipse::gui::imgui {
 
         // this function should return true as long as you want the layout to stay visible
         // after the menu has been toggled off
-        virtual bool wantStayVisible() const { return false; }
+        [[nodiscard]] virtual bool wantStayVisible() const { return false; }
 
         [[nodiscard]] LayoutMode getMode() const { return m_mode; }
         [[nodiscard]] bool canForceKeyboardFocus() const { return m_canForceKeyboardFocus; }

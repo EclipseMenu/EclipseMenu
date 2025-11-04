@@ -56,12 +56,12 @@ namespace eclipse::gui::cocos {
 
     //since cocos is retained mode, extra work might not be needed
     //might need to change in the future IDK
-    void CocosRenderer::queueAfterDrawing(const std::function<void()>& func) {
+    void CocosRenderer::queueAfterDrawing(Function<void()>&& func) {
         func();
     }
 
-    void CocosRenderer::showPopup(const eclipse::Popup& popup) {
-        auto modal = ModalPopup::create(popup);
+    void CocosRenderer::showPopup(eclipse::Popup&& popup) {
+        auto modal = ModalPopup::create(std::move(popup));
         modal->show();
         m_extraPopups.push_back(modal);
     }

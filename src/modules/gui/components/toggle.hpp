@@ -1,5 +1,6 @@
 #pragma once
-#include <functional>
+#include <std23/function_ref.h>
+
 #include "base-component.hpp"
 
 namespace eclipse::gui {
@@ -14,16 +15,16 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        ToggleComponent* callback(const std::function<void(bool)>& func);
+        ToggleComponent* callback(Function<void(bool)>&& func);
 
         /// @brief Add sub-component to toggle.
-        void addOptions(const std::function<void(std::shared_ptr<MenuTab>)>& options);
+        void addOptions(FunctionRef<void(std::shared_ptr<MenuTab>)> options);
 
         /// @brief Get the toggle value.
         [[nodiscard]] bool getValue() const;
 
         /// @brief Set the toggle value.
-        void setValue(bool value) const;
+        void setValue(bool value);
 
         /// @brief Allows to set keybinds for the toggle.
         ToggleComponent* handleKeybinds();
@@ -31,17 +32,17 @@ namespace eclipse::gui {
         ToggleComponent* setDescription(std::string description) override;
         ToggleComponent* setDescription();
 
-        [[nodiscard]] const std::string& getId() const override;
-        [[nodiscard]] const std::string& getTitle() const override;
+        [[nodiscard]] std::string const& getId() const override;
+        [[nodiscard]] std::string const& getTitle() const override;
         [[nodiscard]] std::weak_ptr<MenuTab> getOptions() const;
         [[nodiscard]] bool hasKeybind() const;
 
-        void triggerCallback(bool value) const;
+        void triggerCallback(bool value);
 
     private:
         std::string m_id;
         std::string m_title;
-        std::function<void(bool)> m_callback;
+        Function<void(bool)> m_callback;
         std::shared_ptr<MenuTab> m_options = nullptr;
         bool m_hasKeybind = false;
     };

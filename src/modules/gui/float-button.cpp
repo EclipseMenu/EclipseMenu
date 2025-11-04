@@ -12,7 +12,7 @@ namespace eclipse::gui {
         return instance;
     }
 
-    void FloatingButton::setCallback(std::function<void()> callback) {
+    void FloatingButton::setCallback(Function<void()>&& callback) {
         m_callback = std::move(callback);
     }
 

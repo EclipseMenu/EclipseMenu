@@ -5,8 +5,8 @@
 
 namespace eclipse::gui::imgui {
 
-    Window::Window(const std::string& title, std::function<void()> onDraw) {
-        m_title = title;
+    Window::Window(std::string title, Function<void()>&& onDraw) {
+        m_title = std::move(title);
         m_drawCallback = std::move(onDraw);
         m_position = ImVec2(0, 0);
         m_drawPosition = m_position;
@@ -67,39 +67,44 @@ namespace eclipse::gui::imgui {
                m_position.y < screenSize.y;
     }
 
-    const std::string& Window::getTitle() const { return m_title; }
+    std::string const& Window::getTitle() const { return m_title; }
 
-    void Window::setTitle(const std::string& title) { m_title = title; }
+    void Window::setTitle(std::string title) { m_title = std::move(title); }
 
-    const ImVec2& Window::getPosition() const { return m_position; }
+    ImVec2 const& Window::getPosition() const { return m_position; }
 
-    void Window::setPosition(const ImVec2& position) { m_position = position; }
+    void Window::setPosition(ImVec2 const& position) { m_position = position; }
 
-    const ImVec2& Window::getDrawPosition() const { return m_drawPosition; }
+    ImVec2 const& Window::getDrawPosition() const { return m_drawPosition; }
 
-    void Window::setDrawPosition(const ImVec2& position) { m_drawPosition = position; }
+    void Window::setDrawPosition(ImVec2 const& position) { m_drawPosition = position; }
 
-    const ImVec2& Window::getSize() const { return m_size; }
+    ImVec2 const& Window::getSize() const { return m_size; }
 
-    void Window::setSize(const ImVec2& size) { m_size = size; }
+    void Window::setSize(ImVec2 const& size) { m_size = size; }
 
-    std::shared_ptr<animation::MoveAction> Window::animateTo(const ImVec2& target, double duration, animation::EasingFunction easing, bool useRealPosition) {
+    std::unique_ptr<animation::MoveAction> Window::animateTo(ImVec2 const& target, double duration, animation::EasingFunction easing, bool useRealPosition) {
         auto action = animation::MoveAction::create(duration, &m_drawPosition, target, easing);
 
         if (useRealPosition)
             m_position = target;
 
-        return action;
+        return std::move(action);
     }
 
-    void to_json(nlohmann::json& j, const Window& e) {
-        auto pos = nlohmann::json{{"x", e.getPosition().x}, {"y", e.getPosition().y}};
-        j = nlohmann::json{{"pos",   pos},
-                           {"open",  e.isOpen()},
-                           {"title", e.getTitle()}};
+    void to_json(nlohmann::json& j, Window const& e) {
+        auto pos = nlohmann::json{
+            {"x", e.getPosition().x},
+            {"y", e.getPosition().y}
+        };
+        j = nlohmann::json{
+            {"pos",   std::move(pos)},
+            {"open",  e.isOpen()},
+            {"title", e.getTitle()}
+        };
     }
 
-    void from_json(const nlohmann::json& j, Window& e) {
+    void from_json(nlohmann::json const& j, Window& e) {
         auto pos = j.at("pos");
         e.setPosition({pos.at("x").get<float>(), pos.at("y").get<float>()});
         e.setOpen(j.at("open").get<bool>());

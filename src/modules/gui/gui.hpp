@@ -36,91 +36,91 @@ namespace eclipse::gui {
         explicit MenuTab(std::string title, bool isSearchedFor);
 
         /// @brief Add a component to the tab.
-        void addComponent(const std::shared_ptr<Component>& component);
+        std::shared_ptr<Component> addComponent(std::shared_ptr<Component> component);
 
         /// @brief Remove a component from the tab.
         void removeComponent(std::weak_ptr<Component> component);
 
         /// @brief Add a label to the tab.
-        std::shared_ptr<LabelComponent> addLabel(const std::string& title);
+        std::shared_ptr<LabelComponent> addLabel(std::string title);
 
         /// @brief Add a checkbox to the tab. (id is the same as title)
-        std::shared_ptr<ToggleComponent> addToggle(const std::string& id);
+        std::shared_ptr<ToggleComponent> addToggle(std::string id);
 
         /// @brief Add a checkbox to the tab.
-        std::shared_ptr<ToggleComponent> addToggle(const std::string& title, const std::string& id);
+        std::shared_ptr<ToggleComponent> addToggle(std::string title, std::string id);
 
         /// @brief Add a radio button to the tab.
-        std::shared_ptr<RadioButtonComponent> addRadioButton(const std::string& title, const std::string& id, int value);
+        std::shared_ptr<RadioButtonComponent> addRadioButton(std::string title, std::string id, int value);
 
         /// @brief Add a combo to the tab.
-        std::shared_ptr<ComboComponent> addCombo(const std::string& title, const std::string& id, std::vector<std::string> items, int value);
+        std::shared_ptr<ComboComponent> addCombo(std::string title, std::string id, std::vector<std::string> items, int value);
 
         /// @brief Add a combo to the tab. (id is the same as title)
-        std::shared_ptr<ComboComponent> addCombo(const std::string& id, std::vector<std::string> items, int value);
+        std::shared_ptr<ComboComponent> addCombo(std::string id, std::vector<std::string> items, int value);
 
         /// @brief Add a filesystem combo button to the tab.
-        std::shared_ptr<FilesystemComboComponent> addFilesystemCombo(const std::string& title, const std::string& id, std::filesystem::path directory);
+        std::shared_ptr<FilesystemComboComponent> addFilesystemCombo(std::string title, std::string id, std::filesystem::path directory);
 
         /// @brief Add a filesystem combo button to the tab. (id is the same as title)
-        std::shared_ptr<FilesystemComboComponent> addFilesystemCombo(const std::string& id, std::filesystem::path directory);
+        std::shared_ptr<FilesystemComboComponent> addFilesystemCombo(std::string id, std::filesystem::path directory);
 
         /// @brief Add a slider to the tab.
-        std::shared_ptr<SliderComponent> addSlider(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f");
+        std::shared_ptr<SliderComponent> addSlider(std::string title, std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f");
 
         /// @brief Add a slider to the tab. (id is the same as title)
-        std::shared_ptr<SliderComponent> addSlider(const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f");
+        std::shared_ptr<SliderComponent> addSlider(std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f");
 
         /// @brief Add an input float to the tab.
-        std::shared_ptr<InputFloatComponent> addInputFloat(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f");
+        std::shared_ptr<InputFloatComponent> addInputFloat(std::string title, std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f");
 
         /// @brief Add an input float to the tab.
-        std::shared_ptr<InputFloatComponent> addInputFloat(const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f");
+        std::shared_ptr<InputFloatComponent> addInputFloat(std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f");
 
         /// @brief Add an input int to the tab.
-        std::shared_ptr<InputIntComponent> addInputInt(const std::string& title, const std::string& id, int min = INT_MIN, int max = INT_MAX);
+        std::shared_ptr<InputIntComponent> addInputInt(std::string title, std::string id, int min = INT_MIN, int max = INT_MAX);
 
         /// @brief Add an input int to the tab.
-        std::shared_ptr<InputIntComponent> addInputInt(const std::string& id, int min = INT_MIN, int max = INT_MAX);
+        std::shared_ptr<InputIntComponent> addInputInt(std::string id, int min = INT_MIN, int max = INT_MAX);
 
         /// @brief Add an float toggle to the tab.
-        std::shared_ptr<IntToggleComponent> addIntToggle(const std::string& title, const std::string& id, int min = INT_MIN, int max = INT_MAX);
+        std::shared_ptr<IntToggleComponent> addIntToggle(std::string title, std::string id, int min = INT_MIN, int max = INT_MAX);
 
         /// @brief Add an float toggle to the tab. (id is the same as title)
-        std::shared_ptr<IntToggleComponent> addIntToggle(const std::string& id, int min = INT_MIN, int max = INT_MAX);
+        std::shared_ptr<IntToggleComponent> addIntToggle(std::string id, int min = INT_MIN, int max = INT_MAX);
 
         /// @brief Add an float toggle to the tab.
-        std::shared_ptr<FloatToggleComponent> addFloatToggle(const std::string& title, const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f");
+        std::shared_ptr<FloatToggleComponent> addFloatToggle(std::string title, std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f");
 
         /// @brief Add an float toggle to the tab. (id is the same as title)
-        std::shared_ptr<FloatToggleComponent> addFloatToggle(const std::string& id, float min = FLT_MIN, float max = FLT_MAX, const std::string& format = "%.3f");
+        std::shared_ptr<FloatToggleComponent> addFloatToggle(std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f");
 
         /// @brief Add an input text to the tab.
-        std::shared_ptr<InputTextComponent> addInputText(const std::string& title, const std::string& id);
+        std::shared_ptr<InputTextComponent> addInputText(std::string title, std::string id);
 
         /// @brief Add an input text to the tab. (id is the same as title)
-        std::shared_ptr<InputTextComponent> addInputText(const std::string& id);
+        std::shared_ptr<InputTextComponent> addInputText(std::string id);
 
         /// @brief Add a button to the tab.
-        std::shared_ptr<ButtonComponent> addButton(const std::string& title);
+        std::shared_ptr<ButtonComponent> addButton(std::string title);
 
         /// @brief Add a color picker to the tab.
-        std::shared_ptr<ColorComponent> addColorComponent(const std::string& title, const std::string& id, bool hasOpacity = false);
+        std::shared_ptr<ColorComponent> addColorComponent(std::string title, std::string id, bool hasOpacity = false);
 
         /// @brief Add a color picker to the tab. (id is the same as title)
-        std::shared_ptr<ColorComponent> addColorComponent(const std::string& id, bool hasOpacity = false);
+        std::shared_ptr<ColorComponent> addColorComponent(std::string id, bool hasOpacity = false);
 
         /// @brief Add a keybind to the tab.
-        std::shared_ptr<KeybindComponent> addKeybind(const std::string& title, const std::string& id, bool canDelete = false);
+        std::shared_ptr<KeybindComponent> addKeybind(std::string title, std::string id, bool canDelete = false);
 
         /// @brief Add a label settings to the tab.
         std::shared_ptr<LabelSettingsComponent> addLabelSetting(labels::LabelSettings* settings);
 
         /// @brief Get the tab's title.
-        [[nodiscard]] const std::string& getTitle() const { return m_title; }
+        [[nodiscard]] std::string const& getTitle() const { return m_title; }
 
         /// @brief Get the tab's components.
-        [[nodiscard]] const std::vector<std::shared_ptr<Component>>& getComponents() const { return m_components; }
+        [[nodiscard]] std::vector<std::shared_ptr<Component>> const& getComponents() const { return m_components; }
 
         /// @brief Find a tab by name (or create a new one if it does not exist).
         static std::shared_ptr<MenuTab> find(std::string_view name);
@@ -161,10 +161,10 @@ namespace eclipse::gui {
         [[nodiscard]] virtual bool isToggled() const = 0;
 
         /// @brief [Implementation specific] Calls the function after the main render loop
-        virtual void queueAfterDrawing(const std::function<void()>& func) = 0;
+        virtual void queueAfterDrawing(Function<void()>&& func) = 0;
 
         /// @brief Opens a modal popup with provided configuration.
-        virtual void showPopup(const Popup& popup) = 0;
+        virtual void showPopup(Popup&& popup) = 0;
 
         /// @brief Get the renderer type.
         [[nodiscard]] virtual RendererType getType() const = 0;
@@ -199,17 +199,25 @@ namespace eclipse::gui {
         std::shared_ptr<MenuTab> findTab(std::string_view name);
 
         /// @brief Calls the function after the main render loop
-        static void queueAfterDrawing(const std::function<void()>& func) {
-            if (auto renderer = get()->m_renderer)
-                renderer->queueAfterDrawing(func);
-            else func(); // fallback
+        template <typename Func>
+        static void queueAfterDrawing(Func&& func) {
+            if (auto renderer = get()->m_renderer) {
+                // if cocos renderer, just call the function
+                if (renderer->getType() == RendererType::Cocos2d) {
+                    func();
+                } else {
+                    renderer->queueAfterDrawing(std::forward<Func>(func));
+                }
+            } else {
+                func(); // fallback
+            }
         }
 
-        void showPopup(const Popup& popup) const {
-            if (m_renderer) m_renderer->showPopup(popup);
+        void showPopup(Popup&& popup) const {
+            if (m_renderer) m_renderer->showPopup(std::move(popup));
         }
 
-        [[nodiscard]] const Tabs& getTabs() const { return m_tabs; }
+        [[nodiscard]] Tabs const& getTabs() const { return m_tabs; }
         [[nodiscard]] bool isInitialized() const { return m_initialized; }
 
     private:

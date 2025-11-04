@@ -1,8 +1,8 @@
 #include "move-action.hpp"
 
 namespace eclipse::gui::animation {
-    std::shared_ptr<MoveAction> MoveAction::create(double duration, ImVec2* vector, ImVec2 target, EasingFunction easing) {
-        auto instance = std::make_shared<MoveAction>();
+    std::unique_ptr<MoveAction> MoveAction::create(double duration, ImVec2* vector, ImVec2 target, EasingFunction easing) {
+        auto instance = std::make_unique<MoveAction>();
         instance->m_duration = duration;
         instance->m_target = vector;
         instance->m_start = {vector->x, vector->y};
@@ -10,7 +10,7 @@ namespace eclipse::gui::animation {
         instance->m_delta = {target.x - vector->x, target.y - vector->y};
         instance->m_easing = easing;
         instance->m_totalTime = 0;
-        return instance;
+        return std::move(instance);
     }
 
     void MoveAction::update(double deltaTime) {
