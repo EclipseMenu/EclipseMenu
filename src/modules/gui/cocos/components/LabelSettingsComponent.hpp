@@ -59,18 +59,8 @@ namespace eclipse::gui::cocos {
             this->addChildAtPosition(deleteButton, geode::Anchor::Right, { -21.f, 0.f });
 
             auto settingsButton = geode::cocos::CCMenuItemExt::createSpriteExtra(
-                createButton("settings.png"_spr, 0.5f), [this, settings](auto) {
-                LabelSettingsPopup::create(settings, [this](auto event) {
-                    switch (event) {
-                        default: break;
-                        case CallbackEvent::Update:
-                            this->m_component->triggerEditCallback();
-                            break;
-                        case CallbackEvent::Export:
-                            this->m_component->triggerExportCallback();
-                            break;
-                    }
-                })->show();
+                createButton("settings.png"_spr, 0.5f), [this](auto) {
+                LabelSettingsPopup::create(m_component)->show();
             });
             settingsButton->setID("settings-btn");
             this->addChildAtPosition(settingsButton, geode::Anchor::Right, { -54.f, 0.f });
