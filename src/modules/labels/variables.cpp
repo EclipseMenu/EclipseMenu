@@ -464,7 +464,7 @@ namespace eclipse::labels {
                || levelID == 3001; // "The Challenge"
     }
 
-    int getTotalOrbsForLevel(GJGameLevel* level, int levelID) {
+    static int getTotalOrbsForLevel(GJGameLevel* level, int levelID) {
         static int s_lastLevelID = -1;
         static int s_lastTotalOrbs = 0;
         if (levelID == s_lastLevelID) return s_lastTotalOrbs;
@@ -473,7 +473,7 @@ namespace eclipse::labels {
         return s_lastTotalOrbs;
     }
 
-    int getCurrentOrbsForLevel(GJGameLevel* level, int levelID) {
+    static int getCurrentOrbsForLevel(GJGameLevel* level, int levelID) {
         auto gsm = utils::get<GameStatsManager>();
         auto totalOrbs = getTotalOrbsForLevel(level, levelID);
         auto dailyId = level->m_dailyID.value();
@@ -664,22 +664,25 @@ namespace eclipse::labels {
         fetchPlayerData(gameLayer->m_player2, true);
     }
 
-    void fetchGlobedData(rift::Object& variables) {
+    static void fetchGlobedData(rift::Object& variables) {
         auto& globed = variables["globed"];
-        globed[std::string("enabled")] = geode::Loader::get()->isModLoaded("dankmeme.globed2");
-        if (globed[std::string("enabled")]) {
+
+        auto enabled = geode::Loader::get()->isModLoaded("dankmeme.globed2");
+        globed[std::string("enabled")] = enabled;
+
+        if (enabled) {
             // net
             globed[std::string("isConnected")] = globed::net::isConnected().unwrapOrDefault();
-            globed[std::string("ping")] = (int)globed::net::getPing().unwrapOrDefault();
-            globed[std::string("tps")] = (int)globed::net::getServerTps().unwrapOrDefault();
+            globed[std::string("ping")] = (int64_t)globed::net::getPing().unwrapOrDefault();
+            globed[std::string("tps")] = (int64_t)globed::net::getServerTps().unwrapOrDefault();
 
             // suggestion for daniel meme to add:
             // serverName
             // roomName
             // roomId
             // other room things
-            globed[std::string("playersOnline")] = (int)globed::player::playersOnline().unwrapOrDefault();
-            globed[std::string("playersOnLevel")] = (int)globed::player::playersOnLevel().unwrapOrDefault();
+            globed[std::string("playersOnline")] = (int64_t)globed::player::playersOnline().unwrapOrDefault();
+            globed[std::string("playersOnLevel")] = (int64_t)globed::player::playersOnLevel().unwrapOrDefault();
         }
     }
 

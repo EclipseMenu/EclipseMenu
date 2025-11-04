@@ -15,8 +15,8 @@
 namespace eclipse::api {
 using namespace geode::prelude;
 
-std::map<std::string, std::function<bool()>> g_cheats;
-std::map<std::string, std::function<bool()>> const& getCheats() { return g_cheats; }
+std::map<std::string, StdFunction<bool()>> g_cheats;
+std::map<std::string, StdFunction<bool()>> const& getCheats() { return g_cheats; }
 
 template <config::SupportedType T>
 void createGetConfigListener() {
