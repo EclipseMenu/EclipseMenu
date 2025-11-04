@@ -6,7 +6,7 @@
 namespace eclipse::gui::cocos {
     class ColorPicker : public CCMenuItemSpriteExtra, geode::ColorPickPopupDelegate {
     public:
-        static ColorPicker* create(gui::Color const& original, bool useAlpha, std::function<void(gui::Color const&)>&& callback) {
+        static ColorPicker* create(gui::Color const& original, bool useAlpha, Function<void(gui::Color const&)>&& callback) {
             auto ret = new ColorPicker();
             if (ret->init(original, useAlpha, std::move(callback))) {
                 ret->autorelease();
@@ -22,13 +22,13 @@ namespace eclipse::gui::cocos {
         }
 
     protected:
-        bool init(gui::Color const& original, bool useAlpha, std::function<void(gui::Color const&)>&& callback);
+        bool init(gui::Color const& original, bool useAlpha, Function<void(gui::Color const&)>&& callback);
         void onClicked(CCObject*);
         void updateColor(cocos2d::ccColor4B const& color) override;
 
     protected:
         cocos2d::CCSprite* m_colorSprite = nullptr;
-        std::function<void(gui::Color const&)> m_callback;
+        Function<void(gui::Color const&)> m_callback;
         gui::Color m_color;
         bool m_useAlpha = false;
         geode::ColorPickPopup* m_popup = nullptr;

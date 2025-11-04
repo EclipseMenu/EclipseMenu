@@ -2,7 +2,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <std23/function_ref.h>
+
+#include <functional.hpp>
 #include <Geode/platform/platform.hpp>
 
 namespace eclipse::gui {
@@ -87,13 +88,13 @@ namespace eclipse::gui::imgui {
         virtual bool checkbox(
             std::string const& label, bool& value,
             bool isSearchedFor,
-            std23::function_ref<void()> postDraw = [] {}
+            FunctionRef<void()> postDraw = [] {}
         ) const;
         virtual bool checkboxWithSettings(
             std::string const& label, bool& value,
             bool isSearchedFor,
-            std23::function_ref<void()> callback,
-            std23::function_ref<void()> postDraw = [] {},
+            FunctionRef<void()> callback,
+            FunctionRef<void()> postDraw = [] {},
             std::string const& popupId = "" // empty = use default
         ) const;
         virtual bool button(std::string const& text, bool isSearchedFor) const;

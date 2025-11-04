@@ -8,7 +8,7 @@
 
 namespace eclipse::gui::imgui::themes {
     bool MegaOverlay::checkbox(
-        std::string const& label, bool& value, bool isSearchedFor, std23::function_ref<void()> postDraw
+        std::string const& label, bool& value, bool isSearchedFor, FunctionRef<void()> postDraw
     ) const {
         auto tm = ThemeManager::get();
         auto textColor = value ? tm->getCheckboxForegroundColor() : tm->getDisabledColor();

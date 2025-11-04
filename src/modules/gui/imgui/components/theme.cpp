@@ -816,7 +816,7 @@ namespace eclipse::gui::imgui {
             labelSettings->triggerEditCallback();
     }
 
-    bool Theme::checkbox(std::string const& label, bool& value, bool isSearchedFor, std23::function_ref<void()> postDraw) const {
+    bool Theme::checkbox(std::string const& label, bool& value, bool isSearchedFor, FunctionRef<void()> postDraw) const {
         auto tm = ThemeManager::get();
 
         ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(isSearchedFor ? tm->getSearchedColor() : tm->getCheckboxForegroundColor()));
@@ -833,8 +833,8 @@ namespace eclipse::gui::imgui {
     bool Theme::checkboxWithSettings(
         std::string const& label, bool& value,
         bool isSearchedFor,
-        std23::function_ref<void()> callback,
-        std23::function_ref<void()> postDraw,
+        FunctionRef<void()> callback,
+        FunctionRef<void()> postDraw,
         std::string const& popupId
     ) const {
         auto tm = ThemeManager::get();

@@ -13,7 +13,7 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        ComboComponent* callback(std::function<void(int)>&& func);
+        ComboComponent* callback(Function<void(int)>&& func);
 
         /// @brief Get the combo value (selected item index).
         [[nodiscard]] int getValue() const;
@@ -37,13 +37,13 @@ namespace eclipse::gui {
 
         ComboComponent* setDescription();
 
-        void triggerCallback(int value) const;
+        void triggerCallback(int value);
 
     private:
         std::string m_id;
         std::string m_title;
         int m_value;
         std::vector<std::string> m_items;
-        std::function<void(int)> m_callback;
+        Function<void(int)> m_callback;
     };
 }

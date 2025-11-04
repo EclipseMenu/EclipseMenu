@@ -1,4 +1,5 @@
 #pragma once
+#include <functional.hpp>
 
 namespace eclipse::labels {
     struct LabelSettings;
@@ -11,26 +12,26 @@ namespace eclipse::hacks::Labels {
 namespace eclipse::gui::cocos {
     enum class CallbackEvent { Update, Export };
 
-    class LabelSettingsPopup : public geode::Popup<labels::LabelSettings*, std::function<void(CallbackEvent)>&&> {
+    class LabelSettingsPopup : public geode::Popup<labels::LabelSettings*, StdFunction<void(CallbackEvent)>&&> {
     protected:
-        bool setup(labels::LabelSettings* settings, std::function<void(CallbackEvent)>&& callback) override;
+        bool setup(labels::LabelSettings* settings, StdFunction<void(CallbackEvent)>&& callback) override;
 
         CCLayer* createSettingsTab();
-        CCLayer* createTextTab() const;
+        CCLayer* createTextTab();
         CCLayer* createEventsTab();
         CCLayer* createPreviewTab();
 
         void updatePreview(float dt);
 
     public:
-        static LabelSettingsPopup* create(labels::LabelSettings* settings, std::function<void(CallbackEvent)>&& callback);
+        static LabelSettingsPopup* create(labels::LabelSettings* settings, StdFunction<void(CallbackEvent)>&& callback);
         void selectTab(size_t index);
 
         ~LabelSettingsPopup() override;
 
     private:
         labels::LabelSettings* m_settings{};
-        std::function<void(CallbackEvent)> m_callback;
+        StdFunction<void(CallbackEvent)> m_callback;
         std::vector<class PopupTab*> m_tabs;
         CCLayer* m_currentTab = nullptr;
         cocos2d::extension::CCScale9Sprite* m_contentBG = nullptr;

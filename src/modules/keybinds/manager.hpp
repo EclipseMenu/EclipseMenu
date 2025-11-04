@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional.hpp>
 #include <Geode/Geode.hpp>
 
 #include <functional>
@@ -85,7 +86,7 @@ namespace eclipse::keybinds {
         /// @param title The title of the keybind.
         /// @param callback The callback to execute when the keybind is pressed.
         /// @param internal Whether the keybind is internal or not.
-        Keybind(Keys key, std::string id, std::string title, std::function<void(bool)>&& callback, bool internal = false)
+        Keybind(Keys key, std::string id, std::string title, Function<void(bool)>&& callback, bool internal = false)
             : m_key(key), m_id(std::move(id)), m_title(std::move(title)), m_callback(std::move(callback)),
               m_internal(internal) {}
 
@@ -131,7 +132,7 @@ namespace eclipse::keybinds {
         Keys m_key;
         std::string m_id;
         std::string m_title;
-        std::function<void(bool)> m_callback;
+        Function<void(bool)> m_callback;
         bool m_initialized = false;
         bool m_internal = false;
     };
@@ -146,12 +147,12 @@ namespace eclipse::keybinds {
         /// @param id The ID of the keybind.
         /// @param title The title of the keybind.
         /// @param callback The callback to execute when the keybind is pressed.
-        Keybind& registerKeybind(std::string id, std::string title, std::function<void(bool)>&& callback);
+        Keybind& registerKeybind(std::string id, std::string title, Function<void(bool)>&& callback);
 
         /// @brief Register a keybind without adding it to the keybinds UI tab. Useful for internal keybinds.
         /// @param id The ID of the keybind.
         /// @param callback The callback to execute when the keybind is pressed.
-        Keybind& addListener(std::string id, std::function<void(bool)>&& callback);
+        Keybind& addListener(std::string id, Function<void(bool)>&& callback);
 
         /// @brief Unregister a keybind from the manager. This will completely remove it from the configuration.
         /// @param id The ID of the keybind.
@@ -199,7 +200,7 @@ namespace eclipse::keybinds {
         size_t m_menuKeybindUID = 0;
         bool m_initialized = false;
 
-        Keybind& registerKeybindInternal(std::string id, std::string title, std::function<void(bool)>&& callback, bool internal);
+        Keybind& registerKeybindInternal(std::string id, std::string title, Function<void(bool)>&& callback, bool internal);
 
         friend bool isKeyDown(Keys key);
         friend bool isKeyPressed(Keys key);

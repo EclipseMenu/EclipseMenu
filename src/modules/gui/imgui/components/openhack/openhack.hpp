@@ -5,12 +5,12 @@ namespace eclipse::gui::imgui::themes {
     class OpenHack final : public Theme {
         bool checkbox(
             std::string const& label, bool& value, bool isSearchedFor,
-            std23::function_ref<void()> postDraw
+            FunctionRef<void()> postDraw
         ) const override;
         bool checkboxWithSettings(
             std::string const& label, bool& value, bool isSearchedFor,
-            std23::function_ref<void()> callback,
-            std23::function_ref<void()> postDraw,
+            FunctionRef<void()> callback,
+            FunctionRef<void()> postDraw,
             std::string const& popupId
         ) const override;
         bool button(std::string const& text, bool isSearchedFor) const override;

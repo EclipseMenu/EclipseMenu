@@ -14,7 +14,7 @@
 
 namespace eclipse::config {
 
-    using CallbackMap = std::unordered_map<std::string_view, std::vector<std::function<void()>>>;
+    using CallbackMap = std::unordered_map<std::string_view, std::vector<Function<void()>>>;
 
     CallbackMap& getCallbacks() {
         static CallbackMap callbacks;
@@ -82,14 +82,14 @@ namespace eclipse::config {
         }
     }
 
-    void addDelegate(std::string_view key, std::function<void()>&& callback, bool first) {
+    void addDelegate(std::string_view key, Function<void()>&& callback, bool first) {
         auto& callbacks = getCallbacks();
         auto& existingCallbacks = callbacks[key];
         first ? void(existingCallbacks.insert(existingCallbacks.begin(), std::move(callback))) :
                 void(existingCallbacks.push_back(std::move(callback)));
     }
 
-    void addTempDelegate(std::string_view key, std::function<void()>&& callback, bool first) {
+    void addTempDelegate(std::string_view key, Function<void()>&& callback, bool first) {
         auto& callbacks = getTempCallbacks();
         auto& existingCallbacks = callbacks[key];
         first ? void(existingCallbacks.insert(existingCallbacks.begin(), std::move(callback))) :

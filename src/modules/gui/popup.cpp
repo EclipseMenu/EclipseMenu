@@ -9,7 +9,7 @@ namespace eclipse {
 
     void Popup::create(
         std::string title, std::string message, std::string button1,
-        std::string button2, std::function<void(bool)> callback
+        std::string button2, PopupCallback&& callback
     ) {
         Popup popup;
         popup.m_id = s_instanceCounter++;
@@ -24,7 +24,7 @@ namespace eclipse {
 
     void Popup::create(
         std::string title, std::string message, std::string button1,
-        std::function<void(bool)> callback
+        PopupCallback&& callback
     ) {
         Popup popup;
         popup.m_id = s_instanceCounter++;
@@ -47,7 +47,7 @@ namespace eclipse {
 
     void Popup::prompt(
         std::string title, std::string message,
-        PromptCallback callback, std::string defaultValue
+        PromptCallback&& callback, std::string defaultValue
     ) {
         Popup popup;
         popup.m_id = s_instanceCounter++;
@@ -61,7 +61,7 @@ namespace eclipse {
     }
 
     void Popup::prompt(
-        std::string title, std::string message, PromptCallback callback,
+        std::string title, std::string message, PromptCallback&& callback,
         std::string button1, std::string button2, std::string defaultValue
     ) {
         Popup popup;
@@ -77,7 +77,7 @@ namespace eclipse {
     }
 
     void Popup::prompt(
-        std::string title, std::string message, PromptCallback callback,
+        std::string title, std::string message, PromptCallback&& callback,
         std::string button1, std::string defaultValue
     ) {
         Popup popup;

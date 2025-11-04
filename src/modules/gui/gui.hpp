@@ -161,7 +161,7 @@ namespace eclipse::gui {
         [[nodiscard]] virtual bool isToggled() const = 0;
 
         /// @brief [Implementation specific] Calls the function after the main render loop
-        virtual void queueAfterDrawing(std::function<void()>&& func) = 0;
+        virtual void queueAfterDrawing(Function<void()>&& func) = 0;
 
         /// @brief Opens a modal popup with provided configuration.
         virtual void showPopup(Popup&& popup) = 0;
@@ -206,7 +206,7 @@ namespace eclipse::gui {
                 if (renderer->getType() == RendererType::Cocos2d) {
                     func();
                 } else {
-                    renderer->queueAfterDrawing(std::move(func));
+                    renderer->queueAfterDrawing(std::forward<Func>(func));
                 }
             } else {
                 func(); // fallback

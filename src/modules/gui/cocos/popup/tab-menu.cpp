@@ -6,7 +6,7 @@
 #include <modules/gui/theming/manager.hpp>
 
 namespace eclipse::gui::cocos {
-    TabMenu* TabMenu::create(Tabs const& tabs, std::function<void(int)>&& callback) {
+    TabMenu* TabMenu::create(Tabs const& tabs, Function<void(int)>&& callback) {
         auto ret = new TabMenu();
         if (ret->init(tabs, std::move(callback))) {
             ret->autorelease();
@@ -68,7 +68,7 @@ namespace eclipse::gui::cocos {
         this->updateLayout();
     }
 
-    bool TabMenu::init(Tabs const& tabs, std::function<void(int)>&& callback) {
+    bool TabMenu::init(Tabs const& tabs, Function<void(int)>&& callback) {
         if (!CCMenu::init()) return false;
         auto const tm = ThemeManager::get();
         this->setID("tab-menu"_spr);

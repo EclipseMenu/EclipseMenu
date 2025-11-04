@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional.hpp>
 #include <string>
 #include <functional>
 #include <imgui.h>
@@ -23,7 +24,7 @@ namespace eclipse::gui::imgui {
         /// @brief Create new instance of `Window` with set title and draw callback
         /// @param title Title of the window
         /// @param onDraw Callback which will be called when the window is drawn
-        Window(std::string title, std::function<void()> onDraw);
+        Window(std::string title, Function<void()>&& onDraw);
 
         /// @brief Draw the window
         void draw();
@@ -71,7 +72,7 @@ namespace eclipse::gui::imgui {
         ImVec2 m_drawPosition; // Window position used for drawing (used for animations)
         ImVec2 m_size;         // Window size
 
-        std::function<void()> m_drawCallback; // Callback which will be called when the window is drawn
+        Function<void()> m_drawCallback; // Callback which will be called when the window is drawn
     };
 
     void to_json(nlohmann::json& j, Window const& e);

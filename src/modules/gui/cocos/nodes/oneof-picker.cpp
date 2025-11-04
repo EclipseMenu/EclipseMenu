@@ -5,7 +5,7 @@
 #include "FallbackBMFont.hpp"
 
 namespace eclipse::gui::cocos {
-    OneOfPicker* OneOfPicker::create(std::vector<std::string>&& options, std::function<void(int)>&& callback, size_t index) {
+    OneOfPicker* OneOfPicker::create(std::vector<std::string>&& options, Function<void(int)>&& callback, size_t index) {
         auto ret = new OneOfPicker();
         if (ret->init(std::move(options), std::move(callback), index)) {
             ret->autorelease();
@@ -15,7 +15,7 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    OneOfPicker* OneOfPicker::create(std::span<char const*> options, std::function<void(int)>&& callback, size_t index) {
+    OneOfPicker* OneOfPicker::create(std::span<char const*> options, Function<void(int)>&& callback, size_t index) {
         std::vector<std::string> items;
         items.reserve(options.size());
         for (auto& option : options) {
@@ -40,7 +40,7 @@ namespace eclipse::gui::cocos {
         this->updateValueLabel();
     }
 
-    bool OneOfPicker::init(std::vector<std::string>&& options, std::function<void(int)>&& callback, size_t index) {
+    bool OneOfPicker::init(std::vector<std::string>&& options, Function<void(int)>&& callback, size_t index) {
         if (!CCMenu::init()) return false;
 
         m_options = std::move(options);

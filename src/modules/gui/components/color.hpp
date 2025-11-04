@@ -13,7 +13,7 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        ColorComponent* callback(std::function<void(Color)>&& func);
+        ColorComponent* callback(Function<void(Color)>&& func);
 
         [[nodiscard]] std::string const& getId() const override;
 
@@ -26,12 +26,12 @@ namespace eclipse::gui {
 
         ColorComponent* setDescription(std::string description) override;
 
-        void triggerCallback(Color const& value) const;
+        void triggerCallback(Color const& value);
 
     private:
         std::string m_id;
         std::string m_title;
         bool m_hasOpacity;
-        std::function<void(Color)> m_callback;
+        Function<void(Color)> m_callback;
     };
 }

@@ -56,7 +56,7 @@ namespace eclipse::gui::cocos {
 
     //since cocos is retained mode, extra work might not be needed
     //might need to change in the future IDK
-    void CocosRenderer::queueAfterDrawing(std::function<void()>&& func) {
+    void CocosRenderer::queueAfterDrawing(Function<void()>&& func) {
         func();
     }
 

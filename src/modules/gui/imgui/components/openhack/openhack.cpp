@@ -8,7 +8,7 @@
 namespace eclipse::gui::imgui::themes {
     static bool ModernCheckbox(
         std::string const& label, bool& value, bool isSearchedFor, bool hasSettings,
-        std::function<void()> const& postDraw
+        FunctionRef<void()> postDraw
     ) {
         auto tm = ThemeManager::get();
         auto textColor = value ? tm->getCheckboxCheckmarkColor() : tm->getDisabledColor();
@@ -34,18 +34,18 @@ namespace eclipse::gui::imgui::themes {
     }
 
     bool OpenHack::checkbox(
-        std::string const& label, bool& value, bool isSearchedFor,std23::function_ref<void()> postDraw
+        std::string const& label, bool& value, bool isSearchedFor, FunctionRef<void()> postDraw
     ) const {
         return ModernCheckbox(label, value, isSearchedFor, false, postDraw);
     }
 
     bool OpenHack::checkboxWithSettings(
-        std::string const& label, bool& value, bool isSearchedFor, std23::function_ref<void()> callback,
-        std23::function_ref<void()> postDraw, std::string const& popupId
+        std::string const& label, bool& value, bool isSearchedFor, FunctionRef<void()> callback,
+        FunctionRef<void()> postDraw, std::string const& popupId
     ) const {
         auto tm = ThemeManager::get();
 
-        bool result = ModernCheckbox(label, value, isSearchedFor, true, postDraw);
+        bool result = ModernCheckbox(label, value, isSearchedFor, true, std::move(postDraw));
 
         auto textColor = value ? tm->getCheckboxCheckmarkColor() : tm->getDisabledColor();
         if (isSearchedFor) textColor = tm->getSearchedColor();

@@ -1,4 +1,5 @@
 #pragma once
+#include <functional.hpp>
 
 namespace eclipse::gui::cocos {
     class TranslatedLabel;
@@ -7,12 +8,12 @@ namespace eclipse::gui::cocos {
     public:
         static OneOfPicker* create(
             std::vector<std::string>&& options,
-            std::function<void(int)>&& callback,
+            Function<void(int)>&& callback,
             size_t index = 0
         );
         static OneOfPicker* create(
             std::span<char const*> options,
-            std::function<void(int)>&& callback,
+            Function<void(int)>&& callback,
             size_t index = 0
         );
 
@@ -22,7 +23,7 @@ namespace eclipse::gui::cocos {
     protected:
         bool init(
             std::vector<std::string>&& options,
-            std::function<void(int)>&& callback,
+            Function<void(int)>&& callback,
             size_t index
         );
         void onArrowClick(CCObject* sender);
@@ -32,7 +33,7 @@ namespace eclipse::gui::cocos {
         TranslatedLabel* m_valueLabel = nullptr;
         cocos2d::extension::CCScale9Sprite* m_background = nullptr;
         std::vector<std::string> m_options;
-        std::function<void(int)> m_callback;
+        Function<void(int)> m_callback;
         size_t m_selected = 0;
     };
 }

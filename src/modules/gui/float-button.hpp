@@ -1,5 +1,6 @@
 #pragma once
 #include <cocos2d.h>
+#include <functional.hpp>
 
 #if defined(GEODE_IS_MOBILE) // || defined(ECLIPSE_DEBUG_BUILD)
 #define ECLIPSE_USE_FLOATING_BUTTON
@@ -20,7 +21,7 @@ namespace eclipse::gui {
         // TODO: change this as this may not be the right value for iOS! (it wont move unless the value is big)
         constexpr static float SNAP_MARGIN = 40.f;
 #endif
-        std::function<void()> m_callback;
+        Function<void()> m_callback;
         cocos2d::CCSprite* m_sprite{}; // "main-sprite"
         cocos2d::CCPoint m_holdPosition{}; // last cursor/touch position
         float m_minOpacity = 0.2f;
@@ -34,7 +35,7 @@ namespace eclipse::gui {
 
     public:
         static FloatingButton* get();
-        void setCallback(std::function<void()> callback);
+        void setCallback(Function<void()>&& callback);
 
         void setScale(float scale) override;
 

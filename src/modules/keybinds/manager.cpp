@@ -127,7 +127,7 @@ namespace eclipse::keybinds {
     }
 
     Keybind& Manager::registerKeybindInternal(
-        std::string id, std::string title, std::function<void(bool)>&& callback, bool internal
+        std::string id, std::string title, Function<void(bool)>&& callback, bool internal
     ) {
         // check if this id already exists
         for (auto& keybind : m_keybinds) {
@@ -150,12 +150,12 @@ namespace eclipse::keybinds {
     }
 
     Keybind& Manager::registerKeybind(
-        std::string id, std::string title, std::function<void(bool)>&& callback
+        std::string id, std::string title, Function<void(bool)>&& callback
     ) {
         return this->registerKeybindInternal(std::move(id), std::move(title), std::move(callback), false);
     }
 
-    Keybind& Manager::addListener(std::string id, std::function<void(bool)>&& callback) {
+    Keybind& Manager::addListener(std::string id, Function<void(bool)>&& callback) {
         std::string title = id;
         return this->registerKeybindInternal(std::move(id), std::move(title), std::move(callback), true);
     }

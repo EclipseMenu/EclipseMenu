@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional.hpp>
 #include <string>
 #include <vector>
 
@@ -97,13 +98,13 @@ namespace eclipse::config {
     /// @param key Key of the value which should have a delegate
     /// @param callback Callback to call when value is changed
     /// @param first If true, the delegate will be added to the front of the list
-    void addDelegate(std::string_view key, std::function<void()>&& callback, bool first = false);
+    void addDelegate(std::string_view key, Function<void()>&& callback, bool first = false);
 
     /// @brief Registers a delegate which is called when a specific value in temp is changed
     /// @param key Key of the value which should have a delegate
     /// @param callback Callback to call when value is changed
     /// @param first If true, the delegate will be added to the front of the list
-    void addTempDelegate(std::string_view key, std::function<void()>&& callback, bool first = false);
+    void addTempDelegate(std::string_view key, Function<void()>&& callback, bool first = false);
 
     /// @brief Check if a key exists in the temporary storage.
     /// @param key Key to check.

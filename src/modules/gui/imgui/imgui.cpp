@@ -359,7 +359,7 @@ namespace eclipse::gui::imgui {
         ImGuiCocos::get().reload();
     }
 
-    void ImGuiRenderer::queueAfterDrawing(std::function<void()>&& func) {
+    void ImGuiRenderer::queueAfterDrawing(Function<void()>&& func) {
         m_runAfterDrawingQueue.push_back(std::move(func));
     }
 
@@ -369,7 +369,7 @@ namespace eclipse::gui::imgui {
     }
 
     void ImGuiRenderer::drawFinished() {
-        for (auto const& f : m_runAfterDrawingQueue) {
+        for (auto& f : m_runAfterDrawingQueue) {
             f();
         }
         m_runAfterDrawingQueue.clear();

@@ -83,7 +83,7 @@ namespace eclipse::gui::cocos {
 
     class FontPicker : public cocos2d::CCMenu {
     public:
-        static FontPicker* create(std::string font, std::function<void(std::string const&)>&& callback) {
+        static FontPicker* create(std::string font, Function<void(std::string const&)>&& callback) {
             auto ret = new FontPicker();
             if (ret->init(std::move(font), std::move(callback))) {
                 ret->autorelease();
@@ -106,7 +106,7 @@ namespace eclipse::gui::cocos {
         }
 
     protected:
-        bool init(std::string&& font, std::function<void(std::string const&)>&& callback) {
+        bool init(std::string&& font, Function<void(std::string const&)>&& callback) {
             if (!CCMenu::init()) return false;
 
             m_callback = std::move(callback);
@@ -176,13 +176,13 @@ namespace eclipse::gui::cocos {
         }
 
     protected:
-        std::function<void(std::string const&)> m_callback;
+        Function<void(std::string const&)> m_callback;
         Label* m_preview = nullptr;
         std::string m_font;
         size_t m_page = 0;
     };
 
-    bool LabelSettingsPopup::setup(labels::LabelSettings* settings, std::function<void(CallbackEvent)>&& callback) {
+    bool LabelSettingsPopup::setup(labels::LabelSettings* settings, StdFunction<void(CallbackEvent)>&& callback) {
         auto const tm = ThemeManager::get();
 
         m_settings = settings;
@@ -351,7 +351,7 @@ namespace eclipse::gui::cocos {
     /// Helper function to create a grid of buttons with a single callback
     template <typename... Args>
     static std::pair<cocos2d::CCMenu*, std::array<cocos2d::CCSprite*, sizeof...(Args)>> createCompactMenu(
-        float width, std::function<void(CCMenuItemSpriteExtra*)>&& callback, Args... args
+        float width, StdFunction<void(CCMenuItemSpriteExtra*)>&& callback, Args... args
     ) {
         auto menu = cocos2d::CCMenu::create();
         menu->setContentSize({ width, 28.f });
@@ -379,7 +379,7 @@ namespace eclipse::gui::cocos {
         return label;
     }
 
-    auto createLabelButton(char const* text, float width, std::function<void(CCMenuItemSpriteExtra*)> const& callback) {
+    auto createLabelButton(char const* text, float width, StdFunction<void(CCMenuItemSpriteExtra*)>&& callback) {
         auto const tm = ThemeManager::get();
         auto label = TranslatedLabel::create(text);
         label->limitLabelWidth(width * 0.8f, 1.f, 0.1f);
@@ -389,7 +389,7 @@ namespace eclipse::gui::cocos {
         bg->setColor(tm->getButtonBackgroundColor().toCCColor3B());
         bg->addChildAtPosition(label, geode::Anchor::Center);
         bg->setScale(0.65f);
-        auto button = geode::cocos::CCMenuItemExt::createSpriteExtra(bg, callback);
+        auto button = geode::cocos::CCMenuItemExt::createSpriteExtra(bg, std::move(callback));
         return button;
     }
 
@@ -552,7 +552,7 @@ namespace eclipse::gui::cocos {
         return layer;
     }
 
-    cocos2d::CCLayer* LabelSettingsPopup::createTextTab() const {
+    cocos2d::CCLayer* LabelSettingsPopup::createTextTab() {
         auto layer = CCLayer::create();
 
         auto input = geode::TextInput::create(250.f, "FPS: {fps}", "font_default.fnt"_spr);
@@ -578,7 +578,7 @@ namespace eclipse::gui::cocos {
         return std::max((CARD_HEIGHT + 2.5f) * count + 42.f, 200.f);
     }
 
-    cocos2d::CCNode* createEventCard(labels::LabelEvent& event, std::function<void(CallbackEvent)>&& callback, std::function<void()>&& removeCallback);
+    static cocos2d::CCNode* createEventCard(labels::LabelEvent& event, StdFunction<void(CallbackEvent)> callback, StdFunction<void()>&& removeCallback);
 
     template <typename Func1, typename Func2>
     static cocos2d::CCNode* createEventAddButton(labels::LabelSettings* settings, cocos2d::CCNode* contentLayer, Func1&& callback, Func2&& removeCallback) {
@@ -611,7 +611,7 @@ namespace eclipse::gui::cocos {
         return menu;
     }
 
-    cocos2d::CCNode* createEventCard(labels::LabelEvent& event, std::function<void(CallbackEvent)> const& callback, std::function<void()> const& removeCallback) {
+    static cocos2d::CCNode* createEventCard(labels::LabelEvent& event, StdFunction<void(CallbackEvent)> callback, StdFunction<void()>&& removeCallback) {
         auto menu = cocos2d::CCMenu::create();
         menu->setContentSize({ CARD_WIDTH, CARD_HEIGHT });
         menu->setID("event-card"_spr);
@@ -802,13 +802,15 @@ namespace eclipse::gui::cocos {
         menu->addChildAtPosition(modifyScaleToggle, geode::Anchor::TopLeft, { 198.5f, -44.f });
 
         auto modifyOpacityToggle = geode::cocos::CCMenuItemExt::createToggler(
-            createToggle("checkmark.png"_spr), createToggle(nullptr), [&, callback, modifyOpacityInput](auto) {
-            if (!event.opacity.has_value()) event.opacity = 1.f;
-            else event.opacity.reset();
-            modifyOpacityInput->setString(fmt::to_string(event.opacity.value_or(1.f)));
-            modifyOpacityInput->setVisible(event.opacity.has_value());
-            callback(CallbackEvent::Update);
-        });
+            createToggle("checkmark.png"_spr), createToggle(nullptr),
+            [&, callback = std::move(callback), modifyOpacityInput](auto) {
+                if (!event.opacity.has_value()) event.opacity = 1.f;
+                else event.opacity.reset();
+                modifyOpacityInput->setString(fmt::to_string(event.opacity.value_or(1.f)));
+                modifyOpacityInput->setVisible(event.opacity.has_value());
+                callback(CallbackEvent::Update);
+            }
+        );
         modifyOpacityToggle->toggle(event.opacity.has_value());
         modifyOpacityToggle->setID("modify-opacity-toggle"_spr);
         menu->addChildAtPosition(modifyOpacityToggle, geode::Anchor::TopLeft, { 198.5f, -73.f });
@@ -837,7 +839,7 @@ namespace eclipse::gui::cocos {
         // Delete button
         auto deleteBtn = geode::cocos::CCMenuItemExt::createSpriteExtra(
             createButtonSprite("trashbin.png"_spr, 0.35f),
-            [removeCallback](auto) { removeCallback(); }
+            [removeCallback = std::move(removeCallback)](auto) mutable { removeCallback(); }
         );
         deleteBtn->setID("delete-btn"_spr);
         menu->addChildAtPosition(deleteBtn, geode::Anchor::TopLeft, { 352.5f, -16.f });
@@ -929,7 +931,7 @@ namespace eclipse::gui::cocos {
         m_contentBG->addChildAtPosition(m_currentTab, geode::Anchor::Center);
     }
 
-    LabelSettingsPopup* LabelSettingsPopup::create(labels::LabelSettings* settings, std::function<void(CallbackEvent)>&& callback) {
+    LabelSettingsPopup* LabelSettingsPopup::create(labels::LabelSettings* settings, StdFunction<void(CallbackEvent)>&& callback) {
         auto ret = new LabelSettingsPopup;
         if (ret->initAnchored(400.f, 240.f, settings, std::move(callback))) {
             ret->autorelease();

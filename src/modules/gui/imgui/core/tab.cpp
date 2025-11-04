@@ -3,7 +3,7 @@
 
 namespace eclipse::gui::imgui {
 
-    Tab::Tab(std::string title, std::function<void()> onDraw) {
+    Tab::Tab(std::string title, Function<void()>&& onDraw) {
         m_title = std::move(title);
         m_drawCallback = std::move(onDraw);
         m_isOpen = false;

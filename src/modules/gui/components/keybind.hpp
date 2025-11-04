@@ -13,7 +13,7 @@ namespace eclipse::gui {
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.
-        KeybindComponent* callback(std::function<void(keybinds::Keys)>&& func);
+        KeybindComponent* callback(Function<void(keybinds::Keys)>&& func);
 
         /// @brief Sets the default callback for internal keybinds.
         KeybindComponent* setInternal();
@@ -27,13 +27,13 @@ namespace eclipse::gui {
 
         KeybindComponent* setDescription(std::string description) override;
 
-        void triggerCallback(keybinds::Keys key) const;
+        void triggerCallback(keybinds::Keys key);
 
     private:
         std::string m_id;
         std::string m_title;
         keybinds::Keys m_defaultKey = keybinds::Keys::None;
         bool m_canDelete;
-        std::function<void(keybinds::Keys)> m_callback;
+        Function<void(keybinds::Keys)> m_callback;
     };
 }

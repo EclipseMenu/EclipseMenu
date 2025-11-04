@@ -55,7 +55,7 @@ namespace eclipse::gui::imgui {
         [[nodiscard]] bool isToggled() const override;
         [[nodiscard]] std::unique_ptr<Layout> const& getLayout() const;
         void shutdown() override;
-        void queueAfterDrawing(std::function<void()>&& func) override;
+        void queueAfterDrawing(Function<void()>&& func) override;
         void showPopup(Popup&& popup) override;
         [[nodiscard]] RendererType getType() const override { return RendererType::ImGui; }
         void updateTabs() override;
@@ -89,7 +89,7 @@ namespace eclipse::gui::imgui {
 
         bool m_insideDraw = false;
         LayoutMode m_queuedMode = LayoutMode::Tabbed;
-        std::vector<std::function<void()>> m_runAfterDrawingQueue;
+        std::vector<Function<void()>> m_runAfterDrawingQueue;
         std::vector<Popup> m_popups;
     };
 }

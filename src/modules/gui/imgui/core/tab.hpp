@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional.hpp>
 #include <string>
 #include <functional>
 #include <imgui.h>
@@ -17,7 +18,7 @@ namespace eclipse::gui::imgui {
         /// @brief Create new instance of `Tab` with set title and draw callback
         /// @param title Title of the Tab
         /// @param onDraw Callback which will be called when the Tab is drawn
-        Tab(std::string title, std::function<void()> onDraw);
+        Tab(std::string title, Function<void()>&& onDraw);
 
         /// @brief Draw the Tab
         void draw();
@@ -34,10 +35,9 @@ namespace eclipse::gui::imgui {
         void setTitle(std::string title);
 
     private:
+        Function<void()> m_drawCallback; // Callback which will be called when the Tab is drawn
         std::string m_title; // Tab title
         bool m_isOpen;       // Whether the Tab is collapsed or not
-
-        std::function<void()> m_drawCallback; // Callback which will be called when the Tab is drawn
     };
 
 }

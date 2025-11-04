@@ -105,7 +105,7 @@ namespace eclipse::gui {
         m_type = ComponentType::Button;
     }
 
-    ButtonComponent* ButtonComponent::callback(std::function<void()>&& func) {
+    ButtonComponent* ButtonComponent::callback(Function<void()>&& func) {
         m_callback = std::move(func);
         return this;
     }
@@ -136,7 +136,7 @@ namespace eclipse::gui {
 
     bool ButtonComponent::hasKeybind() const { return m_hasKeybind; }
 
-    void ButtonComponent::triggerCallback() const {
+    void ButtonComponent::triggerCallback() {
         if (m_callback) m_callback();
     }
 
@@ -149,7 +149,7 @@ namespace eclipse::gui {
         m_type = ComponentType::Color;
     }
 
-    ColorComponent* ColorComponent::callback(std::function<void(Color)>&& func) {
+    ColorComponent* ColorComponent::callback(Function<void(Color)>&& func) {
         m_callback = std::move(func);
         return this;
     }
@@ -171,7 +171,7 @@ namespace eclipse::gui {
         return this;
     }
 
-    void ColorComponent::triggerCallback(Color const& value) const {
+    void ColorComponent::triggerCallback(Color const& value) {
         if (m_callback) m_callback(value);
     }
 
@@ -186,7 +186,7 @@ namespace eclipse::gui {
         setValueIfEmpty(m_value);
     }
 
-    ComboComponent* ComboComponent::callback(std::function<void(int)>&& func) {
+    ComboComponent* ComboComponent::callback(Function<void(int)>&& func) {
         m_callback = std::move(func);
         return this;
     }
@@ -219,7 +219,7 @@ namespace eclipse::gui {
         return this;
     }
 
-    void ComboComponent::triggerCallback(int value) const {
+    void ComboComponent::triggerCallback(int value) {
         if (m_callback) m_callback(value);
     }
 
@@ -244,7 +244,7 @@ namespace eclipse::gui {
         globFiles();
     }
 
-    FilesystemComboComponent* FilesystemComboComponent::callback(std::function<void(int)>&& func) {
+    FilesystemComboComponent* FilesystemComboComponent::callback(Function<void(int)>&& func) {
         m_callback = std::move(func);
         return this;
     }
@@ -272,7 +272,7 @@ namespace eclipse::gui {
         return this;
     }
 
-    void FilesystemComboComponent::triggerCallback(int value) const {
+    void FilesystemComboComponent::triggerCallback(int value) {
         if (m_callback) m_callback(value);
     }
 
@@ -298,12 +298,12 @@ namespace eclipse::gui {
         m_type = ComponentType::FloatToggle;
     }
 
-    FloatToggleComponent* FloatToggleComponent::toggleCallback(std::function<void()>&& func) {
+    FloatToggleComponent* FloatToggleComponent::toggleCallback(Function<void()>&& func) {
         m_toggleCallback = std::move(func);
         return this;
     }
 
-    FloatToggleComponent* FloatToggleComponent::valueCallback(std::function<void(float)>&& func) {
+    FloatToggleComponent* FloatToggleComponent::valueCallback(Function<void(float)>&& func) {
         m_valueCallback = std::move(func);
         return this;
     }
@@ -357,11 +357,11 @@ namespace eclipse::gui {
         store_value(fmt::format("{}.toggle", this->getId()), value, m_noSave);
     }
 
-    void FloatToggleComponent::triggerCallback(float value) const {
+    void FloatToggleComponent::triggerCallback(float value) {
         if (m_valueCallback) m_valueCallback(value);
     }
 
-    void FloatToggleComponent::triggerCallback() const {
+    void FloatToggleComponent::triggerCallback() {
         if (m_toggleCallback) m_toggleCallback();
     }
 
@@ -376,7 +376,7 @@ namespace eclipse::gui {
         m_type = ComponentType::InputFloat;
     }
 
-    InputFloatComponent* InputFloatComponent::callback(std::function<void(float)>&& func) {
+    InputFloatComponent* InputFloatComponent::callback(Function<void(float)>&& func) {
         m_callback = std::move(func);
         return this;
     }
@@ -408,7 +408,7 @@ namespace eclipse::gui {
         return this;
     }
 
-    void InputFloatComponent::triggerCallback(float value) const {
+    void InputFloatComponent::triggerCallback(float value) {
         if (m_callback) m_callback(value);
     }
 
@@ -421,7 +421,7 @@ namespace eclipse::gui {
         m_type = ComponentType::InputInt;
     }
 
-    InputIntComponent* InputIntComponent::callback(std::function<void(int)>&& func) {
+    InputIntComponent* InputIntComponent::callback(Function<void(int)>&& func) {
         m_callback = std::move(func);
         return this;
     }
@@ -444,7 +444,7 @@ namespace eclipse::gui {
         return this;
     }
 
-    void InputIntComponent::triggerCallback(int value) const {
+    void InputIntComponent::triggerCallback(int value) {
         if (m_callback) m_callback(value);
     }
 
@@ -457,7 +457,7 @@ namespace eclipse::gui {
         m_type = ComponentType::InputText;
     }
 
-    InputTextComponent* InputTextComponent::callback(std::function<void(std::string)>&& func) {
+    InputTextComponent* InputTextComponent::callback(Function<void(std::string)>&& func) {
         m_callback = std::move(func);
         return this;
     }
@@ -478,7 +478,7 @@ namespace eclipse::gui {
         return this;
     }
 
-    void InputTextComponent::triggerCallback(std::string value) const {
+    void InputTextComponent::triggerCallback(std::string value) {
         if (m_callback) m_callback(std::move(value));
     }
 
@@ -491,12 +491,12 @@ namespace eclipse::gui {
         m_type = ComponentType::IntToggle;
     }
 
-    IntToggleComponent* IntToggleComponent::toggleCallback(std::function<void()>&& func) {
+    IntToggleComponent* IntToggleComponent::toggleCallback(Function<void()>&& func) {
         m_toggleCallback = std::move(func);
         return this;
     }
 
-    IntToggleComponent* IntToggleComponent::valueCallback(std::function<void(int)>&& func) {
+    IntToggleComponent* IntToggleComponent::valueCallback(Function<void(int)>&& func) {
         m_valueCallback = std::move(func);
         return this;
     }
@@ -544,11 +544,11 @@ namespace eclipse::gui {
         store_value(fmt::format("{}.toggle", this->getId()), value, m_noSave);
     }
 
-    void IntToggleComponent::triggerCallback(int value) const {
+    void IntToggleComponent::triggerCallback(int value) {
         if (m_valueCallback) m_valueCallback(value);
     }
 
-    void IntToggleComponent::triggerCallback() const {
+    void IntToggleComponent::triggerCallback() {
         if (m_toggleCallback) m_toggleCallback();
     }
 
@@ -586,11 +586,11 @@ namespace eclipse::gui {
         return this;
     }
 
-    void KeybindComponent::triggerCallback(keybinds::Keys key) const {
+    void KeybindComponent::triggerCallback(keybinds::Keys key) {
         if (m_callback) m_callback(key);
     }
 
-    KeybindComponent* KeybindComponent::callback(std::function<void(keybinds::Keys)>&& func) {
+    KeybindComponent* KeybindComponent::callback(Function<void(keybinds::Keys)>&& func) {
         m_callback = std::move(func);
         return this;
     }
@@ -625,34 +625,34 @@ namespace eclipse::gui {
     std::string const& LabelSettingsComponent::getTitle() const { return m_settings->text; }
     labels::LabelSettings* LabelSettingsComponent::getSettings() const { return m_settings; }
 
-    LabelSettingsComponent* LabelSettingsComponent::deleteCallback(std::function<void()>&& func) {
+    LabelSettingsComponent* LabelSettingsComponent::deleteCallback(Function<void()>&& func) {
         m_deleteCallback = std::move(func);
         return this;
     }
 
-    LabelSettingsComponent* LabelSettingsComponent::editCallback(std::function<void()>&& func) {
+    LabelSettingsComponent* LabelSettingsComponent::editCallback(Function<void()>&& func) {
         m_editCallback = std::move(func);
         return this;
     }
 
-    LabelSettingsComponent* LabelSettingsComponent::moveCallback(std::function<void(bool)>&& func) {
+    LabelSettingsComponent* LabelSettingsComponent::moveCallback(Function<void(bool)>&& func) {
         m_moveCallback = std::move(func);
         return this;
     }
 
-    LabelSettingsComponent* LabelSettingsComponent::exportCallback(std::function<void()>&& func) {
+    LabelSettingsComponent* LabelSettingsComponent::exportCallback(Function<void()>&& func) {
         m_exportCallback = std::move(func);
         return this;
     }
 
-    void LabelSettingsComponent::triggerDeleteCallback() const {
+    void LabelSettingsComponent::triggerDeleteCallback() {
         if (m_deleteCallback) m_deleteCallback();
 
         // We also have to clean up the keybind
         keybinds::Manager::get()->unregisterKeybind(fmt::format("label.{}", m_settings->id));
     }
 
-    void LabelSettingsComponent::triggerEditCallback() const {
+    void LabelSettingsComponent::triggerEditCallback() {
         if (m_editCallback) m_editCallback();
 
         // Update the keybind title
@@ -664,11 +664,11 @@ namespace eclipse::gui {
         }
     }
 
-    void LabelSettingsComponent::triggerMoveCallback(bool up) const {
+    void LabelSettingsComponent::triggerMoveCallback(bool up) {
         if (m_moveCallback) m_moveCallback(up);
     }
 
-    void LabelSettingsComponent::triggerExportCallback() const {
+    void LabelSettingsComponent::triggerExportCallback() {
         if (m_exportCallback) m_exportCallback();
     }
 
@@ -695,7 +695,7 @@ namespace eclipse::gui {
         m_type = ComponentType::RadioButton;
     }
 
-    RadioButtonComponent* RadioButtonComponent::callback(std::function<void(int)>&& func) {
+    RadioButtonComponent* RadioButtonComponent::callback(Function<void(int)>&& func) {
         m_callback = std::move(func);
         return this;
     }
@@ -728,7 +728,7 @@ namespace eclipse::gui {
     std::string const& RadioButtonComponent::getTitle() const { return m_title; }
     bool RadioButtonComponent::hasKeybind() const { return m_hasKeybind; }
 
-    void RadioButtonComponent::triggerCallback(int value) const {
+    void RadioButtonComponent::triggerCallback(int value) {
         if (m_callback) m_callback(value);
     }
 
@@ -747,7 +747,7 @@ namespace eclipse::gui {
         m_type = ComponentType::Slider;
     }
 
-    SliderComponent* SliderComponent::callback(std::function<void(float)>&& func) {
+    SliderComponent* SliderComponent::callback(Function<void(float)>&& func) {
         m_callback = std::move(func);
         return this;
     }
@@ -771,7 +771,7 @@ namespace eclipse::gui {
         return this;
     }
 
-    void SliderComponent::triggerCallback(float value) const {
+    void SliderComponent::triggerCallback(float value) {
         if (m_callback) m_callback(value);
     }
 
@@ -784,12 +784,12 @@ namespace eclipse::gui {
         m_type = ComponentType::Toggle;
     }
 
-    ToggleComponent* ToggleComponent::callback(std::function<void(bool)>&& func) {
+    ToggleComponent* ToggleComponent::callback(Function<void(bool)>&& func) {
         m_callback = std::move(func);
         return this;
     }
 
-    void ToggleComponent::addOptions(std23::function_ref<void(std::shared_ptr<MenuTab>)> options) {
+    void ToggleComponent::addOptions(FunctionRef<void(std::shared_ptr<MenuTab>)> options) {
         if (!m_options) m_options = std::make_shared<MenuTab>(m_title, false);
 
         options(m_options);
@@ -823,7 +823,7 @@ namespace eclipse::gui {
     std::weak_ptr<MenuTab> ToggleComponent::getOptions() const { return m_options; }
     bool ToggleComponent::hasKeybind() const { return m_hasKeybind; }
 
-    void ToggleComponent::triggerCallback(bool value) const {
+    void ToggleComponent::triggerCallback(bool value) {
         if (m_callback) m_callback(value);
     }
 

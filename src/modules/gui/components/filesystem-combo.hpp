@@ -15,7 +15,7 @@ namespace eclipse::gui {
         void onUpdate() override;
 
         /// @brief Set a callback function to be called when the component value changes.
-        FilesystemComboComponent* callback(std::function<void(int)>&& func);
+        FilesystemComboComponent* callback(Function<void(int)>&& func);
 
         /// @brief Get the combo value.
         [[nodiscard]] std::filesystem::path getValue() const;
@@ -37,7 +37,7 @@ namespace eclipse::gui {
 
         FilesystemComboComponent* setDescription(std::string description) override;
 
-        void triggerCallback(int value) const;
+        void triggerCallback(int value);
 
     private:
         void globFiles();
@@ -47,7 +47,7 @@ namespace eclipse::gui {
         std::string m_title;
         std::filesystem::path m_directory;
         std::vector<std::filesystem::path> m_items;
-        std::function<void(int)> m_callback;
+        Function<void(int)> m_callback;
 
         std::string m_searchBuffer;
     };
