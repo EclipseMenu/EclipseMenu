@@ -17,6 +17,7 @@ namespace eclipse::gui {
     }
 
     void FloatingButton::setScale(float scale) {
+        m_baseScale = scale;
         m_sprite->setScale(scale);
     }
 
@@ -53,6 +54,7 @@ namespace eclipse::gui {
             return false;
 
         // setup settings
+        m_baseScale = config::get<float>("float-btn.scale", 0.25f);
         m_maxOpacity = config::get<float>("float-btn.max-opacity", 1.f);
         m_minOpacity = config::get<float>("float-btn.min-opacity", 0.5f);
         m_showInLevel = config::get<bool>("float-btn.show-in-level", false);
@@ -106,9 +108,22 @@ namespace eclipse::gui {
             }
         }
 
-        if (!m_shouldMove) return;
-
         auto currentPos = m_sprite->getPosition();
+        auto radius = getRadius();
+        auto winSize = utils::get<CCDirector>()->getWinSize();
+
+        auto clampedPos = currentPos;
+        clampedPos.x = std::clamp(currentPos.x, radius, winSize.width - radius);
+        clampedPos.y = std::clamp(currentPos.y, radius, winSize.height - radius);
+
+        if (currentPos.x != clampedPos.x || currentPos.y != clampedPos.y) {
+            m_sprite->setPosition(clampedPos);
+            config::set<float>("float-btn.x", clampedPos.x);
+            config::set<float>("float-btn.y", clampedPos.y);
+            currentPos = clampedPos;
+        }
+
+        if (!m_shouldMove) return;
 
         // if very close to the end, speed up
         if (ccpDistance(currentPos, m_holdPosition) < SNAP_MARGIN * 10.f) {
@@ -121,8 +136,6 @@ namespace eclipse::gui {
             m_shouldMove = false; // finished moving
         }
 
-        auto radius = getRadius();
-        auto winSize = utils::get<CCDirector>()->getWinSize();
         newPoint.x = std::clamp(newPoint.x, radius, winSize.width - radius);
         newPoint.y = std::clamp(newPoint.y, radius, winSize.height - radius);
 
@@ -136,8 +149,8 @@ namespace eclipse::gui {
         if (auto pl = utils::get<PlayLayer>(); !m_showInLevel && pl)
             return !pl->m_isPaused && !pl->m_hasCompletedLevel;
 
-        if (auto le = utils::get<LevelEditorLayer>(); !m_showInLevel && le)
-            return le->m_playbackMode == PlaybackMode::Playing;
+        if (auto le = utils::get<LevelEditorLayer>(); !m_showInEditor && le)
+            return !le->m_editorUI->m_isPaused;
 
         return false;
     }
@@ -147,19 +160,35 @@ namespace eclipse::gui {
     }
 
     void FloatingButton::fadeIn() const {
-        m_sprite->stopAllActions();
-        m_sprite->runAction(CCFadeTo::create(0.2f, m_maxOpacity * 255));
+        m_sprite->stopActionByTag(2);
+        auto action = CCFadeTo::create(0.2f, m_maxOpacity * 255);
+        action->setTag(2);
+        m_sprite->runAction(action);
     }
 
     void FloatingButton::fadeOut() const {
-        m_sprite->stopAllActions();
-        m_sprite->runAction(
-            CCSequence::create(
-                CCDelayTime::create(1.f),
-                CCFadeTo::create(0.2f, m_minOpacity * 255),
-                nullptr
-            )
+        m_sprite->stopActionByTag(2);
+        auto action = CCSequence::create(
+            CCDelayTime::create(1.f),
+            CCFadeTo::create(0.2f, m_minOpacity * 255),
+            nullptr
         );
+        action->setTag(2);
+        m_sprite->runAction(action);
+    }
+
+    void FloatingButton::scaleDown() {
+        m_sprite->stopActionByTag(1);
+        auto action = CCScaleTo::create(0.1f, m_baseScale * PRESS_SCALE);
+        action->setTag(1);
+        m_sprite->runAction(action);
+    }
+
+    void FloatingButton::scaleUp() {
+        m_sprite->stopActionByTag(1);
+        auto action = CCEaseBackOut::create(CCScaleTo::create(0.15f, m_baseScale));
+        action->setTag(1);
+        m_sprite->runAction(action);
     }
 
     bool FloatingButton::ccTouchBegan(CCTouch* touch, CCEvent* event) {
@@ -174,11 +203,14 @@ namespace eclipse::gui {
         m_haveReleased = false;
         m_holdPosition = touchPos;
         this->fadeIn();
+        this->scaleDown();
 
         return true;
     }
 
     void FloatingButton::ccTouchEnded(CCTouch* touch, CCEvent* event) {
+        this->scaleUp();
+
         if (m_haveMoved) {
             this->fadeOut();
             return;
@@ -201,12 +233,10 @@ namespace eclipse::gui {
     }
 
     void FloatingButton::registerWithTouchDispatcher() {
-        eclipse::utils::get<CCTouchDispatcher>()->addTargetedDelegate(this, -1000, true);
+        utils::get<CCTouchDispatcher>()->addTargetedDelegate(this, -1000, true);
     }
 
-    FloatingButton::~FloatingButton() {
-        // utils::get<cocos2d::CCTouchDispatcher>()->unregisterForcePrio(this);
-    }
+    FloatingButton::~FloatingButton() = default;
 
 #ifdef ECLIPSE_USE_FLOATING_BUTTON
     class $modify(CCScene) {
