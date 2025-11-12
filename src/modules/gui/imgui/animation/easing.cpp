@@ -9,7 +9,7 @@ namespace eclipse::gui::animation {
         auto modeIndex = static_cast<size_t>(mode);
 
         // Check if not out-of-bounds
-        if (easingIndex > 10 || modeIndex > 2)
+        if (easingIndex > std::size(EASING_FUNCTIONS) - 1 || modeIndex > std::size(EASING_FUNCTIONS[0]) - 1)
             return easing::linear;
 
         return EASING_FUNCTIONS[easingIndex][modeIndex];

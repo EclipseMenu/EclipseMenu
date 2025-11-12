@@ -17,7 +17,7 @@ namespace eclipse::gui::imgui {
     public:
         bool shouldRender() const;
         static ImVec2 randomWindowPosition(Window const& window);
-        std::map<Window*, ImVec2> getStackedPositions();
+        std::vector<std::pair<Window*, ImVec2>> getStackedPositions();
         void stackWindows();
 
     private:

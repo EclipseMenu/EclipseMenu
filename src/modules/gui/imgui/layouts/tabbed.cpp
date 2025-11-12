@@ -170,13 +170,9 @@ namespace eclipse::gui::imgui {
     }
 
     /// @brief Auto-stacks windows on screen.
-    std::map<Window*, ImVec2> TabbedLayout::getStackedPositions() {
-        auto firstColumnLock = config::get<bool>("menu.lockFirstColumn", false);
-        static std::array<std::string, 2> s_builtInWindows = {"Interface", "Keybinds"}; // TODO: Add all primary windows
-        std::vector<std::string> builtInWindows(s_builtInWindows.begin(), s_builtInWindows.end());
-        if (!firstColumnLock) {
-            builtInWindows.clear();
-        }
+    std::vector<std::pair<Window*, ImVec2>> TabbedLayout::getStackedPositions() {
+        auto firstColumnLock = config::get<"menu.lockFirstColumn", bool>(false);
+        constexpr std::array<std::string_view, 2> BuiltInWindows = {"Interface", "Keybinds"};
 
         auto tm = ThemeManager::get();
         auto const scale = tm->getGlobalScale();
@@ -185,20 +181,25 @@ namespace eclipse::gui::imgui {
 
         float windowWidth = Window::MIN_SIZE.x * scale;
         auto columns = static_cast<int>((screenSize.x - margin) / (windowWidth + margin));
+        auto freeSpace = (screenSize.x - margin - (columns * (windowWidth + margin))) * 0.5f + margin;
 
-        std::map<Window*, ImVec2> positions;
+        // std::map<Window*, ImVec2> positions;
+        std::vector<std::pair<Window*, ImVec2>> positions;
+        positions.reserve(m_windows.size());
 
         // Built-ins go into first column
-        float x = margin;
+        float x = freeSpace;
         float y = margin;
-        for (auto& title : builtInWindows) {
-            auto it = std::ranges::find_if(m_windows, [&title](Window const& window) {
-                return window.getTitle() == title;
-            });
+        if (firstColumnLock) {
+            for (auto title : BuiltInWindows) {
+                auto it = std::ranges::find_if(m_windows, [&title](Window const& window) {
+                    return window.getTitle() == title;
+                });
 
-            if (it != m_windows.end()) {
-                positions[&(*it)] = ImVec2(x, y);
-                y += it->getSize().y + margin;
+                if (it != m_windows.end()) {
+                    positions.emplace_back(&(*it), ImVec2(x, y));
+                    y += it->getSize().y + margin;
+                }
             }
         }
 
@@ -209,7 +210,7 @@ namespace eclipse::gui::imgui {
         std::vector<float> heights(columnCount, margin);
         for (auto& window : m_windows) {
             // Skip built-in windows
-            if (std::ranges::find(builtInWindows, window.getTitle()) != builtInWindows.end())
+            if (std::ranges::find(BuiltInWindows, window.getTitle()) != BuiltInWindows.end())
                 continue;
 
             // Find the column with the smallest height
@@ -218,7 +219,7 @@ namespace eclipse::gui::imgui {
 
             // Set the position
             auto windowColumn = firstColumnLock ? index + 1 : index;
-            positions[&window] = ImVec2(static_cast<float>(windowColumn) * (windowWidth + margin) + margin, *min);
+            positions.emplace_back(&window, ImVec2(static_cast<float>(windowColumn) * (windowWidth + margin) + freeSpace, *min));
             *min += window.getSize().y + margin;
 
             // Update the height
@@ -229,9 +230,9 @@ namespace eclipse::gui::imgui {
     }
 
     void TabbedLayout::stackWindows() {
-        double duration = config::get("menu.animationDuration", 0.3);
-        auto easingType = config::get("menu.animationEasingType", animation::Easing::Quadratic);
-        auto easingMode = config::get("menu.animationEasingMode", animation::EasingMode::EaseInOut);
+        double duration = config::get<"menu.animationDuration", float>(0.3);
+        auto easingType = config::get<"menu.animationEasingType", animation::Easing>(animation::Easing::Quadratic);
+        auto easingMode = config::get<"menu.animationEasingMode", animation::EasingMode>(animation::EasingMode::EaseInOut);
         auto easing = animation::getEasingFunction(easingType, easingMode);
 
         for (auto& [window, target] : getStackedPositions()) {

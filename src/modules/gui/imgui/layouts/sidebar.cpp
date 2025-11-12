@@ -114,8 +114,8 @@ namespace eclipse::gui::imgui {
         recalculateSize(false);
 
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
-		ImGui::BeginChild("modules-wrapper", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y), false);
-		ImGui::PopStyleColor();
+        ImGui::BeginChild("modules-wrapper", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y), false);
+        ImGui::PopStyleColor();
 
         // Render tabs
         for (int i = 0; i < m_tabs.size(); i++) {
