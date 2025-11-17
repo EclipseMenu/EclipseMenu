@@ -8,7 +8,6 @@ namespace eclipse::gui {
     public:
         explicit InputIntComponent(std::string title, std::string id, int min = INT_MIN, int max = INT_MAX);
 
-        void onInit() override {}
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.

@@ -12,13 +12,13 @@ namespace eclipse::gui::imgui {
         m_windows.clear();
 
         // Load tabs
-        auto& tabs = Engine::get()->getTabs();
+        auto& tabs = Engine::get().getTabs();
         m_windows.reserve(tabs.size());
         for (auto& tab : tabs) {
-            m_windows.emplace_back(tab->getTitle(), [tab] {
+            m_windows.emplace_back(tab.getTitle(), [tab = &tab] {
                 for (auto& component : tab->getComponents()) {
                     if (component->getFlags() & ComponentFlags::DisableTabbed) continue;
-                    ImGuiRenderer::get()->visitComponent(component);
+                    ImGuiRenderer::get()->visitComponent(component.get());
                 }
             });
         }
@@ -27,7 +27,7 @@ namespace eclipse::gui::imgui {
         {
             auto windowStates = config::get("windows", std::vector<nlohmann::json>());
             for (auto &windowState: windowStates) {
-                auto title = windowState.at("title").get<std::string>();
+                auto title = windowState.at("title").get<std::string_view>();
                 auto window = std::ranges::find_if(m_windows, [&title](Window const& w) {
                     return w.getTitle() == title;
                 });
@@ -42,7 +42,7 @@ namespace eclipse::gui::imgui {
     }
 
     bool TabbedLayout::shouldRender() const {
-        return Engine::get()->isToggled() || wantStayVisible();
+        return Engine::get().isToggled() || wantStayVisible();
     }
 
     bool TabbedLayout::wantStayVisible() const {
@@ -62,7 +62,7 @@ namespace eclipse::gui::imgui {
                 {
                     auto windowStates = config::get("windows", std::vector<nlohmann::json>());
                     for (auto& windowState: windowStates) {
-                        auto title = windowState.at("title").get<std::string>();
+                        auto title = windowState.at("title").get<std::string_view>();
                         auto window = std::ranges::find_if(m_windows, [&title](Window const& window) {
                             return window.getTitle() == title;
                         });

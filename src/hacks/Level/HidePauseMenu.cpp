@@ -19,20 +19,21 @@ namespace eclipse::hacks::Level {
 
     class $modify(HPMPauseLayerHook, PauseLayer) {
         void customSetup() override {
-            HPMPauseLayerHook::createHideScheduler(this);
+            this->createHideScheduler(this);
             PauseLayer::customSetup();
         }
 
         static void createHideScheduler(PauseLayer* pauseLayer) {
             pauseLayer->schedule(schedule_selector(HPMPauseLayerHook::updatePauseMenu));
-            pauseLayer->setVisible(!config::get<bool>("level.hidepause", false));
+            pauseLayer->setVisible(!config::get<"level.hidepause", bool>(false));
         }
 
         void updatePauseMenu(float dt) {
-            bool hasZoomMod = geode::Loader::get()->isModLoaded("bobby_shmurner.zoom");
+            static bool const hasZoomMod = geode::Loader::get()->isModLoaded("bobby_shmurner.zoom");
 
-            if (config::get<bool>("level.hidepause", false) == this->isVisible() && (hasZoomMod ? gui::Engine::get()->isToggled() : true)) {
-                this->setVisible(!config::get<bool>("level.hidepause", false));
+            auto hidePause = config::get<"level.hidepause", bool>(false);
+            if (hidePause == this->isVisible() && (hasZoomMod ? gui::Engine::get().isToggled() : true)) {
+                this->setVisible(!hidePause);
             }
         }
     };

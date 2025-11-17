@@ -9,7 +9,6 @@ namespace eclipse::gui {
     public:
         explicit ButtonComponent(std::string title);
 
-        void onInit() override {}
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.

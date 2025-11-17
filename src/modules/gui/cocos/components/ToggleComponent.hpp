@@ -36,11 +36,11 @@ namespace eclipse::gui::cocos {
 
             auto labelSize = width - 35.f;
             auto offset = 0.f;
-            if (auto options = m_component->getOptions().lock()) {
+            if (auto options = m_component->getOptions()) {
                 m_extraButton = createSpriteExtra(
                     createButton("settings.png"_spr, 0.35f),
                     [options](auto) {
-                        OptionsPopup::create(options)->show();
+                        OptionsPopup::create(*options)->show();
                     }
                 );
                 m_extraButton->setAnchorPoint({ 0.5, 0.5f });

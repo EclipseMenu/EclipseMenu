@@ -91,12 +91,12 @@ namespace eclipse::keybinds {
         return names.at(Keys::Unknown);
     }
 
-    static std::map<std::string, std::shared_ptr<gui::KeybindComponent>> s_keybindComponents;
-    static std::shared_ptr<gui::LabelComponent> s_hintLabel;
+    static std::map<std::string, gui::KeybindComponent*> s_keybindComponents;
+    static gui::LabelComponent* s_hintLabel;
 
     void updateHintLabel() {
         if (!s_hintLabel) return;
-        auto components = gui::MenuTab::find("tab.keybinds")->getComponents();
+        auto& components = gui::MenuTab::find("tab.keybinds")->getComponents();
         s_hintLabel->setText(
             components.size() <= 3 ? i18n::get_("keybinds.hint") : ""
         );
@@ -109,9 +109,9 @@ namespace eclipse::keybinds {
         }
     }
 
-    std::shared_ptr<Manager> Manager::get() {
-        static auto instance = std::make_shared<Manager>();
-        return instance;
+    Manager* Manager::get() {
+        static Manager instance;
+        return &instance;
     }
 
     inline Keys getCfgKeyInternal(std::string_view id) {

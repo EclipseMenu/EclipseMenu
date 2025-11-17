@@ -27,14 +27,15 @@ namespace eclipse::gui {
         return 0;
     }
 
-    void ThemeManager::init() {
+    ThemeManager::ThemeManager() {
         if (!loadTheme(geode::Mod::get()->getSaveDir() / "theme.json")) {
             // theme not created, load a built-in one
             auto themes = listAvailableThemes();
             if (themes.empty()) {
                 // okay, we're screwed, just set the defaults
                 applyValues(config::getTempStorage(), true);
-                return setDefaults();
+                setDefaults();
+                return;
             }
 
             // TODO: add a priority for default theme
@@ -70,13 +71,9 @@ namespace eclipse::gui {
         // TODO: fill this after all properties are figured out
     }
 
-    std::shared_ptr<ThemeManager> ThemeManager::get() {
-        static std::shared_ptr<ThemeManager> instance;
-        if (!instance) {
-            instance = std::make_shared<ThemeManager>();
-            instance->init();
-        }
-        return instance;
+    ThemeManager* ThemeManager::get() {
+        static ThemeManager instance;
+        return &instance;
     }
 
     void ThemeManager::reloadTheme() {
@@ -102,7 +99,7 @@ namespace eclipse::gui {
         else geode::log::warn("Failed to read \"{}\" from theme", key);
     }
 
-    bool ThemeManager::loadTheme(const std::filesystem::path& path) {
+    bool ThemeManager::loadTheme(std::filesystem::path const& path) {
         std::error_code ec;
         if (!std::filesystem::exists(path, ec)) return false;
         std::ifstream file(path);
@@ -189,7 +186,7 @@ namespace eclipse::gui {
         return true;
     }
 
-    void ThemeManager::saveTheme(const std::filesystem::path& path) const {
+    void ThemeManager::saveTheme(std::filesystem::path const& path) const {
         nlohmann::json json;
         this->applyValues(json);
 
@@ -262,11 +259,11 @@ namespace eclipse::gui {
         }
     }
 
-    bool ThemeManager::importTheme(const std::filesystem::path& path) {
+    bool ThemeManager::importTheme(std::filesystem::path const& path) {
         return false;
     }
 
-    void ThemeManager::exportTheme(const std::filesystem::path& path) {}
+    void ThemeManager::exportTheme(std::filesystem::path const& path) {}
 
     float ThemeManager::getGlobalScale() const {
         auto ret = m_uiScale * imgui::DEFAULT_SCALE;
@@ -278,7 +275,7 @@ namespace eclipse::gui {
         return ret;
     }
 
-    std::optional<ThemeMeta> ThemeManager::checkTheme(const std::filesystem::path& path) {
+    std::optional<ThemeMeta> ThemeManager::checkTheme(std::filesystem::path const& path) {
         std::error_code ec;
         if (!std::filesystem::exists(path, ec)) return std::nullopt;
         std::ifstream file(path);
@@ -319,7 +316,7 @@ namespace eclipse::gui {
         return themes;
     }
 
-    void ThemeManager::applyAccentColor(const Color& color) {
+    void ThemeManager::applyAccentColor(Color const& color) {
         auto isDark = color.luminance() < 0.5f;
         auto foreground = isDark ? Color::WHITE : Color::BLACK;
 
@@ -337,7 +334,7 @@ namespace eclipse::gui {
         m_buttonActiveForeground = foreground;
     }
 
-    void ThemeManager::applyBackgroundColor(const Color& color) {
+    void ThemeManager::applyBackgroundColor(Color const& color) {
         auto isDark = color.luminance() < 0.5f;
         auto foreground = isDark ? Color::WHITE : Color::BLACK;
 
@@ -350,9 +347,9 @@ namespace eclipse::gui {
     }
 
     void ThemeManager::setRenderer(RendererType renderer) {
-        auto engine = Engine::get();
-        if (engine->isInitialized()) {
-            engine->setRenderer(renderer);
+        auto& engine = Engine::get();
+        if (engine.isInitialized()) {
+            engine.setRenderer(renderer);
         }
         m_renderer = renderer;
     }

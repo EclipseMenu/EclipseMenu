@@ -58,7 +58,7 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.show-taps.stroke", 0);
             config::setIfEmpty("global.show-taps.color", gui::Color::WHITE);
 
-            tab->addToggle("global.show-taps")->setDescription()->handleKeybinds()->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+            tab->addToggle("global.show-taps")->setDescription()->handleKeybinds()->addOptions([](auto options) {
                 options->addToggle("global.show-taps.fill")->setDescription();
                 options->addInputFloat("global.show-taps.scale", 0.01f, 5.f, "%.2f");
                 options->addInputInt("global.show-taps.stroke", 0, 10);

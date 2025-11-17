@@ -58,10 +58,10 @@ namespace eclipse::gui::imgui {
         "ImGui", "MegaHack", "MegaOverlay", "Gruvbox", "OpenHack"
     };
 
-    void Theme::visit(std::shared_ptr<Component> const& component) const {
+    void Theme::visit(Component* component) const {
 
 #define CASE(x) case ComponentType::x: \
-    this->visit##x(std::static_pointer_cast<x##Component>(component)); break;
+    this->visit##x(static_cast<x##Component*>(component)); break
 
         ImGui::PushID(component->getId().c_str());
         switch (component->getType()) {
@@ -197,7 +197,7 @@ namespace eclipse::gui::imgui {
         ImGui::End();
     }
 
-    void Theme::visitLabel(std::shared_ptr<LabelComponent> const& label) const {
+    void Theme::visitLabel(LabelComponent* label) const {
         if (label->getTitle().empty()) return; // skip empty labels
         if (label->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PushStyleColor(ImGuiCol_Text, static_cast<ImVec4>(ThemeManager::get()->getSearchedColor()));
@@ -207,17 +207,17 @@ namespace eclipse::gui::imgui {
         ImGui::PopStyleColor();
     }
 
-    void Theme::visitToggle(std::shared_ptr<ToggleComponent> const& toggle) const {
+    void Theme::visitToggle(ToggleComponent* toggle) const {
         auto tm = ThemeManager::get();
 
         bool toggled = false;
         bool value = toggle->getValue();
         auto title = i18n::get_(toggle->getTitle());
 
-        if (auto options = toggle->getOptions().lock()) {
+        if (auto options = toggle->getOptions()) {
             toggled = this->checkboxWithSettings(title, value, toggle->getFlags() & ComponentFlags::SearchedFor, [this, options] {
                 for (auto& comp : options->getComponents())
-                    this->visit(comp);
+                    this->visit(comp.get());
             }, [toggle] {
                 handleTooltip(toggle->getDescription());
                 if (toggle->hasKeybind())
@@ -237,7 +237,7 @@ namespace eclipse::gui::imgui {
         }
     }
 
-    void Theme::visitRadioButton(std::shared_ptr<RadioButtonComponent> const& radio) const {
+    void Theme::visitRadioButton(RadioButtonComponent* radio) const {
         int value = radio->getValue();
 
         if (radio->getFlags() & ComponentFlags::SearchedFor)
@@ -258,7 +258,7 @@ namespace eclipse::gui::imgui {
             handleKeybindMenu(fmt::format("{}-{}", radio->getId(), radio->getChoice()));
     }
 
-    void Theme::visitCombo(std::shared_ptr<ComboComponent> const& combo) const {
+    void Theme::visitCombo(ComboComponent* combo) const {
         auto& items = combo->getItems();
         int value = combo->getValue();
         auto title = i18n::get(combo->getTitle());
@@ -292,7 +292,7 @@ namespace eclipse::gui::imgui {
             ImGui::PopStyleColor();
     }
 
-    void Theme::visitFilesystemCombo(std::shared_ptr<FilesystemComboComponent> const& combo) const {
+    void Theme::visitFilesystemCombo(FilesystemComboComponent* combo) const {
         auto& items = combo->getItems();
         std::filesystem::path value = combo->getValue();
         auto title = i18n::get(combo->getTitle());
@@ -328,7 +328,7 @@ namespace eclipse::gui::imgui {
             ImGui::PopStyleColor();
     }
 
-    void Theme::visitSlider(std::shared_ptr<SliderComponent> const& slider) const {
+    void Theme::visitSlider(SliderComponent* slider) const {
         auto value = slider->getValue();
 
         if (slider->getFlags() & ComponentFlags::SearchedFor)
@@ -347,7 +347,7 @@ namespace eclipse::gui::imgui {
         ImGui::PopItemWidth();
     }
 
-    void Theme::visitInputFloat(std::shared_ptr<InputFloatComponent> const& inputFloat) const {
+    void Theme::visitInputFloat(InputFloatComponent* inputFloat) const {
         auto value = inputFloat->getValue();
         auto title = i18n::get(inputFloat->getTitle());
 
@@ -372,7 +372,7 @@ namespace eclipse::gui::imgui {
         ImGui::PopItemWidth();
     }
 
-    void Theme::visitInputInt(std::shared_ptr<InputIntComponent> const& inputInt) const {
+    void Theme::visitInputInt(InputIntComponent* inputInt) const {
         auto value = inputInt->getValue();
         auto title = i18n::get(inputInt->getTitle());
 
@@ -397,7 +397,7 @@ namespace eclipse::gui::imgui {
         ImGui::PopItemWidth();
     }
 
-    void Theme::visitIntToggle(std::shared_ptr<IntToggleComponent> const& intToggle) const {
+    void Theme::visitIntToggle(IntToggleComponent* intToggle) const {
         auto value = intToggle->getValue();
         auto state = intToggle->getState();
         auto tm = ThemeManager::get();
@@ -423,7 +423,7 @@ namespace eclipse::gui::imgui {
         }
     }
 
-    void Theme::visitFloatToggle(std::shared_ptr<FloatToggleComponent> const& floatToggle) const {
+    void Theme::visitFloatToggle(FloatToggleComponent* floatToggle) const {
         auto value = floatToggle->getValue();
         auto state = floatToggle->getState();
         auto tm = ThemeManager::get();
@@ -449,7 +449,7 @@ namespace eclipse::gui::imgui {
         }
     }
 
-    void Theme::visitInputText(std::shared_ptr<InputTextComponent> const& inputText) const {
+    void Theme::visitInputText(InputTextComponent* inputText) const {
         auto value = inputText->getValue();
         auto title = i18n::get(inputText->getTitle());
 
@@ -478,7 +478,7 @@ namespace eclipse::gui::imgui {
         handleTooltip(inputText->getDescription());
     }
 
-    void Theme::visitColor(std::shared_ptr<ColorComponent> const& color) const {
+    void Theme::visitColor(ColorComponent* color) const {
         auto value = color->getValue();
         bool changed = false;
         auto title = i18n::get(color->getTitle());
@@ -506,7 +506,7 @@ namespace eclipse::gui::imgui {
         handleTooltip(color->getDescription());
     }
 
-    void Theme::visitButton(std::shared_ptr<ButtonComponent> const& button) const {
+    void Theme::visitButton(ButtonComponent* button) const {
         if (this->button(i18n::get_(button->getTitle()), button->getFlags() & ComponentFlags::SearchedFor)) {
             button->triggerCallback();
         }
@@ -516,7 +516,7 @@ namespace eclipse::gui::imgui {
             handleKeybindMenu(fmt::format("button.{}", button->getId()));
     }
 
-    void Theme::visitKeybind(std::shared_ptr<KeybindComponent> const& keybind) const {
+    void Theme::visitKeybind(KeybindComponent* keybind) const {
         auto title = i18n::get(keybind->getTitle());
         auto canDelete = keybind->canDelete();
 
@@ -605,7 +605,7 @@ namespace eclipse::gui::imgui {
         ImGui::PopID();
     }
 
-    void Theme::visitLabelSettings(std::shared_ptr<LabelSettingsComponent> const& labelSettings) const {
+    void Theme::visitLabelSettings(LabelSettingsComponent* labelSettings) const {
         auto* settings = labelSettings->getSettings();
 
         if (this->checkboxWithSettings(settings->name, settings->visible, labelSettings->getFlags() & ComponentFlags::SearchedFor, [this, settings, labelSettings] {

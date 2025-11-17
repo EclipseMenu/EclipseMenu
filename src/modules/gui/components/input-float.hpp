@@ -10,7 +10,6 @@ namespace eclipse::gui {
             std::string title, std::string id, float min = FLT_MIN, float max = FLT_MAX, std::string format = "%.3f"
         );
 
-        void onInit() override {}
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.

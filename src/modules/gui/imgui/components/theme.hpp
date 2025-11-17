@@ -48,7 +48,7 @@ namespace eclipse::gui::imgui {
         Theme& operator=(Theme&&) = delete;
 
         /// @brief Accepts a component and uses current theme to render it
-        void visit(std::shared_ptr<Component> const& component) const;
+        void visit(Component* component) const;
 
         /// @brief Renders the tooltip with correct sizing and theme color
         static void handleTooltip(std::string const& text);
@@ -67,21 +67,21 @@ namespace eclipse::gui::imgui {
 
         // == Components == //
 
-        virtual void visitLabel(std::shared_ptr<LabelComponent> const& label) const;
-        virtual void visitToggle(std::shared_ptr<ToggleComponent> const& toggle) const;
-        virtual void visitRadioButton(std::shared_ptr<RadioButtonComponent> const& radio) const;
-        virtual void visitCombo(std::shared_ptr<ComboComponent> const& combo) const;
-        virtual void visitFilesystemCombo(std::shared_ptr<FilesystemComboComponent> const& combo) const;
-        virtual void visitSlider(std::shared_ptr<SliderComponent> const& slider) const;
-        virtual void visitInputFloat(std::shared_ptr<InputFloatComponent> const& inputFloat) const;
-        virtual void visitInputInt(std::shared_ptr<InputIntComponent> const& inputInt) const;
-        virtual void visitIntToggle(std::shared_ptr<IntToggleComponent> const& intToggle) const;
-        virtual void visitFloatToggle(std::shared_ptr<FloatToggleComponent> const& floatToggle) const;
-        virtual void visitInputText(std::shared_ptr<InputTextComponent> const& inputText) const;
-        virtual void visitColor(std::shared_ptr<ColorComponent> const& color) const;
-        virtual void visitButton(std::shared_ptr<ButtonComponent> const& button) const;
-        virtual void visitKeybind(std::shared_ptr<KeybindComponent> const& keybind) const;
-        virtual void visitLabelSettings(std::shared_ptr<LabelSettingsComponent> const& labelSettings) const;
+        virtual void visitLabel(LabelComponent* label) const;
+        virtual void visitToggle(ToggleComponent* toggle) const;
+        virtual void visitRadioButton(RadioButtonComponent* radio) const;
+        virtual void visitCombo(ComboComponent* combo) const;
+        virtual void visitFilesystemCombo(FilesystemComboComponent* combo) const;
+        virtual void visitSlider(SliderComponent* slider) const;
+        virtual void visitInputFloat(InputFloatComponent* inputFloat) const;
+        virtual void visitInputInt(InputIntComponent* inputInt) const;
+        virtual void visitIntToggle(IntToggleComponent* intToggle) const;
+        virtual void visitFloatToggle(FloatToggleComponent* floatToggle) const;
+        virtual void visitInputText(InputTextComponent* inputText) const;
+        virtual void visitColor(ColorComponent* color) const;
+        virtual void visitButton(ButtonComponent* button) const;
+        virtual void visitKeybind(KeybindComponent* keybind) const;
+        virtual void visitLabelSettings(LabelSettingsComponent* labelSettings) const;
 
         // == ImGui Widgets == //
 

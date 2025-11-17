@@ -7,7 +7,7 @@
 namespace eclipse::gui::cocos {
     class RadioButtonsMenuNode : public cocos2d::CCNode {
     protected:
-        std::vector<std::shared_ptr<RadioButtonComponent>> m_radioButtons;
+        std::vector<RadioButtonComponent*> m_radioButtons;
         std::vector<std::pair<CCMenuItemToggler*, int>> m_toggles;
 
     public:
@@ -25,7 +25,7 @@ namespace eclipse::gui::cocos {
             return box;
         }
 
-        void addRadioButton(std::shared_ptr<RadioButtonComponent> const& radioButton, float width) {
+        void addRadioButton(RadioButtonComponent* radioButton, float width) {
             auto const tm = ThemeManager::get();
             constexpr float height = 28.f;
 
@@ -82,7 +82,7 @@ namespace eclipse::gui::cocos {
             return true;
         }
 
-        static RadioButtonsMenuNode* create(std::vector<std::shared_ptr<RadioButtonComponent>> radioButtons, float width) {
+        static RadioButtonsMenuNode* create(std::vector<RadioButtonComponent*> radioButtons, float width) {
             auto ret = new RadioButtonsMenuNode;
             ret->m_radioButtons = std::move(radioButtons);
             if (ret->init(width)) {

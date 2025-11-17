@@ -61,11 +61,11 @@ namespace eclipse::gui {
 
     Component::Component() { m_uid = m_uniqueID++; }
 
-    std::shared_ptr<Component> Component::find(size_t uid) {
-        for (auto& tab : Engine::get()->getTabs()) {
-            for (auto& component : tab->getComponents()) {
+    Component* Component::find(size_t uid) {
+        for (auto& tab : Engine::get().getTabs()) {
+            for (auto& component : tab.getComponents()) {
                 if (component->getUID() == uid) {
-                    return component;
+                    return component.get();
                 }
             }
         }
@@ -232,11 +232,8 @@ namespace eclipse::gui {
         std::filesystem::path directory
     ): m_id(std::move(id)), m_title(std::move(title)), m_directory(std::move(directory)) {
         m_type = ComponentType::FilesystemCombo;
-    }
 
-    void FilesystemComboComponent::onInit() {
         globFiles();
-
         if (getValue().empty() && m_items.size() > 0) setValue(0);
     }
 
@@ -789,10 +786,9 @@ namespace eclipse::gui {
         return this;
     }
 
-    void ToggleComponent::addOptions(FunctionRef<void(std::shared_ptr<MenuTab>)> options) {
-        if (!m_options) m_options = std::make_shared<MenuTab>(m_title, false);
-
-        options(m_options);
+    void ToggleComponent::addOptions(FunctionRef<void(MenuTab*)> options) {
+        m_options = std::make_unique<MenuTab>(m_title, false);
+        options(m_options.get());
     }
 
     ToggleComponent* ToggleComponent::handleKeybinds() {
@@ -820,7 +816,7 @@ namespace eclipse::gui {
 
     std::string const& ToggleComponent::getId() const { return m_id; }
     std::string const& ToggleComponent::getTitle() const { return m_title; }
-    std::weak_ptr<MenuTab> ToggleComponent::getOptions() const { return m_options; }
+    MenuTab* ToggleComponent::getOptions() const { return m_options.get(); }
     bool ToggleComponent::hasKeybind() const { return m_hasKeybind; }
 
     void ToggleComponent::triggerCallback(bool value) {

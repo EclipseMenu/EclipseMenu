@@ -12,7 +12,6 @@ namespace eclipse::gui {
     public:
         explicit LabelSettingsComponent(labels::LabelSettings* settings);
 
-        void onInit() override {}
         void onUpdate() override {}
 
         [[nodiscard]] std::string const& getId() const override;

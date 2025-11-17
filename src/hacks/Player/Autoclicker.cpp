@@ -17,7 +17,7 @@ namespace eclipse::hacks::Player {
             tab->addToggle("player.autoclick")
                ->handleKeybinds()
                ->setDescription()
-               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+               ->addOptions([](auto options) {
                    options->addToggle("player.autoclick.p1");
                    options->addToggle("player.autoclick.p2");
                    options->addInputInt("player.autoclick.intervalhold", 1, 1000);

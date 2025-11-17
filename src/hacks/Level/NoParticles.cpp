@@ -59,7 +59,7 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("level.noparticles")->handleKeybinds()->setDescription()
                ->callback(onHideParticles)
-               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+               ->addOptions([](auto options) {
                    options->addToggle("level.noparticles.nomiscparticles")->setDescription();
                    options->addToggle("level.noparticles.nocustomparticles")->setDescription();
                });

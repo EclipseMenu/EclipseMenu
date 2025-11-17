@@ -49,10 +49,7 @@ namespace eclipse::gui {
         [[nodiscard]] size_t getUID() const { return m_uid; }
 
         /// @brief Find a component by its unique identifier.
-        static std::shared_ptr<Component> find(size_t uid);
-
-        /// @brief Initialize the component.
-        virtual void onInit() = 0;
+        static Component* find(size_t uid);
 
         /// @brief Update the component.
         virtual void onUpdate() = 0;

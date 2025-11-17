@@ -10,13 +10,13 @@ namespace eclipse::gui::imgui {
     void SidebarLayout::init() {
         m_tabs.clear();
 
-        auto& tabs = Engine::get()->getTabs();
+        auto& tabs = Engine::get().getTabs();
         m_tabs.reserve(tabs.size());
         for (auto& tab : tabs) {
-            m_tabs.emplace_back(tab->getTitle(), [tab] {
+            m_tabs.emplace_back(tab.getTitle(), [tab = &tab] {
                 for (auto& component : tab->getComponents()) {
                     if (component->getFlags() & ComponentFlags::DisableSidebar) continue;
-                    ImGuiRenderer::get()->visitComponent(component);
+                    ImGuiRenderer::get()->visitComponent(component.get());
                 }
             });
         }
@@ -36,7 +36,7 @@ namespace eclipse::gui::imgui {
     }
 
     void SidebarLayout::draw() {
-        if (!Engine::get()->isToggled()) return;
+        if (!Engine::get().isToggled()) return;
 
         auto tm = ThemeManager::get();
         auto scale = tm->getGlobalScale();
@@ -55,7 +55,7 @@ namespace eclipse::gui::imgui {
         // Logo (not really)
 
         ImGui::BeginGroup(); {
-            ImGui::BeginChild("Logo", ImVec2(188 * scale, 50 * scale));
+            ImGui::BeginChild("Logo", ImVec2(160 * scale, 50 * scale));
             ImGui::SameLine();
 
             ImGui::SetCursorPosY(11);
@@ -78,13 +78,13 @@ namespace eclipse::gui::imgui {
 
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10 * scale);
 
-        Tabs currentTabs = Engine::get()->getTabs();
+        auto& currentTabs = Engine::get().getTabs();
 
         for (int i = 0; i < currentTabs.size(); i++) {
-            std::string it = i18n::get_(currentTabs[i]->getTitle());
+            std::string it = i18n::get_(currentTabs[i].getTitle());
             ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5, 0.5));
             ImGui::PushStyleColor(ImGuiCol_Button, m_selectedTab == i ? style->Colors[ImGuiCol_Button] : ImVec4(0, 0, 0, 0));
-            ImGui::PushStyleColor(ImGuiCol_Text, currentTabs[i]->isSearchedFor() ? static_cast<ImVec4>(tm->getSearchedColor()) : style->Colors[ImGuiCol_Text]);
+            ImGui::PushStyleColor(ImGuiCol_Text, currentTabs[i].isSearchedFor() ? static_cast<ImVec4>(tm->getSearchedColor()) : style->Colors[ImGuiCol_Text]);
             if (ImGui::Button(it.c_str(), ImVec2(160 * scale, 40 * scale))) {
                 m_selectedTab = i;
             }

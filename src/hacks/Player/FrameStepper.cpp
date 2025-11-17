@@ -36,7 +36,7 @@ namespace eclipse::hacks::Player {
             tab->addToggle("player.framestepper")
                ->setDescription()
                ->handleKeybinds()
-               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+               ->addOptions([](auto options) {
                    options->addKeybind("player.framestepper.step_key", "player.framestepper.step_key")
                           ->setDefaultKey(keybinds::Keys::C);
                    options->addToggle("player.framestepper.hold");

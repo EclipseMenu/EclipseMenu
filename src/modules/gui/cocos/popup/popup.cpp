@@ -90,14 +90,14 @@ namespace eclipse::gui::cocos {
     }
 
     void Popup::setActiveTab(int idx) const {
-        auto tabs = Engine::get()->getTabs();
+        auto& tabs = Engine::get().getTabs();
         if (idx < 0 || idx >= tabs.size()) return;
         config::set("menu.current_tab", idx);
         m_contentMenu->setContent(tabs[idx]);
     }
 
     void Popup::refreshPage() const {
-        auto tabs = Engine::get()->getTabs();
+        auto& tabs = Engine::get().getTabs();
         auto idx = config::get<int>("menu.current_tab", 0);
         if (idx < 0 || idx >= tabs.size()) return;
         m_contentMenu->setContent(tabs[idx], false);

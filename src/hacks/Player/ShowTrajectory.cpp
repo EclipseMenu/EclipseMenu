@@ -232,7 +232,7 @@ namespace eclipse::hacks::Player {
 
             config::setIfEmpty("player.showtrajectory.iterations", 300);
 
-            toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+            toggle->addOptions([](auto options) {
                 options->addInputInt("player.showtrajectory.iterations", 1, 1000);
             });
 

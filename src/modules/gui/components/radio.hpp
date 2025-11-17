@@ -8,7 +8,6 @@ namespace eclipse::gui {
     public:
         explicit RadioButtonComponent(std::string id, std::string title, int value);
 
-        void onInit() override {}
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.

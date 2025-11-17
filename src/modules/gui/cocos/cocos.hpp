@@ -12,11 +12,12 @@ namespace eclipse::gui::cocos {
     class ScrollLayer;
     class ContentView;
 
-    class CocosRenderer : public Renderer {
+    class CocosRenderer final : public Renderer {
     public:
-        static std::shared_ptr<CocosRenderer> get() {
-            if (Engine::getRendererType() != RendererType::Cocos2d) return nullptr;
-            return std::static_pointer_cast<CocosRenderer>(Engine::get()->getRenderer());
+        static CocosRenderer* get() {
+            auto& engine = Engine::get();
+            if (engine.getRendererType() != RendererType::Cocos2d) return nullptr;
+            return static_cast<CocosRenderer*>(engine.getRenderer());
         }
 
         void init() override;

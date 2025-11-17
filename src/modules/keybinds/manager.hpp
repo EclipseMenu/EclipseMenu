@@ -141,7 +141,7 @@ namespace eclipse::keybinds {
     class Manager {
     public:
         /// @brief Get the keybind manager.
-        static std::shared_ptr<Manager> get();
+        static Manager* get();
 
         /// @brief Register a keybind to the manager (in case the keybind will be later used)
         /// @param id The ID of the keybind.

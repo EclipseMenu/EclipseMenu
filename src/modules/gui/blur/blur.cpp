@@ -339,7 +339,7 @@ namespace eclipse::gui::blur {
     void update(float) {
         auto tm = ThemeManager::get();
         auto duration = tm->getBlurSpeed();
-        auto toggled = Engine::get()->isToggled();
+        auto toggled = Engine::get().isToggled();
 
         auto deltaTimeMod = utils::get<cocos2d::CCDirector>()->getActualDeltaTime();
         blurTimer += toggled ? deltaTimeMod : -deltaTimeMod;

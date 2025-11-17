@@ -9,7 +9,6 @@ namespace eclipse::gui {
     public:
         explicit ColorComponent(std::string title, std::string id, bool hasOpacity = false);
 
-        void onInit() override {}
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.

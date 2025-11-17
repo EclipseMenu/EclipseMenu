@@ -153,6 +153,11 @@ namespace eclipse::gui::imgui {
         );
     }
 
+    FontManager* FontManager::get() {
+        auto imgui = ImGuiRenderer::get();
+        return imgui ? &imgui->getFontManager() : nullptr;
+    }
+
     std::vector<FontManager::FontMetadata> FontManager::fetchAvailableFonts() {
         std::vector<FontMetadata> result;
         auto globFonts = [&](std::filesystem::path const& path) {
@@ -336,7 +341,7 @@ namespace eclipse::gui::imgui {
         if (s_initialized) m_theme->init();
     }
 
-    void ImGuiRenderer::visitComponent(std::shared_ptr<Component> const& component) const {
+    void ImGuiRenderer::visitComponent(Component* component) const {
         if (!m_theme) return;
         component->onUpdate();
         m_theme->visit(component);

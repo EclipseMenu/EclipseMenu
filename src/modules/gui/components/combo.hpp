@@ -9,7 +9,6 @@ namespace eclipse::gui {
     public:
         explicit ComboComponent(std::string id, std::string title, std::vector<std::string> items, int value);
 
-        void onInit() override {}
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.

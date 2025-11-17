@@ -415,11 +415,11 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.showhitboxes.passable_color", gui::Color(0, 1, 1));
             config::setIfEmpty("level.showhitboxes.triggers_color", gui::Color(1, 0, 0.9f));
 
-            toggle->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+            toggle->addOptions([](auto options) {
                 options->addToggle("level.showhitboxes.editor");
                 options->addToggle("level.showhitboxes.hideplayer");
                 options->addToggle("level.showhitboxes.showtriggers");
-                options->addToggle("level.showhitboxes.customcolors")->addOptions([](std::shared_ptr<gui::MenuTab> optionsColor) {
+                options->addToggle("level.showhitboxes.customcolors")->addOptions([](auto optionsColor) {
                     optionsColor->addColorComponent("level.showhitboxes.solid_color");
                     optionsColor->addColorComponent("level.showhitboxes.danger_color");
                     optionsColor->addColorComponent("level.showhitboxes.other_color");
@@ -434,7 +434,7 @@ namespace eclipse::hacks::Level {
                 options->addFloatToggle("level.showhitboxes.traillength", 1.f, 2000.f, "%.0f");
             });
 
-            tab->addToggle("level.showhitboxes.ondeath")->handleKeybinds()->addOptions([](std::shared_ptr<gui::MenuTab> optionsOnDeath) {
+            tab->addToggle("level.showhitboxes.ondeath")->handleKeybinds()->addOptions([](auto optionsOnDeath) {
                 optionsOnDeath->addToggle("level.showhitboxes.ondeath.player");
             });
 

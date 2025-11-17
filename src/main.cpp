@@ -32,7 +32,7 @@ using namespace eclipse;
 static bool s_isInitialized = false;
 
 static void toggleMenu(bool down = true) {
-    gui::Engine::get()->toggle();
+    gui::Engine::get().toggle();
     config::save();
     gui::ThemeManager::get()->saveTheme();
 }
@@ -71,7 +71,7 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
         gui::blur::init();
 
         // Initialize the GUI engine.
-        gui::Engine::get()->init();
+        gui::Engine::get().init();
 
         #ifdef ECLIPSE_USE_FLOATING_BUTTON
         // This will create the floating button and keep it across scenes
@@ -311,10 +311,10 @@ $on_mod(Loaded) {
 
             if (input.empty()) {
                 if (hasSearched) {
-                    for (auto& tab : Engine::get()->getTabs()) {
-                        tab->setSearchedFor(false);
+                    for (auto& tab : Engine::get().getTabs()) {
+                        tab.setSearchedFor(false);
 
-                        for (auto& component : tab->getComponents())
+                        for (auto& component : tab.getComponents())
                             component->removeFlag(ComponentFlags::SearchedFor);
                     }
 
@@ -323,17 +323,17 @@ $on_mod(Loaded) {
             } else {
                 hasSearched = true;
 
-                for (auto& tab : Engine::get()->getTabs()) {
+                for (auto& tab : Engine::get().getTabs()) {
                     bool hasFoundComponent = false;
 
-                    for (auto& component : tab->getComponents()) {
+                    for (auto& component : tab.getComponents()) {
                         if (utils::matchesStringFuzzy(i18n::get(component->getTitle()), input)) {
                             component->addFlag(ComponentFlags::SearchedFor);
                             hasFoundComponent = true;
                         } else component->removeFlag(ComponentFlags::SearchedFor);
                     }
 
-                    tab->setSearchedFor(hasFoundComponent);
+                    tab.setSearchedFor(hasFoundComponent);
                 }
             }
         })->disableSaving()->setFlags(ComponentFlags::DisableCocos | ComponentFlags::StartWithKeyboardFocus);
@@ -346,7 +346,7 @@ $on_mod(Loaded) {
     );
 
     geode::listenForSettingChanges<std::string>("menu-style", [](std::string const& style) {
-        gui::Engine::get()->setRenderer(
+        gui::Engine::get().setRenderer(
             style == "ImGui" ? gui::RendererType::ImGui : gui::RendererType::Cocos2d
         );
     });

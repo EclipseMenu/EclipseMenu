@@ -34,7 +34,7 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("level.startpos_switcher")
                ->handleKeybinds()->setDescription()
-               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+               ->addOptions([](auto options) {
                    options->addKeybind("level.startpos_switcher.previous", "level.startpos_switcher.previous")
                           ->setInternal()->setDefaultKey(keybinds::Keys::Q);
                    options->addKeybind("level.startpos_switcher.next", "level.startpos_switcher.next")
@@ -42,7 +42,7 @@ namespace eclipse::hacks::Level {
                    options->addToggle("level.startpos_switcher.reset_camera");
                    options->addInputFloat("level.startpos_switcher.delay", 0.f, 10.f, "%.2fs");
                    options->addToggle("level.startpos_switcher.label")
-                          ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+                          ->addOptions([](auto options) {
                               options->addInputFloat("label.startpos_switcher.scale", 0.1f, 2.f, "%.2fx");
                               options->addInputFloat("label.startpos_switcher.alpha_mod", 0.f, 1.f);
                               options->addColorComponent("label.startpos_switcher.color", true);

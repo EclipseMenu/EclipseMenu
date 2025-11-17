@@ -14,11 +14,11 @@ namespace eclipse::gui::cocos {
     template<typename S, typename T, typename U, typename... Args>
     class BaseComponentNode : public T {
     protected:
-        std::shared_ptr<U> m_component;
+        U* m_component{};
     public:
-        static S* create(std::shared_ptr<Component> const& component, Args... args) {
+        static S* create(Component* component, Args... args) {
             auto ret = new S;
-            ret->m_component = std::static_pointer_cast<U>(component);
+            ret->m_component = static_cast<U*>(component);
             if (ret->S::init(args...)) {
                 ret->autorelease();
                 return ret;

@@ -41,9 +41,9 @@ namespace eclipse::hacks::Level {
 
             tab->addToggle("level.confirmpractice")
                 ->handleKeybinds()->setDescription()
-                ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
-                options->addToggle("level.confirmpractice.confirmexitpractice")->setDescription();
-                    });
+                ->addOptions([](auto options) {
+                    options->addToggle("level.confirmpractice.confirmexitpractice")->setDescription();
+                });
         }
 
         [[nodiscard]] const char* getId() const override { return "Confirm Practice"; }
@@ -56,19 +56,19 @@ namespace eclipse::hacks::Level {
     class $modify(ConfirmRestartPauseLayerHook, PauseLayer) {
         ADD_HOOKS_DELEGATE("level.confirmrestart")
 
-	    struct Fields {
-                bool m_isPopupVisible = false;
-	    };
+        struct Fields {
+            bool m_isPopupVisible = false;
+        };
 
-	    void onRestart(cocos2d::CCObject* sender) {
+        void onRestart(cocos2d::CCObject* sender) {
             if (m_fields->m_isPopupVisible) {
                 PauseLayer::onRestart(sender);
                 return;
-		    }
+            }
 
             geode::createQuickPopup(
                 "Restart Level",                                   // title
-                "Are you sure you want to <cr>restart</c>?",			// content
+                "Are you sure you want to <cr>restart</c>?",            // content
                 "Cancel", "Restart",                                  // buttons
                 [this, sender](auto, bool btn2) {
                     if (btn2) {
@@ -84,7 +84,7 @@ namespace eclipse::hacks::Level {
     class $modify(ConfirmPracticePauseLayerHook, PauseLayer) {
         ADD_HOOKS_DELEGATE("level.confirmpractice")
 
-            struct Fields {
+        struct Fields {
             bool m_isEnterPopupVisible = false;
             bool m_isExitPopupVisible = false;
         };
@@ -97,7 +97,7 @@ namespace eclipse::hacks::Level {
 
             geode::createQuickPopup(
                 "Enter Practice",                                   // title
-                "Are you sure you want to\n<cr>enter</c> <cg>Practice Mode</c>?",			// content
+                "Are you sure you want to\n<cr>enter</c> <cg>Practice Mode</c>?",           // content
                 "Cancel", "Enter",                                  // buttons
                 [this, sender](auto, bool btn2) {
                     if (btn2) {
@@ -118,7 +118,7 @@ namespace eclipse::hacks::Level {
 
             geode::createQuickPopup(
                 "Exit Practice",                                     // title
-                "Are you sure you want to\n<cr>exit</c> <cg>Practice Mode</c>?",			 // content
+                "Are you sure you want to\n<cr>exit</c> <cg>Practice Mode</c>?",             // content
                 "Cancel", "Exit",                                    // buttons
                 [this, sender](auto, bool btn2) {
                     if (btn2) {
@@ -146,7 +146,7 @@ namespace eclipse::hacks::Level {
 
             geode::createQuickPopup(
                 "Reset Progress",                                   // title
-                "Are you sure you want to <cr>fully reset current progress</c>?",			// content
+                "Are you sure you want to <cr>fully reset current progress</c>?",           // content
                 "Cancel", "Reset",                                  // buttons
                 [this, sender](auto, bool btn2) {
                     if (btn2) {

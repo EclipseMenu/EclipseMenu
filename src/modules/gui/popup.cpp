@@ -19,7 +19,7 @@ namespace eclipse {
         popup.m_button2 = std::move(button2);
         popup.m_callback = std::move(callback);
         s_instanceCounter++;
-        gui::Engine::get()->showPopup(std::move(popup));
+        gui::Engine::get().showPopup(std::move(popup));
     }
 
     void Popup::create(
@@ -33,7 +33,7 @@ namespace eclipse {
         popup.m_button1 = std::move(button1);
         popup.m_callback = std::move(callback);
         s_instanceCounter++;
-        gui::Engine::get()->showPopup(std::move(popup));
+        gui::Engine::get().showPopup(std::move(popup));
     }
 
     void Popup::create(std::string title, std::string message) {
@@ -43,7 +43,7 @@ namespace eclipse {
         popup.m_message = std::move(message);
         popup.m_button1 = i18n::get_("common.ok");
         popup.m_callback = [](bool){};
-        gui::Engine::get()->showPopup(std::move(popup));
+        gui::Engine::get().showPopup(std::move(popup));
     }
 
     void Popup::prompt(
@@ -58,7 +58,7 @@ namespace eclipse {
         popup.m_button1 = i18n::get_("common.ok");
         popup.m_promptValue = std::move(defaultValue);
         popup.m_promptCallback = std::move(callback);
-        gui::Engine::get()->showPopup(std::move(popup));
+        gui::Engine::get().showPopup(std::move(popup));
     }
 
     void Popup::prompt(
@@ -74,7 +74,7 @@ namespace eclipse {
         popup.m_button2 = std::move(button2);
         popup.m_promptValue = std::move(defaultValue);
         popup.m_promptCallback = std::move(callback);
-        gui::Engine::get()->showPopup(std::move(popup));
+        gui::Engine::get().showPopup(std::move(popup));
     }
 
     void Popup::prompt(
@@ -89,6 +89,6 @@ namespace eclipse {
         popup.m_button1 = std::move(button1);
         popup.m_promptValue = std::move(defaultValue);
         popup.m_promptCallback = std::move(callback);
-        gui::Engine::get()->showPopup(std::move(popup));
+        gui::Engine::get().showPopup(std::move(popup));
     }
 }

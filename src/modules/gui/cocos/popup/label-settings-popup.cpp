@@ -183,10 +183,10 @@ namespace eclipse::gui::cocos {
         size_t m_page = 0;
     };
 
-    bool LabelSettingsPopup::setup(std::shared_ptr<LabelSettingsComponent> component) {
+    bool LabelSettingsPopup::setup(LabelSettingsComponent* component) {
         auto const tm = ThemeManager::get();
 
-        m_component = std::move(component);
+        m_component = component;
 
         // The behind background for the entire popup to get the outline
         auto bgBehind = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
@@ -966,9 +966,9 @@ namespace eclipse::gui::cocos {
         m_component->triggerEditCallback();
     }
 
-    LabelSettingsPopup* LabelSettingsPopup::create(std::shared_ptr<LabelSettingsComponent> component) {
+    LabelSettingsPopup* LabelSettingsPopup::create(LabelSettingsComponent* component) {
         auto ret = new LabelSettingsPopup;
-        if (ret->initAnchored(400.f, 240.f, std::move(component))) {
+        if (ret->initAnchored(400.f, 240.f, component)) {
             ret->autorelease();
             return ret;
         }

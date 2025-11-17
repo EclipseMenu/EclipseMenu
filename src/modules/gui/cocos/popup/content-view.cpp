@@ -20,7 +20,7 @@
 #include "scroll-layer.hpp"
 
 namespace eclipse::gui::cocos {
-    ContentView* ContentView::create(cocos2d::CCSize const& size, std::shared_ptr<MenuTab> const& tab) {
+    ContentView* ContentView::create(cocos2d::CCSize const& size, MenuTab const& tab) {
         auto ret = new ContentView();
         if (ret->init(size, tab)) {
             ret->autorelease();
@@ -30,12 +30,12 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    void ContentView::setContent(std::shared_ptr<MenuTab> const& tab, bool resetScroll) const {
+    void ContentView::setContent(MenuTab const& tab, bool resetScroll) const {
         this->loadContent(tab);
         if (resetScroll) m_contentLayer->scrollToTop();
     }
 
-    bool ContentView::init(cocos2d::CCSize const& size, std::shared_ptr<MenuTab> const& tab) {
+    bool ContentView::init(cocos2d::CCSize const& size, MenuTab const& tab) {
         if (!CCNode::init()) return false;
         //m_contentLayer = geode::ScrollLayer::create(size);
         m_contentLayer = ScrollLayer::create(size);
@@ -50,24 +50,24 @@ namespace eclipse::gui::cocos {
     }
 
     template <ComponentType Type>
-    static std::optional<std::shared_ptr<Component>> peekComponent(
-        std::vector<std::shared_ptr<Component>> const& components, size_t index
+    static std::optional<Component*> peekComponent(
+        std::vector<std::unique_ptr<Component>> const& components, size_t index
     ) {
         if (index >= components.size()) return std::nullopt;
         auto& component = components[index];
         if (component->getType() != Type) return std::nullopt;
-        return component;
+        return component.get();
     }
 
-    void ContentView::loadContent(std::shared_ptr<MenuTab> const& tab) const {
+    void ContentView::loadContent(MenuTab const& tab) const {
         auto layer = m_contentLayer->m_contentLayer;
         layer->removeAllChildrenWithCleanup(true);
 
         auto size = this->getContentSize();
 
         // Add the tab components
-        for (size_t i = 0; i < tab->getComponents().size(); ++i) {
-            auto& component = tab->getComponents()[i];
+        for (size_t i = 0; i < tab.getComponents().size(); ++i) {
+            auto component = tab.getComponents()[i].get();
             if (component->getFlags() & ComponentFlags::DisableCocos) continue;
 
             switch (component->getType()) {
@@ -79,7 +79,7 @@ namespace eclipse::gui::cocos {
                 } break;
                 case ComponentType::Toggle: {
                     // Group two toggles into one row
-                    if (auto component2 = peekComponent<ComponentType::Toggle>(tab->getComponents(), i + 1);
+                    if (auto component2 = peekComponent<ComponentType::Toggle>(tab.getComponents(), i + 1);
                         component2) {
                         auto row = CCNode::create();
                         row->setContentWidth(this->getContentWidth());
@@ -101,10 +101,10 @@ namespace eclipse::gui::cocos {
                     auto menu = cocos2d::CCMenu::create();
                     int count = 1;
                     menu->addChild(ButtonComponentNode::create(component, size.width));
-                    auto btn2 = peekComponent<ComponentType::Button>(tab->getComponents(), i + 1);
+                    auto btn2 = peekComponent<ComponentType::Button>(tab.getComponents(), i + 1);
                     while (btn2) {
                         menu->addChild(ButtonComponentNode::create(*btn2, size.width));
-                        btn2 = peekComponent<ComponentType::Button>(tab->getComponents(), ++i + 1);
+                        btn2 = peekComponent<ComponentType::Button>(tab.getComponents(), ++i + 1);
                         ++count;
                     }
                     menu->setContentSize({ size.width, count * 30.5f });
@@ -121,23 +121,23 @@ namespace eclipse::gui::cocos {
                     layer->addChild(menu);
                 } break;
                 case ComponentType::RadioButton: {
-                    std::vector<std::shared_ptr<RadioButtonComponent>> radioComponents;
-                    radioComponents.push_back(std::static_pointer_cast<RadioButtonComponent>(component));
-                    auto radioComponent = peekComponent<ComponentType::RadioButton>(tab->getComponents(), i + 1);
+                    std::vector<RadioButtonComponent*> radioComponents;
+                    radioComponents.push_back(static_cast<RadioButtonComponent*>(component));
+                    auto radioComponent = peekComponent<ComponentType::RadioButton>(tab.getComponents(), i + 1);
                     while (radioComponent) {
-                        radioComponents.push_back(std::static_pointer_cast<RadioButtonComponent>(*radioComponent));
-                        radioComponent = peekComponent<ComponentType::RadioButton>(tab->getComponents(), ++i + 1);
+                        radioComponents.push_back(static_cast<RadioButtonComponent*>(*radioComponent));
+                        radioComponent = peekComponent<ComponentType::RadioButton>(tab.getComponents(), ++i + 1);
                     }
-                    layer->addChild(RadioButtonsMenuNode::create(radioComponents, size.width));
+                    layer->addChild(RadioButtonsMenuNode::create(std::move(radioComponents), size.width));
                 } break;
                 case ComponentType::LabelSettings: {
                     auto list = cocos2d::CCNode::create();
                     list->addChild(LabelSettingsComponentNode::create(component, size.width));
-                    auto label2 = peekComponent<ComponentType::LabelSettings>(tab->getComponents(), i + 1);
+                    auto label2 = peekComponent<ComponentType::LabelSettings>(tab.getComponents(), i + 1);
                     size_t count = 1;
                     while (label2) {
                         list->addChild(LabelSettingsComponentNode::create(*label2, size.width));
-                        label2 = peekComponent<ComponentType::LabelSettings>(tab->getComponents(), ++i + 1);
+                        label2 = peekComponent<ComponentType::LabelSettings>(tab.getComponents(), ++i + 1);
                         ++count;
                     }
                     list->setContentHeight(count * 37.5f);

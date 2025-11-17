@@ -10,8 +10,6 @@ namespace eclipse::gui {
     public:
         explicit FilesystemComboComponent(std::string id, std::string title, std::filesystem::path directory);
 
-        void onInit() override;
-
         void onUpdate() override;
 
         /// @brief Set a callback function to be called when the component value changes.

@@ -8,10 +8,10 @@
 #include "content-view.hpp"
 
 namespace eclipse::gui::cocos {
-    bool OptionsPopup::setup(std::shared_ptr<MenuTab> const& tab) {
+    bool OptionsPopup::setup(MenuTab const& tab) {
         auto const tm = ThemeManager::get();
 
-        auto title = TranslatedLabel::create(tab->getTitle());
+        auto title = TranslatedLabel::create(tab.getTitle());
         title->setPosition(200, 225);
         title->setID("title"_spr);
         m_mainLayer->addChild(title, 2);
@@ -57,9 +57,9 @@ namespace eclipse::gui::cocos {
         CocosRenderer::get()->unregisterModal(this);
     }
 
-    OptionsPopup* OptionsPopup::create(std::shared_ptr<MenuTab> const& tab) {
+    OptionsPopup* OptionsPopup::create(MenuTab const& tab) {
         auto ret = new OptionsPopup;
-        if (ret->initAnchored(400.f, 240.f, std::move(tab))) {
+        if (ret->initAnchored(400.f, 240.f, tab)) {
             ret->autorelease();
             return ret;
         }

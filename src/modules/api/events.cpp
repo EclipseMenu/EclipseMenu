@@ -130,13 +130,13 @@ $execute {
     new EventListener<EventFilter<events::SetLabelTextEvent>>(+[](events::SetLabelTextEvent* e) {
         auto label = gui::Component::find(e->getID());
         if (!label || label->getType() != gui::ComponentType::Label) return ListenerResult::Stop;
-        std::static_pointer_cast<gui::LabelComponent>(label)->setText(e->getText());
+        static_cast<gui::LabelComponent*>(label)->setText(e->getText());
         return ListenerResult::Stop;
     });
     new EventListener<EventFilter<events::SetInputFloatParamsEvent>>(+[](events::SetInputFloatParamsEvent* e) {
         auto input = gui::Component::find(e->getID());
         if (!input || input->getType() != gui::ComponentType::InputFloat) return ListenerResult::Stop;
-        auto inputFloat = std::static_pointer_cast<gui::InputFloatComponent>(input);
+        auto inputFloat = static_cast<gui::InputFloatComponent*>(input);
         if (e->getMin()) inputFloat->setMin(e->getMin().value());
         if (e->getMax()) inputFloat->setMax(e->getMax().value());
         if (e->getFormat()) inputFloat->setFormat(e->getFormat().value());

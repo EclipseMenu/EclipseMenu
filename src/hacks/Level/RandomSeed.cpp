@@ -16,7 +16,7 @@ namespace eclipse::hacks::Level {
             tab->addToggle("level.randomseed")
                ->handleKeybinds()
                ->setDescription()
-               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+               ->addOptions([](auto options) {
                    options->addInputInt("level.randomseed.seed", "level.randomseed.seed");
                });
         }

@@ -27,7 +27,7 @@ namespace eclipse::hacks::Player {
             tab->addToggle("player.noclip")
                ->setDescription()
                ->handleKeybinds()
-               ->addOptions([](std::shared_ptr<gui::MenuTab> options) {
+               ->addOptions([](auto options) {
                    options->addToggle("player.noclip.p1");
                    options->addToggle("player.noclip.p2");
                    options->addFloatToggle("player.noclip.acclimit", 0.01f, 100.f, "%.2f")->handleKeybinds();

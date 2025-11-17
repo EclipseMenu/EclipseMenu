@@ -125,31 +125,31 @@ namespace eclipse::gui::imgui::themes {
         drawList->AddLine(ImVec2(cursorPos.x, cursorPos.y + 24 * scale), ImVec2(cursorPos.x + width, cursorPos.y + 24 * scale), color);
     }
 
-    void OpenHack::visitInputText(std::shared_ptr<InputTextComponent> const& inputText) const {
+    void OpenHack::visitInputText(InputTextComponent* inputText) const {
         prepareInput(0.5f);
         Theme::visitInputText(inputText);
         ImGui::PopStyleColor(3);
     }
 
-    void OpenHack::visitInputFloat(std::shared_ptr<InputFloatComponent> const& inputFloat) const {
+    void OpenHack::visitInputFloat(InputFloatComponent* inputFloat) const {
         prepareInput(0.35f);
         Theme::visitInputFloat(inputFloat);
         ImGui::PopStyleColor(3);
     }
 
-    void OpenHack::visitInputInt(std::shared_ptr<InputIntComponent> const& inputInt) const {
+    void OpenHack::visitInputInt(InputIntComponent* inputInt) const {
         prepareInput(0.35f);
         Theme::visitInputInt(inputInt);
         ImGui::PopStyleColor(3);
     }
 
-    void OpenHack::visitFloatToggle(std::shared_ptr<FloatToggleComponent> const& floatToggle) const {
+    void OpenHack::visitFloatToggle(FloatToggleComponent* floatToggle) const {
         prepareInput(0.35f);
         Theme::visitFloatToggle(floatToggle);
         ImGui::PopStyleColor(3);
     }
 
-    void OpenHack::visitIntToggle(std::shared_ptr<IntToggleComponent> const& intToggle) const {
+    void OpenHack::visitIntToggle(IntToggleComponent* intToggle) const {
         prepareInput(0.35f);
         Theme::visitIntToggle(intToggle);
         ImGui::PopStyleColor(3);

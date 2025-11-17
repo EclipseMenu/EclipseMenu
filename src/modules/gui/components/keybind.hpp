@@ -9,7 +9,6 @@ namespace eclipse::gui {
     public:
         explicit KeybindComponent(std::string title, std::string id, bool canDelete = false);
 
-        void onInit() override {}
         void onUpdate() override {}
 
         /// @brief Set a callback function to be called when the component value changes.

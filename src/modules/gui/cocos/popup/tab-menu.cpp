@@ -97,7 +97,7 @@ namespace eclipse::gui::cocos {
 
         m_tabs.reserve(tabs.size());
         for (auto const& tab : tabs) {
-            auto tabName = tab->getTitle();
+            auto& tabName = tab.getTitle();
             auto tabSpr = TabButton::create(tabName, {width, height});
             auto tabButton = CCMenuItemSpriteExtra::create(tabSpr, this, menu_selector(TabMenu::onPageButton));
             tabButton->setTag(i++);

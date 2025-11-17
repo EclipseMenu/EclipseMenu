@@ -30,7 +30,7 @@ namespace eclipse::gui {
     /// @brief Holds current theme configuration and manages saving/loading themes.
     class ThemeManager {
         /// @brief Loads current theme/default values
-        void init();
+        ThemeManager();
 
         /// @brief Sets all values to default ones. Used to ensure nothing is left uninitialized when loading a theme.
         void setDefaults();
@@ -38,7 +38,7 @@ namespace eclipse::gui {
         /// === Saving/loading
     public:
         /// @brief Get the theme manager instance
-        static std::shared_ptr<ThemeManager> get();
+        static ThemeManager* get();
 
         /// @brief Reloads the currently selected theme
         void reloadTheme();

@@ -15,9 +15,9 @@ namespace eclipse::hacks::Labels {
 }
 
 namespace eclipse::gui::cocos {
-    class LabelSettingsPopup : public geode::Popup<std::shared_ptr<LabelSettingsComponent>> {
+    class LabelSettingsPopup : public geode::Popup<LabelSettingsComponent*> {
     protected:
-        bool setup(std::shared_ptr<LabelSettingsComponent> component) override;
+        bool setup(LabelSettingsComponent* component) override;
 
         CCLayer* createSettingsTab();
         CCLayer* createTextTab();
@@ -29,7 +29,7 @@ namespace eclipse::gui::cocos {
         CCNode* createEventCard(labels::LabelEvent& event, size_t index);
 
     public:
-        static LabelSettingsPopup* create(std::shared_ptr<LabelSettingsComponent> component);
+        static LabelSettingsPopup* create(LabelSettingsComponent* component);
         void selectTab(size_t index);
         void onExport(CCObject*);
         void onCreateEvent(CCObject*);
@@ -40,7 +40,7 @@ namespace eclipse::gui::cocos {
         ~LabelSettingsPopup() override;
 
     private:
-        std::shared_ptr<LabelSettingsComponent> m_component{};
+        LabelSettingsComponent* m_component{};
         std::array<class PopupTab*, 4> m_tabs{};
         CCLayer* m_currentTab = nullptr;
         cocos2d::extension::CCScale9Sprite* m_contentBG = nullptr;

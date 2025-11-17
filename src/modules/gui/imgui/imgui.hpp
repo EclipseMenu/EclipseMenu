@@ -27,6 +27,8 @@ namespace eclipse::gui::imgui {
             friend class FontManager;
         };
 
+        static FontManager* get();
+
         /// @brief Scan config and mod resources directory to find available fonts
         static std::vector<FontMetadata> fetchAvailableFonts();
         void fetchFonts();
@@ -42,12 +44,12 @@ namespace eclipse::gui::imgui {
         int m_selectedFontIndex = 0;
     };
 
-    class ImGuiRenderer : public Renderer {
+    class ImGuiRenderer final : public Renderer {
     public:
-        static std::shared_ptr<ImGuiRenderer> get() {
-            auto engine = Engine::get();
-            if (!engine->isInitialized() || engine->getRendererType() != RendererType::ImGui) return nullptr;
-            return std::static_pointer_cast<ImGuiRenderer>(engine->getRenderer());
+        static ImGuiRenderer* get() {
+            auto& engine = Engine::get();
+            if (!engine.isInitialized() || engine.getRendererType() != RendererType::ImGui) return nullptr;
+            return static_cast<ImGuiRenderer*>(engine.getRenderer());
         }
 
         void init() override;
@@ -65,7 +67,7 @@ namespace eclipse::gui::imgui {
         void setLayoutMode(LayoutMode mode);
         void setComponentTheme(ComponentTheme theme);
 
-        void visitComponent(std::shared_ptr<Component> const& component) const;
+        void visitComponent(Component* component) const;
         bool beginWindow(std::string const& title) const;
         void endWindow() const;
         void reload() const;
@@ -84,7 +86,7 @@ namespace eclipse::gui::imgui {
 
         FontManager m_fontManager;
 
-        Theme const* m_theme;
+        Theme const* m_theme = nullptr;
         std::unique_ptr<Layout> m_layout;
 
         bool m_insideDraw = false;
