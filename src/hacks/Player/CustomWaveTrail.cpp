@@ -20,7 +20,8 @@ namespace eclipse::hacks::Player {
         void init() override {
             auto tab = gui::MenuTab::find("tab.player");
 
-            config::setIfEmpty("player.customwavetrail.scale", 2.f);
+            config::setIfEmpty("player.customwavetrail.pulse", true);
+            config::setIfEmpty("player.customwavetrail.scale", 1.f);
             config::setIfEmpty("player.customwavetrail.speed", 0.5f);
             config::setIfEmpty("player.customwavetrail.saturation", 100.f);
             config::setIfEmpty("player.customwavetrail.value", 100.f);
@@ -31,7 +32,8 @@ namespace eclipse::hacks::Player {
 
             tab->addToggle("player.customwavetrail")->handleKeybinds()->setDescription()
                ->addOptions([](auto options) {
-                   options->addInputFloat("player.customwavetrail.scale", 0.f, 10.f, "%.2f");
+                   options->addToggle("player.customwavetrail.pulse");
+                   options->addInputFloat("player.customwavetrail.scale", 0.f, 25.f, "%.2f");
                    options->addToggle("player.customwavetrail.rainbow")->addOptions([](auto opt) {
                        opt->addInputFloat("player.customwavetrail.speed", 0.f, FLT_MAX, "%.2f");
                        opt->addInputFloat("player.customwavetrail.saturation", 0.f, 100.f, "%.2f");
@@ -64,6 +66,11 @@ namespace eclipse::hacks::Player {
 
     class $modify(WaveTrailSizeHSHook, HardStreak) {
         ADD_HOOKS_DELEGATE("player.customwavetrail")
+
+        struct Fields {
+            float m_oldPulseSize = 0.f;
+        };
+
         void updateStroke(float dt) {
             if (config::get<"player.customwavetrail.rainbow", bool>(false)) {
                 auto speed = config::get<"player.customwavetrail.speed", float>(0.5f);
@@ -75,7 +82,18 @@ namespace eclipse::hacks::Player {
                 this->setColor(color.toCCColor3B());
             }
 
-            this->m_pulseSize = config::get<"player.customwavetrail.scale", float>(2.f);
+            auto pulse = config::get<"player.customwavetrail.pulse", bool>(true);
+            auto scale = config::get<"player.customwavetrail.scale", float>(1.f);
+
+            if (pulse) {
+                auto& [oldPulseSize] = *m_fields.self();
+                if (oldPulseSize != m_pulseSize) {
+                    m_pulseSize *= scale;
+                    oldPulseSize = m_pulseSize;
+                }
+            } else {
+                m_pulseSize = scale;
+            }
 
             if (s_currentStreak == nullptr || s_currentStreak2 == nullptr) {
                 if (auto PL = utils::get<PlayLayer>()) {
