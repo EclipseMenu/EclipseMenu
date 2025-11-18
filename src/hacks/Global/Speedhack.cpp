@@ -43,6 +43,23 @@ namespace eclipse::hacks::Global {
 
             dt *= speed;
 
+            // i love inventing solutions for problems that should not even exist!
+        #ifdef GEODE_IS_WINDOWS
+            static bool hasCBFPhysicsBypass = []{
+                auto cbf = geode::Loader::get()->getLoadedMod("syzzi.click_between_frames");
+                if (!cbf) return false;
+
+                geode::listenForSettingChanges<bool>(
+                    "physics-bypass",
+                    [](bool value) { hasCBFPhysicsBypass = value; },
+                    cbf
+                );
+
+                return cbf->getSettingValue<bool>("physics-bypass");
+            }();
+            if (hasCBFPhysicsBypass) cocos2d::CCDirector::get()->m_fActualDeltaTime *= speed;
+        #endif
+
             CCScheduler::update(dt);
         }
     };
