@@ -64,8 +64,8 @@ namespace eclipse::debug {
         Benchmark(
             std::string_view name,
             Function<void()> func,
-            size_t maxIterations = 1'000'000'000, // 1 billion
-            size_t maxTime = 10'000'000'000       // 10 seconds
+            uint64_t maxIterations = 1'000'000'000, // 1 billion
+            uint64_t maxTime = 10'000'000'000       // 10 seconds
         ) : m_name(name), m_func(std::move(func)), m_maxIterations(maxIterations), m_maxTime(maxTime) { run(); }
 
         void run() {
@@ -87,8 +87,8 @@ namespace eclipse::debug {
     private:
         std::string_view m_name;
         Function<void()> m_func;
-        size_t m_maxIterations;
-        size_t m_maxTime;
+        uint64_t m_maxIterations;
+        uint64_t m_maxTime;
     };
 }
 
