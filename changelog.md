@@ -1,5 +1,21 @@
 # Eclipse Menu
 
+## v1.6.0
+**Additions**:
+* Added responsive press animation for <co>Floating Button</c>
+* Added <cg>Wave Trail Pulse</c> toggle to <co>Custom Wave Trail</c>
+* Added new label variables: `playerXVelocity`, `playerYVelocity`, `player2XVelocity`, `player2YVelocity`
+* Tabbed layout is now horizontally centered 
+
+**Fixes**:
+* <cg>Fixed</c> <co>Floating Button</c> ignoring <cl>Show in Editor</c> setting
+* <cg>Fixed</c> <co>Floating Button</c> going offscreen when changing resolution
+* <cg>Fixed</c> a race condition with <co>StartPos Switcher</c> causing crashes while level is loading
+* <cg>Fixed</c> <co>Show Hitboxes</c> classifying speed portals as triggers
+* <cg>Improved</c> <co>Show Hitboxes</c> behavior parity with vanilla hitboxes in editor 
+* Various <co>Shipcopter</c> improvements and fixes
+* Massive refactoring of codebase that improves performance and load times
+
 ## v1.5.0
 **Additions**:
 * Added <cg>Freeze Best Run</c> for <co>Safe Mode</c>
