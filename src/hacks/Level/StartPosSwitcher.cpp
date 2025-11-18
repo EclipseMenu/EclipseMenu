@@ -14,6 +14,7 @@
 
 namespace eclipse::hacks::Level {
     static std::vector<StartPosObject*> startPosObjects;
+    static bool levelFinishedLoading = false;
     static int32_t currentStartPosIndex = 0;
     static cocos2d::CCSequence* startPosSwitcherSequence = nullptr;
 
@@ -68,7 +69,7 @@ namespace eclipse::hacks::Level {
         }
 
         static void pickStartPos(PlayLayer* playLayer, int32_t index) {
-            if (startPosObjects.empty()) return;
+            if (startPosObjects.empty() || !levelFinishedLoading) return;
 
             auto count = static_cast<int32_t>(startPosObjects.size());
             if (index >= count)
@@ -237,6 +238,7 @@ namespace eclipse::hacks::Level {
 
     class $modify(StartPosSwitcherPLHook, PlayLayer) {
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
+            levelFinishedLoading = false;
             startPosObjects.clear();
 
             return PlayLayer::init(level, useReplay, dontCreateObjects);
@@ -275,6 +277,8 @@ namespace eclipse::hacks::Level {
                 if (it != startPosObjects.end())
                     currentStartPosIndex = static_cast<int32_t>(std::distance(startPosObjects.begin(), it));
             }
+
+            levelFinishedLoading = true;
 
             auto* switcher = StartposSwitcherNode::create(this);
             if (!switcher) return;
