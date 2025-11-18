@@ -123,19 +123,19 @@ namespace eclipse::hacks::Level {
             auto playerColorInnerFill = gui::Color(playerColorInner, fillAlphaToggle ? fillAlpha : 0.f);
             auto playerColorRotatedFill = gui::Color(playerColorRotated, fillAlphaToggle ? fillAlpha : 0.f);
 
-            const auto visitObject = [&](GameObject* obj) {
+            auto const visitObject = [&](GameObject* obj) {
                 // skip objects that don't have a hitbox or are not activated
                 if (obj->m_objectType == GameObjectType::Decoration || !obj->m_isActivated || obj->m_isGroupDisabled)
                     return;
 
                 switch (obj->m_objectType) {
                     default: { // pretty much everything (portals, orbs, etc.)
-                        constexpr auto drawFunc = [](
+                        auto drawFunc = [this](
                             cocos2d::CCDrawNode* node, GameObject* obj,
                             cocos2d::ccColor4F const& colorFill, float borderWidth,
                             cocos2d::ccColor4F const& color
                         ) {
-                            if (auto orientedBox = obj->m_orientedBox) {
+                            if (auto orientedBox = m_isEditor ? obj->getOrientedBox() : obj->m_orientedBox) {
                                 node->drawPolygon(
                                     orientedBox->m_corners.data(), 4,
                                     colorFill, borderWidth, color
@@ -149,7 +149,11 @@ namespace eclipse::hacks::Level {
                             }
                         };
 
-                        if (obj->m_objectType == GameObjectType::Modifier) {
+                        auto isSpeedPortal = obj->m_objectID == 200 || obj->m_objectID == 201 ||
+                            obj->m_objectID == 202 || obj->m_objectID == 203 ||
+                            obj->m_objectID == 1334;
+
+                        if (obj->m_objectType == GameObjectType::Modifier && !isSpeedPortal) {
                             if (!renderTriggers || !static_cast<EffectGameObject*>(obj)->m_isTouchTriggered) return;
                             return drawFunc(
                                 drawNode, obj,
@@ -217,7 +221,7 @@ namespace eclipse::hacks::Level {
                                 dangerColorFill, borderSize,
                                 dangerColor, 16
                             );
-                        } else if (auto orientedBox = obj->m_orientedBox) {
+                        } else if (auto orientedBox = m_isEditor ? obj->getOrientedBox() : obj->m_orientedBox) {
                             drawNode->drawPolygon(
                                 orientedBox->m_corners.data(), 4,
                                 dangerColorFill, borderSize, dangerColor
@@ -429,7 +433,7 @@ namespace eclipse::hacks::Level {
                     optionsColor->addColorComponent("level.showhitboxes.player_color_inner");
                     optionsColor->addColorComponent("level.showhitboxes.player_color_rotated");
                 });
-                options->addInputFloat("level.showhitboxes.bordersize", 0.01f, 10.f, "%.2f");
+                options->addInputFloat("level.showhitboxes.bordersize", 0.f, 10.f, "%.2f");
                 options->addFloatToggle("level.showhitboxes.fillalpha", 0.f, 1.f);
                 options->addFloatToggle("level.showhitboxes.traillength", 1.f, 2000.f, "%.0f");
             });
