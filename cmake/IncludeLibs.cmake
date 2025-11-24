@@ -27,6 +27,7 @@ CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
 CPMAddPackage("gh:prevter/AdvancedLabel#d78d7f8")
 CPMAddPackage("gh:prevter/sinaps#2541d6d")
 CPMAddPackage("gh:zhihaoy/nontype_functional@1.0.2")
+CPMAddPackage("gh:zyantific/zydis#ae12a09")
 CPMAddPackage(
     NAME nlohmann_json
     GITHUB_REPOSITORY nlohmann/json
@@ -51,6 +52,8 @@ target_link_libraries(third_party INTERFACE
     advanced_label
     sinaps
     nontype_functional
+    Zydis
+    Zycore
 )
 
 if (NOT ANDROID AND NOT IOS)

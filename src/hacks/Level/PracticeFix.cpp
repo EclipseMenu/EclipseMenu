@@ -11,7 +11,11 @@ using namespace geode::prelude;
 namespace eclipse::Hacks::Level {
     class $hack(PracticeFix) {
         static bool shouldEnable() {
-            return config::get<bool>("bot.practicefix", false) || config::get<int>("bot.state", 0) == 1;
+            bool isRightMode = config::get<int>("bot.practice-fix-mode", 0) == 0;
+            bool isBotRecording = config::get<int>("bot.state", 0) == 1;
+            bool hasFix = config::get<bool>("bot.practicefix", false);
+            if(isBotRecording) return isRightMode;
+            return hasFix;
         }
 
         void init() override {

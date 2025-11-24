@@ -22,6 +22,7 @@ using namespace geode::prelude;
 
 namespace eclipse::hacks::Bot {
     static bot::Bot s_bot;
+    static bool s_respawning = false;
 
     void newReplay() {
         Popup::prompt(
@@ -243,6 +244,11 @@ namespace eclipse::hacks::Bot {
                 Bot::applySettings();
             };
 
+#ifdef GEODE_IS_WINDOWS
+            config::set("bot.practice-fix-mode", 1);
+#else
+            config::set("bot.practice-fix-mode", 0);
+#endif
             config::set("bot.state", 0);
             restorePreBotSettings();
             updateBotState(0);
@@ -254,6 +260,9 @@ namespace eclipse::hacks::Bot {
             tab->addRadioButton("bot.playback", "bot.state", 2)->callback(updateBotState)->handleKeybinds();
 
             tab->addFilesystemCombo("bot.replays", "bot.selectedreplay", Mod::get()->getSaveDir() / "replays");
+#ifdef GEODE_IS_WINDOWS
+            tab->addCombo("bot.practice-fix-mode", {"Checkpoint", "Memory"}, 0);
+#endif
 
             tab->addToggle("bot.ignore-inputs")->handleKeybinds()->setDescription();
 
@@ -290,20 +299,24 @@ namespace eclipse::hacks::Bot {
             bool result = PlayLayer::init(gj, p1, p2);
             s_bot.setLevelInfo(gdr::Level(gj->m_levelName, gj->m_levelID.value()));
             s_bot.setPlatformer(gj->isPlatformer());
+            s_respawning = false;
             return result;
         }
 
         void resetLevel() {
+            s_respawning = true;
             PlayLayer::resetLevel();
             Bot::applySettings();
+
+            int practiceFixMode = config::get<int>("bot.practice-fix-mode", 0);
 
             if (s_bot.getState() == bot::State::RECORD) {
                 //gd does this automatically for holding but not releases so we do it manually
                 s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, false, false);
-                m_player1->m_isDashing = false; // temporary, find better way to fix dash orbs
+                if(practiceFixMode == 0) m_player1->m_isDashing = false; // temporary, find better way to fix dash orbs
                 if (m_gameState.m_isDualMode && m_levelSettings->m_twoPlayerMode) {
                     s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, true, false);
-                    m_player2->m_isDashing = false;
+                    if(practiceFixMode == 0) m_player2->m_isDashing = false;
                 }
             }
 
@@ -336,6 +349,11 @@ namespace eclipse::hacks::Bot {
     };
 
     class $modify(BotBGLHook, GJBaseGameLayer) {
+
+        static void onModify(auto& self) {
+            SAFE_HOOKS(GJBaseGameLayer, "processCommands");
+        }
+
         void simulateClick(PlayerButton button, bool down, bool player2) {
             auto performButton = down ? &PlayerObject::pushButton : &PlayerObject::releaseButton;
             bool swapControls = GameManager::get()->getGameVariable("0010");
@@ -366,6 +384,11 @@ namespace eclipse::hacks::Bot {
         }
 
         void processCommands(float dt) {
+            if (s_respawning) { // somethow this avoid a weird bug where an orb buffered if you press down while respawning doesn't register
+                s_respawning = false;
+                m_gameState.m_currentProgress++;
+                return;
+            }
             GJBaseGameLayer::processCommands(dt);
 
             if (s_bot.getState() != bot::State::PLAYBACK)
