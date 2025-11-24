@@ -106,8 +106,11 @@ struct MemoryEntry {
 
 class MemoryTracker {
 public:
-    MemoryTracker(size_t pageSize) {
+    MemoryTracker() {
         m_memoryLog.reserve(0x500000);
+        SYSTEM_INFO si;
+        GetSystemInfo(&si);
+        m_pageSize = si.dwPageSize;
     }
 
     void enableCapture() {
@@ -243,14 +246,14 @@ public:
                 }
 
                 if (!canRestore) {
-                    geode::log::warn("Skipping restore at %p because page(s) not suitable.", (void*)entry.addr);
+                    geode::log::warn("Skipping restore at {} because page(s) not suitable.", (void*)entry.addr);
                     continue;
                 }
 
                 __try {
                     memcpy((void*)entry.addr, entry.data.data(), entry.data.size());
                 } __except (EXCEPTION_EXECUTE_HANDLER) {
-                    geode::log::error("Exception during memcpy when restoring addr %p (frame %zu)", (void*)entry.addr, entry.frame);
+                    geode::log::error("Exception during memcpy when restoring addr {} (frame {})", (void*)entry.addr, entry.frame);
                 }
             }
 
@@ -302,11 +305,11 @@ private:
 };
 
 static size_t s_currentFrame = 0;
-static std::unique_ptr<MemoryTracker> s_memoryTracker = nullptr;
+static MemoryTracker s_memoryTracker;
 static PVOID s_writeHandler = nullptr, s_stepHandler = nullptr;
 
 LONG CALLBACK writeWatchHandler(PEXCEPTION_POINTERS info) {
-    if (!s_memoryTracker->isCaptureEnabled())
+    if (!s_memoryTracker.isCaptureEnabled())
         return EXCEPTION_CONTINUE_SEARCH;
     auto code = info->ExceptionRecord->ExceptionCode;
     if (code != EXCEPTION_ACCESS_VIOLATION)
@@ -319,12 +322,12 @@ LONG CALLBACK writeWatchHandler(PEXCEPTION_POINTERS info) {
         return EXCEPTION_CONTINUE_SEARCH;
 
     uintptr_t a = faultAddr;
-    uintptr_t pageBase = a & ~(s_memoryTracker->getPageSize() - 1);
+    uintptr_t pageBase = a & ~(s_memoryTracker.getPageSize() - 1);
 
-    if(s_memoryTracker->isInWatchedRegion(a)) {
+    if(s_memoryTracker.isInWatchedRegion(a)) {
         size_t size = getWriteSizeFromRIP(info->ContextRecord->Rip, info->ContextRecord);
         std::vector<uint8_t> before(size);
-        size_t maxReadable = s_memoryTracker->getPageSize() - (faultAddr & (s_memoryTracker->getPageSize() - 1));
+        size_t maxReadable = s_memoryTracker.getPageSize() - (faultAddr & (s_memoryTracker.getPageSize() - 1));
         size_t toRead = std::min(size, maxReadable);
 
         __try {
@@ -333,31 +336,31 @@ LONG CALLBACK writeWatchHandler(PEXCEPTION_POINTERS info) {
             return EXCEPTION_CONTINUE_SEARCH;
         }
 
-        s_memoryTracker->writeMemoryLog(s_currentFrame, faultAddr, std::move(before));
+        s_memoryTracker.writeMemoryLog(s_currentFrame, faultAddr, std::move(before));
     }
 
     DWORD old;
-    if(!VirtualProtect((void*)pageBase, s_memoryTracker->getPageSize(), PAGE_READWRITE, &old))
+    if(!VirtualProtect((void*)pageBase, s_memoryTracker.getPageSize(), PAGE_READWRITE, &old))
         geode::log::error("Failed to VirtualProtect: {}", getLastWindowsErrorAsString());
 
     // single step after the instruction finishes
     info->ContextRecord->EFlags |= 0x100;
 
-    s_memoryTracker->savePendingRestore(pageBase, old);
+    s_memoryTracker.savePendingRestore(pageBase, old);
 
     return EXCEPTION_CONTINUE_EXECUTION;
 }
 
 LONG CALLBACK singleStepHandler(PEXCEPTION_POINTERS info) {
-    if (!s_memoryTracker->isCaptureEnabled())
+    if (!s_memoryTracker.isCaptureEnabled())
         return EXCEPTION_CONTINUE_SEARCH;
     if (info->ExceptionRecord->ExceptionCode != EXCEPTION_SINGLE_STEP)
         return EXCEPTION_CONTINUE_SEARCH;
 
     MemoryRestore pr;
-    while(s_memoryTracker->consumePendingRestore(pr)) {
+    while(s_memoryTracker.consumePendingRestore(pr)) {
         DWORD tmp;
-        if(!VirtualProtect((void*)pr.addr, s_memoryTracker->getPageSize(), pr.old, &tmp))
+        if(!VirtualProtect((void*)pr.addr, s_memoryTracker.getPageSize(), pr.old, &tmp))
             geode::log::error("Failed to VirtualProtect: {}", getLastWindowsErrorAsString());
     }
 
@@ -383,7 +386,7 @@ class $modify(MPFPlayLayer, PlayLayer) {
 
     void pauseGame(bool p0) {
         PlayLayer::pauseGame(p0);
-        s_memoryTracker->disableCapture();
+        s_memoryTracker.disableCapture();
     }
 
     void loadFromCheckpoint(CheckpointObject* checkpoint) {
@@ -393,7 +396,7 @@ class $modify(MPFPlayLayer, PlayLayer) {
 
         PlayLayer::loadFromCheckpoint(checkpoint);
         if(m_checkpointArray->count() > 0)
-            s_memoryTracker->restoreToFrame(checkpoint->m_gameState.m_currentProgress);
+            s_memoryTracker.restoreToFrame(checkpoint->m_gameState.m_currentProgress);
     }
 
     void resetLevel() {
@@ -402,20 +405,20 @@ class $modify(MPFPlayLayer, PlayLayer) {
         if (m_checkpointArray->count() > 0) return;
 
         s_currentFrame = 0;
-        s_memoryTracker->clear();
+        s_memoryTracker.clear();
     }
 
     void postUpdate(float dt) {
         PlayLayer::postUpdate(dt);   
-        bool hasCapture = s_memoryTracker->isCaptureEnabled();
+        bool hasCapture = s_memoryTracker.isCaptureEnabled();
         int botState = config::get<int>("bot.state", 0);
         int practiceFixMode = config::get<int>("bot.practice-fix-mode", 0);
         if(practiceFixMode == 1 && s_currentFrame > 0 && m_isPracticeMode && botState == (int)eclipse::bot::State::RECORD && !hasCapture) {
-            s_memoryTracker->clearWatchedRegions();
-            #define REGION(p,x,y) s_memoryTracker->addWatchedRegion((uintptr_t)p + offsetof(PlayerObject, x), (uintptr_t)p + offsetof(PlayerObject, y));
+            s_memoryTracker.clearWatchedRegions();
+            #define REGION(p,x,y) s_memoryTracker.addWatchedRegion((uintptr_t)p + offsetof(PlayerObject, x), (uintptr_t)p + offsetof(PlayerObject, y));
             #pragma GCC diagnostic push
             #pragma GCC diagnostic ignored "-Winvalid-offsetof"
-            s_memoryTracker->addWatchedRegion((uintptr_t)m_player1 + offsetof(cocos2d::CCNode, m_fRotationX), (uintptr_t)m_player1 + offsetof(cocos2d::CCNode, m_pCamera));
+            s_memoryTracker.addWatchedRegion((uintptr_t)m_player1 + offsetof(cocos2d::CCNode, m_fRotationX), (uintptr_t)m_player1 + offsetof(cocos2d::CCNode, m_pCamera));
             REGION(m_player1, m_mainLayer, m_currentSlope2);
             REGION(m_player1, m_preLastGroundObject, m_currentPotentialSlope);
             REGION(m_player1, unk_584, m_rotateObjectsRelated);
@@ -425,7 +428,7 @@ class $modify(MPFPlayLayer, PlayLayer) {
             REGION(m_player1, m_stateRingJump, m_holdingButtons);
             REGION(m_player1, m_inputsLocked, m_enable22Changes);
 
-            s_memoryTracker->addWatchedRegion((uintptr_t)m_player2 + offsetof(cocos2d::CCNode, m_fRotationX), (uintptr_t)m_player2 + offsetof(cocos2d::CCNode, m_pCamera));
+            s_memoryTracker.addWatchedRegion((uintptr_t)m_player2 + offsetof(cocos2d::CCNode, m_fRotationX), (uintptr_t)m_player2 + offsetof(cocos2d::CCNode, m_pCamera));
             REGION(m_player2, m_mainLayer, m_currentSlope2);
             REGION(m_player2, m_preLastGroundObject, m_currentPotentialSlope);
             REGION(m_player2, unk_584, m_rotateObjectsRelated);
@@ -436,18 +439,18 @@ class $modify(MPFPlayLayer, PlayLayer) {
             REGION(m_player2, m_inputsLocked, m_enable22Changes);
             #pragma GCC diagnostic pop
             #undef REGION
-            s_memoryTracker->enableCapture();
+            s_memoryTracker.enableCapture();
         }
     }
 
     void togglePracticeMode(bool mode) {
         PlayLayer::togglePracticeMode(mode);
-        if(!mode) s_memoryTracker->disableCapture();
+        if(!mode) s_memoryTracker.disableCapture();
     }
 
     void onQuit() {
-        s_memoryTracker->disableCapture();
-        s_memoryTracker->clear();
+        s_memoryTracker.disableCapture();
+        s_memoryTracker.clear();
         PlayLayer::onQuit();
     }
 };
@@ -460,10 +463,6 @@ class $modify(GJBaseGameLayer) {
 };
 
 $on_mod(Loaded) {
-    SYSTEM_INFO si;
-    GetSystemInfo(&si);
-    s_memoryTracker = std::make_unique<MemoryTracker>(si.dwPageSize);
-
     s_writeHandler = AddVectoredExceptionHandler(1, writeWatchHandler);
     s_stepHandler = AddVectoredExceptionHandler(1, singleStepHandler);
 }
