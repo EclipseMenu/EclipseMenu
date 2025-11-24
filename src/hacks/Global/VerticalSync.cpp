@@ -4,7 +4,7 @@
 #include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GameManager.hpp>
-
+#ifdef GEODE_IS_WINDOWS
 namespace eclipse::hacks::Global {
 
     class $hack(VerticalSync) {
@@ -41,3 +41,4 @@ namespace eclipse::hacks::Global {
         }
     };
 }
+#endif
