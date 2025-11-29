@@ -13,6 +13,8 @@
 #include <Geode/modify/RetryLevelLayer.hpp>
 #include <modules/gui/cocos/nodes/CCMenuItemExt.hpp>
 
+#include <modules.hpp>
+
 namespace eclipse::hacks::Global {
     enum class SafeModeState {
         Normal,   // no cheats detected
@@ -25,6 +27,23 @@ namespace eclipse::hacks::Global {
 
     // Whether the last attempt had tripped any cheats
     bool s_trippedLastAttempt = false;
+
+    $execute {
+        new geode::EventListener<geode::EventFilter<events::GetHackingModulesEvent>>(+[](events::GetHackingModulesEvent* e) {
+            std::vector<events::HackingModule> modules;
+            modules.reserve(s_attemptCheats.size());
+
+            for (auto const& [name, state] : s_attemptCheats) {
+                modules.push_back(events::HackingModule {
+                    .name = name,
+                    .state = state ? events::HackingModule::State::Enabled : events::HackingModule::State::Tripped
+                });
+            }
+
+            e->setModules(std::move(modules));
+            return geode::ListenerResult::Stop;
+        });
+    }
 
     class $hack(AutoSafeMode) {
         static bool hasCheats() {

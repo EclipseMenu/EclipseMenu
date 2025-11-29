@@ -54,6 +54,23 @@ namespace eclipse::events {
     private:
         bool m_result = false;
     };
+
+    struct HackingModule {
+        std::string_view name;
+        enum class State {
+            Enabled,
+            Tripped
+        } state = State::Enabled;
+    };
+
+    class GetHackingModulesEvent final : public geode::Event {
+    public:
+        GetHackingModulesEvent() = default;
+        [[nodiscard]] std::vector<HackingModule>&& getModules() { return std::move(m_modules); }
+        void setModules(std::vector<HackingModule> modules) { m_modules = std::move(modules); }
+    private:
+        std::vector<HackingModule> m_modules;
+    };
 }
 
 namespace eclipse::modules {
@@ -96,6 +113,14 @@ namespace eclipse {
         events::CheckCheatedInAttemptEvent event;
         event.post();
         return event.getResult();
+    }
+
+    /// @brief Get a list of enabled cheating modules.
+    /// @return A vector of HackingModule representing the enabled cheats.
+    inline std::vector<events::HackingModule> getEnabledCheats() {
+        events::GetHackingModulesEvent event;
+        event.post();
+        return std::move(event).getModules();
     }
 }
 
