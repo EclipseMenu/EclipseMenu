@@ -12,7 +12,8 @@
 * <cg>Fixed</c> <co>Floating Button</c> going offscreen when changing resolution
 * <cg>Fixed</c> a race condition with <co>StartPos Switcher</c> causing crashes while level is loading
 * <cg>Fixed</c> <co>Show Hitboxes</c> classifying speed portals as triggers
-* <cg>Improved</c> <co>Show Hitboxes</c> behavior parity with vanilla hitboxes in editor 
+* <cg>Fixed</c> <co>Speedhack</c> compatibility with <co>CBF Physics Bypass</c>
+* <cg>Improved</c> <co>Show Hitboxes</c> behavior parity with vanilla hitboxes in editor
 * Various <co>Shipcopter</c> improvements and fixes
 * Massive refactoring of codebase that improves performance and load times
 
