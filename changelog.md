@@ -4,6 +4,8 @@
 **Additions**:
 * Added responsive press animation for <co>Floating Button</c>
 * Added <cg>Wave Trail Pulse</c> toggle to <co>Custom Wave Trail</c>
+* Added <cg>Vertical Sync</c> toggle (#268 by @slideglide)
+* Added <cg>Memory-based</c> option for <co>Practice Fix</c>
 * Added new label variables: `playerXVelocity`, `playerYVelocity`, `player2XVelocity`, `player2YVelocity`
 * Tabbed layout is now horizontally centered 
 
@@ -14,6 +16,7 @@
 * <cg>Fixed</c> <co>Show Hitboxes</c> classifying speed portals as triggers
 * <cg>Fixed</c> <co>Speedhack</c> compatibility with <co>CBF Physics Bypass</c>
 * <cg>Improved</c> <co>Show Hitboxes</c> behavior parity with vanilla hitboxes in editor
+* <co>Replay Bot</c> accuracy improvements
 * Various <co>Shipcopter</c> improvements and fixes
 * Massive refactoring of codebase that improves performance and load times
 
