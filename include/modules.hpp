@@ -36,6 +36,24 @@ namespace eclipse::events {
         std::span<uint8_t> m_data;
         geode::Result<> m_result = geode::Err("Unknown error");
     };
+
+    class CheckCheatsEnabledEvent final : public geode::Event {
+    public:
+        CheckCheatsEnabledEvent() = default;
+        [[nodiscard]] bool getResult() const { return m_result; }
+        void setResult(bool result) { m_result = result; }
+    private:
+        bool m_result = false;
+    };
+
+    class CheckCheatedInAttemptEvent final : public geode::Event {
+    public:
+        CheckCheatedInAttemptEvent() = default;
+        [[nodiscard]] bool getResult() const { return m_result; }
+        void setResult(bool result) { m_result = result; }
+    private:
+        bool m_result = false;
+    };
 }
 
 namespace eclipse::modules {
@@ -62,6 +80,22 @@ namespace eclipse {
         events::LoadReplayEvent event(data);
         event.post();
         return std::move(event).getResult();
+    }
+
+    /// @brief Check if any cheats are enabled.
+    /// @return True if any cheats are enabled, false otherwise.
+    inline bool hasCheatsEnabled() {
+        events::CheckCheatsEnabledEvent event;
+        event.post();
+        return event.getResult();
+    }
+
+    /// @brief Check if the player has cheated in the current attempt.
+    /// @return True if the player has cheated in the current attempt, false otherwise.
+    inline bool hasCheatedInAttempt() {
+        events::CheckCheatedInAttemptEvent event;
+        event.post();
+        return event.getResult();
     }
 }
 

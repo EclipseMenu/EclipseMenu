@@ -189,6 +189,16 @@ $execute {
         g_cheats[e->getName()] = e->getCallback();
         return ListenerResult::Stop;
     });
+
+    new EventListener<EventFilter<events::CheckCheatsEnabledEvent>>(+[](events::CheckCheatsEnabledEvent* e) {
+        e->setResult(config::getTemp<"hasCheats", bool>(false));
+        return ListenerResult::Stop;
+    });
+
+    new EventListener<EventFilter<events::CheckCheatedInAttemptEvent>>(+[](events::CheckCheatedInAttemptEvent* e) {
+        e->setResult(config::getTemp<"trippedSafeMode", bool>(false));
+        return ListenerResult::Stop;
+    });
 }
 
 }
