@@ -15,7 +15,7 @@ else()
 
     CPMAddPackage(
         NAME eclipse-translations
-        GITHUB_REPOSITORY EclipseMenu/translations
+        GITHUB_REPOSITORY BeatACVR/translations
         GIT_TAG main
     )
     set(TRANSLATIONS_PATH ${eclipse-translations_SOURCE_DIR})
