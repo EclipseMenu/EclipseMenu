@@ -12,7 +12,6 @@ namespace eclipse::hacks::Global {
             tab->addToggle("global.nomusicfadeout")->handleKeybinds()->setDescription();
         }
 
-        [[nodiscard]] bool isCheating() const override { return config::get<"global.nomusicfadeout", bool>(); }
         [[nodiscard]] const char* getId() const override { return "No Music Fade Out"; }
     };
 
