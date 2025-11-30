@@ -6,12 +6,13 @@
 #include <Geode/modify/FMODAudioEngine.hpp>
 
 namespace eclipse::hacks::Global {
-    class $hack(Shipcopter) {
+    class $hack(NoMusicFadeOut) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addToggle("global.nomusicfadeout")->handleKeybinds()->setDescription();
         }
 
+        [[nodiscard]] bool isCheating() const override { return config::get<"global.nomusicfadeout", bool>(); }
         [[nodiscard]] const char* getId() const override { return "No Music Fade Out"; }
     };
 
