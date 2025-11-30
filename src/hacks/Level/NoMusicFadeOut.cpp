@@ -18,10 +18,11 @@ namespace eclipse::hacks::Level {
     REGISTER_HACK(NoMusicFadeOut)
 
     class $modify(NMFOFMODAudioEngineHook, FMODAudioEngine) {
-        ADD_HOOKS_DELEGATE_AND_SAFE_PRIO("level.nomusicfadeout")
+            ALL_DELEGATES_AND_SAFE_PRIO("level.nomusicfadeout")
 
         void fadeOutMusic(float duration, int channel) {
             return;
         }
     };
+
 }
