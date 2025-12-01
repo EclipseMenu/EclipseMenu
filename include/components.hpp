@@ -159,6 +159,8 @@ namespace eclipse::events {
     };
 }
 
+#ifndef ECLIPSE_DONT_DEFINE_IMPLS
+
 namespace eclipse {
     /// @brief Get a menu tab handle by name. Creates the tab if it doesn't exist.
     /// @param name The name of the tab.
@@ -283,5 +285,7 @@ namespace eclipse {
         }
     }
 }
+
+#endif // ECLIPSE_DONT_DEFINE_IMPLS
 
 #endif // ECLIPSE_COMPONENTS_HPP

@@ -1,3 +1,4 @@
+#define ECLIPSE_DONT_DEFINE_IMPLS
 #include <eclipse.hpp>
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
