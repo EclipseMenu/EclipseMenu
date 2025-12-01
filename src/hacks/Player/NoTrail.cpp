@@ -11,39 +11,6 @@
 #endif
 
 namespace eclipse::hacks::Player {
-    class $hack(NoTrail) {
-        void init() override {
-            auto tab = gui::MenuTab::find("tab.player");
-            tab->addToggle("player.notrail")->handleKeybinds()->setDescription();
-        }
-
-        [[nodiscard]] const char* getId() const override { return "No Trail"; }
-    };
-
-    REGISTER_HACK(NoTrail)
-
-    class $hack(AlwaysTrail) {
-        void init() override {
-            auto tab = gui::MenuTab::find("tab.player");
-            tab->addToggle("player.alwaystrail")->handleKeybinds()->setDescription();
-        }
-
-        [[nodiscard]] const char* getId() const override { return "Always Show Trail"; }
-    };
-
-    REGISTER_HACK(AlwaysTrail)
-
-    class $hack(NoWaveTrailBehind) {
-        void init() override {
-            auto tab = gui::MenuTab::find("tab.player");
-            tab->addToggle("player.nowavetrailbehind")->handleKeybinds()->setDescription();
-        }
-
-        [[nodiscard]] const char* getId() const override { return "No Wave Trail Behind"; }
-    };
-
-    REGISTER_HACK(NoWaveTrailBehind)
-
     // CCMotionStreak functions are too small to be hooked on ARM
     #ifdef GEODE_IS_ARM
     class $modify(NoTrailPOHook, PlayerObject) {
@@ -53,7 +20,8 @@ namespace eclipse::hacks::Player {
             HOOKS_TOGGLE("player.alwaystrail", PlayerObject, "deactivateStreak");
         }
 
-        void deactivateStreak(bool p0) {
+        void deactivateStreak(bool stop) {
+            // if (m_alwaysShowStreak <= stop) m_regularTrail->stopStroke();
             if (!this->m_fadeOutStreak) return;
             this->m_fadeOutStreak = false;
             this->fadeOutStreak2(this->m_playEffects ? 0.2f : 0.6f);
@@ -65,6 +33,7 @@ namespace eclipse::hacks::Player {
             if (this->m_isHidden) return;
 
             this->m_fadeOutStreak = true;
+            // m_regularTrail->resumeStroke();
             if (this->m_isDart) {
                 auto pos = this->getPosition();
                 this->m_waveTrail->m_currentPoint = pos;
@@ -75,6 +44,7 @@ namespace eclipse::hacks::Player {
         }
     };
     #else
+    // and on windows PlayerObject::deactivateStreak is inlined
     class $modify(NoTrailCCMSHook, cocos2d::CCMotionStreak) {
         static void onModify(auto& self) {
             SAFE_HOOKS_ALL();
@@ -112,4 +82,49 @@ namespace eclipse::hacks::Player {
             }
         }
     };
+
+    class $hack(NoTrail) {
+        void init() override {
+            auto tab = gui::MenuTab::find("tab.player");
+            tab->addToggle("player.notrail")->handleKeybinds()->setDescription()->callback([](bool enabled) {
+                if (!enabled) return;
+                if (auto pl = utils::get<PlayLayer>()) {
+                    pl->m_player1->m_regularTrail->stopStroke();
+                    pl->m_player2->m_regularTrail->stopStroke();
+                }
+            });
+        }
+
+        [[nodiscard]] const char* getId() const override { return "No Trail"; }
+    };
+
+    REGISTER_HACK(NoTrail)
+
+    class $hack(AlwaysTrail) {
+        void init() override {
+            auto tab = gui::MenuTab::find("tab.player");
+            tab->addToggle("player.alwaystrail")->handleKeybinds()->setDescription()->callback([](bool enabled) {
+                if (!enabled) return;
+                if (auto pl = utils::get<PlayLayer>()) {
+                    pl->m_player1->m_regularTrail->resumeStroke();
+                    pl->m_player2->m_regularTrail->resumeStroke();
+                }
+            });
+        }
+
+        [[nodiscard]] const char* getId() const override { return "Always Show Trail"; }
+    };
+
+    REGISTER_HACK(AlwaysTrail)
+
+    class $hack(NoWaveTrailBehind) {
+        void init() override {
+            auto tab = gui::MenuTab::find("tab.player");
+            tab->addToggle("player.nowavetrailbehind")->handleKeybinds()->setDescription();
+        }
+
+        [[nodiscard]] const char* getId() const override { return "No Wave Trail Behind"; }
+    };
+
+    REGISTER_HACK(NoWaveTrailBehind)
 }
