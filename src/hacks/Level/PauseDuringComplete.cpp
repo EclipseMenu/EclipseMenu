@@ -26,5 +26,23 @@ namespace eclipse::hacks::Level {
             PlayLayer::pauseGame(p0);
             m_levelEndAnimationStarted = original;
         }
+
+        void resetLevel() {
+            if (m_levelEndAnimationStarted) {
+                m_player1->stopAllActions();
+                m_player2->stopAllActions();
+            }
+            PlayLayer::resetLevel();
+        }
+
+        void activatePlatformerEndTrigger(EndTriggerGameObject* p0, gd::vector<int> const& p1) {
+            PlayLayer::activatePlatformerEndTrigger(p0, p1);
+            m_uiLayer->m_pauseBtn->setEnabled(true);
+        }
+
+        void checkForEnd() {
+            PlayLayer::checkForEnd();
+            m_uiLayer->m_pauseBtn->setEnabled(true);
+        }
     };
 }
