@@ -1,5 +1,21 @@
 # Eclipse Menu
 
+## v1.7.0
+**Additions**:
+* Added <cg>No Music Fade Out</c> (#273 by @Beat)
+* Added toggle for <cg>Horizontal Centering</c> in <co>Tabbed Layout</c>
+* <co>Layout Mode</c> can now change level colors
+
+**Fixes**:
+* <cg>Fixed</c> <co>Ball Rotation</c> triggering when switching to Cube and Robot
+* <cg>Fixed</c> <co>Level Edit</c> showing the "read-only" warning (cosmetic change)
+* <cg>Fixed</c> <co>Pause During Complete</c> registering level completion if you restart the level
+* <cg>Fixed</c> <co>Pause During Complete</c> not enabling the pause button on mobile
+* <cg>Fixed</c> <co>Layout Mode</c> breaking levels in Editor
+* <cg>Fixed</c> <co>Layout Mode</c> cheat indicator logic
+* <cg>Fixed</c> <co>No Trail</c>/<co>Always Show Trail</c> not updating while in-game
+* <cg>Fixed</c> `config::setInternal` method in <co>Eclipse API</c>
+
 ## v1.6.0
 **Additions**:
 * Added responsive press animation for <co>Floating Button</c>
