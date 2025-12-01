@@ -243,6 +243,9 @@ $on_mod(Loaded) {
         });
         animateToggle->setFlags(ComponentFlags::OnlyTabbed);
 
+        config::setIfEmpty<bool>("menu.horizontallyCenter", true);
+        tab->addToggle("menu.horizontallyCenter")->setFlags(ComponentFlags::OnlyTabbed);
+
     #ifdef ECLIPSE_USE_FLOATING_BUTTON
 
         config::setIfEmpty<float>("float-btn.max-opacity", 1.f);

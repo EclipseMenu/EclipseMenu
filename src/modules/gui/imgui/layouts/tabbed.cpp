@@ -181,9 +181,12 @@ namespace eclipse::gui::imgui {
 
         float windowWidth = Window::MIN_SIZE.x * scale;
         auto columns = static_cast<int>((screenSize.x - margin) / (windowWidth + margin));
-        auto freeSpace = (screenSize.x - margin - (columns * (windowWidth + margin))) * 0.5f + margin;
 
-        // std::map<Window*, ImVec2> positions;
+        float freeSpace = margin;
+        if (config::get<"menu.horizontallyCenter", bool>(true)) {
+            freeSpace += (screenSize.x - margin - (columns * (windowWidth + margin))) * 0.5f;
+        }
+
         std::vector<std::pair<Window*, ImVec2>> positions;
         positions.reserve(m_windows.size());
 
