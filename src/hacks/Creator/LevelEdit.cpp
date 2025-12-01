@@ -34,7 +34,7 @@ namespace eclipse::hacks::Creator {
             level->m_levelType = levelType;
         }
 
-        void onEdit(cocos2d::CCObject* sender) {
+        void onTryEdit(cocos2d::CCObject* sender) {
             auto level = utils::get<PlayLayer>()->m_level;
             auto levelType = level->m_levelType;
 
