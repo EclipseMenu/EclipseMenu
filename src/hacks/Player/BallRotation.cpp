@@ -91,6 +91,10 @@ namespace eclipse::hacks::Player {
             bool prevBall = m_isBall;
             PlayerObject::switchedToMode(p0);
 
+            if (p0 == GameObjectType::CubePortal || p0 == GameObjectType::RobotPortal) {
+                return;
+            }
+
             if (p0 != GameObjectType::BallPortal && prevBall) {
                 if (config::get<bool>("player.ballrotation.variation", false)) {
                     auto fields = m_fields.self();
