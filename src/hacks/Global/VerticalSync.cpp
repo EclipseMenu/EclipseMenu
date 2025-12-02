@@ -9,13 +9,6 @@
 namespace eclipse::hacks::Global {
 
     class $hack(VerticalSync) {
-    public:
-        static void disableVSync() {
-            config::setTemp("global.vsync", false);
-            utils::get<GameManager>()->setGameVariable("0030", false);
-            utils::get<AppDelegate>()->toggleVerticalSync(false);
-        }
-
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
 
