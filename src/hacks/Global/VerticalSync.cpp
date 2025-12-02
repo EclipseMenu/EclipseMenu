@@ -4,10 +4,18 @@
 #include <modules/hack/hack.hpp>
 
 #include <Geode/modify/GameManager.hpp>
+
 #ifdef GEODE_IS_WINDOWS
 namespace eclipse::hacks::Global {
 
     class $hack(VerticalSync) {
+    public:
+        static void disableVSync() {
+            config::setTemp("global.vsync", false);
+            utils::get<GameManager>()->setGameVariable("0030", false);
+            utils::get<AppDelegate>()->toggleVerticalSync(false);
+        }
+
         void init() override {
             auto tab = gui::MenuTab::find("tab.global");
 
@@ -15,14 +23,18 @@ namespace eclipse::hacks::Global {
                ->handleKeybinds()
                ->setDescription()
                ->callback([](bool v) {
-                   GameManager::sharedState()->setGameVariable("0030", v);
-                   AppDelegate::get()->toggleVerticalSync(v);
+                   if (v) {
+                       config::set("global.fpsbypass.toggle", false);
+                       utils::get<GameManager>()->setGameVariable("0116", false);
+                   }
+                   utils::get<GameManager>()->setGameVariable("0030", v);
+                   utils::get<AppDelegate>()->toggleVerticalSync(v);
                })
                ->disableSaving();
         }
 
         void lateInit() override {
-            bool vsyncEnabled = GameManager::sharedState()->getGameVariable("0030");
+            bool vsyncEnabled = utils::get<GameManager>()->getGameVariable("0030");
             config::setTemp("global.vsync", vsyncEnabled);
         }
 
@@ -36,7 +48,7 @@ namespace eclipse::hacks::Global {
             GameManager::setGameVariable(key, value);
             if (strcmp(key, "0030") == 0) {
                 config::setTemp("global.vsync", value);
-                AppDelegate::get()->toggleVerticalSync(value);
+                utils::get<AppDelegate>()->toggleVerticalSync(value);
             }
         }
     };
