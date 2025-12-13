@@ -133,10 +133,10 @@ namespace eclipse::utils {
             m_lastJumpTime = player->m_lastJumpTime;
             m_lastFlipTime = player->m_lastFlipTime;
             m_flashTime = player->m_flashTime;
-            m_flashRelated = player->m_flashRelated;
-            m_flashRelated1 = player->m_flashRelated1;
-            m_colorRelated2 = player->m_colorRelated2;
-            m_flashRelated3 = player->m_flashRelated3;
+            m_flashDuration = player->m_flashDuration;
+            m_flashDelay = player->m_flashDelay;
+            m_flashMainColor = player->m_flashMainColor;
+            m_flashSecondColor = player->m_flashSecondColor;
             m_lastSpiderFlipTime = player->m_lastSpiderFlipTime;
             m_unkBool5 = player->m_unkBool5;
             m_maybeIsVehicleGlowing = player->m_maybeIsVehicleGlowing;
@@ -171,8 +171,8 @@ namespace eclipse::utils {
             m_collidedRightMinX = player->m_collidedRightMinX;
             m_fadeOutStreak = player->m_fadeOutStreak;
             // m_canPlaceCheckpoint =  m_canPlaceCheckpointckpoint; (breaking)
-            m_colorRelated = player->m_colorRelated;
-            m_secondColorRelated = player->m_secondColorRelated;
+            m_originalMainColor = player->m_originalMainColor;
+            m_originalSecondColor = player->m_originalSecondColor;
             m_hasCustomGlowColor = player->m_hasCustomGlowColor>m_hasCustomGlowColor;
             m_glowColor = player->m_glowColor;
             m_maybeIsColliding = player->m_maybeIsColliding;
@@ -392,10 +392,10 @@ namespace eclipse::utils {
             player->m_lastJumpTime = m_lastJumpTime;
             player->m_lastFlipTime = m_lastFlipTime;
             player->m_flashTime = m_flashTime;
-            player->m_flashRelated = m_flashRelated;
-            player->m_flashRelated1 = m_flashRelated1;
-            player->m_colorRelated2 = m_colorRelated2;
-            player->m_flashRelated3 = m_flashRelated3;
+            player->m_flashDuration = m_flashDuration;
+            player->m_flashDelay = m_flashDelay;
+            player->m_flashMainColor = m_flashMainColor;
+            player->m_flashSecondColor = m_flashSecondColor;
             player->m_lastSpiderFlipTime = m_lastSpiderFlipTime;
             player->m_unkBool5 = m_unkBool5;
             player->m_maybeIsVehicleGlowing = m_maybeIsVehicleGlowing;
@@ -430,8 +430,8 @@ namespace eclipse::utils {
             player->m_collidedRightMinX = m_collidedRightMinX;
             player->m_fadeOutStreak = m_fadeOutStreak;
             // player->m_canPlaceCheckpoint = m_canPlaceCheckpoint; (breaking)
-            player->m_colorRelated = m_colorRelated;
-            player->m_secondColorRelated = m_secondColorRelated;
+            player->m_originalMainColor = m_originalMainColor;
+            player->m_originalSecondColor = m_originalSecondColor;
             player->m_hasCustomGlowColor = m_hasCustomGlowColor;
             player->m_glowColor = m_glowColor;
             player->m_maybeIsColliding = m_maybeIsColliding;
@@ -653,10 +653,10 @@ namespace eclipse::utils {
         double m_lastJumpTime;
         double m_lastFlipTime;
         double m_flashTime;
-        float m_flashRelated;
-        float m_flashRelated1;
-        cocos2d::ccColor3B m_colorRelated2;
-        cocos2d::ccColor3B m_flashRelated3;
+        float m_flashDuration;
+        float m_flashDelay;
+        cocos2d::ccColor3B m_flashMainColor;
+        cocos2d::ccColor3B m_flashSecondColor;
         double m_lastSpiderFlipTime;
         bool m_unkBool5;
         bool m_maybeIsVehicleGlowing;
@@ -691,8 +691,8 @@ namespace eclipse::utils {
         double m_collidedRightMinX;
         bool m_fadeOutStreak;
         // bool m_canPlaceCheckpoint; (breaking)
-        cocos2d::ccColor3B m_colorRelated;
-        cocos2d::ccColor3B m_secondColorRelated;
+        cocos2d::ccColor3B m_originalMainColor;
+        cocos2d::ccColor3B m_originalSecondColor;
         bool m_hasCustomGlowColor;
         cocos2d::ccColor3B m_glowColor;
         bool m_maybeIsColliding;
