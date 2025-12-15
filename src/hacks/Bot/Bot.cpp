@@ -384,12 +384,8 @@ namespace eclipse::hacks::Bot {
         }
 
         void processCommands(float dt) {
-            if (s_respawning) { // somethow this avoid a weird bug where an orb buffered if you press down while respawning doesn't register
-                s_respawning = false;
-                m_gameState.m_currentProgress++;
-                return;
-            }
             GJBaseGameLayer::processCommands(dt);
+            if(s_respawning) s_respawning = false;
 
             if (s_bot.getState() != bot::State::PLAYBACK)
                 return;
@@ -404,6 +400,13 @@ namespace eclipse::hacks::Bot {
         void handleButton(bool down, int button, bool player1) {
             if (s_bot.getState() == bot::State::PLAYBACK && s_bot.getInputCount() && config::get<bool>("bot.ignore-inputs", false))
                 return;
+
+            if (s_bot.getState() == bot::State::RECORD && s_respawning) { // somethow this avoid a weird bug where an orb buffered if you press down while respawning doesn't register
+                bool swapControls = GameManager::get()->getGameVariable("0010");
+                bool player2 = swapControls ? player1 : !player1;
+                PlayerObject* checkPlayer = player2 ? m_player2 : m_player1;
+                if(checkPlayer->m_touchedRings.size() > 0) return;
+            }
 
             GJBaseGameLayer::handleButton(down, button, player1);
 
