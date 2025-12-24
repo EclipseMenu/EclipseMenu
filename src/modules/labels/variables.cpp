@@ -612,6 +612,7 @@ namespace eclipse::labels {
         m_variables["activeObjects"] = gameLayer->m_activeObjectsCount;
         m_variables["gradients"] = gameLayer->m_activeGradients;
         m_variables["particleCount"] = gameLayer->m_particleCount;
+        m_variables["randomSeed"] = static_cast<int64_t>(GameToolbox::getfast_srand());
 
         auto fmod = utils::get<FMODAudioEngine>();
         m_variables["songsCount"] = fmod->countActiveMusic();

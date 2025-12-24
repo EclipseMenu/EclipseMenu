@@ -117,7 +117,7 @@ namespace eclipse::hack {
         config::addDelegate(id, [hookPtrs = std::move(hookPtrs), id] {
             auto value = config::get(id, false);
             for (auto hook : hookPtrs) {
-                (void) (value ? hook->enable() : hook->disable());
+                (void) hook->toggle(value);
             }
         });
     }
@@ -141,7 +141,7 @@ namespace eclipse::hack {
         config::addDelegate(id, [hookPtrs = std::move(hookPtrs), id] {
             auto value = config::get(id, false);
             for (auto hook : hookPtrs) {
-                (void) (value ? hook->enable() : hook->disable());
+                (void) hook->toggle(value);
             }
         });
     }
