@@ -416,4 +416,14 @@ namespace eclipse::hacks::Bot {
             s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !player1, down);
         }
     };
+
+    // this fixes bot playback in level editor (robtop doesn't reset the counter)
+    class $modify(BotEUIHook, EditorUI) {
+        void onPlaytest(CCObject* sender) {
+            if (auto* editorLayer = utils::get<LevelEditorLayer>()) {
+                editorLayer->m_gameState.m_currentProgress = 0;
+            }
+            EditorUI::onPlaytest(sender);
+        }
+    };
 }
