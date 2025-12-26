@@ -12,6 +12,15 @@ namespace eclipse::hacks::Level {
             tab->addToggle("level.stoptrigondeath")->setDescription()->handleKeybinds();
         }
 
+        [[nodiscard]] bool isCheating() const override {
+            if (config::get<"level.stoptrigondeath", bool>(false)) {
+                if (auto pl = utils::get<PlayLayer>()) {
+                    if (pl->m_level->isPlatformer()) return true;
+                }
+            }
+            return false;
+        }
+
         [[nodiscard]] const char* getId() const override { return "Stop Triggers On Death"; }
     };
 
