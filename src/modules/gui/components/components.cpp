@@ -280,6 +280,11 @@ namespace eclipse::gui {
         if (!std::filesystem::exists(m_directory, ec)) return;
 
         for (auto const& entry : std::filesystem::recursive_directory_iterator(m_directory, ec)) {
+            #ifdef GEODE_IS_MACOS
+            // Ignore stupid .DS_Store
+            if(entry.path().filename() == ".DS_Store") continue;
+            #endif
+
             m_items.push_back(entry.path());
         }
     }
