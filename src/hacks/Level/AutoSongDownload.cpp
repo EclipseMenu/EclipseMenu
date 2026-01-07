@@ -20,11 +20,21 @@ namespace eclipse::hacks::Level {
     class $modify(AutoSongDownloadLILHook, LevelInfoLayer) {
         ADD_HOOKS_DELEGATE("level.autosongdownload")
 
-        void onEnterTransitionDidFinish() override {
-            LevelInfoLayer::onEnterTransitionDidFinish();
-
+        void tryDownload() {
             if (m_songWidget->m_downloadBtn->isVisible())
                 m_songWidget->m_downloadBtn->activate();
+        }
+
+        void levelDownloadFinished(GJGameLevel* level) override {
+            LevelInfoLayer::levelDownloadFinished(level);
+            this->tryDownload();
+        }
+
+        void onEnterTransitionDidFinish() override {
+            LevelInfoLayer::onEnterTransitionDidFinish();
+            if (m_level->m_dailyID > 0) {
+                this->tryDownload();
+            }
         }
     };
 }
