@@ -63,7 +63,7 @@ protected:
     }
 
     void onButton(CCObject*) {
-        static std::unordered_map<std::string, void(*)()> buttonCallbacks = {
+        static utils::StringMap<void(*)()> buttonCallbacks = {
             {"reset-theme", +[] {
                 createQuickPopup("Reset Theme", "Are you sure you want to reset the theme to default?",
                     "No", "Yes", [](auto, bool btn2) {

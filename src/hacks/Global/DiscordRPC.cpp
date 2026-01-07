@@ -17,7 +17,7 @@
 
 namespace eclipse::hacks::Global {
     std::chrono::time_point<std::chrono::steady_clock> s_lastDiscordUpdate;
-    std::map<std::string, std::unique_ptr<rift::Script>> s_discordScripts;
+    geode::utils::StringMap<std::unique_ptr<rift::Script>> s_discordScripts;
     static time_t s_startTimestamp, s_levelTimestamp;
 
     class $hack(DiscordRPC) {
@@ -42,7 +42,7 @@ namespace eclipse::hacks::Global {
             auto gameState = getGameState();
             auto getScript = [gameState](const std::string& key, bool addPrefix = true) -> rift::Script* {
                 static auto nullScript = rift::compile("").unwrap(); // Script that returns empty string
-                std::string keyStr;
+                std::string_view keyStr;
                 if (addPrefix) {
                     switch (gameState) {
                         case GameState::Menu: keyStr = "menu.";
@@ -55,8 +55,7 @@ namespace eclipse::hacks::Global {
                             break;
                     }
                 }
-                keyStr += key;
-                auto it = s_discordScripts.find(keyStr);
+                auto it = s_discordScripts.find(fmt::format("{}{}", keyStr, key));
                 return it != s_discordScripts.end() ? it->second.get() : nullScript.get();
             };
 

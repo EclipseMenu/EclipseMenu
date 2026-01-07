@@ -28,10 +28,12 @@
 #endif
 
 namespace eclipse::utils {
+#if 0
     std::mt19937_64& getRng() {
         static std::mt19937_64 rng{std::random_device{}()};
         return rng;
     }
+#endif
 
     std::string getClock(bool useTwelveHours) {
         auto now = std::chrono::system_clock::now();

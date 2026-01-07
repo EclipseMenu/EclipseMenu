@@ -26,7 +26,6 @@ CPMAddPackage("gh:EclipseMenu/rift@2.0.1")
 CPMAddPackage("gh:SpaghettDev/subprocess#e12740b")
 CPMAddPackage("gh:prevter/AdvancedLabel#d78d7f8")
 CPMAddPackage("gh:prevter/sinaps#7d2f7b1")
-CPMAddPackage("gh:zhihaoy/nontype_functional#8ec2e09")
 CPMAddPackage(
     NAME nlohmann_json
     GITHUB_REPOSITORY nlohmann/json
@@ -54,7 +53,6 @@ target_link_libraries(third_party INTERFACE
     rift
     advanced_label
     sinaps
-    nontype_functional
 )
 
 if (NOT ANDROID AND NOT IOS)

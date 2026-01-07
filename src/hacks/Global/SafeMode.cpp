@@ -367,7 +367,7 @@ namespace eclipse::hacks::Global {
             nullptr,
             "Auto-Safe Mode (Eclipse)",
             fmt::format(
-                "<cr>Progress saving is disabled for this level.</c>\n\n"
+                "<cr>Progress saving is disabled.</c>\n\n"
                 "<cy>Auto-Safe Mode is active because cheats are enabled.</c>\n"
                 "While this is active, progress will <cr>NOT</c> be saved.\n\n"
                 "<cy>Active cheats ({}):</c>\n{}",

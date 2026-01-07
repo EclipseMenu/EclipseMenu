@@ -1,5 +1,17 @@
 #pragma once
 
+#if 1 // Geode v5 has all we need now
+
+#include <Geode/utils/function.hpp>
+
+namespace eclipse {
+    using geode::Function, geode::FunctionRef;
+
+    template <class Signature>
+    using StdFunction = geode::CopyableFunction<Signature>;
+}
+
+#else // pre Geode v5
 #if defined(__cpp_lib_move_only_function) || defined(__cpp_lib_function_ref)
 #include <functional>
 #endif
@@ -32,3 +44,4 @@ namespace eclipse {
     template <typename... Args>
     using StdFunction = std::function<Args...>;
 }
+#endif

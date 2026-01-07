@@ -65,14 +65,14 @@ namespace eclipse::hack {
             hack->lateInit();
     }
 
-    void safeHooksAll(std::map<std::string, std::shared_ptr<geode::Hook>>& hooks) {
+    void safeHooksAll(geode::utils::StringMap<std::shared_ptr<geode::Hook>>& hooks) {
         for (auto& hookPtr : hooks | std::views::values) {
             hookPtr->setPriority(SAFE_HOOK_PRIORITY);
         }
     }
 
     void safeHooks(
-        std::map<std::string, std::shared_ptr<geode::Hook>>& hooks, std::string_view className,
+        geode::utils::StringMap<std::shared_ptr<geode::Hook>>& hooks, std::string_view className,
         std::initializer_list<std::string_view> funcs
     ) {
         for (auto hook : funcs) {
@@ -86,14 +86,14 @@ namespace eclipse::hack {
         }
     }
 
-    void firstHooksAll(std::map<std::string, std::shared_ptr<geode::Hook>>& hooks) {
+    void firstHooksAll(geode::utils::StringMap<std::shared_ptr<geode::Hook>>& hooks) {
         for (auto& hookPtr : hooks | std::views::values) {
             hookPtr->setPriority(FIRST_HOOK_PRIORITY);
         }
     }
 
     void firstHooks(
-        std::map<std::string, std::shared_ptr<geode::Hook>>& hooks, std::string_view className,
+        geode::utils::StringMap<std::shared_ptr<geode::Hook>>& hooks, std::string_view className,
         std::initializer_list<std::string_view> funcs
     ) {
         for (auto hook : funcs) {
@@ -107,7 +107,7 @@ namespace eclipse::hack {
         }
     }
 
-    void setupTogglesAll(std::string_view id, std::map<std::string, std::shared_ptr<geode::Hook>>& hooks) {
+    void setupTogglesAll(std::string_view id, geode::utils::StringMap<std::shared_ptr<geode::Hook>>& hooks) {
         auto value = config::get(id, false);
         std::vector<geode::Hook*> hookPtrs;
         for (auto& hook : hooks | std::views::values) {
@@ -123,7 +123,7 @@ namespace eclipse::hack {
     }
 
     void setupToggles(
-        std::string_view id, std::map<std::string, std::shared_ptr<geode::Hook>>& hooks, std::string_view className,
+        std::string_view id, geode::utils::StringMap<std::shared_ptr<geode::Hook>>& hooks, std::string_view className,
         std::initializer_list<std::string_view> funcs
     ) {
         auto value = config::get(id, false);
