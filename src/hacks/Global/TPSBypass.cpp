@@ -167,15 +167,11 @@ namespace eclipse::hacks::Global {
 
             // toggle the patch if enabled
             config::addDelegate("global.tpsbypass.toggle", [patch] {
-                (void) (config::get<bool>("global.tpsbypass.toggle", false)
-                    ? patch->enable()
-                    : patch->disable());
+                (void) patch->toggle(config::get<bool>("global.tpsbypass.toggle", false));
             });
 
             // set the initial state of the patch
-            (void) (config::get<bool>("global.tpsbypass.toggle", false)
-                    ? patch->enable()
-                    : patch->disable());
+            (void) patch->toggle(config::get<bool>("global.tpsbypass.toggle", false));
 
             // on macOS, we also have to patch instructions in GJBaseGameLayer::getModifiedDelta because it's inlined
             #ifdef REQUIRE_MODIFIED_DELTA_PATCH

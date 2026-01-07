@@ -45,9 +45,9 @@ namespace eclipse::hacks::Labels {
         );
 
         // Cheating - Red, Tripped - Orange, Normal - Green
-        auto color = isCheating ? gui::Color::RED : hasTripped
+        auto color = isCheating ? gui::Colors::RED : hasTripped
                                 ? gui::Color{0.72f, 0.37f, 0.f}
-                                : gui::Color::GREEN;
+                                : gui::Colors::GREEN;
         label->setColor(color.toCCColor3B());
     }
 

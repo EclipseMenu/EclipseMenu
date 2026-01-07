@@ -131,32 +131,32 @@ namespace eclipse::hacks::Level {
                 switch (colorID) {
                     case 1000: { // BG
                         if (!config::get<bool>("level.layoutmode.override-bg", false)) break;
-                        color = config::get<gui::Color>("level.layoutmode.background", gui::Color::BLUE).toCCColor3B();
+                        color = config::get<gui::Color>("level.layoutmode.background", gui::Colors::BLUE).toCCColor3B();
                         break;
                     }
                     case 1001: { // G1
                         if (!config::get<bool>("level.layoutmode.override-ground1", false)) break;
-                        color = config::get<gui::Color>("level.layoutmode.ground1", gui::Color::BLUE).toCCColor3B();
+                        color = config::get<gui::Color>("level.layoutmode.ground1", gui::Colors::BLUE).toCCColor3B();
                         break;
                     }
                     case 1002: { // Line
                         if (!config::get<bool>("level.layoutmode.override-line", false)) break;
-                        color = config::get<gui::Color>("level.layoutmode.line", gui::Color::BLUE).toCCColor3B();
+                        color = config::get<gui::Color>("level.layoutmode.line", gui::Colors::BLUE).toCCColor3B();
                         break;
                     }
                     case 1009: { // G2
                         if (!config::get<bool>("level.layoutmode.override-ground2", false)) break;
-                        color = config::get<gui::Color>("level.layoutmode.ground2", gui::Color::BLUE).toCCColor3B();
+                        color = config::get<gui::Color>("level.layoutmode.ground2", gui::Colors::BLUE).toCCColor3B();
                         break;
                     }
                     case 1013: { // MG1
                         if (!config::get<bool>("level.layoutmode.override-mg1", false)) break;
-                        color = config::get<gui::Color>("level.layoutmode.middleground1", gui::Color::BLUE).toCCColor3B();
+                        color = config::get<gui::Color>("level.layoutmode.middleground1", gui::Colors::BLUE).toCCColor3B();
                         break;
                     }
                     case 1014: { // MG2
                         if (!config::get<bool>("level.layoutmode.override-mg2", false)) break;
-                        color = config::get<gui::Color>("level.layoutmode.middleground2", gui::Color::BLUE).toCCColor3B();
+                        color = config::get<gui::Color>("level.layoutmode.middleground2", gui::Colors::BLUE).toCCColor3B();
                         break;
                     }
                     default: break;

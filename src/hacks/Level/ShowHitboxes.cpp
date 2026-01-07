@@ -411,11 +411,11 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.showhitboxes.traillength", 240.0f);
             config::setIfEmpty("level.showhitboxes.fillalpha.toggle", true);
             config::setIfEmpty("level.showhitboxes.solid_color", gui::Color(0, 0.247, 1));
-            config::setIfEmpty("level.showhitboxes.danger_color", gui::Color::RED);
-            config::setIfEmpty("level.showhitboxes.player_color", gui::Color::RED);
+            config::setIfEmpty("level.showhitboxes.danger_color", gui::Colors::RED);
+            config::setIfEmpty("level.showhitboxes.player_color", gui::Colors::RED);
             config::setIfEmpty("level.showhitboxes.player_color_inner", gui::Color(0, 1, 0.2f));
-            config::setIfEmpty("level.showhitboxes.player_color_rotated", gui::Color::YELLOW);
-            config::setIfEmpty("level.showhitboxes.other_color", gui::Color::GREEN);
+            config::setIfEmpty("level.showhitboxes.player_color_rotated", gui::Colors::YELLOW);
+            config::setIfEmpty("level.showhitboxes.other_color", gui::Colors::GREEN);
             config::setIfEmpty("level.showhitboxes.passable_color", gui::Color(0, 1, 1));
             config::setIfEmpty("level.showhitboxes.triggers_color", gui::Color(1, 0, 0.9f));
 

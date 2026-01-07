@@ -4,37 +4,8 @@
 #include <nlohmann/json.hpp>
 
 namespace eclipse::gui {
-    Color const Color::WHITE = {1, 1, 1};
-    Color const Color::BLACK = {0, 0, 0};
-    Color const Color::RED = {1, 0, 0};
-    Color const Color::GREEN = {0, 1, 0};
-    Color const Color::BLUE = {0, 0, 1};
-    Color const Color::YELLOW = {1, 1, 0};
-    Color const Color::CYAN = {0, 1, 1};
-    Color const Color::MAGENTA = {1, 0, 1};
-
     Color::operator ImU32() const {
         return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
-    }
-
-    Color& Color::operator=(Color const& other) {
-        if (this == &other) return *this;
-        r = other.r;
-        g = other.g;
-        b = other.b;
-        a = other.a;
-        return *this;
-    }
-
-    Color& Color::operator=(Color&& other) noexcept {
-        if (this == &other) return *this;
-        r = other.r;
-        g = other.g;
-        b = other.b;
-        a = other.a;
-        other.r = other.g = other.b = 0;
-        other.a = 1.0f;
-        return *this;
     }
 
     Color::operator ImVec4() const {
@@ -47,19 +18,6 @@ namespace eclipse::gui {
         b = col2.z;
         a = col2.w;
         return *this;
-    }
-
-    Color::operator cocos2d::ccColor4F() const {
-        return {r, g, b, a};
-    }
-
-    Color::operator cocos2d::_ccColor4B() const {
-        return {
-            static_cast<uint8_t>(r * 255),
-            static_cast<uint8_t>(g * 255),
-            static_cast<uint8_t>(b * 255),
-            static_cast<uint8_t>(a * 255)
-        };
     }
 
     Color Color::fromHSV(float h, float s, float v, float a) {
@@ -139,18 +97,6 @@ namespace eclipse::gui {
         return fmt::format("{:08X}", c);
     }
 
-    Color Color::fromCCColor3B(cocos2d::ccColor3B const& color) {
-        return Color(color.r / 255.F, color.g / 255.F, color.b / 255.F);
-    }
-
-    cocos2d::ccColor3B Color::toCCColor3B() const {
-        return {
-            static_cast<uint8_t>(r * 255),
-            static_cast<uint8_t>(g * 255),
-            static_cast<uint8_t>(b * 255)
-        };
-    }
-
     constexpr float hue2rgb(float p, float q, float t) {
         if (t < 0) t += 1;
         if (t > 1) t -= 1;
@@ -205,7 +151,7 @@ namespace eclipse::gui {
         return HSL::fromColor(*this);
     }
 
-    Color Color::fromHSL(HSL const& hsl) const {
+    Color Color::fromHSL(HSL const& hsl) {
         return HSL::toColor(hsl);
     }
 

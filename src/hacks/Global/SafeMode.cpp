@@ -14,6 +14,7 @@
 #include <modules/gui/cocos/nodes/CCMenuItemExt.hpp>
 
 #include <modules.hpp>
+#include <ranges>
 
 namespace eclipse::hacks::Global {
     enum class SafeModeState {
@@ -47,11 +48,11 @@ namespace eclipse::hacks::Global {
 
     class $hack(AutoSafeMode) {
         static bool hasCheats() {
-            for (auto& [_, callback] : api::getCheats()) {
+            for (auto const& callback : api::getCheats() | std::views::values) {
                 if (callback()) return true;
             }
 
-            const auto& hacks = hack::getCheatingHacks();
+            auto const& hacks = hack::getCheatingHacks();
             return std::ranges::any_of(hacks, [](auto& hack) {
                 return hack->isCheating();
             });
@@ -65,14 +66,14 @@ namespace eclipse::hacks::Global {
         }
 
         static void updateCheatStates() {
-            for (const auto& hack : hack::getCheatingHacks()) {
+            for (auto const& hack : hack::getCheatingHacks()) {
                 if (hack->isCheating()) {
                     s_attemptCheats[hack->getId()] = true;
                 } else if (s_attemptCheats.contains(hack->getId())) {
                     s_attemptCheats[hack->getId()] = false;
                 }
             }
-            for (const auto& [id, active] : api::getCheats()) {
+            for (auto const& [id, active] : api::getCheats()) {
                 if (active()) {
                     s_attemptCheats[id] = true;
                 } else if (s_attemptCheats.contains(id)) {
@@ -84,7 +85,7 @@ namespace eclipse::hacks::Global {
         static std::string constructMessage() {
             std::string message = "";
             message.reserve(s_attemptCheats.size() * 20);
-            for (const auto& [id, active] : s_attemptCheats) {
+            for (auto const& [id, active] : s_attemptCheats) {
                 message += fmt::format("- {}{}</c>\n", active ? "<cr>" : "<co>", id);
             }
 
@@ -95,7 +96,7 @@ namespace eclipse::hacks::Global {
             return message;
         }
 
-        static void showPopup(const std::string& message) {
+        static void showPopup(std::string const& message) {
             if (!s_trippedLastAttempt && !hasCheats())
                 return;
 
@@ -223,8 +224,8 @@ namespace eclipse::hacks::Global {
         }
     };
 
-    #define NormalColor gui::Color::GREEN
-    #define CheatingColor gui::Color::RED
+    #define NormalColor gui::Colors::GREEN
+    #define CheatingColor gui::Colors::RED
     #define TrippedColor gui::Color { 0.72f, 0.37f, 0.f }
 
     static CCMenuItemSpriteExtra* createCI() {
@@ -232,7 +233,7 @@ namespace eclipse::hacks::Global {
         auto color = AutoSafeMode::hasCheats() ? CheatingColor : s_trippedLastAttempt ? TrippedColor : NormalColor;
         ci->setColor(color.toCCColor3B());
         auto msg = AutoSafeMode::constructMessage();
-        auto btn = gui::cocos::createSpriteExtra(ci, [msg](auto) {
+        auto btn = gui::cocos::createSpriteExtra(ci, [msg = std::move(msg)](auto) {
             AutoSafeMode::showPopup(msg);
         });
         btn->setAnchorPoint({0.45f, 0.2f});

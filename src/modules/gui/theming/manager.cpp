@@ -318,7 +318,7 @@ namespace eclipse::gui {
 
     void ThemeManager::applyAccentColor(Color const& color) {
         auto isDark = color.luminance() < 0.5f;
-        auto foreground = isDark ? Color::WHITE : Color::BLACK;
+        auto foreground = isDark ? Colors::WHITE : Colors::BLACK;
 
         m_disabledColor = isDark ? foreground.darken(0.4f) : foreground.lighten(0.4f);
         m_titleBackgroundColor = color;
@@ -336,7 +336,7 @@ namespace eclipse::gui {
 
     void ThemeManager::applyBackgroundColor(Color const& color) {
         auto isDark = color.luminance() < 0.5f;
-        auto foreground = isDark ? Color::WHITE : Color::BLACK;
+        auto foreground = isDark ? Colors::WHITE : Colors::BLACK;
 
         m_backgroundColor = color;
         m_frameBackground = isDark ? color.lighten(0.1f) : color.darken(0.1f);

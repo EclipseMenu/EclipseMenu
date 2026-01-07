@@ -20,7 +20,7 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.noclip.p2", true);
             config::setIfEmpty("player.noclip.opacity", 90.f);
             config::setIfEmpty("player.noclip.time", 0.f);
-            config::setIfEmpty("player.noclip.color", gui::Color::RED);
+            config::setIfEmpty("player.noclip.color", gui::Colors::RED);
             config::setIfEmpty("player.noclip.acclimit", 95.f);
             config::setIfEmpty("player.noclip.deathlimit", 2);
 
@@ -81,7 +81,7 @@ namespace eclipse::hacks::Player {
             auto fields = m_fields.self();
 
             if (!fields->m_noclipTint && config::get<bool>("player.noclip.tint", false)) {
-                auto color = config::get<gui::Color>("player.noclip.color", gui::Color::RED).toCCColor3B();
+                auto color = config::get<gui::Color>("player.noclip.color", gui::Colors::RED).toCCColor3B();
                 fields->m_noclipTint = cocos2d::CCLayerColor::create(
                     cocos2d::_ccColor4B{color.r, color.g, color.b, 0}
                 );

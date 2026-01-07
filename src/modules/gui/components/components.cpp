@@ -159,7 +159,7 @@ namespace eclipse::gui {
     bool ColorComponent::hasOpacity() const { return m_hasOpacity; }
 
     Color ColorComponent::getValue() const {
-        return get_value(m_id, Color::BLACK, m_noSave);
+        return get_value(m_id, Colors::BLACK, m_noSave);
     }
 
     void ColorComponent::setValue(Color const& value) const {

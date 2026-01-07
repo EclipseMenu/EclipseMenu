@@ -25,8 +25,8 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.customwavetrail.speed", 0.5f);
             config::setIfEmpty("player.customwavetrail.saturation", 100.f);
             config::setIfEmpty("player.customwavetrail.value", 100.f);
-            config::setIfEmpty("player.customwavetrail.color", gui::Color::WHITE);
-            config::setIfEmpty("player.customwavetrail.outline.color", gui::Color::BLACK);
+            config::setIfEmpty("player.customwavetrail.color", gui::Colors::WHITE);
+            config::setIfEmpty("player.customwavetrail.outline.color", gui::Colors::BLACK);
             config::setIfEmpty("player.customwavetrail.outline.stroke", 2.f);
             config::setIfEmpty("player.customwavetrail.outline.blur", 0);
 
@@ -78,7 +78,7 @@ namespace eclipse::hacks::Player {
                 auto value = config::get<"player.customwavetrail.value", float>(100.f);
                 this->setColor(utils::getRainbowColor(speed / 10.f, saturation / 100.f, value / 100.f).toCCColor3B());
             } else if (config::get<"player.customwavetrail.customcolor", bool>(false)) {
-                auto color = config::get<"player.customwavetrail.color", gui::Color>(gui::Color::WHITE);
+                auto color = config::get<"player.customwavetrail.color", gui::Color>(gui::Colors::WHITE);
                 this->setColor(color.toCCColor3B());
             }
 
@@ -122,7 +122,7 @@ namespace eclipse::hacks::Player {
             if ((fillColor.r == 1.F && fillColor.g == 1.F && fillColor.b == 1.F && fillColor.a != 1.F) || ((s_currentStreak != this) && (s_currentStreak2 != this)))
                 return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor);
 
-            auto color = config::get<"player.customwavetrail.outline.color", gui::Color>(gui::Color::BLACK);
+            auto color = config::get<"player.customwavetrail.outline.color", gui::Color>(gui::Colors::BLACK);
             auto width = config::get<"player.customwavetrail.outline.stroke", float>(2.F);
 
             this->setBlendFunc(cocos2d::CCSprite::create()->getBlendFunc());

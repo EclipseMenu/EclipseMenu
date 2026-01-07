@@ -12,32 +12,22 @@ using ImU32 = unsigned int;
 
 namespace eclipse::gui {
     struct Color {
-        static Color const WHITE;
-        static Color const BLACK;
-        static Color const RED;
-        static Color const GREEN;
-        static Color const BLUE;
-        static Color const YELLOW;
-        static Color const CYAN;
-        static Color const MAGENTA;
-
         float r, g, b, a;
 
-        Color() : r(0), g(0), b(0), a(1.0f) {}
-        Color(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a) {}
-        Color(Color const& other) = default;
-        Color(Color const& other, float a) : r(other.r), g(other.g), b(other.b), a(a) {}
-        explicit Color(cocos2d::ccColor4F const& other) : r(other.r), g(other.g), b(other.b), a(other.a) {}
-        explicit Color(cocos2d::ccColor4B const& other) : r(other.r / 255.0f), g(other.g / 255.0f), b(other.b / 255.0f), a(other.a / 255.0f) {}
+        constexpr Color() : r(0), g(0), b(0), a(1.0f) {}
+        constexpr Color(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a) {}
+        constexpr Color(Color const& other) = default;
+        constexpr Color(Color const& other, float a) : r(other.r), g(other.g), b(other.b), a(a) {}
+        explicit constexpr Color(cocos2d::ccColor4F const& other) : r(other.r), g(other.g), b(other.b), a(other.a) {}
+        explicit constexpr Color(cocos2d::ccColor4B const& other) : r(other.r / 255.0f), g(other.g / 255.0f), b(other.b / 255.0f), a(other.a / 255.0f) {}
 
-        Color(Color&& other) noexcept : r(other.r), g(other.g), b(other.b), a(other.a) {
+        constexpr Color(Color&& other) noexcept : r(other.r), g(other.g), b(other.b), a(other.a) {
             other.r = other.g = other.b = 0;
             other.a = 1.0f;
         }
 
-        Color& operator=(Color const& other);
-
-        Color& operator=(Color&& other) noexcept;
+        constexpr Color& operator=(Color const& other) = default;
+        constexpr Color& operator=(Color&& other) noexcept = default;
 
         /// @brief Converts the color to ImVec4
         operator ImVec4() const;
@@ -47,14 +37,24 @@ namespace eclipse::gui {
 
         Color& operator=(ImVec4 const& col2);
 
-        operator cocos2d::ccColor4F() const;
-        operator cocos2d::ccColor4B() const;
+        constexpr operator cocos2d::ccColor4F() const {
+            return {r, g, b, a};
+        }
+
+        constexpr operator cocos2d::ccColor4B() const {
+            return {
+                static_cast<uint8_t>(r * 255),
+                static_cast<uint8_t>(g * 255),
+                static_cast<uint8_t>(b * 255),
+                static_cast<uint8_t>(a * 255)
+            };
+        }
 
         /// @brief Returns a pointer to the color data
         /// @return Pointer to the color data
-        float* data() { return &r; }
+        constexpr float* data() { return &r; }
 
-        GLubyte getAlphaByte() const { return static_cast<GLubyte>(a * 255); }
+        constexpr GLubyte getAlphaByte() const { return static_cast<GLubyte>(a * 255); }
 
         /// @brief Creates a new color from HSV values
         /// @param h Hue
@@ -98,28 +98,36 @@ namespace eclipse::gui {
 
         /// @brief Converts the color to a CCColor3B
         /// @return CCColor3B color
-        [[nodiscard]] cocos2d::ccColor3B toCCColor3B() const;
+        [[nodiscard]] constexpr cocos2d::ccColor3B toCCColor3B() const {
+            return {
+                static_cast<uint8_t>(r * 255),
+                static_cast<uint8_t>(g * 255),
+                static_cast<uint8_t>(b * 255)
+            };
+        }
 
         /// @brief Creates a new color from a CCColor3B
         /// @param color CCColor3B color in proper format
         /// @return New color
-        static Color fromCCColor3B(cocos2d::ccColor3B const& color);
+        static constexpr Color fromCCColor3B(cocos2d::ccColor3B const& color) {
+            return Color(color.r / 255.F, color.g / 255.F, color.b / 255.F);
+        }
 
         struct HSL {
             float h, s, l;
 
-            HSL() : h(0), s(0), l(0) {}
-            HSL(float h, float s, float l) : h(h), s(s), l(l) {}
-            HSL(HSL const& other) = default;
+            constexpr HSL() : h(0), s(0), l(0) {}
+            constexpr HSL(float h, float s, float l) : h(h), s(s), l(l) {}
+            constexpr HSL(HSL const& other) = default;
 
             static HSL fromColor(Color const& color);
             static Color toColor(HSL const& hsl);
 
-            operator Color() const { return toColor(*this); }
+            constexpr operator Color() const { return toColor(*this); }
         };
 
         [[nodiscard]] HSL toHSL() const;
-        [[nodiscard]] Color fromHSL(HSL const& hsl) const;
+        [[nodiscard]] static Color fromHSL(HSL const& hsl);
 
         /// @brief Gets the luminance of the color (0-1)
         [[nodiscard]] float luminance() const;
@@ -127,6 +135,17 @@ namespace eclipse::gui {
         [[nodiscard]] Color darken(float factor) const;
         [[nodiscard]] Color lighten(float factor) const;
     };
+
+    namespace Colors {
+        constexpr Color WHITE = {1, 1, 1};
+        constexpr Color BLACK = {0, 0, 0};
+        constexpr Color RED = {1, 0, 0};
+        constexpr Color GREEN = {0, 1, 0};
+        constexpr Color BLUE = {0, 0, 1};
+        constexpr Color YELLOW = {1, 1, 0};
+        constexpr Color CYAN = {0, 1, 1};
+        constexpr Color MAGENTA = {1, 0, 1};
+    }
 
     void to_json(nlohmann::json& j, Color const& e);
     void from_json(nlohmann::json const& j, Color& e);

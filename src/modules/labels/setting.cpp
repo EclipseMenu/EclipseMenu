@@ -97,7 +97,7 @@ namespace eclipse::labels {
         settings.text = json.value("text", "");
         settings.font = json.value("font", "bigFont.fnt");
         settings.scale = json.value("scale", 0.6f);
-        settings.color = json.value("color", gui::Color::WHITE);
+        settings.color = json.value("color", gui::Colors::WHITE);
         settings.visible = json.value("visible", true);
         settings.absolutePosition = json.value("absolutePosition", false);
         settings.offset.x = json.value("offset-x", 0.f);
