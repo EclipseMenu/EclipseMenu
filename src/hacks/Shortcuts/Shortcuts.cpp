@@ -166,39 +166,36 @@ namespace eclipse::hacks::Shortcuts {
 
         #ifdef GEODE_IS_WINDOWS
         static void injectDll() {
-            static geode::EventListener<FileEvent> m_listener;
             geode::utils::file::FilePickOptions::Filter filter;
             filter.description = "Dynamic Link Library (*.dll)";
             filter.files.insert("*.dll");
 
-            m_listener.bind([](FileEvent::Event* event) {
-                if (auto value = event->getValue()) {
-                    auto path = value->unwrapOr("");
-                    std::error_code ec;
-                    if (path.empty() || !std::filesystem::exists(path, ec))
-                        return;
-
-                    geode::log::warn("Injecting DLL: {}", path);
-                    HMODULE module = LoadLibraryW(path.native().c_str());
-                    if (!module) return geode::log::error("Failed to inject DLL: {}", path);
-
-                    // Call DLLMain with DLL_PROCESS_ATTACH
-                    bool success = module > (HMODULE) HINSTANCE_ERROR;
-                    if (success) {
-                        using DllMain = BOOL(WINAPI*)(HINSTANCE, DWORD, LPVOID);
-                        auto dllMain = reinterpret_cast<DllMain>(GetProcAddress(module, "DllMain"));
-                        if (dllMain)
-                            dllMain(static_cast<HINSTANCE>(module), DLL_PROCESS_ATTACH, nullptr);
-                    } else {
-                        FreeLibrary(module);
-                        geode::log::error("Failed to inject DLL: {}", path);
-                    }
-                }
-            });
-            m_listener.setFilter(geode::utils::file::pick(
+            geode::utils::file::pick(
                 geode::utils::file::PickMode::OpenFile,
                 {geode::dirs::getGameDir(), {filter}}
-            ));
+            ).listen([](geode::Result<std::filesystem::path>* value) {
+                if (!value) return;
+                auto path = value->unwrapOr("");
+                std::error_code ec;
+                if (path.empty() || !std::filesystem::exists(path, ec))
+                    return;
+
+                geode::log::warn("Injecting DLL: {}", path);
+                HMODULE module = LoadLibraryW(path.native().c_str());
+                if (!module) return geode::log::error("Failed to inject DLL: {}", path);
+
+                // Call DLLMain with DLL_PROCESS_ATTACH
+                bool success = module > (HMODULE) HINSTANCE_ERROR;
+                if (success) {
+                    using DllMain = BOOL(WINAPI*)(HINSTANCE, DWORD, LPVOID);
+                    auto dllMain = reinterpret_cast<DllMain>(GetProcAddress(module, "DllMain"));
+                    if (dllMain)
+                        dllMain(static_cast<HINSTANCE>(module), DLL_PROCESS_ATTACH, nullptr);
+                } else {
+                    FreeLibrary(module);
+                    geode::log::error("Failed to inject DLL: {}", path);
+                }
+            });
         }
         #endif
 

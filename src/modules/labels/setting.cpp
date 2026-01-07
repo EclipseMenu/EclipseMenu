@@ -69,31 +69,27 @@ namespace eclipse::labels {
     }
 
     void LabelSettings::promptSave() const {
-        using FileEvent = geode::Task<geode::Result<std::filesystem::path>>;
-        static geode::EventListener<FileEvent> s_listener;
         geode::utils::file::FilePickOptions::Filter filter;
         filter.description = "Eclipse Label (*.ecl)";
         filter.files.insert("*.ecl");
-        s_listener.bind([this](FileEvent::Event* event) {
-            if (auto value = event->getValue()) {
-                auto path = value->unwrapOr("");
-                if (path.empty()) return;
 
-                // ensure the file has the correct extension
-                if (path.extension() != ".ecl") path.replace_extension(".ecl");
-
-                auto data = nlohmann::json(*this).dump(4, ' ', false, nlohmann::detail::error_handler_t::ignore);
-                auto res = geode::utils::file::writeString(path, data);
-                if (res.isErr()) {
-                    geode::log::error("Failed to save label file: {}", res.unwrapErr());
-                }
-            }
-        });
-
-        s_listener.setFilter(geode::utils::file::pick(
+        geode::utils::file::pick(
             geode::utils::file::PickMode::SaveFile,
             { geode::Mod::get()->getSaveDir(), { filter }}
-        ));
+        ).listen([this](geode::Result<std::filesystem::path>* value) {
+            if (!value) return;
+            auto path = value->unwrapOr("");
+            if (path.empty()) return;
+
+            // ensure the file has the correct extension
+            if (path.extension() != ".ecl") path.replace_extension(".ecl");
+
+            auto data = nlohmann::json(*this).dump(4, ' ', false, nlohmann::detail::error_handler_t::ignore);
+            auto res = geode::utils::file::writeString(path, data);
+            if (res.isErr()) {
+                geode::log::error("Failed to save label file: {}", res.unwrapErr());
+            }
+        });
     }
 
     void from_json(nlohmann::json const& json, LabelSettings& settings) {
