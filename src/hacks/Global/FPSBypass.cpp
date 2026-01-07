@@ -31,14 +31,13 @@ namespace eclipse::hacks::Global {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addFloatToggle("global.fpsbypass", "global.fpsbypass", MIN_FPS, MAX_FPS, "%.2f FPS")
                ->handleKeybinds()
-               ->toggleCallback([] { 
-                   bool enabled = config::get<bool>("global.fpsbypass.toggle", false);
-                   if (enabled) {
+               ->toggleCallback([] {
+                   if (config::get<bool>("global.fpsbypass.toggle", false)) {
                        config::setTemp("global.vsync", false);
                        utils::get<GameManager>()->setGameVariable(GameVar::VerticalSync, false);
                        utils::get<AppDelegate>()->toggleVerticalSync(false);
                    }
-                   updateRefreshRate(); 
+                   updateRefreshRate();
                })
                ->valueCallback([](float) { updateRefreshRate(); });
         }
@@ -65,9 +64,14 @@ namespace eclipse::hacks::Global {
         void setGameVariable(char const* key, bool value) {
             GameManager::setGameVariable(key, value);
             if (strcmp(key, GameVar::UnlockFPS) == 0 && value) {
-                config::setTemp("global.vsync", false);
-                GameManager::setGameVariable(GameVar::VerticalSync, false);
-                utils::get<AppDelegate>()->toggleVerticalSync(false);
+                if (this->getGameVariable(GameVar::VerticalSync)) {
+                    config::setTemp("global.vsync", false);
+                    GameManager::setGameVariable(GameVar::VerticalSync, false);
+                    // extra safety if called before AppDelegate is ready
+                    geode::queueInMainThread([] {
+                        utils::get<AppDelegate>()->toggleVerticalSync(false);
+                    });
+                }
             }
         }
     };
