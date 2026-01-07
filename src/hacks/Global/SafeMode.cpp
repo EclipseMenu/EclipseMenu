@@ -140,9 +140,11 @@ namespace eclipse::hacks::Global {
             config::setIfEmpty("global.safemode.freeze_attempts", true);
             config::setIfEmpty("global.safemode.freeze_jumps", true);
             config::setIfEmpty("global.safemode.freeze_best_run", false);
+            config::setIfEmpty("global.safemode.warn-popup", true);
 
             tab->addToggle("global.safemode")->handleKeybinds()->setDescription()
                ->addOptions([](auto options) {
+                   options->addToggle("global.safemode.warn-popup")->setDescription();
                    options->addToggle("global.safemode.freeze_attempts");
                    options->addToggle("global.safemode.freeze_jumps");
                    options->addToggle("global.safemode.freeze_best_run");
@@ -293,7 +295,54 @@ namespace eclipse::hacks::Global {
     /// "Cheats Enabled" warning popup
     /// ==========
 
+    static bool manualSafeModePopup() {
+        if (!config::get<"global.safemode", bool>(false)) {
+            return false;
+        }
+
+        if (!config::get<"global.safemode.warn-popup", bool>(true)) {
+            return false;
+        }
+
+        s_attemptCheats.clear();
+        AutoSafeMode::updateCheatStates();
+
+        // edge case: noclip is only considered a cheat if you die while using it
+        if (config::get<"player.noclip", bool>()) {
+            s_attemptCheats["Noclip"] = false;
+        }
+
+        if (s_attemptCheats.empty() ) {
+            FLAlertLayer::create(
+                nullptr,
+                "Safe Mode (Eclipse)",
+                "<cr>Progress saving is disabled.</c>\n\n"
+                "<cy>Safe Mode is enabled. Progress will NOT be saved for any attempts until you disable Safe Mode.</c>",
+                "OK", nullptr, 400, true, 0, 1
+            )->show();
+        } else {
+            FLAlertLayer::create(
+                nullptr,
+                "Safe Mode (Eclipse)",
+                fmt::format(
+                    "<cr>Progress saving is disabled.</c>\n\n"
+                    "<cy>Safe Mode is enabled. Progress will NOT be saved for any attempts until you disable Safe Mode.</c>"
+                    "\n\n<cy>Active cheats ({}):</c>\n{}",
+                    s_attemptCheats.size(),
+                    AutoSafeMode::constructMessage()
+                ), "OK",
+                nullptr, 400, true, 0, 1
+            )->show();
+        }
+
+        return true;
+    }
+
     static bool showCheatWarn() {
+        if (manualSafeModePopup()) {
+            return true;
+        }
+
         if (!config::get<"global.autosafemode.warn-popup", bool>(true)) {
             return false;
         }
@@ -302,6 +351,7 @@ namespace eclipse::hacks::Global {
             return false;
         }
 
+        s_attemptCheats.clear();
         AutoSafeMode::updateCheatStates();
 
         // edge case: noclip is only considered a cheat if you die while using it
