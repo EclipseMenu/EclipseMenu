@@ -422,7 +422,10 @@ namespace eclipse::hacks::Bot {
     class $modify(BotEUIHook, EditorUI) {
         void onPlaytest(CCObject* sender) {
             if (auto* editorLayer = utils::get<LevelEditorLayer>()) {
-                editorLayer->m_gameState.m_currentProgress = 0;
+                if (editorLayer->m_playbackMode == PlaybackMode::Not) {
+                    s_bot.restart();
+                    editorLayer->m_gameState.m_currentProgress = 0;
+                }
             }
             EditorUI::onPlaytest(sender);
         }
