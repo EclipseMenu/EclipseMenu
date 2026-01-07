@@ -2,16 +2,19 @@
 #include <modules/config/config.hpp>
 #include <modules/gui/color.hpp>
 #include <modules/gui/gui.hpp>
+#include <modules/gui/cocos/nodes/CCMenuItemExt.hpp>
 #include <modules/gui/components/toggle.hpp>
 #include <modules/hack/hack.hpp>
 
 #include <Geode/binding/GameStatsManager.hpp>
 
+#include <Geode/modify/EditLevelLayer.hpp>
 #include <Geode/modify/EndLevelLayer.hpp>
+#include <Geode/modify/LevelInfoLayer.hpp>
+#include <Geode/modify/LevelPage.hpp>
 #include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/RetryLevelLayer.hpp>
-#include <modules/gui/cocos/nodes/CCMenuItemExt.hpp>
 
 #include <modules.hpp>
 #include <ranges>
@@ -86,7 +89,7 @@ namespace eclipse::hacks::Global {
             std::string message = "";
             message.reserve(s_attemptCheats.size() * 20);
             for (auto const& [id, active] : s_attemptCheats) {
-                message += fmt::format("- {}{}</c>\n", active ? "<cr>" : "<co>", id);
+                fmt::format_to(std::back_inserter(message), "- {}{}</c>\n", active ? "<cr>" : "<co>", id);
             }
 
             // Remove the last newline
@@ -111,7 +114,11 @@ namespace eclipse::hacks::Global {
             auto tab = gui::MenuTab::find("tab.global");
 
             config::setIfEmpty("global.autosafemode", true);
-            tab->addToggle("global.autosafemode")->handleKeybinds()->setDescription();
+            config::setIfEmpty("global.autosafemode.warn-popup", true);
+
+            tab->addToggle("global.autosafemode")->handleKeybinds()->setDescription()->addOptions([](auto options) {
+                options->addToggle("global.autosafemode.warn-popup")->setDescription();
+            });
         }
 
         void update() override {
@@ -281,4 +288,64 @@ namespace eclipse::hacks::Global {
             if (menu) menu->addChild(btn);
         }
     };
+
+    /// ==========
+    /// "Cheats Enabled" warning popup
+    /// ==========
+
+    static bool showCheatWarn() {
+        if (!config::get<"global.autosafemode.warn-popup", bool>(true)) {
+            return false;
+        }
+
+        if (!config::get<"global.autosafemode", bool>(true)) {
+            return false;
+        }
+
+        AutoSafeMode::updateCheatStates();
+
+        // edge case: noclip is only considered a cheat if you die while using it
+        if (config::get<"player.noclip", bool>()) {
+            s_attemptCheats["Noclip"] = false;
+        }
+
+        if (s_attemptCheats.empty() ) {
+            return false;
+        }
+
+        FLAlertLayer::create(
+            nullptr,
+            "Auto-Safe Mode (Eclipse)",
+            fmt::format(
+                "<cr>Progress saving is disabled for this level.</c>\n\n"
+                "<cy>Auto-Safe Mode is active because cheats are enabled.</c>\n"
+                "While this is active, progress will <cr>NOT</c> be saved.\n\n"
+                "<cy>Active cheats ({}):</c>\n{}",
+                s_attemptCheats.size(),
+                AutoSafeMode::constructMessage()
+            ), "OK",
+            nullptr, 400, true, 0, 1
+        )->show();
+
+        return true;
+    }
+
+#define DEFINE_WARN_HOOK(name, cls)                \
+    class $modify(name, cls) {                     \
+        ENABLE_FIRST_HOOKS_ALL()                   \
+        struct Fields {                            \
+            bool m_shownCheatWarn = false;         \
+        };                                         \
+        void onPlay(CCObject* sender) {            \
+            if (!m_fields->m_shownCheatWarn) {     \
+                m_fields->m_shownCheatWarn = true; \
+                if (showCheatWarn()) return;       \
+            }                                      \
+            cls::onPlay(sender);                   \
+        }                                          \
+    }
+
+    DEFINE_WARN_HOOK(CheatsEnabledWarnLPHook, LevelPage);
+    DEFINE_WARN_HOOK(CheatsEnabledWarnELLHook, EditLevelLayer);
+    DEFINE_WARN_HOOK(CheatsEnabledWarnLILHook, LevelInfoLayer);
 }
