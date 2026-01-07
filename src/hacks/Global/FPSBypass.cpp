@@ -3,6 +3,8 @@
 #include <modules/gui/components/float-toggle.hpp>
 #include <modules/hack/hack.hpp>
 
+#include <Geode/modify/GameManager.hpp>
+
 #ifdef GEODE_IS_WINDOWS
 constexpr float MIN_FPS = 1.f;
 constexpr float MAX_FPS = 100000.f;
@@ -17,7 +19,7 @@ namespace eclipse::hacks::Global {
             bool fpsBypassEnabled = config::get<bool>("global.fpsbypass.toggle", false);
             auto fpsBypassValue = config::get<float>("global.fpsbypass", gm->m_customFPSTarget);
             float actualFPS = std::clamp(fpsBypassValue, MIN_FPS, MAX_FPS); // sometimes the value can be 0
-            gm->setGameVariable("0116", fpsBypassEnabled);
+            gm->setGameVariable(GameVar::UnlockFPS, fpsBypassEnabled);
             gm->m_customFPSTarget = actualFPS;
 
             // apply settings
@@ -29,13 +31,20 @@ namespace eclipse::hacks::Global {
             auto tab = gui::MenuTab::find("tab.global");
             tab->addFloatToggle("global.fpsbypass", "global.fpsbypass", MIN_FPS, MAX_FPS, "%.2f FPS")
                ->handleKeybinds()
-               ->toggleCallback([] { updateRefreshRate(); })
+               ->toggleCallback([] {
+                   if (config::get<bool>("global.fpsbypass.toggle", false)) {
+                       config::setTemp("global.vsync", false);
+                       utils::get<GameManager>()->setGameVariable(GameVar::VerticalSync, false);
+                       utils::get<AppDelegate>()->toggleVerticalSync(false);
+                   }
+                   updateRefreshRate();
+               })
                ->valueCallback([](float) { updateRefreshRate(); });
         }
 
         void lateInit() override {
             auto* gm = utils::get<GameManager>();
-            auto fpsBypassEnabled = gm->getGameVariable("0116");
+            auto fpsBypassEnabled = gm->getGameVariable(GameVar::UnlockFPS);
             auto fpsBypassValue = gm->m_customFPSTarget;
             if (fpsBypassValue == 0) // rare robtop bug
                 fpsBypassValue = 60.f;
@@ -50,5 +59,21 @@ namespace eclipse::hacks::Global {
     };
 
     REGISTER_HACK(FPSBypass)
+
+    class $modify(FPSBypassGMHook, GameManager) {
+        void setGameVariable(char const* key, bool value) {
+            GameManager::setGameVariable(key, value);
+            if (strcmp(key, GameVar::UnlockFPS) == 0 && value) {
+                if (this->getGameVariable(GameVar::VerticalSync)) {
+                    config::setTemp("global.vsync", false);
+                    GameManager::setGameVariable(GameVar::VerticalSync, false);
+                    // extra safety if called before AppDelegate is ready
+                    geode::queueInMainThread([] {
+                        utils::get<AppDelegate>()->toggleVerticalSync(false);
+                    });
+                }
+            }
+        }
+    };
 }
 #endif

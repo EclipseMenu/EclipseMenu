@@ -357,7 +357,7 @@ namespace eclipse::hacks::Bot {
 
         void simulateClick(PlayerButton button, bool down, bool player2) {
             auto performButton = down ? &PlayerObject::pushButton : &PlayerObject::releaseButton;
-            bool swapControls = GameManager::get()->getGameVariable("0010");
+            bool swapControls = GameManager::get()->getGameVariable(GameVar::Flip2PlayerControls);
             player2 = swapControls ? !player2 : player2;
 
             // in two player mode, only one player should be controlled

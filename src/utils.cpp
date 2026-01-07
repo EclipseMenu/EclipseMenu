@@ -89,7 +89,7 @@ namespace eclipse::utils {
         if (auto* playLayer = utils::get<PlayLayer>()) {
             canShowInLevel = playLayer->m_hasCompletedLevel ||
                              playLayer->m_isPaused ||
-                             utils::get<GameManager>()->getGameVariable("0024");
+                             utils::get<GameManager>()->getGameVariable(GameVar::ShowCursor);
         }
         if (visible || canShowInLevel)
             PlatformToolbox::showCursor();
