@@ -9,7 +9,10 @@ namespace eclipse::hacks::Level {
     class $hack(StopTriggersOnDeath) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
-            tab->addToggle("level.stoptrigondeath")->setDescription()->handleKeybinds();
+            config::setIfEmpty("level.stoptrigondeath.platformer", false);
+            tab->addToggle("level.stoptrigondeath")->setDescription()->handleKeybinds()->addOptions([](auto options) {
+                options->addToggle("level.stoptrigondeath.platformer")->setDescription()->handleKeybinds();
+            });
         }
 
         [[nodiscard]] const char* getId() const override { return "Stop Triggers On Death"; }
@@ -22,6 +25,9 @@ namespace eclipse::hacks::Level {
 
         void update(float dt) {
             if (!utils::get<PlayLayer>()) return GJBaseGameLayer::update(dt);
+
+            auto pl = utils::get<PlayLayer>();
+            if (pl->m_level && pl->m_level->isPlatformer() && !config::get<"level.stoptrigondeath.platformer", bool>(false)) return GJBaseGameLayer::update(dt);
 
             if ((m_player1 && m_player1->m_isDead) || (m_player2 && m_player2->m_isDead)) return;
 

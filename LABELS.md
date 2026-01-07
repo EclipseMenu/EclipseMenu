@@ -571,3 +571,15 @@ In addition, there's also a `stats` dictionary which contains various player sta
 | `cpsP2`     | Total clicks per second (player 2)                | Integer |
 | `clicksP2`  | Total clicks (player 2)                           | Integer |
 | `maxCpsP2`  | Total maximum CPS (player 2)                      | Integer |
+
+### Globed information
+> Note: some of these values are only available if you have the Globed mod installed.
+
+| Name                      | Description                                                      | Type    |
+|---------------------------|------------------------------------------------------------------|---------|
+| `globed.enabled`          | Whether or not the Globed mod is enabled                         | Boolean |
+| `globed.isConnected`      | Whether or not you are connected to a Globed server              | Boolean |
+| `globed.ping`             | Network latency between the client and the Globed server (in ms) | Integer |
+| `globed.tps`              | The TPS (ticks per second) of the server, or 0 if not connected  | Integer |
+| `globed.playersOnline`    | All players online on the Globed server                          | Integer |
+| `globed.playersOnLevel`   | All players currently on the level you are playing               | Integer |
