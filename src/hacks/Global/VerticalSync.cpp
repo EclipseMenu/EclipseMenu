@@ -18,16 +18,16 @@ namespace eclipse::hacks::Global {
                ->callback([](bool v) {
                    if (v) {
                        config::set("global.fpsbypass.toggle", false);
-                       utils::get<GameManager>()->setGameVariable("0116", false);
+                       utils::get<GameManager>()->setGameVariable(GameVar::UnlockFPS, false);
                    }
-                   utils::get<GameManager>()->setGameVariable("0030", v);
+                   utils::get<GameManager>()->setGameVariable(GameVar::VerticalSync, v);
                    utils::get<AppDelegate>()->toggleVerticalSync(v);
                })
                ->disableSaving();
         }
 
         void lateInit() override {
-            bool vsyncEnabled = utils::get<GameManager>()->getGameVariable("0030");
+            bool vsyncEnabled = utils::get<GameManager>()->getGameVariable(GameVar::VerticalSync);
             config::setTemp("global.vsync", vsyncEnabled);
         }
 
@@ -39,7 +39,7 @@ namespace eclipse::hacks::Global {
     class $modify(VerticalSyncGMHook, GameManager) {
         void setGameVariable(char const* key, bool value) {
             GameManager::setGameVariable(key, value);
-            if (strcmp(key, "0030") == 0) {
+            if (strcmp(key, GameVar::VerticalSync) == 0) {
                 config::setTemp("global.vsync", value);
                 utils::get<AppDelegate>()->toggleVerticalSync(value);
             }

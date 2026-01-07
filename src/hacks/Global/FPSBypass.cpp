@@ -19,7 +19,7 @@ namespace eclipse::hacks::Global {
             bool fpsBypassEnabled = config::get<bool>("global.fpsbypass.toggle", false);
             auto fpsBypassValue = config::get<float>("global.fpsbypass", gm->m_customFPSTarget);
             float actualFPS = std::clamp(fpsBypassValue, MIN_FPS, MAX_FPS); // sometimes the value can be 0
-            gm->setGameVariable("0116", fpsBypassEnabled);
+            gm->setGameVariable(GameVar::UnlockFPS, fpsBypassEnabled);
             gm->m_customFPSTarget = actualFPS;
 
             // apply settings
@@ -35,7 +35,7 @@ namespace eclipse::hacks::Global {
                    bool enabled = config::get<bool>("global.fpsbypass.toggle", false);
                    if (enabled) {
                        config::setTemp("global.vsync", false);
-                       utils::get<GameManager>()->setGameVariable("0030", false);
+                       utils::get<GameManager>()->setGameVariable(GameVar::VerticalSync, false);
                        utils::get<AppDelegate>()->toggleVerticalSync(false);
                    }
                    updateRefreshRate(); 
@@ -45,7 +45,7 @@ namespace eclipse::hacks::Global {
 
         void lateInit() override {
             auto* gm = utils::get<GameManager>();
-            auto fpsBypassEnabled = gm->getGameVariable("0116");
+            auto fpsBypassEnabled = gm->getGameVariable(GameVar::UnlockFPS);
             auto fpsBypassValue = gm->m_customFPSTarget;
             if (fpsBypassValue == 0) // rare robtop bug
                 fpsBypassValue = 60.f;
@@ -64,9 +64,9 @@ namespace eclipse::hacks::Global {
     class $modify(FPSBypassGMHook, GameManager) {
         void setGameVariable(char const* key, bool value) {
             GameManager::setGameVariable(key, value);
-            if (strcmp(key, "0116") == 0 && value) {
+            if (strcmp(key, GameVar::UnlockFPS) == 0 && value) {
                 config::setTemp("global.vsync", false);
-                GameManager::setGameVariable("0030", false);
+                GameManager::setGameVariable(GameVar::VerticalSync, false);
                 utils::get<AppDelegate>()->toggleVerticalSync(false);
             }
         }
