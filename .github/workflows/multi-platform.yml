@@ -96,6 +96,7 @@ jobs:
           files: |
             ${{ steps.build.outputs.build-output }}/*.geode
             ${{ steps.build.outputs.build-output }}/*.pdb
+            ${{ steps.build.outputs.build-output }}/*.sym
 
       - name: Get commit messages
         id: commit
