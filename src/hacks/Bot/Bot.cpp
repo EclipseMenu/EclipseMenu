@@ -201,6 +201,23 @@ namespace eclipse::hacks::Bot {
             }
         );
     }
+    void openReplaysFolder() {
+        auto replaysDir = Mod::get()->getSaveDir() / "replays";
+        std::error_code ec;
+        
+        // create the folder if it doesn't exist
+        if (!std::filesystem::exists(replaysDir, ec)) {
+            std::filesystem::create_directory(replaysDir, ec);
+            if (ec) {
+                return Popup::create(
+                    i18n::get_("common.error"),
+                    ec.message()
+                );
+            }
+        }
+        
+        geode::utils::file::openFolder(replaysDir);
+    }
 
     class $hack(Bot) {
         static void savePreBotSettings() {
@@ -271,6 +288,7 @@ namespace eclipse::hacks::Bot {
             tab->addButton("common.save")->handleKeybinds()->callback(saveReplay);
             tab->addButton("common.load")->handleKeybinds()->callback(loadReplay);
             tab->addButton("common.delete")->handleKeybinds()->callback(deleteReplay);
+            tab->addButton("bot.open-replays-folder")->handleKeybinds()->callback(openReplaysFolder);
         }
 
         [[nodiscard]] bool isCheating() const override {
