@@ -77,10 +77,12 @@ jobs:
 
       - name: Get latest release tag
         id: get_latest_release
+        if: github.ref == 'refs/heads/main'
         run: echo "tag=$(curl -s https://api.github.com/repos/${{ github.event.repository.full_name }}/releases/latest | jq -r .tag_name)" >> $GITHUB_OUTPUT
 
       - name: Create nightly release
         uses: andelf/nightly-release@main
+        if: github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
