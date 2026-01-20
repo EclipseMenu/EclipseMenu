@@ -48,8 +48,10 @@ jobs:
           # sdk: nightly
           combine: true
           export-pdb: true
+          export-symbols: true
           target: ${{ matrix.config.target }}
           build-config: ${{ matrix.config.build-type || 'Release' }}
+          ccache-variant: ${{ matrix.config.os != 'macos-latest' && 'sccache' || '' }}
 
   package:
     name: Package builds
@@ -73,6 +75,31 @@ jobs:
       - uses: actions/checkout@v4
         if: ${{ steps.check.outputs.has-nightly-webhook == 'true' }}
 
+      - name: Get latest release tag
+        id: get_latest_release
+        if: github.ref == 'refs/heads/main'
+        run: echo "tag=$(curl -s https://api.github.com/repos/${{ github.event.repository.full_name }}/releases/latest | jq -r .tag_name)" >> $GITHUB_OUTPUT
+
+      - name: Create nightly release
+        uses: andelf/nightly-release@main
+        if: github.ref == 'refs/heads/main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: nightly
+          name: 'Development Release'
+          body: |
+            This is a nightly build of Eclipse Menu for commit ${{ github.sha }} (${{ github.event.head_commit.message }}).
+            You can use this build to test the latest features and changes.
+            
+            > **Note:** This build is not stable and may contain bugs.
+            
+            Changes since the last release: ${{ github.event.repository.html_url }}/compare/${{ steps.get_latest_release.outputs.tag }}...nightly
+          files: |
+            ${{ steps.build.outputs.build-output }}/*.geode
+            ${{ steps.build.outputs.build-output }}/*.pdb
+            ${{ steps.build.outputs.build-output }}/*.sym
+
       - name: Get commit messages
         id: commit
         if: ${{ steps.check.outputs.has-nightly-webhook == 'true' }}
@@ -89,9 +116,10 @@ jobs:
         with:
           webhook-url: ${{ secrets.NIGHTLY_WEBHOOK }}
           content: 'New nightly build available!'
-          files: ${{ steps.build.outputs.build-output }}/*.geode
+          # files: ${{ steps.build.outputs.build-output }}/*.geode # discord limits file sizes to 10mb, and we're past that already 
           embed-title: ${{ steps.commit.outputs.commit-message }}
           # embed-description: ${{ steps.commit.outputs.commit-message-full }}
+          embed-description: '[Download](https://nightly.link/${{ github.event.repository.full_name }}/actions/runs/${{ github.run_id }})'
           embed-color: ${{ steps.commit.outputs.build-color }}
           embed-url: ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}
           embed-author: ${{ github.actor }}

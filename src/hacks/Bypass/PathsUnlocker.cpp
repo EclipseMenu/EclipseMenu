@@ -30,7 +30,7 @@ namespace eclipse::hacks::Cosmetic {
         bool isItemUnlocked(UnlockType type, int key) {
             if (GameStatsManager::isItemUnlocked(type, key)) return true;
 
-            if (type == UnlockType::GJItem && (key >= 6 || key <= 15))
+            if (type == UnlockType::GJItem && (key >= 6 && key <= 15))
                 return config::get<"bypass.unlockpaths", bool>(false);
 
             return false;
