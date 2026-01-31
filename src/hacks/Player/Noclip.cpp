@@ -198,9 +198,12 @@ namespace eclipse::hacks::Player {
 
             auto frame = m_gameState.m_currentProgress;
             if (frame > 0) {
-                float acc = static_cast<float>(frame - fields->m_deadFrames) / static_cast<float>(frame) * 100.f;
-                config::setTemp("noclipAccuracy", acc);
+                float acc = static_cast<float>(frame - fields->m_deadFrames) / static_cast<float>(frame) * 100.f;;
                 bool dead = (m_player1 && m_player1->m_isDead) || (m_player2 && m_player2->m_isDead);
+                if (config::getTemp<int>("noclipDeaths", 0) > 0 && acc >= 100.f) {
+                    acc = 99.99f;
+                }
+                config::setTemp("noclipAccuracy", acc);
                 //if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc <= config::get<float>("player.noclip.acclimit", 95.f) && !dead)
                 //utils::get<PlayLayer>()->destroyPlayer(m_player1, (GameObject*)((int*)1));
             }
