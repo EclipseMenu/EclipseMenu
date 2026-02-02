@@ -216,8 +216,8 @@ namespace eclipse::config {
     }
 
     template <typename T>
-    void set(std::string_view key, T const& value) {
-        getStorage()[key] = value;
+    void set(std::string_view key, T value) {
+        getStorage()[key] = std::move(value);
         executeCallbacks(key);
     }
 
@@ -241,9 +241,9 @@ namespace eclipse::config {
     }
 
     template <typename T>
-    void setIfEmpty(std::string_view key, T const& value) {
+    void setIfEmpty(std::string_view key, T value) {
         if (!has(key))
-            set(key, value);
+            set(key, std::move(value));
     }
 
     template <typename T>
@@ -263,8 +263,8 @@ namespace eclipse::config {
     }
 
     template <typename T>
-    void setTemp(std::string_view key, T const& value) {
-        getTempStorage()[key] = value;
+    void setTemp(std::string_view key, T value) {
+        getTempStorage()[key] = std::move(value);
         executeTempCallbacks(key);
     }
 
@@ -283,14 +283,14 @@ namespace eclipse::config {
 
     #define INSTANTIATE_IMPL(type, def) \
         INSTANTIATE_IMPL_VOID(type, def); \
-        INSTANTIATE_IMPL_NON_VOID(type, def)
+        INSTANTIATE_IMPL_NON_VOID(type, def const&)
 
-    #define INSTANTIATE(type) INSTANTIATE_IMPL(type, const type&)
+    #define INSTANTIATE(type) INSTANTIATE_IMPL(type, type)
 
     INSTANTIATE(std::filesystem::path);
     INSTANTIATE(std::string);
     INSTANTIATE(std::string_view);
-    INSTANTIATE_IMPL_VOID(char[1], char const (&)[1]);
+    INSTANTIATE_IMPL_VOID(char[1], char[1]);
     INSTANTIATE(int);
     INSTANTIATE(int64_t);
     INSTANTIATE(uint64_t);

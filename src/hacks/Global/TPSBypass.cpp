@@ -418,13 +418,13 @@ namespace eclipse::hacks::Global {
         void levelComplete() {
             // levelComplete uses m_gameState.m_unkUint2 to store the timestamp
             // also we can't rely on m_level->m_timestamp, because it might not be updated yet
-            auto oldTimestamp = m_gameState.m_unkUint2;
+            auto oldTimestamp = m_gameState.m_commandIndex;
             if (config::get<"global.tpsbypass", float>(240.f) != 240.f) {
                 auto ticks = static_cast<uint32_t>(std::round(m_gameState.m_levelTime * 240));
-                m_gameState.m_unkUint2 = ticks;
+                m_gameState.m_commandIndex = ticks;
             }
             PlayLayer::levelComplete();
-            m_gameState.m_unkUint2 = oldTimestamp;
+            m_gameState.m_commandIndex = oldTimestamp;
         }
     };
 }

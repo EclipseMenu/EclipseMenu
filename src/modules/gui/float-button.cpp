@@ -86,8 +86,7 @@ namespace eclipse::gui {
         m_sprite = createSprite();
         this->addChild(m_sprite);
 
-        CCScene::get()->addChild(this);
-        geode::SceneManager::get()->keepAcrossScenes(this);
+        geode::OverlayManager::get()->addChild(this);
 
         // im mostly sure this will override the next priorities, so i guess this should not be a force prio
         // utils::get<cocos2d::CCTouchDispatcher>()->registerForcePrio(this, 2);
@@ -238,21 +237,21 @@ namespace eclipse::gui {
 
     FloatingButton::~FloatingButton() = default;
 
-#ifdef ECLIPSE_USE_FLOATING_BUTTON
-    class $modify(CCScene) {
-        /// Allows our button to stay top-most, passing z-order of the node below the button.
-        /// Shout-out to QOLMod for the idea.
-        int getHighestChildZ() {
-            auto btn = FloatingButton::get();
-            auto original = btn->getZOrder();
-            btn->setZOrder(-1);
-
-            auto highest = CCScene::getHighestChildZ();
-            btn->setZOrder(original);
-
-            return highest;
-        }
-    };
-#endif
+// #ifdef ECLIPSE_USE_FLOATING_BUTTON
+//     class $modify(CCScene) {
+//         /// Allows our button to stay top-most, passing z-order of the node below the button.
+//         /// Shout-out to QOLMod for the idea.
+//         int getHighestChildZ() {
+//             auto btn = FloatingButton::get();
+//             auto original = btn->getZOrder();
+//             btn->setZOrder(-1);
+//
+//             auto highest = CCScene::getHighestChildZ();
+//             btn->setZOrder(original);
+//
+//             return highest;
+//         }
+//     };
+// #endif
 
 }

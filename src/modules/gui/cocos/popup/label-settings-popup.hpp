@@ -15,9 +15,9 @@ namespace eclipse::hacks::Labels {
 }
 
 namespace eclipse::gui::cocos {
-    class LabelSettingsPopup : public geode::Popup<LabelSettingsComponent*> {
+    class LabelSettingsPopup : public geode::Popup {
     protected:
-        bool setup(LabelSettingsComponent* component) override;
+        bool init(LabelSettingsComponent* component);
 
         CCLayer* createSettingsTab();
         CCLayer* createTextTab();

@@ -51,9 +51,9 @@ namespace eclipse::hacks::Level {
             config::addDelegate("level.randomseed.constantseed", handleToggle, true);
         }
 
-        void processCommands(float dt) {
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
             GameToolbox::fast_srand(config::get<"level.randomseed.seed", int>(1));
-            GJBaseGameLayer::processCommands(dt);
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
         }
     };
 

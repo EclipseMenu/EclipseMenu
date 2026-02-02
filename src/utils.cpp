@@ -36,10 +36,9 @@ namespace eclipse::utils {
 #endif
 
     std::string getClock(bool useTwelveHours) {
-        auto now = std::chrono::system_clock::now();
-        auto time = std::chrono::system_clock::to_time_t(now);
-        auto tm = fmt::localtime(time);
-        return useTwelveHours ? fmt::format("{:%I:%M:%S %p}", tm) : fmt::format("{:%H:%M:%S}", tm);
+        auto lt = geode::localtime(std::time(nullptr));
+        return useTwelveHours ? fmt::format("{:%I:%M:%S %p}", lt)
+                              : fmt::format("{:%H:%M:%S}", lt);
     }
 
     bool hasOpenGLExtension(std::string_view extension) {

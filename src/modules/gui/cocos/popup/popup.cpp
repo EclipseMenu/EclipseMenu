@@ -10,7 +10,11 @@
 #include "tab-menu.hpp"
 
 namespace eclipse::gui::cocos {
-    bool Popup::setup(Tabs const& tabs) {
+    bool Popup::init(Tabs const& tabs) {
+        if (!geode::Popup::init(480.f, 280.f)) {
+            return false;
+        }
+
         auto const tm = ThemeManager::get();
         auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
         this->setTitle("");
@@ -76,7 +80,7 @@ namespace eclipse::gui::cocos {
 
     Popup* Popup::create(Tabs const& tabs) {
         auto ret = new Popup;
-        if (ret->initAnchored(480.f, 280.f, std::move(tabs))) {
+        if (ret->init(tabs)) {
             ret->autorelease();
             return ret;
         }

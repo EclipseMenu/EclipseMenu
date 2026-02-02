@@ -8,9 +8,9 @@ namespace eclipse::gui::cocos {
     class ContentView;
 
     /// @brief A popup with a ContentView for displaying extra hack options.
-    class OptionsPopup : public geode::Popup<MenuTab const&> {
+    class OptionsPopup : public geode::Popup {
     protected:
-        bool setup(MenuTab const& tab) override;
+        bool init(MenuTab const& tab);
         void onExit() override;
 
     public:

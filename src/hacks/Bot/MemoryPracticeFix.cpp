@@ -456,8 +456,8 @@ class $modify(MPFPlayLayer, PlayLayer) {
 };
 
 class $modify(GJBaseGameLayer) {
-    void processCommands(float dt) {
-        GJBaseGameLayer::processCommands(dt);
+    void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+        GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
         s_currentFrame = m_gameState.m_currentProgress;
     }
 };

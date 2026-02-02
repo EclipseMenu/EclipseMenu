@@ -16,7 +16,7 @@
 
 #include <rift/config.hpp>
 
-#include <dankmeme.globed2/include/globed.hpp>
+// #include <dankmeme.globed2/include/globed.hpp>
 
 namespace eclipse::labels {
     static std::vector<EffectGameObject*> s_coins;
@@ -425,7 +425,7 @@ namespace eclipse::labels {
 
     void VariableManager::fetchTimeData() {
         auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        auto localTime = fmt::localtime(time);
+        auto localTime = geode::localtime(time);
         m_variables["hour"] = localTime.tm_hour;
         m_variables["minute"] = localTime.tm_min;
         m_variables["second"] = localTime.tm_sec;
@@ -600,7 +600,7 @@ namespace eclipse::labels {
         m_variables["levelLength"] = gameLayer->m_levelLength;
         m_variables["levelDuration"] = gameLayer->m_level->m_timestamp / 240.f;
         m_variables["time"] = utils::formatTime(gameLayer->m_gameState.m_levelTime);
-        m_variables["frame"] = gameLayer->m_gameState.m_currentProgress;
+        m_variables["frame"] = (int64_t)gameLayer->m_gameState.m_currentProgress;
         m_variables["frameReal"] = gameLayer->m_gameState.m_levelTime * utils::getTPS();
         m_variables["isDead"] = gameLayer->m_player1->m_isDead;
         m_variables["isDualMode"] = gameLayer->m_player2 != nullptr && gameLayer->m_player2->isRunning();
@@ -674,20 +674,20 @@ namespace eclipse::labels {
         auto enabled = geode::Loader::get()->isModLoaded("dankmeme.globed2");
         globed[std::string("enabled")] = enabled;
 
-        if (enabled) {
-            // net
-            globed[std::string("isConnected")] = globed::net::isConnected().unwrapOrDefault();
-            globed[std::string("ping")] = (int64_t)globed::net::getPing().unwrapOrDefault();
-            globed[std::string("tps")] = (int64_t)globed::net::getServerTps().unwrapOrDefault();
-
-            // suggestion for daniel meme to add:
-            // serverName
-            // roomName
-            // roomId
-            // other room things
-            globed[std::string("playersOnline")] = (int64_t)globed::player::playersOnline().unwrapOrDefault();
-            globed[std::string("playersOnLevel")] = (int64_t)globed::player::playersOnLevel().unwrapOrDefault();
-        }
+        // if (enabled) {
+        //     // net
+        //     globed[std::string("isConnected")] = globed::net::isConnected().unwrapOrDefault();
+        //     globed[std::string("ping")] = (int64_t)globed::net::getPing().unwrapOrDefault();
+        //     globed[std::string("tps")] = (int64_t)globed::net::getServerTps().unwrapOrDefault();
+        //
+        //     // suggestion for daniel meme to add:
+        //     // serverName
+        //     // roomName
+        //     // roomId
+        //     // other room things
+        //     globed[std::string("playersOnline")] = (int64_t)globed::player::playersOnline().unwrapOrDefault();
+        //     globed[std::string("playersOnLevel")] = (int64_t)globed::player::playersOnLevel().unwrapOrDefault();
+        // }
     }
 
     void VariableManager::refetch() {
@@ -708,8 +708,8 @@ namespace eclipse::labels {
     }
 
     class $modify(LabelsGJBGLHook, GJBaseGameLayer) {
-        void processCommands(float dt) {
-            GJBaseGameLayer::processCommands(dt);
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
 
             static time_t s_lastUpdate = utils::getTimestamp();
             static size_t s_frames = 0;
@@ -807,7 +807,7 @@ namespace eclipse::labels {
             }
         }
 
-        void resetLevel() {
+        void resetLevel() override {
             PlayLayer::resetLevel();
             auto from = utils::getActualProgress(this);
             m_fields->m_runFrom = from;

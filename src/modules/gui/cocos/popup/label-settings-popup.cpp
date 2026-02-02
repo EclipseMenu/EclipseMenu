@@ -3,7 +3,6 @@
 #include <hacks/Labels/Label.hpp>
 #include <modules/gui/cocos/cocos.hpp>
 #include <modules/gui/cocos/components/LabelSettingsComponent.hpp>
-#include <modules/gui/cocos/nodes/color-picker.hpp>
 #include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 #include <modules/gui/cocos/nodes/oneof-picker.hpp>
 #include <modules/gui/theming/manager.hpp>
@@ -183,7 +182,10 @@ namespace eclipse::gui::cocos {
         size_t m_page = 0;
     };
 
-    bool LabelSettingsPopup::setup(LabelSettingsComponent* component) {
+    bool LabelSettingsPopup::init(LabelSettingsComponent* component) {
+        if (!Popup::init(400.f, 240.f))
+            return false;
+
         auto const tm = ThemeManager::get();
 
         m_component = component;
@@ -968,7 +970,7 @@ namespace eclipse::gui::cocos {
 
     LabelSettingsPopup* LabelSettingsPopup::create(LabelSettingsComponent* component) {
         auto ret = new LabelSettingsPopup;
-        if (ret->initAnchored(400.f, 240.f, component)) {
+        if (ret->init(component)) {
             ret->autorelease();
             return ret;
         }

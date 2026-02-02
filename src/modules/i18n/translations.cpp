@@ -204,39 +204,39 @@ namespace eclipse::i18n {
         return true;
     }
 
-    void downloadLanguage(std::string const& code) {
+    void downloadLanguage(std::string code) {
         static auto langsPath = geode::Mod::get()->getSaveDir() / "languages";
 
         using namespace geode::utils;
-        web::WebRequest()
-            .get(fmt::format("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/main/translations/{}.lang.json", code))
-            .listen([code](web::WebResponse* value) {
-                if (!value->ok()) {
-                    return;
-                }
+        geode::async::runtime().spawn([](std::string code) -> arc::Future<> {
+            auto res = co_await web::WebRequest()
+                .get(fmt::format("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/main/translations/{}.lang.json", code));
 
-                auto content = value->string().unwrapOrDefault();
-                if (content.empty()) {
-                    geode::log::warn("Failed to download language file: {}", code);
-                    return;
-                }
+            if (!res.ok()) {
+                co_return;
+            }
 
-                std::error_code ec;
-                std::filesystem::create_directories(langsPath, ec);
-                if (ec) {
-                    geode::log::warn("Failed to create languages directory: {}", ec.message());
-                    return;
-                }
+            if (res.data().empty()) {
+                geode::log::warn("Failed to download language file: {}", code);
+                co_return;
+            }
 
-                auto path = langsPath / fmt::format("{}.lang.json", code);
-                auto res = file::writeString(path, content);
-                if (!res) {
-                    geode::log::warn("Failed to save language file: {}", path);
-                    return;
-                }
+            std::error_code ec;
+            std::filesystem::create_directories(langsPath, ec);
+            if (ec) {
+                geode::log::warn("Failed to create languages directory: {}", ec.message());
+                co_return;
+            }
 
-                geode::log::debug("Downloaded language file: {}", code);
-            });
+            auto path = langsPath / fmt::format("{}.lang.json", code);
+            auto writeRes = res.into(path);
+            if (writeRes.isErr()) {
+                geode::log::warn("Failed to save language file: {}", path);
+                co_return;
+            }
+
+            geode::log::debug("Downloaded language file: {}", code);
+        }(std::move(code)));
     }
 
     geode::Result<> handleLanguageMetadata(matjson::Value metadata) {
@@ -281,21 +281,22 @@ namespace eclipse::i18n {
         geode::log::info("Checking for language updates...");
 
         using namespace geode::utils;
-        web::WebRequest()
-            .get("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/metadata/metadata.json")
-            .listen([](web::WebResponse* value) {
-                if (!value->ok()) {
-                    return;
-                }
+        geode::async::runtime().spawn([]() -> arc::Future<> {
+            auto res = co_await web::WebRequest()
+                .get("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/metadata/metadata.json");
 
-                auto res = value->json();
-                if (!res) {
-                    geode::log::warn("Failed to parse language metadata");
-                    return;
-                }
+            if (!res.ok()) {
+                co_return;
+            }
 
-                (void) handleLanguageMetadata(*res);
-            });
+            auto jsonRes = res.json();
+            if (jsonRes.isErr()) {
+                geode::log::warn("Failed to parse language metadata");
+                co_return;
+            }
+
+            (void) handleLanguageMetadata(std::move(jsonRes).unwrap());
+        }());
     }
 
     size_t getLanguageIndex() {

@@ -8,7 +8,7 @@ namespace eclipse::gui::cocos {
 
     ModalPopup* ModalPopup::create(eclipse::Popup&& settings) {
         auto ret = new ModalPopup();
-        if (ret->initAnchored(260.f, 160.f, std::move(settings), "GJ_square04.png")) {
+        if (ret->init(std::forward<eclipse::Popup>(settings))) {
             ret->autorelease();
             return ret;
         }
@@ -16,7 +16,10 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    bool ModalPopup::setup(eclipse::Popup&& settings) {
+    bool ModalPopup::init(eclipse::Popup settings) {
+        if (!Popup::init(260.f, 160.f, "GJ_square04.png"))
+            return false;
+
         m_closeBtn->setVisible(false);
 
         m_settings = std::move(settings);

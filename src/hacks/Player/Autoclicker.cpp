@@ -39,17 +39,19 @@ namespace eclipse::hacks::Player {
 
         ADD_HOOKS_DELEGATE("player.autoclick")
 
-        void processCommands(float dt) {
-            GJBaseGameLayer::processCommands(dt);
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
 
-            auto clickInterval = config::get<int>("player.autoclick.intervalhold", 1);
-            auto releaseInterval = config::get<int>("player.autoclick.intervalrelease", 1);
-            m_fields->timer++;
-            if ((m_fields->timer >= clickInterval && !m_fields->clicking) || (m_fields->timer >= releaseInterval && m_fields->clicking)) {
-                m_fields->clicking = !m_fields->clicking;
-                if (config::get<bool>("player.autoclick.p1")) this->handleButton(m_fields->clicking, 1, true);
-                if (config::get<bool>("player.autoclick.p2")) this->handleButton(m_fields->clicking, 1, false);
-                m_fields->timer = 0.f;
+            auto clickInterval = config::get<"player.autoclick.intervalhold", int>(1);
+            auto releaseInterval = config::get<"player.autoclick.intervalrelease", int>(1);
+            auto fields = m_fields.self();
+
+            fields->timer++;
+            if ((fields->timer >= clickInterval && !fields->clicking) || (fields->timer >= releaseInterval && fields->clicking)) {
+                fields->clicking = !fields->clicking;
+                if (config::get<"player.autoclick.p1", bool>(false)) this->handleButton(fields->clicking, 1, true);
+                if (config::get<"player.autoclick.p2", bool>(false)) this->handleButton(fields->clicking, 1, false);
+                fields->timer = 0.f;
             }
         }
     };

@@ -296,8 +296,8 @@ namespace eclipse::hacks::Level {
             }
         }
 
-        void processCommands(float dt) {
-            GJBaseGameLayer::processCommands(dt);
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
 
             if (s_isDead || !config::get<"level.showhitboxes.traillength.toggle", bool>(false))
                 return;

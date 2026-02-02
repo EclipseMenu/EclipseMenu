@@ -118,9 +118,9 @@ namespace eclipse::hacks::Player {
 
     class $modify(WaveTrailStrokeHSHook, cocos2d::CCDrawNode) {
         ADD_HOOKS_DELEGATE("player.customwavetrail.outline")
-        bool drawPolygon(cocos2d::CCPoint *verts, unsigned int count, const cocos2d::ccColor4F &fillColor, float borderWidth, const cocos2d::ccColor4F &borderColor) {
+        bool drawPolygon(cocos2d::CCPoint *verts, unsigned int count, const cocos2d::ccColor4F &fillColor, float borderWidth, const cocos2d::ccColor4F &borderColor, cocos2d::BorderAlignment alignment) {
             if ((fillColor.r == 1.F && fillColor.g == 1.F && fillColor.b == 1.F && fillColor.a != 1.F) || ((s_currentStreak != this) && (s_currentStreak2 != this)))
-                return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor);
+                return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor, alignment);
 
             auto color = config::get<"player.customwavetrail.outline.color", gui::Color>(gui::Colors::BLACK);
             auto width = config::get<"player.customwavetrail.outline.stroke", float>(2.F);
@@ -141,7 +141,7 @@ namespace eclipse::hacks::Player {
                 newVerts[2].y += offset;
                 this->drawSegment(newVerts[0], newVerts[3], width, color);
                 this->drawSegment(newVerts[1], newVerts[2], width, color);
-                return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor);
+                return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor, alignment);
             }
             //width = width / glowLayers;
             for (int i = 0; i < glowLayers; i++) {
@@ -164,7 +164,7 @@ namespace eclipse::hacks::Player {
                 this->drawSegment(newVerts[0], newVerts[3], layerWidth, glowColor);
                 this->drawSegment(newVerts[1], newVerts[2], layerWidth, glowColor);
             }
-            return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor);
+            return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor, alignment);
         }
     };
 }

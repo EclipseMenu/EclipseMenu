@@ -18,11 +18,11 @@ namespace eclipse::gui::cocos {
         void onDelete(CCObject*);
     };
 
-    class SelectKeybindPopup : public geode::Popup<keybinds::Keys, KeybindComponentNode*> {
+    class SelectKeybindPopup : public geode::Popup {
     public:
         static SelectKeybindPopup* create(keybinds::Keys initialKey, KeybindComponentNode* btn) {
             auto ret = new SelectKeybindPopup();
-            if (ret->initAnchored(260.f, 120.f, initialKey, btn, "GJ_square02.png")) {
+            if (ret->init(initialKey, btn)) {
                 ret->autorelease();
                 return ret;
             }
@@ -31,7 +31,9 @@ namespace eclipse::gui::cocos {
         }
 
     private:
-        bool setup(keybinds::Keys initialKey, KeybindComponentNode* btn) override {
+        bool init(keybinds::Keys initialKey, KeybindComponentNode* btn) {
+            if (!Popup::init(260.f, 120.f, "GJ_square02.png")) return false;
+
             m_keybindNode = btn;
             m_initialKey = initialKey;
 

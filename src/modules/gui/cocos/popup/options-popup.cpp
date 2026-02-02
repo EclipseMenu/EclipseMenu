@@ -8,7 +8,11 @@
 #include "content-view.hpp"
 
 namespace eclipse::gui::cocos {
-    bool OptionsPopup::setup(MenuTab const& tab) {
+    bool OptionsPopup::init(MenuTab const& tab) {
+        if (!Popup::init(400.f, 240.f)) {
+            return false;
+        }
+
         auto const tm = ThemeManager::get();
 
         auto title = TranslatedLabel::create(tab.getTitle());
@@ -59,7 +63,7 @@ namespace eclipse::gui::cocos {
 
     OptionsPopup* OptionsPopup::create(MenuTab const& tab) {
         auto ret = new OptionsPopup;
-        if (ret->initAnchored(400.f, 240.f, tab)) {
+        if (ret->init(tab)) {
             ret->autorelease();
             return ret;
         }

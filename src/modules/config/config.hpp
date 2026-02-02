@@ -69,7 +69,7 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    void set(std::string_view key, T const& value);
+    void set(std::string_view key, T value);
 
     /// @brief Erase a key from the configuration.
     /// @param key Key to erase.
@@ -92,7 +92,7 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    void setIfEmpty(std::string_view key, T const& value);
+    void setIfEmpty(std::string_view key, T value);
 
     /// @brief Registers a delegate which is called when a specific value in config is changed
     /// @param key Key of the value which should have a delegate
@@ -132,7 +132,7 @@ namespace eclipse::config {
     /// @param key Key to set the value to.
     /// @param value Value to set.
     template<typename T>
-    void setTemp(std::string_view key, T const& value);
+    void setTemp(std::string_view key, T value);
 
     namespace __impl {
         template <size_t N>

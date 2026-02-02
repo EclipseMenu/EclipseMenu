@@ -192,7 +192,7 @@ namespace eclipse::hacks::Bot {
                         );
                     }
                     // apparently i cannot put the Popup below here otherwise some memory corruption happens, WHY? its not even a pointer!!
-                    config::set("bot.selectedreplay", "");
+                    config::set<std::string_view>("bot.selectedreplay", "");
 
                     // refresh cocos ui page
                     if (auto cocos = gui::cocos::CocosRenderer::get())
@@ -284,16 +284,17 @@ namespace eclipse::hacks::Bot {
 
     REGISTER_HACK(Bot)
 
-    $execute {
-        new EventListener<EventFilter<events::LoadReplayEvent>>(+[](events::LoadReplayEvent* e) {
-            if (auto* path = e->getPath()) {
-                e->setResult(s_bot.load(*path));
-            } else {
-                e->setResult(s_bot.load(e->getData()));
-            }
-            return ListenerResult::Stop;
-        });
-    }
+    // TODO: geode v5
+    // $execute {
+    //     new EventListener<EventFilter<events::LoadReplayEvent>>(+[](events::LoadReplayEvent* e) {
+    //         if (auto* path = e->getPath()) {
+    //             e->setResult(s_bot.load(*path));
+    //         } else {
+    //             e->setResult(s_bot.load(e->getData()));
+    //         }
+    //         return ListenerResult::Stop;
+    //     });
+    // }
 
     class $modify(BotPLHook, PlayLayer) {
         bool init(GJGameLevel* gj, bool p1, bool p2) {
@@ -384,8 +385,8 @@ namespace eclipse::hacks::Bot {
             }
         }
 
-        void processCommands(float dt) {
-            GJBaseGameLayer::processCommands(dt);
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
             if(s_respawning) s_respawning = false;
 
             if (s_bot.getState() != bot::State::PLAYBACK)

@@ -5,7 +5,9 @@
 #include <modules/hack/hack.hpp>
 #include <modules/i18n/translations.hpp>
 
-struct ToggleDevToolsEvent : geode::Event { ToggleDevToolsEvent() {} };
+struct ToggleDevToolsEvent : geode::SimpleEvent<ToggleDevToolsEvent> {
+    using SimpleEvent::SimpleEvent;
+};
 
 namespace eclipse::hacks::Shortcuts {
     class $hack(Shortcuts) {
@@ -225,7 +227,7 @@ namespace eclipse::hacks::Shortcuts {
             // reinterpret_cast<MenuLayer*>(utils::get<cocos2d::CCScene>())->onMoreGames(nullptr);
 
             // DevTools now has an event to open it
-            ToggleDevToolsEvent().post();
+            ToggleDevToolsEvent().send();
         }
 
         static int getSecretCoinsRange(int min, int max) {
