@@ -14,8 +14,7 @@ using namespace geode::prelude;
 
 namespace eclipse::hacks::Bot {
 
-size_t getWriteSizeFromRIP(uint64_t rip, const CONTEXT* ctx)
-{
+static size_t getWriteSizeFromRIP(uint64_t rip, const CONTEXT* ctx) {
     uint8_t buffer[16];
     memcpy(buffer, (const void*)rip, sizeof(buffer));
 
@@ -80,16 +79,16 @@ std::string getLastWindowsErrorAsString() {
     if(errorMessageID == 0) {
         return std::string();
     }
-    
+
     LPSTR messageBuffer = nullptr;
 
     size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                                  NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
-    
+
     std::string message(messageBuffer, size);
-    
+
     LocalFree(messageBuffer);
-            
+
     return message;
 }
 
@@ -117,7 +116,7 @@ public:
         m_captureEnabled.store(false);
         m_memoryRestores.clear();
         std::unordered_set<uintptr_t> pages;
-        
+
         for(auto& pair : m_memoryRegions) {
             uintptr_t pageStart = pair.first & ~(m_pageSize - 1);
             uintptr_t pageEnd = (pair.second - 1) & ~(m_pageSize - 1);
@@ -318,7 +317,7 @@ LONG CALLBACK writeWatchHandler(PEXCEPTION_POINTERS info) {
     ULONG_PTR faultType = info->ExceptionRecord->ExceptionInformation[0];
     ULONG_PTR faultAddr = info->ExceptionRecord->ExceptionInformation[1];
 
-    if (faultType != 1)  
+    if (faultType != 1)
         return EXCEPTION_CONTINUE_SEARCH;
 
     uintptr_t a = faultAddr;
@@ -374,7 +373,7 @@ class $modify(MPFPlayLayer, PlayLayer) {
     static void onModify(auto& self) {
         std::vector<geode::Hook*> hooks;
         for(auto& hook : self.m_hooks) hooks.push_back(hook.second.get());
-        
+
         config::addDelegate("bot.practice-fix-mode", [hooks = std::move(hooks)]{
             if (config::get<int>("bot.practice-fix-mode", 0) == 0) {
                 for(auto& hook : hooks) (void) hook->disable();
@@ -409,7 +408,7 @@ class $modify(MPFPlayLayer, PlayLayer) {
     }
 
     void postUpdate(float dt) {
-        PlayLayer::postUpdate(dt);   
+        PlayLayer::postUpdate(dt);
         bool hasCapture = s_memoryTracker.isCaptureEnabled();
         int botState = config::get<int>("bot.state", 0);
         int practiceFixMode = config::get<int>("bot.practice-fix-mode", 0);

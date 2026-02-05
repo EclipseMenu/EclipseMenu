@@ -3,6 +3,7 @@
 #include <hacks/Labels/Label.hpp>
 #include <modules/gui/cocos/cocos.hpp>
 #include <modules/gui/cocos/components/LabelSettingsComponent.hpp>
+#include <modules/gui/cocos/nodes/color-picker.hpp>
 #include <modules/gui/cocos/nodes/FallbackBMFont.hpp>
 #include <modules/gui/cocos/nodes/oneof-picker.hpp>
 #include <modules/gui/theming/manager.hpp>
@@ -465,7 +466,7 @@ namespace eclipse::gui::cocos {
 
         auto column2 = cocos2d::CCMenu::create();
 
-        column2->addChild(ColorPicker::create(settings->color, false, [this](gui::Color const& color) {
+        column2->addChild(ColorPicker::create(settings->color, false, [this](Color color) {
             m_component->getSettings()->color = { color.r, color.g, color.b, m_component->getSettings()->color.a };
             m_component->triggerEditCallback();
         }));
@@ -604,7 +605,7 @@ namespace eclipse::gui::cocos {
         // Pickers
         auto colorPicker = ColorPicker::create(
             event.color.value_or(Color{1.f, 1.f, 1.f}), false,
-            [&](Color const& color) {
+            [this, &event](Color color) {
                 event.color = color;
                 m_component->triggerEditCallback();
             }
@@ -615,7 +616,7 @@ namespace eclipse::gui::cocos {
 
         auto fontPicker = FontPicker::create(
             event.font.value_or("bigFont.fnt"),
-            [&](std::string const& font) {
+            [this, &event](std::string const& font) {
                 event.font = font;
                 m_component->triggerEditCallback();
             }
@@ -630,7 +631,7 @@ namespace eclipse::gui::cocos {
 
         auto conditionPicker = OneOfPicker::create(
             labels::eventNames,
-            [&](int i) {
+            [this, &event](int i) {
                 event.type = static_cast<labels::LabelEvent::Type>(i);
                 m_component->triggerEditCallback();
             },
@@ -662,7 +663,7 @@ namespace eclipse::gui::cocos {
         customConditionInput->setCommonFilter(geode::CommonFilter::Any);
         customConditionInput->setString(event.condition);
         customConditionInput->setScale(0.9f);
-        customConditionInput->setCallback([&](std::string const& text) {
+        customConditionInput->setCallback([this, &event](std::string const& text) {
             event.condition = text;
             m_component->triggerEditCallback();
         });
@@ -673,7 +674,7 @@ namespace eclipse::gui::cocos {
         durationInput->setCommonFilter(geode::CommonFilter::Float);
         durationInput->setString(fmt::to_string(event.duration));
         durationInput->setScale(0.9f);
-        durationInput->setCallback([&](std::string const& text) {
+        durationInput->setCallback([this, &event](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
             event.duration = res.unwrap();
@@ -686,7 +687,7 @@ namespace eclipse::gui::cocos {
         modifyScaleInput->setCommonFilter(geode::CommonFilter::Float);
         modifyScaleInput->setString(fmt::to_string(event.scale.value_or(1.f)));
         modifyScaleInput->setScale(0.9f);
-        modifyScaleInput->setCallback([&](std::string const& text) {
+        modifyScaleInput->setCallback([this, &event](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
             event.scale = res.unwrap();
@@ -700,7 +701,7 @@ namespace eclipse::gui::cocos {
         modifyOpacityInput->setCommonFilter(geode::CommonFilter::Float);
         modifyOpacityInput->setString(fmt::to_string(event.opacity.value_or(1.f)));
         modifyOpacityInput->setScale(0.9f);
-        modifyOpacityInput->setCallback([&](std::string const& text) {
+        modifyOpacityInput->setCallback([this, &event](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
             event.opacity = res.unwrap();
@@ -714,7 +715,7 @@ namespace eclipse::gui::cocos {
         delayInput->setCommonFilter(geode::CommonFilter::Float);
         delayInput->setString(fmt::to_string(event.delay));
         delayInput->setScale(0.9f);
-        delayInput->setCallback([&](std::string const& text) {
+        delayInput->setCallback([this, &event](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
             event.delay = res.unwrap();
@@ -727,7 +728,7 @@ namespace eclipse::gui::cocos {
         easingInput->setCommonFilter(geode::CommonFilter::Float);
         easingInput->setString(fmt::to_string(event.easing));
         easingInput->setScale(0.9f);
-        easingInput->setCallback([&](std::string const& text) {
+        easingInput->setCallback([this, &event](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
             event.easing = res.unwrap();
@@ -740,7 +741,7 @@ namespace eclipse::gui::cocos {
         auto enableToggle = createToggler(
             createToggle("checkmark.png"_spr),
             createToggle(nullptr),
-            [&](auto) {
+            [this, &event](auto) {
                 event.enabled = !event.enabled;
                 m_component->triggerEditCallback();
             }
@@ -751,7 +752,7 @@ namespace eclipse::gui::cocos {
 
         auto modifyColorToggle = createToggler(
             createToggle("checkmark.png"_spr), createToggle(nullptr),
-            [&, colorPicker](auto) {
+            [this, &event, colorPicker](auto) {
                 if (!event.color.has_value()) event.color = {1.f, 1.f, 1.f};
                 else event.color.reset();
                 colorPicker->setVisible(event.color.has_value());
@@ -765,7 +766,7 @@ namespace eclipse::gui::cocos {
 
         auto modifyFontToggle = createToggler(
             createToggle("checkmark.png"_spr), createToggle(nullptr),
-            [&, fontPicker](auto) {
+            [this, &event, fontPicker](auto) {
                 if (!event.font.has_value()) event.font = "bigFont.fnt";
                 else event.font.reset();
                 fontPicker->setVisible(event.font.has_value());
@@ -780,7 +781,7 @@ namespace eclipse::gui::cocos {
         auto modifyScaleToggle = createToggler(
             createToggle("checkmark.png"_spr),
             createToggle(nullptr),
-            [&, modifyScaleInput](auto) {
+            [this, &event, modifyScaleInput](auto) {
                 if (!event.scale.has_value()) event.scale = 1.f;
                 else event.scale.reset();
                 modifyScaleInput->setString(fmt::to_string(event.scale.value_or(1.f)));
@@ -795,7 +796,7 @@ namespace eclipse::gui::cocos {
         auto modifyOpacityToggle = createToggler(
             createToggle("checkmark.png"_spr),
             createToggle(nullptr),
-            [&, modifyOpacityInput](auto) {
+            [this, &event, modifyOpacityInput](auto) {
                 if (!event.opacity.has_value()) event.opacity = 1.f;
                 else event.opacity.reset();
                 modifyOpacityInput->setString(fmt::to_string(event.opacity.value_or(1.f)));

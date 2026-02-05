@@ -99,6 +99,7 @@ jobs:
             ${{ steps.build.outputs.build-output }}/*.geode
             ${{ steps.build.outputs.build-output }}/*.pdb
             ${{ steps.build.outputs.build-output }}/*.sym
+            ${{ steps.build.outputs.build-output }}/*.dSym
 
       - name: Get commit messages
         id: commit

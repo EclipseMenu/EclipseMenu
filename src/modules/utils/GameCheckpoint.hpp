@@ -15,7 +15,7 @@ namespace eclipse::utils {
             m_player2CollisionBlock = playLayer->m_player2CollisionBlock;
             m_extraDelta = playLayer->m_extraDelta;
             m_unk32d0 = playLayer->m_unk32d0;
-            m_queueInterval = playLayer->m_queueInterval;
+            // m_queueInterval = playLayer->m_queueInterval;
             m_unk32ec = playLayer->m_unk32ec;
             m_currentStep = playLayer->m_currentStep;
             m_unk3380 = playLayer->m_unk3380;
@@ -32,7 +32,7 @@ namespace eclipse::utils {
             playLayer->m_player2CollisionBlock = m_player2CollisionBlock;
             playLayer->m_extraDelta = m_extraDelta;
             playLayer->m_unk32d0 = m_unk32d0;
-            playLayer->m_queueInterval = m_queueInterval;
+            // playLayer->m_queueInterval = m_queueInterval;
             playLayer->m_unk32ec = m_unk32ec;
             playLayer->m_currentStep = m_currentStep;
             playLayer->m_unk3380 = m_unk3380;
@@ -333,7 +333,7 @@ namespace eclipse::utils {
             player->m_dashStartTime = m_dashStartTime;
             player->m_slopeStartTime = m_slopeStartTime;
             player->m_justPlacedStreak = m_justPlacedStreak;
-            player->m_maybeLastGroundObject = m_maybeLastGroundObject;
+            // player->m_maybeLastGroundObject = m_maybeLastGroundObject;
             player->m_lastCollisionBottom = m_lastCollisionBottom;
             player->m_lastCollisionTop = m_lastCollisionTop;
             player->m_lastCollisionLeft = m_lastCollisionLeft;
