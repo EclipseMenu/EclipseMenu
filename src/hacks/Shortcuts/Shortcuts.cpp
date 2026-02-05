@@ -125,7 +125,8 @@ namespace eclipse::hacks::Shortcuts {
                     level->m_normalPercent = 0;
                     level->m_newNormalPercent2 = 0;
                     level->m_orbCompletion = 0;
-                    level->m_54 = 0;
+                    // TODO: v5 geode
+                    // level->m_54 = 0;
                     level->m_platformerSeed = 0;
                     level->m_bestPoints = 0;
                     level->m_bestTime = 0;
@@ -172,32 +173,34 @@ namespace eclipse::hacks::Shortcuts {
             filter.description = "Dynamic Link Library (*.dll)";
             filter.files.insert("*.dll");
 
-            geode::utils::file::pick(
-                geode::utils::file::PickMode::OpenFile,
-                {geode::dirs::getGameDir(), {filter}}
-            ).listen([](geode::Result<std::filesystem::path>* value) {
-                if (!value) return;
-                auto path = value->unwrapOr("");
-                std::error_code ec;
-                if (path.empty() || !std::filesystem::exists(path, ec))
-                    return;
+            geode::async::spawn(
+                geode::utils::file::pick(
+                    geode::utils::file::PickMode::OpenFile,
+                    {geode::dirs::getGameDir(), {filter}}
+                ),
+                [](geode::Result<std::optional<std::filesystem::path>> res) {
+                    auto path = std::move(res).unwrapOrDefault().value_or("");
+                    std::error_code ec;
+                    if (path.empty() || !std::filesystem::exists(path, ec))
+                        return;
 
-                geode::log::warn("Injecting DLL: {}", path);
-                HMODULE module = LoadLibraryW(path.native().c_str());
-                if (!module) return geode::log::error("Failed to inject DLL: {}", path);
+                    geode::log::warn("Injecting DLL: {}", path);
+                    HMODULE module = LoadLibraryW(path.native().c_str());
+                    if (!module) return geode::log::error("Failed to inject DLL: {}", path);
 
-                // Call DLLMain with DLL_PROCESS_ATTACH
-                bool success = module > (HMODULE) HINSTANCE_ERROR;
-                if (success) {
-                    using DllMain = BOOL(WINAPI*)(HINSTANCE, DWORD, LPVOID);
-                    auto dllMain = reinterpret_cast<DllMain>(GetProcAddress(module, "DllMain"));
-                    if (dllMain)
-                        dllMain(static_cast<HINSTANCE>(module), DLL_PROCESS_ATTACH, nullptr);
-                } else {
-                    FreeLibrary(module);
-                    geode::log::error("Failed to inject DLL: {}", path);
+                    // Call DLLMain with DLL_PROCESS_ATTACH
+                    bool success = module > (HMODULE) HINSTANCE_ERROR;
+                    if (success) {
+                        using DllMain = BOOL(WINAPI*)(HINSTANCE, DWORD, LPVOID);
+                        auto dllMain = reinterpret_cast<DllMain>(GetProcAddress(module, "DllMain"));
+                        if (dllMain)
+                            dllMain(static_cast<HINSTANCE>(module), DLL_PROCESS_ATTACH, nullptr);
+                    } else {
+                        FreeLibrary(module);
+                        geode::log::error("Failed to inject DLL: {}", path);
+                    }
                 }
-            });
+            );
         }
         #endif
 
@@ -371,12 +374,12 @@ namespace eclipse::hacks::Shortcuts {
             manager->addListener("shortcut.p1jump", [](bool down) {
                 auto gameLayer = utils::get<GJBaseGameLayer>();
                 if (!gameLayer) return;
-                gameLayer->queueButton(1, down, false);
+                gameLayer->queueButton(1, down, false, 0.0); // TODO: geode v5
             });
             manager->addListener("shortcut.p2jump", [](bool down) {
                 auto gameLayer = utils::get<GJBaseGameLayer>();
                 if (!gameLayer) return;
-                gameLayer->queueButton(1, down, true);
+                gameLayer->queueButton(1, down, true, 0.0); // TODO: geode v5
             });
         }
 

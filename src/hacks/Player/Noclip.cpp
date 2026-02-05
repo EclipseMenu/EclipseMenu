@@ -154,7 +154,7 @@ namespace eclipse::hacks::Player {
             PlayLayer::postUpdate(dt);
         }
 
-        void resetLevel() {
+        void resetLevel() override {
             PlayLayer::resetLevel();
             auto fields = m_fields.self();
             fields->m_wouldDie = false;

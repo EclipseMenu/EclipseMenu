@@ -1,6 +1,9 @@
 #pragma once
+#if 0
 #ifndef ECLIPSE_COMPONENTS_HPP
 #define ECLIPSE_COMPONENTS_HPP
+
+#include "events.hpp"
 
 #include <functional>
 #include <memory>
@@ -289,3 +292,4 @@ namespace eclipse {
 #endif // ECLIPSE_DONT_DEFINE_IMPLS
 
 #endif // ECLIPSE_COMPONENTS_HPP
+#endif

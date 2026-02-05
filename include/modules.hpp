@@ -1,4 +1,5 @@
 #pragma once
+#if 0
 #ifndef ECLIPSE_MODULES_HPP
 #define ECLIPSE_MODULES_HPP
 
@@ -125,3 +126,4 @@ namespace eclipse {
 }
 
 #endif // ECLIPSE_MODULES_HPP
+#endif

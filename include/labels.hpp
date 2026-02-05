@@ -1,4 +1,5 @@
 #pragma once
+#if 0
 #ifndef ECLIPSE_LABELS_HPP
 #define ECLIPSE_LABELS_HPP
 
@@ -89,4 +90,5 @@ namespace eclipse::label {
     }
 }
 
+#endif
 #endif

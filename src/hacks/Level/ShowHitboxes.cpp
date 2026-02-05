@@ -338,7 +338,7 @@ namespace eclipse::hacks::Level {
             $hitbox->visitHitboxes();
         }
 
-        void resetLevel() {
+        void resetLevel() override {
             PlayLayer::resetLevel();
 
             s_isDead = false;

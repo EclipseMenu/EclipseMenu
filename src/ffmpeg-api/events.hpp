@@ -1,5 +1,5 @@
 #pragma once
-
+#if 0
 #include "render_settings.hpp"
 
 #include <Geode/loader/Event.hpp>
@@ -210,13 +210,13 @@ public:
     /**
      * @brief Mixes a video file and an audio file into a single MP4 output.
      *
-     * This function takes an input video file and an audio file, and merges them into a single MP4 output file. 
+     * This function takes an input video file and an audio file, and merges them into a single MP4 output file.
      * The output MP4 file will have both the video and audio streams synchronized.
      *
      * @param videoFile The path to the input video file.
      * @param audioFile The path to the input audio file.
      * @param outputMp4File The path where the output MP4 file will be saved.
-     * 
+     *
      * @warning The audio file is expected to contain stereo (dual-channel) audio. Using other formats might lead to unexpected results.
      * @warning The video file is expected to contain a single video stream. Only the first video stream will be copied.
      */
@@ -247,3 +247,4 @@ public:
 };
 
 }
+#endif

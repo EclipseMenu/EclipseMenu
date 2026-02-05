@@ -1,4 +1,5 @@
 #pragma once
+#if 0
 #include <functional.hpp>
 #include <Geode/platform/platform.hpp>
 #include "ffmpeg-api/events.hpp"
@@ -37,3 +38,4 @@ namespace eclipse::recorder {
         Function<void(std::string const&)> m_callback;
     };
 };
+#endif
