@@ -32,7 +32,7 @@ namespace eclipse::gui::cocos {
     /// @brief Tab buttons for both activating and deactivating
     class TabButton : public cocos2d::CCNode {
     protected:
-        cocos2d::extension::CCScale9Sprite* m_bgSprite{};
+        geode::NineSlice* m_bgSprite{};
         TranslatedLabel* m_label{};
         cocos2d::CCSprite* m_icon{};
 

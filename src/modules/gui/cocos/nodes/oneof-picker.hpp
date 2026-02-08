@@ -31,7 +31,7 @@ namespace eclipse::gui::cocos {
 
     protected:
         TranslatedLabel* m_valueLabel = nullptr;
-        cocos2d::extension::CCScale9Sprite* m_background = nullptr;
+        geode::NineSlice* m_background = nullptr;
         std::vector<std::string> m_options;
         Function<void(int)> m_callback;
         size_t m_selected = 0;

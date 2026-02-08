@@ -44,7 +44,7 @@ namespace eclipse::gui::cocos {
         bool init(std::string_view text, size_t page, LabelSettingsPopup* popup) {
             auto const tm = ThemeManager::get();
 
-            m_background = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+            m_background = geode::NineSlice::create("square02b_001.png");
             m_background->setContentSize({ 100.f, 32.f });
             m_background->setScale(0.7f);
             m_background->setColor(tm->getButtonActivatedBackground().toCCColor3B());
@@ -79,7 +79,7 @@ namespace eclipse::gui::cocos {
     protected:
         LabelSettingsPopup* m_popup = nullptr;
         size_t m_page = 0;
-        cocos2d::extension::CCScale9Sprite* m_background = nullptr;
+        geode::NineSlice* m_background = nullptr;
     };
 
     class FontPicker : public cocos2d::CCMenu {
@@ -192,21 +192,21 @@ namespace eclipse::gui::cocos {
         m_component = component;
 
         // The behind background for the entire popup to get the outline
-        auto bgBehind = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        auto bgBehind = geode::NineSlice::create("square02b_001.png");
         bgBehind->setContentSize(m_mainLayer->getContentSize() * std::clamp(tm->getBorderSize(), 0.F, 1.F));
         m_bgSprite->setColor(tm->getBorderColor().toCCColor3B());
         bgBehind->setID("bg-behind"_spr);
         m_mainLayer->addChildAtPosition(bgBehind, geode::Anchor::Center);
 
         // Background for the entire popup
-        m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        m_bgSprite = geode::NineSlice::create("square02b_001.png");
         m_bgSprite->setContentSize(m_mainLayer->getContentSize() - 3);
         m_bgSprite->setColor(tm->getTitleBackgroundColor().toCCColor3B());
         m_bgSprite->setID("main-bg"_spr);
         m_mainLayer->addChildAtPosition(m_bgSprite, geode::Anchor::Center);
 
         // Background for content
-        m_contentBG = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        m_contentBG = geode::NineSlice::create("square02b_001.png");
         m_contentBG->setAnchorPoint({0, 1});
         m_contentBG->setPosition(7.5f, 210.f);
         m_contentBG->setColor(tm->getBackgroundColor().toCCColor3B());
@@ -390,7 +390,7 @@ namespace eclipse::gui::cocos {
         auto label = TranslatedLabel::create(text);
         label->limitLabelWidth(width * 0.8f, 1.f, 0.1f);
         label->setColor(tm->getButtonForegroundColor().toCCColor3B());
-        auto bg = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        auto bg = geode::NineSlice::create("square02b_001.png");
         bg->setContentSize({ width, 36.f });
         bg->setColor(tm->getButtonBackgroundColor().toCCColor3B());
         bg->addChildAtPosition(label, geode::Anchor::Center);
@@ -595,7 +595,7 @@ namespace eclipse::gui::cocos {
         menu->setContentSize({ CARD_WIDTH, CARD_HEIGHT });
         menu->setID("event-card"_spr);
 
-        auto cardBackground = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        auto cardBackground = geode::NineSlice::create("square02b_001.png");
         cardBackground->setContentSize({ CARD_WIDTH, CARD_HEIGHT });
         cardBackground->setColor(ThemeManager::get()->getBackgroundColor().lighten(0.25f).toCCColor3B());
         cardBackground->setOpacity(32);

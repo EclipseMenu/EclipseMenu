@@ -177,7 +177,7 @@ namespace eclipse::gui::cocos {
         m_label = TranslatedLabel::create(name);
         m_label->limitLabelWidth(m_icon ? 75 : 100, 1.f, .2f);
 
-        m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0.0f, 0.0f, 80.0f, 80.0f});
+        m_bgSprite = geode::NineSlice::create("square02b_001.png", {0.0f, 0.0f, 80.0f, 80.0f});
         m_bgSprite->setContentSize({size.width, size.height + 8.F}); // minimum 36
         m_bgSprite->setScaleY(.75F);
 

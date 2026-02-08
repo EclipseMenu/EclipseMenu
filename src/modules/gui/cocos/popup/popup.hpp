@@ -22,7 +22,7 @@ namespace eclipse::gui::cocos {
     private:
         TabMenu* m_tabMenu = nullptr;
 
-        cocos2d::extension::CCScale9Sprite* m_contentBG = nullptr;
+        geode::NineSlice* m_contentBG = nullptr;
         ContentView* m_contentMenu = nullptr;
     };
 }

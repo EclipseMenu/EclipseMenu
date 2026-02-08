@@ -90,7 +90,7 @@ namespace eclipse::gui::cocos {
     cocos2d::CCNode* ModalPopup::createButtonSprite(std::string_view text) const {
         auto label = TranslatedLabel::createRaw(text);
         label->setScale(0.9f);
-        auto bg = cocos2d::extension::CCScale9Sprite::create("geode.loader/GE_button_05.png");
+        auto bg = geode::NineSlice::create("geode.loader/GE_button_05.png");
         bg->setContentSize({ label->getContentSize().width + 20.f, 28.f });
         bg->setID("bg"_spr);
         bg->setAnchorPoint({ 0.5f, 0.5f });

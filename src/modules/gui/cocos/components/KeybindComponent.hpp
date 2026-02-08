@@ -130,7 +130,7 @@ namespace eclipse::gui::cocos {
         m_keyName->setScale(1.2f);
 
         auto btnWidth = width * 0.3f;
-        auto btnSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", { 0.0f, 0.0f, 80.0f, 80.0f });
+        auto btnSprite = geode::NineSlice::create("square02b_001.png", { 0.0f, 0.0f, 80.0f, 80.0f });
         btnSprite->setContentSize({ btnWidth * (1.f / 0.75f), 36.f });
         btnSprite->setScale(0.6f);
         btnSprite->addChildAtPosition(m_keyName, geode::Anchor::Center);

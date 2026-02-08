@@ -17,7 +17,7 @@ namespace eclipse::gui::cocos {
         static OptionsPopup* create(MenuTab const& tab);
 
     protected:
-        cocos2d::extension::CCScale9Sprite* m_contentBG = nullptr;
+        geode::NineSlice* m_contentBG = nullptr;
         ContentView* m_contentView = nullptr;
     };
 }

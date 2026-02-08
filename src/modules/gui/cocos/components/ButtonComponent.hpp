@@ -15,7 +15,7 @@ namespace eclipse::gui::cocos {
             auto const tm = ThemeManager::get();
 
             auto label = TranslatedLabel::create(m_component->getTitle());
-            auto bg = cocos2d::extension::CCScale9Sprite::create("square.png", { 0.0f, 0.0f, 80.0f, 80.0f });
+            auto bg = geode::NineSlice::create("square.png", { 0.0f, 0.0f, 80.0f, 80.0f });
             if (!bg || !label) return false;
 
             width *= 0.9f;

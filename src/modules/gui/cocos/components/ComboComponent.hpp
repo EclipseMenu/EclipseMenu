@@ -11,7 +11,7 @@ namespace eclipse::gui::cocos {
     protected:
         TranslatedLabel* m_label = nullptr;
         CCMenuItemSpriteExtra* m_infoButton = nullptr;
-        cocos2d::extension::CCScale9Sprite* m_background = nullptr;
+        geode::NineSlice* m_background = nullptr;
         TranslatedLabel* m_valueLabel = nullptr;
         geode::Ref<CCMenuItemSpriteExtra> m_arrowButton = nullptr;
         geode::Ref<ScrollLayer> m_scrollLayer;
@@ -63,7 +63,7 @@ namespace eclipse::gui::cocos {
             scrollBlock->addChildAtPosition(scrollBlockButton, geode::Anchor::Center);
             m_scrollLayer->addChildAtPosition(scrollBlock, geode::Anchor::Center);
 
-            auto scrollBackground = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+            auto scrollBackground = geode::NineSlice::create("square02b_001.png");
             scrollBackground->setID("scrollBackground");
             scrollBackground->setScale(0.3f);
             scrollBackground->setContentSize({365.f, scrollHeight});
@@ -203,7 +203,7 @@ namespace eclipse::gui::cocos {
             m_label->limitLabelWidth(labelSize, 1.f, 0.25f);
             this->addChildAtPosition(m_label, geode::Anchor::Left, { 15.f, 0.f });
 
-            m_background = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+            m_background = geode::NineSlice::create("square02b_001.png");
             m_background->setID("background");
             m_background->setAnchorPoint({ 0.5f, 0.5f });
             m_background->setScale(0.3f);

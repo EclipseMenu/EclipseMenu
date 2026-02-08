@@ -34,8 +34,8 @@ namespace eclipse::__internal__ {
         // size_t(*MenuTab_addLabel)(std::string_view, std::string) = nullptr;
     };
 
-    struct FetchVTableEvent : geode::SimpleEvent<FetchVTableEvent, VTable&> {
-        using SimpleEvent::SimpleEvent;
+    struct FetchVTableEvent : geode::Event<FetchVTableEvent, bool(VTable&)> {
+        using Event::Event;
     };
 
     inline VTable const& getVTable() {
