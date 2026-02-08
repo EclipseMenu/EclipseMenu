@@ -1,5 +1,6 @@
 #include <Geode/platform/platform.hpp>
-#ifdef GEODE_IS_ANDROID
+#ifdef GEODE_IS_MOBILE
+
 #include <modules/keybinds/manager.hpp>
 #include <modules/hack/hack.hpp>
 
@@ -24,4 +25,5 @@ namespace eclipse::keybinds {
         }
     };
 }
+
 #endif

@@ -1,8 +1,8 @@
 #include <Geode/platform/platform.hpp>
 #include <modules/hack/hack.hpp>
-#ifdef GEODE_IS_WINDOWS
-#include <modules/keybinds/manager.hpp>
+
 #include <Geode/utils/Keyboard.hpp>
+#include <modules/keybinds/manager.hpp>
 
 using namespace geode::prelude;
 
@@ -174,5 +174,3 @@ namespace eclipse::keybinds {
         }).leak();
     }
 }
-
-#endif

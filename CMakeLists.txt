@@ -14,17 +14,9 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 project(EclipseMenu VERSION 1.0.0 LANGUAGES CXX)
 
-set(MACOS_SOURCES "")
-if (APPLE)
-  enable_language(OBJCXX)
-  if (NOT IOS)
-  set(MACOS_SOURCES src/modules/keybinds/mouse/macos.mm src/modules/keybinds/keyboard/macos.mm)
-  endif()
-endif()
-
 # Sources
 file(GLOB_RECURSE SOURCES src/*.cpp)
-add_library(${PROJECT_NAME} SHARED ${SOURCES} ${MACOS_SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 # Configure for GitHub Actions builds
 if (DEFINED ENV{GITHUB_ACTIONS})
@@ -68,11 +60,6 @@ if (WIN32)
       set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-incremental:no")
     endif()
   endif()
-endif()
-
-# macOS specific settings
-if (APPLE)
-  set_source_files_properties(${MACOS_SOURCES} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 endif()
 
 # Debug macro

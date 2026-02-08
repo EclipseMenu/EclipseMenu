@@ -5,8 +5,8 @@
 #include <modules/hack/hack.hpp>
 #include <modules/i18n/translations.hpp>
 
-struct ToggleDevToolsEvent : geode::SimpleEvent<ToggleDevToolsEvent> {
-    using SimpleEvent::SimpleEvent;
+struct ToggleDevToolsEvent : geode::Event<ToggleDevToolsEvent, bool()> {
+    using Event::Event;
 };
 
 namespace eclipse::hacks::Shortcuts {
