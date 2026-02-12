@@ -21,6 +21,7 @@ if (NOT ANDROID AND NOT IOS)
 endif()
 
 CPMAddPackage("gh:matcool/gd-imgui-cocos#9764333")
+CPMAddPackage("gh:prevter/msgpack-for-matjson#16a7957")
 CPMAddPackage("gh:maxnut/GDR-converter#71104a9")
 CPMAddPackage("gh:EclipseMenu/rift@2.0.2")
 CPMAddPackage("gh:prevter/AdvancedLabel#a800983")
