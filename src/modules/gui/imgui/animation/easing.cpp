@@ -204,3 +204,29 @@ namespace eclipse::gui::animation {
         }
     }
 }
+
+geode::Result<eclipse::gui::animation::Easing> matjson::Serialize<eclipse::gui::animation::Easing>::fromJson(
+    Value const& value
+) {
+    GEODE_UNWRAP_INTO(auto n, value.asUInt());
+    return geode::Ok(static_cast<eclipse::gui::animation::Easing>(n));
+}
+
+matjson::Value matjson::Serialize<eclipse::gui::animation::Easing>::toJson(
+    eclipse::gui::animation::Easing const& easing
+) {
+    return static_cast<unsigned int>(easing);
+}
+
+geode::Result<eclipse::gui::animation::EasingMode> matjson::Serialize<eclipse::gui::animation::EasingMode>::fromJson(
+    Value const& value
+) {
+    GEODE_UNWRAP_INTO(auto n, value.asUInt());
+    return geode::Ok(static_cast<eclipse::gui::animation::EasingMode>(n));
+}
+
+matjson::Value matjson::Serialize<eclipse::gui::animation::EasingMode>::toJson(
+    eclipse::gui::animation::EasingMode const& mode
+) {
+    return static_cast<unsigned int>(mode);
+}

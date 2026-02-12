@@ -13,16 +13,16 @@ namespace eclipse::i18n {
     constexpr auto DEFAULT_LANGUAGE = "en_US";
 
     /// @brief Get a translation for the specified key.
-    std::string_view get(std::string_view key);
+    geode::ZStringView get(geode::ZStringView key);
 
     /// @brief Get a translation for the specified key. (std::string version)
-    std::string get_(std::string_view key);
+    std::string const& get_(geode::ZStringView key);
 
     /// @brief Format a translation with the specified arguments.
     /// Note: use numbers in the format string to specify the argument index.
     template<typename... Args>
-    std::string format(std::string_view key, Args&&... args) {
-        return fmt::format(fmt::runtime(get(key)), std::forward<Args>(args)...);
+    std::string format(geode::ZStringView key, Args&&... args) {
+        return fmt::format(fmt::runtime(get(key).view()), std::forward<Args>(args)...);
     }
 
     /// @brief Loads translations from the specified language file.

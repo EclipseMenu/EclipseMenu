@@ -19,20 +19,6 @@
 	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev"],
 	"description": "A next-generation mod menu for Geometry Dash.",
 	"early-load": true,
-	"incompatibilities": {
-		"prevter.openhack": {
-			"version": "*",
-			"importance": "superseded"
-		},
-		"maxnu.gd_mega_overlay": {
-			"version": "*",
-			"importance": "superseded"
-		},
-		"ninxout.crystal_client": {
-			"version": "*",
-			"importance": "superseded"
-		}
-	},
 	"resources": {
 		"files": [
 			"resources/Blur/*.glsl",
@@ -53,11 +39,11 @@
 	"dependencies": {
 		"eclipse.ffmpeg-api": {
 			"version": ">=1.2.0",
-			"importance": "suggested"
+			"required": false
 		},
 		"dankmeme.globed2": {
 			"version": ">=1.8.5",
-			"importance": "suggested"
+			"required": false
 		}
 	},
 	"settings": {

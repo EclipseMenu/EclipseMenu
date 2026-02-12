@@ -22,19 +22,21 @@ namespace eclipse::labels {
     static std::vector<EffectGameObject*> s_coins;
 
     rift::Value getConfigValue(std::string const& key) {
-        if (!config::has(key)) {
-            return {};
-        }
         switch (config::getType(key)) {
-            case nlohmann::detail::value_t::string: return config::get<std::string>(key).unwrap();
-            case nlohmann::detail::value_t::boolean: return config::get<bool>(key).unwrap();
-            case nlohmann::detail::value_t::number_integer: return config::get<int>(key).unwrap();
-            case nlohmann::detail::value_t::number_float: return config::get<float>(key).unwrap();
+            case matjson::Type::String: return config::get<std::string>(key).unwrap();
+            case matjson::Type::Bool: return config::get<bool>(key).unwrap();
+            case matjson::Type::Object: return config::get<matjson::Value>(key).unwrap();
+            case matjson::Type::Number: {
+                if (config::getStorage()[key].isExactlyDouble()) {
+                    return config::get<double>(key).unwrap();
+                }
+                return config::get<int64_t>(key).unwrap();
+            }
             default: return {};
         }
     }
 
-    $on_mod(Loaded) {
+    $execute {
         rift::Config::get().makeFunction("cfg", getConfigValue);
     }
 
@@ -766,7 +768,7 @@ namespace eclipse::labels {
             if(config::get<"player.noclip", bool>(false) && !m_levelEndAnimationStarted && !m_hasCompletedLevel) {
                 if (config::get<"player.noclip.acclimit.toggle", bool>(false)) {
                     float acc = config::getTemp<float>("noclipAccuracy", 100.f);
-                    float limit = config::get<"player.noclip.acclimit", float>(95.f);
+                    float limit = config::get<"player.noclip.acclimit", double>(95.f);
                     if (acc >= limit)
                         return false;
                 }

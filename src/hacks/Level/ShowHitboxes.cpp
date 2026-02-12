@@ -109,9 +109,9 @@ namespace eclipse::hacks::Level {
             auto playerColorInner = config::get<"level.showhitboxes.player_color_inner", gui::Color>(gui::Color(0, 1, 0.2f));
             auto playerColorRotated = config::get<"level.showhitboxes.player_color_rotated", gui::Color>(gui::Color(1, 1, 0));
 
-            auto fillAlpha = config::get<"level.showhitboxes.fillalpha", float>(0.25f);
+            auto fillAlpha = config::get<"level.showhitboxes.fillalpha", double>(0.25f);
             auto fillAlphaToggle = config::get<"level.showhitboxes.fillalpha.toggle", bool>(true);
-            auto borderSize = config::get<"level.showhitboxes.bordersize", float>(0.25f);
+            auto borderSize = config::get<"level.showhitboxes.bordersize", double>(0.25f);
             auto renderTriggers = config::get<"level.showhitboxes.showtriggers", bool>(false);
 
             auto solidColorFill = gui::Color(solidColor, fillAlphaToggle ? fillAlpha : 0.f);
@@ -314,7 +314,7 @@ namespace eclipse::hacks::Level {
                 );
             }
 
-            auto max = static_cast<int>(config::get<"level.showhitboxes.traillength", float>(240.f));
+            auto max = static_cast<int>(config::get<"level.showhitboxes.traillength", double>(240.f));
 
             while (s_playerTrail1.size() > max)
                 s_playerTrail1.pop_front();

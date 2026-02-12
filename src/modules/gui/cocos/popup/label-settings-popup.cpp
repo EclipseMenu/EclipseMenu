@@ -17,7 +17,7 @@ namespace eclipse::gui::cocos {
 
     class PopupTab : public CCMenuItemSpriteExtra {
     public:
-        static PopupTab* create(std::string_view text, size_t page, LabelSettingsPopup* popup) {
+        static PopupTab* create(geode::ZStringView text, size_t page, LabelSettingsPopup* popup) {
             auto ret = new PopupTab();
             if (ret->init(text, page, popup)) {
                 ret->autorelease();
@@ -41,7 +41,7 @@ namespace eclipse::gui::cocos {
             m_popup->selectTab(m_page);
         }
 
-        bool init(std::string_view text, size_t page, LabelSettingsPopup* popup) {
+        bool init(geode::ZStringView text, size_t page, LabelSettingsPopup* popup) {
             auto const tm = ThemeManager::get();
 
             m_background = geode::NineSlice::create("square02b_001.png");

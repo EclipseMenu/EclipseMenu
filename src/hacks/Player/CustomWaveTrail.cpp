@@ -73,9 +73,9 @@ namespace eclipse::hacks::Player {
 
         void updateStroke(float dt) {
             if (config::get<"player.customwavetrail.rainbow", bool>(false)) {
-                auto speed = config::get<"player.customwavetrail.speed", float>(0.5f);
-                auto saturation = config::get<"player.customwavetrail.saturation", float>(100.f);
-                auto value = config::get<"player.customwavetrail.value", float>(100.f);
+                auto speed = config::get<"player.customwavetrail.speed", double>(0.5f);
+                auto saturation = config::get<"player.customwavetrail.saturation", double>(100.f);
+                auto value = config::get<"player.customwavetrail.value", double>(100.f);
                 this->setColor(utils::getRainbowColor(speed / 10.f, saturation / 100.f, value / 100.f).toCCColor3B());
             } else if (config::get<"player.customwavetrail.customcolor", bool>(false)) {
                 auto color = config::get<"player.customwavetrail.color", gui::Color>(gui::Colors::WHITE);
@@ -83,7 +83,7 @@ namespace eclipse::hacks::Player {
             }
 
             auto pulse = config::get<"player.customwavetrail.pulse", bool>(true);
-            auto scale = config::get<"player.customwavetrail.scale", float>(1.f);
+            auto scale = config::get<"player.customwavetrail.scale", double>(1.f);
 
             if (pulse) {
                 auto& [oldPulseSize] = *m_fields.self();
@@ -123,7 +123,7 @@ namespace eclipse::hacks::Player {
                 return CCDrawNode::drawPolygon(verts, count, fillColor, borderWidth, borderColor, alignment);
 
             auto color = config::get<"player.customwavetrail.outline.color", gui::Color>(gui::Colors::BLACK);
-            auto width = config::get<"player.customwavetrail.outline.stroke", float>(2.F);
+            auto width = config::get<"player.customwavetrail.outline.stroke", double>(2.F);
 
             this->setBlendFunc(cocos2d::CCSprite::create()->getBlendFunc());
             this->setZOrder(-1);

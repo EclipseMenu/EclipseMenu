@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace eclipse::keybinds {
-    enum class Keys {
+    enum class Keys : uint32_t {
         None,
 
         // Letters
@@ -129,10 +129,10 @@ namespace eclipse::keybinds {
         void setTitle(std::string title) { m_title = std::move(title); }
 
     private:
-        Keys m_key;
         std::string m_id;
         std::string m_title;
         Function<void(bool)> m_callback;
+        Keys m_key;
         bool m_initialized = false;
         bool m_internal = false;
     };
@@ -207,3 +207,15 @@ namespace eclipse::keybinds {
         friend bool isKeyReleased(Keys key);
     };
 }
+
+template <>
+struct matjson::Serialize<eclipse::keybinds::Keys> {
+    static Value toJson(eclipse::keybinds::Keys const& key) {
+        return static_cast<int>(key);
+    }
+
+    static geode::Result<eclipse::keybinds::Keys> fromJson(Value const& value) {
+        GEODE_UNWRAP_INTO(int keyInt, value.as<int>());
+        return geode::Ok(static_cast<eclipse::keybinds::Keys>(keyInt));
+    }
+};

@@ -208,22 +208,22 @@ $execute {
         // config
         vtable.Config_getBool = &config::getTemp<bool>;
         vtable.Config_getInt = &config::getTemp<int>;
-        vtable.Config_getFloat = &config::getTemp<float>;
+        vtable.Config_getDouble = &config::getTemp<double>;
         vtable.Config_getString = &config::getTemp<std::string>;
         vtable.Config_getStringView = &config::getTemp<std::string_view>;
         vtable.Config_getBoolInternal = &config::get<bool>;
         vtable.Config_getIntInternal = &config::get<int>;
-        vtable.Config_getFloatInternal = &config::get<float>;
+        vtable.Config_getDoubleInternal = &config::get<double>;
         vtable.Config_getStringInternal = &config::get<std::string>;
         vtable.Config_getStringViewInternal = &config::get<std::string_view>;
         vtable.Config_setBool = &config::setTemp<bool>;
         vtable.Config_setInt = &config::setTemp<int>;
-        vtable.Config_setFloat = &config::setTemp<float>;
+        vtable.Config_setDouble = &config::setTemp<double>;
         vtable.Config_setString = &config::setTemp<std::string>;
         vtable.Config_setStringView = &config::setTemp<std::string_view>;
         vtable.Config_setBoolInternal = &config::set<bool>;
         vtable.Config_setIntInternal = &config::set<int>;
-        vtable.Config_setFloatInternal = &config::set<float>;
+        vtable.Config_setDoubleInternal = &config::set<double>;
         vtable.Config_setStringInternal = &config::set<std::string>;
         vtable.Config_setStringViewInternal = &config::set<std::string_view>;
 

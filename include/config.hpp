@@ -8,10 +8,10 @@
 #include "events.hpp"
 
 namespace eclipse::config {
-    /// @brief Concept for supported types in the config system (bool, int, float, std::string)
+    /// @brief Concept for supported types in the config system (bool, int, double, std::string)
     template <typename T>
     concept SupportedType = requires(T a) {
-        std::same_as<T, bool> || std::same_as<T, int> || std::same_as<T, float> || std::same_as<T, std::string> || std::same_as<T, std::string_view>;
+        std::same_as<T, bool> || std::same_as<T, int> || std::same_as<T, double> || std::same_as<T, std::string> || std::same_as<T, std::string_view>;
     };
 }
 
@@ -33,9 +33,9 @@ namespace eclipse::config {
             if (vtable.Config_getInt) {
                 return vtable.Config_getInt(key, defaultValue);
             }
-        } else if constexpr (std::is_same_v<T, float>) {
-            if (vtable.Config_getFloat) {
-                return vtable.Config_getFloat(key, defaultValue);
+        } else if constexpr (std::is_same_v<T, double>) {
+            if (vtable.Config_getDouble) {
+                return vtable.Config_getDouble(key, defaultValue);
             }
         } else if constexpr (std::is_same_v<T, std::string>) {
             if (vtable.Config_getString) {
@@ -64,9 +64,9 @@ namespace eclipse::config {
             if (vtable.Config_getIntInternal) {
                 return vtable.Config_getIntInternal(key, defaultValue);
             }
-        } else if constexpr (std::is_same_v<T, float>) {
-            if (vtable.Config_getFloatInternal) {
-                return vtable.Config_getFloatInternal(key, defaultValue);
+        } else if constexpr (std::is_same_v<T, double>) {
+            if (vtable.Config_getDoubleInternal) {
+                return vtable.Config_getDoubleInternal(key, defaultValue);
             }
         } else if constexpr (std::is_same_v<T, std::string>) {
             if (vtable.Config_getStringInternal) {
@@ -94,9 +94,9 @@ namespace eclipse::config {
             if (vtable.Config_setInt) {
                 vtable.Config_setInt(key, value);
             }
-        } else if constexpr (std::is_same_v<T, float>) {
-            if (vtable.Config_setFloat) {
-                vtable.Config_setFloat(key, value);
+        } else if constexpr (std::is_same_v<T, double>) {
+            if (vtable.Config_setDouble) {
+                vtable.Config_setDouble(key, value);
             }
         } else if constexpr (std::is_same_v<T, std::string>) {
             if (vtable.Config_setString) {
@@ -123,9 +123,9 @@ namespace eclipse::config {
             if (vtable.Config_setIntInternal) {
                 vtable.Config_setIntInternal(key, value);
             }
-        } else if constexpr (std::is_same_v<T, float>) {
-            if (vtable.Config_setFloatInternal) {
-                vtable.Config_setFloatInternal(key, value);
+        } else if constexpr (std::is_same_v<T, double>) {
+            if (vtable.Config_setDoubleInternal) {
+                vtable.Config_setDoubleInternal(key, value);
             }
         } else if constexpr (std::is_same_v<T, std::string>) {
             if (vtable.Config_setStringInternal) {

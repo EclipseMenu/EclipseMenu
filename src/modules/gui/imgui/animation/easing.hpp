@@ -276,3 +276,15 @@ namespace eclipse::gui::animation {
     /// @return The easing function.
     EasingFunction getEasingFunction(Easing easing, EasingMode mode);
 }
+
+template <>
+struct matjson::Serialize<eclipse::gui::animation::Easing> {
+    static geode::Result<eclipse::gui::animation::Easing> fromJson(Value const& value);
+    static Value toJson(eclipse::gui::animation::Easing const& easing);
+};
+
+template <>
+struct matjson::Serialize<eclipse::gui::animation::EasingMode> {
+    static geode::Result<eclipse::gui::animation::EasingMode> fromJson(Value const& value);
+    static Value toJson(eclipse::gui::animation::EasingMode const& mode);
+};

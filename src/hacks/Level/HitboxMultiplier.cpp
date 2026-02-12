@@ -17,11 +17,11 @@ namespace eclipse::hacks::Level {
             return 1.f;
 
         if ((gameObject == utils::get<GJBaseGameLayer>()->m_player1 || gameObject == utils::get<GJBaseGameLayer>()->m_player2))
-            return config::get<float>("level.hitbox_multiplier.player", 1.f);
+            return config::get<double>("level.hitbox_multiplier.player", 1.f);
         if (gameObject->m_objectType == GameObjectType::Hazard || gameObject->m_objectType == GameObjectType::AnimatedHazard)
-            return config::get<float>("level.hitbox_multiplier.hazard", 1.f);
+            return config::get<double>("level.hitbox_multiplier.hazard", 1.f);
         if (gameObject->m_objectType == GameObjectType::Solid || gameObject->m_objectType == GameObjectType::Slope)
-            return config::get<float>("level.hitbox_multiplier.solid", 1.f);
+            return config::get<double>("level.hitbox_multiplier.solid", 1.f);
 
         return 1.f;
     }

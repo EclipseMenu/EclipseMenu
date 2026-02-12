@@ -51,9 +51,9 @@ namespace eclipse::hacks::Player {
             if (!playLayer) return;
 
             auto percentageEnabled = config::get<bool>("player.autokill.percentage.toggle", true);
-            auto percentage = config::get<float>("player.autokill.percentage", 50.0f);
+            auto percentage = config::get<double>("player.autokill.percentage", 50.0f);
             auto timeEnabled = config::get<bool>("player.autokill.time.toggle", false);
-            auto time = config::get<float>("player.autokill.time", 90.0f);
+            auto time = config::get<double>("player.autokill.time", 90.0f);
 
             bool shouldKill = false;
             shouldKill |= percentageEnabled && playLayer->getCurrentPercent() >= percentage;

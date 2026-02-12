@@ -5,7 +5,6 @@
 #include <Geode/loader/Mod.hpp>
 
 #include <fmt/format.h>
-#include <nlohmann/json.hpp>
 
 #include <modules/gui/color.hpp>
 #include <modules/keybinds/manager.hpp>
@@ -26,27 +25,22 @@ namespace eclipse::config {
         return tempCallbacks;
     }
 
-    nlohmann::json& getStorage() {
-        static nlohmann::json storage = [] {
-            auto path = geode::Mod::get()->getSaveDir() / "config.json";
-            std::ifstream file(path);
-            if (!file.is_open()) {
-                geode::log::warn("Failed to open config file, creating a new one.");
-                return nlohmann::json::object();
+    matjson::Value& getStorage() {
+        static matjson::Value storage = [] {
+            auto res = geode::utils::file::readJson(geode::Mod::get()->getSaveDir() / "config.json");
+            if (!res) {
+                geode::log::warn("Failed to read config file: {}, creating a new one.", res.unwrapErr());
+                return matjson::Value::object();
             }
-            auto res = nlohmann::json::parse(file, nullptr, false);
-            if (res.is_discarded()) {
-                geode::log::warn("Failed to parse config file, creating a new one.");
-                return nlohmann::json::object();
-            }
+
             geode::log::debug("Loaded config file");
-            return res;
+            return std::move(res).unwrap();
         }();
         return storage;
     }
 
-    nlohmann::json& getTempStorage() {
-        static nlohmann::json tempStorage;
+    matjson::Value& getTempStorage() {
+        static matjson::Value tempStorage;
         return tempStorage;
     }
 
@@ -54,14 +48,17 @@ namespace eclipse::config {
     /// @param path Path to the config file
     /// @return True if the file was loaded successfully
     bool loadFile(std::filesystem::path const& path) {
-        std::ifstream file(path);
-        if (!file.is_open()) return false;
-
         auto& storage = getStorage();
-        storage = nlohmann::json::parse(file, nullptr, false);
-        file.close();
+        auto res = geode::utils::file::readJson(path);
+        if (!res) {
+            geode::log::warn("Failed to read config file: {}, creating a new one.", res.unwrapErr());
+            storage = matjson::Value::object();
+            return false;
+        }
 
-        return !storage.is_discarded();
+        geode::log::debug("Loaded config file");
+        storage = std::move(res).unwrap();
+        return true;
     }
 
     void executeCallbacks(std::string_view name) {
@@ -112,7 +109,7 @@ namespace eclipse::config {
     /// @brief Save config file to path
     /// @param path Path to save the config file
     void saveFile(std::filesystem::path const& path) {
-        auto data = getStorage().dump(4, ' ', false, nlohmann::detail::error_handler_t::ignore);
+        auto data = getStorage().dump();
         auto res = geode::utils::file::writeStringSafe(path, data);
         if (res.isErr()) {
             geode::log::error("Failed to save config file: {}", res.unwrapErr());
@@ -194,116 +191,8 @@ namespace eclipse::config {
         getStorage().erase(key);
     }
 
-    nlohmann::detail::value_t getType(std::string_view key) {
-        if (!has(key)) return nlohmann::detail::value_t::null;
-        return getStorage().at(key).type();
+    matjson::Type getType(std::string_view key) {
+        if (!has(key)) return matjson::Type::Null;
+        return getStorage()[key].type();
     }
-
-    template <typename T>
-    T get(std::string_view key, T const& defaultValue)  {
-        if (!has(key))
-            return defaultValue;
-
-        return getStorage().at(key).get<T>();
-    }
-
-    template <typename T>
-    geode::Result<T> get(std::string_view key) {
-        if (!has(key))
-            return geode::Err(fmt::format("Key '{}' does not exist", key));
-
-        return geode::Ok(getStorage().at(key).get<T>());
-    }
-
-    template <typename T>
-    void set(std::string_view key, T value) {
-        getStorage()[key] = std::move(value);
-        executeCallbacks(key);
-    }
-
-    template <typename T>
-    bool is(std::string_view key) {
-        if (!has(key))
-            return false;
-
-        auto type = getType(key);
-        if constexpr (std::is_same_v<T, std::string>) {
-            return type == nlohmann::detail::value_t::string;
-        } else if constexpr (std::is_same_v<T, bool>) {
-            return type == nlohmann::detail::value_t::boolean;
-        } else if constexpr (std::is_same_v<T, int>) {
-            return type == nlohmann::detail::value_t::number_integer;
-        } else if constexpr (std::is_same_v<T, float>) {
-            return type == nlohmann::detail::value_t::number_float;
-        }
-
-        return false;
-    }
-
-    template <typename T>
-    void setIfEmpty(std::string_view key, T value) {
-        if (!has(key))
-            set(key, std::move(value));
-    }
-
-    template <typename T>
-    T getTemp(std::string_view key, T const& defaultValue) {
-        if (!hasTemp(key))
-            return defaultValue;
-
-        return getTempStorage().at(key).get<T>();
-    }
-
-    template <typename T>
-    geode::Result<T> getTemp(std::string_view key) {
-        if (!hasTemp(key))
-            return geode::Err(fmt::format("Key '{}' does not exist", key));
-
-        return geode::Ok(getTempStorage().at(key).get<T>());
-    }
-
-    template <typename T>
-    void setTemp(std::string_view key, T value) {
-        getTempStorage()[key] = std::move(value);
-        executeTempCallbacks(key);
-    }
-
-    // Explicit instantiations
-    #define INSTANTIATE_IMPL_VOID(type, def) \
-        template void set<type>(std::string_view, def); \
-        template void setIfEmpty<type>(std::string_view, def); \
-        template void setTemp<type>(std::string_view, def)
-
-    #define INSTANTIATE_IMPL_NON_VOID(type, def) \
-        template type get<type>(std::string_view, def); \
-        template geode::Result<type> get<type>(std::string_view); \
-        template bool is<type>(std::string_view); \
-        template type getTemp<type>(std::string_view, def); \
-        template geode::Result<type> getTemp<type>(std::string_view);
-
-    #define INSTANTIATE_IMPL(type, def) \
-        INSTANTIATE_IMPL_VOID(type, def); \
-        INSTANTIATE_IMPL_NON_VOID(type, def const&)
-
-    #define INSTANTIATE(type) INSTANTIATE_IMPL(type, type)
-
-    INSTANTIATE(std::filesystem::path);
-    INSTANTIATE(std::string);
-    INSTANTIATE(std::string_view);
-    INSTANTIATE_IMPL_VOID(char[1], char[1]);
-    INSTANTIATE(int);
-    INSTANTIATE(int64_t);
-    INSTANTIATE(uint64_t);
-    #if defined(GEODE_IS_MACOS) || defined(GEODE_IS_ANDROID32) || defined(GEODE_IS_IOS)
-    INSTANTIATE(size_t);
-    #endif
-    INSTANTIATE(float);
-    INSTANTIATE(double);
-    INSTANTIATE(bool);
-    INSTANTIATE(gui::Color);
-    INSTANTIATE(keybinds::Keys);
-    INSTANTIATE(std::vector<labels::LabelSettings>);
-    INSTANTIATE(std::vector<nlohmann::json>);
-    INSTANTIATE(gui::animation::Easing);
-    INSTANTIATE(gui::animation::EasingMode);
 }

@@ -10,23 +10,23 @@ namespace eclipse::__internal__ {
         // config
         bool(*Config_getBool)(std::string_view, bool const&) = nullptr;
         int(*Config_getInt)(std::string_view, int const&) = nullptr;
-        float(*Config_getFloat)(std::string_view, float const&) = nullptr;
+        double(*Config_getDouble)(std::string_view, double const&) = nullptr;
         std::string(*Config_getString)(std::string_view, std::string const&) = nullptr;
         std::string_view(*Config_getStringView)(std::string_view, std::string_view const&) = nullptr;
         bool(*Config_getBoolInternal)(std::string_view, bool const&) = nullptr;
         int(*Config_getIntInternal)(std::string_view, int const&) = nullptr;
-        float(*Config_getFloatInternal)(std::string_view, float const&) = nullptr;
+        double(*Config_getDoubleInternal)(std::string_view, double const&) = nullptr;
         std::string(*Config_getStringInternal)(std::string_view, std::string const&) = nullptr;
         std::string_view(*Config_getStringViewInternal)(std::string_view, std::string_view const&) = nullptr;
 
         void(*Config_setBool)(std::string_view, bool) = nullptr;
         void(*Config_setInt)(std::string_view, int) = nullptr;
-        void(*Config_setFloat)(std::string_view, float) = nullptr;
+        void(*Config_setDouble)(std::string_view, double) = nullptr;
         void(*Config_setString)(std::string_view, std::string) = nullptr;
         void(*Config_setStringView)(std::string_view, std::string_view) = nullptr;
         void(*Config_setBoolInternal)(std::string_view, bool) = nullptr;
         void(*Config_setIntInternal)(std::string_view, int) = nullptr;
-        void(*Config_setFloatInternal)(std::string_view, float) = nullptr;
+        void(*Config_setDoubleInternal)(std::string_view, double) = nullptr;
         void(*Config_setStringInternal)(std::string_view, std::string) = nullptr;
         void(*Config_setStringViewInternal)(std::string_view, std::string_view) = nullptr;
 

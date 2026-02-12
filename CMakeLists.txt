@@ -15,7 +15,7 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 project(EclipseMenu VERSION 1.0.0 LANGUAGES CXX)
 
 # Sources
-file(GLOB_RECURSE SOURCES src/*.cpp)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 # Configure for GitHub Actions builds
@@ -25,6 +25,16 @@ if (DEFINED ENV{GITHUB_ACTIONS})
   target_compile_definitions(${PROJECT_NAME} PRIVATE GITHUB_ACTIONS)
   message(STATUS "GitHub Actions build detected")
   set(ECLIPSE_DISABLE_INCREMENTAL_LINK ON)
+  set(ECLIPSE_ENABLE_UNITY_BUILD ON)
+endif()
+
+if (ECLIPSE_ENABLE_UNITY_BUILD)
+  message(STATUS "Enabling unity build")
+  set_target_properties(
+    ${PROJECT_NAME} PROPERTIES
+    UNITY_BUILD ON
+    UNITY_BUILD_UNIQUE_ID "GEODE_UNITY_NS_ID"
+  )
 endif()
 
 # Make sure we can include headers from src

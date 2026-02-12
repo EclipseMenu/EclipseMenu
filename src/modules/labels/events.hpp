@@ -108,3 +108,14 @@ namespace eclipse::labels {
         std::vector<Event> m_events;
     };
 }
+
+template <>
+struct matjson::Serialize<eclipse::labels::LabelEvent::Type> {
+    static Value toJson(eclipse::labels::LabelEvent::Type const& type) {
+        return static_cast<int>(type);
+    }
+    static geode::Result<eclipse::labels::LabelEvent::Type> fromJson(Value const& value) {
+        GEODE_UNWRAP_INTO(auto intValue, value.as<int>());
+        return geode::Ok(static_cast<eclipse::labels::LabelEvent::Type>(intValue));
+    }
+};

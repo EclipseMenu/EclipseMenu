@@ -85,7 +85,7 @@ namespace eclipse::hacks::Player {
                     s_holdDelayTimer = 0;
 
                 // Add a grace period after the first press to allow for holding
-                auto delay = config::get<float>("player.framestepper.hold_delay", 0.25f);
+                auto delay = config::get<double>("player.framestepper.hold_delay", 0.25f);
                 if (FrameStepper::isDown()) {
                     shouldStep = firstPress;
                     s_holdAdvanceTimer++;

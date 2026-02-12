@@ -1,7 +1,6 @@
 #include "color.hpp"
 #include <imgui.h>
 #include <fmt/format.h>
-#include <nlohmann/json.hpp>
 
 namespace eclipse::gui {
     Color::operator ImU32() const {
@@ -174,13 +173,13 @@ namespace eclipse::gui {
         rgb.a = a;
         return rgb;
     }
+}
 
-    void to_json(nlohmann::json& j, Color const& e) {
-        auto str = e.toString();
-        j = str;
-    }
+matjson::Value matjson::Serialize<eclipse::gui::Color>::toJson(eclipse::gui::Color const& color) {
+    return color.toString();
+}
 
-    void from_json(nlohmann::json const& j, Color& e) {
-        e = Color::fromString(j.get<std::string>());
-    }
+geode::Result<eclipse::gui::Color> matjson::Serialize<eclipse::gui::Color>::fromJson(Value const& value) {
+    GEODE_UNWRAP_INTO(auto str, value.as<std::string>());
+    return geode::Ok(eclipse::gui::Color::fromString(str));
 }

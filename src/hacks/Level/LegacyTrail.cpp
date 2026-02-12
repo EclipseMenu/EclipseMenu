@@ -44,7 +44,7 @@ namespace eclipse::hacks::Level {
                 m_fStroke = stroke;
                 m_fFadeDelta = 1.0f / fade;
 
-                float maxPoints = config::get<"level.legacytrail.max_points", float>();
+                float maxPoints = config::get<"level.legacytrail.max_points", double>();
                 m_uMaxPoints = static_cast<unsigned int>(maxPoints);
 
                 m_uNuPoints = 0;

@@ -67,7 +67,7 @@ namespace eclipse::hacks::Player {
 
             if (config::get<bool>("player.noclip.acclimit.toggle", false)) {
                 auto acc = config::getTemp<float>("noclipAccuracy", 100.f);
-                auto limit = config::get<float>("player.noclip.acclimit", 95.f);
+                auto limit = config::get<double>("player.noclip.acclimit", 95.f);
                 if (acc < limit)
                     return PlayLayer::destroyPlayer(player, object);
             }
@@ -113,13 +113,13 @@ namespace eclipse::hacks::Player {
             config::setTemp<bool>("noclipDying", fields->m_wouldDieFrame || fields->m_deadLastFrame);
 
             if (config::get<bool>("player.noclip.tint", false) && fields->m_noclipTint && !m_hasCompletedLevel && !m_player1->m_isDead) {
-                float time = config::get<float>("player.noclip.time", 0.f);
+                float time = config::get<double>("player.noclip.time", 0.f);
                 if (time == 0.f) { // this doesnt really work but ok ninx
                     if (fields->m_wouldDie) {
                         if (fields->m_tintOpacity < 1.f) {
                             fields->m_tintOpacity += 0.25f;
                             fields->m_noclipTint->setOpacity(
-                                fields->m_tintOpacity * config::get<float>("player.noclip.opacity", 90.f)
+                                fields->m_tintOpacity * config::get<double>("player.noclip.opacity", 90.f)
                             );
                         }
                         fields->m_wouldDie = false;
@@ -127,7 +127,7 @@ namespace eclipse::hacks::Player {
                         if (fields->m_tintOpacity > 0.f) {
                             fields->m_tintOpacity -= 0.25f;
                             fields->m_noclipTint->setOpacity(
-                                fields->m_tintOpacity * config::get<float>("player.noclip.opacity", 90.f)
+                                fields->m_tintOpacity * config::get<double>("player.noclip.opacity", 90.f)
                             );
                         }
                     }
@@ -141,7 +141,7 @@ namespace eclipse::hacks::Player {
                             fields->m_tintTimer = 0.F;
                             fields->m_tintOpacity = 0.f;
                         } else {
-                            auto startOpacity = config::get<float>("player.noclip.opacity", 90.f);
+                            auto startOpacity = config::get<double>("player.noclip.opacity", 90.f);
                             fields->m_tintOpacity = (255.F * (startOpacity / 100.F)) * (1.f - progress);
                         }
                         if (fields->m_tintOpacity <= 0.0F)
@@ -201,7 +201,7 @@ namespace eclipse::hacks::Player {
                 float acc = static_cast<float>(frame - fields->m_deadFrames) / static_cast<float>(frame) * 100.f;
                 config::setTemp("noclipAccuracy", acc);
                 bool dead = (m_player1 && m_player1->m_isDead) || (m_player2 && m_player2->m_isDead);
-                //if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc <= config::get<float>("player.noclip.acclimit", 95.f) && !dead)
+                //if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc <= config::get<double>("player.noclip.acclimit", 95.f) && !dead)
                 //utils::get<PlayLayer>()->destroyPlayer(m_player1, (GameObject*)((int*)1));
             }
         }
@@ -209,7 +209,7 @@ namespace eclipse::hacks::Player {
 }
 
 /*
-if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc < config::get<float>("player.noclip.acclimit", 95.f)) {
+if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc < config::get<double>("player.noclip.acclimit", 95.f)) {
                     utils::get<PlayLayer>()->destroyPlayer(m_player1, nullptr);
-                    config::setTemp("noclipAccuracy", config::get<float>("player.noclip.acclimit", 95.f));
+                    config::setTemp("noclipAccuracy", config::get<double>("player.noclip.acclimit", 95.f));
                 }*/

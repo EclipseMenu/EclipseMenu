@@ -96,7 +96,7 @@ namespace eclipse::hacks::Level {
                 playLayer->updateTestModeLabel();
             };
 
-            float delay = config::get<float>("level.startpos_switcher.delay", 0.f);
+            float delay = config::get<double>("level.startpos_switcher.delay", 0.f);
             if(delay <= 0.f) return func();
 
             if(startPosSwitcherSequence) playLayer->stopAction(startPosSwitcherSequence);
@@ -149,7 +149,7 @@ namespace eclipse::hacks::Level {
             m_next->setPosition(65.0f, 0.0f);
             m_label->setPosition(0.0f, 0.0f);
 
-            auto scale = config::get<float>("label.startpos_switcher.scale", 0.7f);
+            auto scale = config::get<double>("label.startpos_switcher.scale", 0.7f);
             auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
             this->setPosition(winSize.width / 2.f, 30.f * scale);
             this->setAnchorPoint({0.f, 0.f});
@@ -199,7 +199,7 @@ namespace eclipse::hacks::Level {
             m_timeSinceAction += dt;
 
             // Update scale and color
-            auto scale = config::get<"label.startpos_switcher.scale", float>(0.7f);
+            auto scale = config::get<"label.startpos_switcher.scale", double>(0.7f);
             auto color = config::get<"label.startpos_switcher.color", gui::Color>(gui::Color(1.f, 1.f, 1.f, 0.6f));
             this->setScale(scale);
             m_label->setColor(color.toCCColor3B());
@@ -209,7 +209,7 @@ namespace eclipse::hacks::Level {
             if (m_timeSinceAction < 3.f) {
                 this->setOpacity(color.a * 255);
             } else {
-                auto opacityMod = 1.f - config::get<"label.startpos_switcher.alpha_mod", float>(0.4f);
+                auto opacityMod = 1.f - config::get<"label.startpos_switcher.alpha_mod", double>(0.4f);
                 auto clampedTime = std::clamp(m_timeSinceAction - 3.f, 0.f, animationTime) / animationTime;
                 auto modifier = 1.f - (clampedTime * opacityMod);
                 this->setOpacity(color.a * 255 * modifier);

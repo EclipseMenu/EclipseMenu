@@ -16,7 +16,7 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    TabButton* TabButton::create(std::string_view name, cocos2d::CCSize const& size) {
+    TabButton* TabButton::create(geode::ZStringView name, cocos2d::CCSize const& size) {
         auto ret = new TabButton();
         if (ret->init(name, size)) {
             ret->autorelease();
@@ -161,7 +161,7 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    bool TabButton::init(std::string_view name, cocos2d::CCSize size) {
+    bool TabButton::init(geode::ZStringView name, cocos2d::CCSize size) {
         if (!CCNode::init()) return false;
         this->setScale(0.9F);
         this->setID(fmt::format("tab-button-{}"_spr, name));

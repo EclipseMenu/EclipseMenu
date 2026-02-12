@@ -54,18 +54,18 @@ namespace eclipse::gui {
             return false;
 
         // setup settings
-        m_baseScale = config::get<float>("float-btn.scale", 0.25f);
-        m_maxOpacity = config::get<float>("float-btn.max-opacity", 1.f);
-        m_minOpacity = config::get<float>("float-btn.min-opacity", 0.5f);
+        m_baseScale = config::get<double>("float-btn.scale", 0.25f);
+        m_maxOpacity = config::get<double>("float-btn.max-opacity", 1.f);
+        m_minOpacity = config::get<double>("float-btn.min-opacity", 0.5f);
         m_showInLevel = config::get<bool>("float-btn.show-in-level", false);
         m_showInEditor = config::get<bool>("float-btn.show-in-editor", true);
 
         // add delegates
         config::addDelegate("float-btn.max-opacity", [this] {
-            m_maxOpacity = config::get<float>("float-btn.max-opacity", 1.f);
+            m_maxOpacity = config::get<double>("float-btn.max-opacity", 1.f);
         });
         config::addDelegate("float-btn.min-opacity", [this] {
-            m_minOpacity = config::get<float>("float-btn.min-opacity", 0.5f);
+            m_minOpacity = config::get<double>("float-btn.min-opacity", 0.5f);
         });
         config::addDelegate("float-btn.show-in-level", [this] {
             m_showInLevel = config::get<bool>("float-btn.show-in-level", false);
@@ -74,7 +74,7 @@ namespace eclipse::gui {
             m_showInEditor = config::get<bool>("float-btn.show-in-editor", true);
         });
         config::addDelegate("float-btn.scale", [this] {
-            this->setScale(config::get<float>("float-btn.scale", 0.25f));
+            this->setScale(config::get<double>("float-btn.scale", 0.25f));
         });
 
         // setup button

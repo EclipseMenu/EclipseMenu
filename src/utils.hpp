@@ -125,7 +125,7 @@ namespace eclipse::utils {
     int getPlayerIcon(PlayerMode mode);
 
     /// @brief Get current chosen TPS.
-    float getTPS();
+    double getTPS();
 
     /// @brief Get custom CCMenu created in UILayer.
     class cocos2d::CCMenu* getEclipseUILayer();

@@ -4,7 +4,6 @@
 #include <string>
 #include <functional>
 #include <imgui.h>
-#include <nlohmann/json.hpp>
 #include "../animation/easing.hpp"
 #include "../animation/move-action.hpp"
 
@@ -53,6 +52,8 @@ namespace eclipse::gui::imgui {
         [[nodiscard]] ImVec2 const& getSize() const;
         void setSize(ImVec2 const& size);
 
+        void applyJson(matjson::Value const& json);
+
         /// @brief Create new `MoveAction` instance for the window
         /// @param target Target position
         /// @param duration How long the animation should last in seconds
@@ -65,17 +66,19 @@ namespace eclipse::gui::imgui {
                 bool useRealPosition = false);
 
     private:
+        Function<void()> m_drawCallback; // Callback which will be called when the window is drawn
         std::string m_title; // Window title
-        bool m_isOpen;       // Whether the window is collapsed or not
 
         ImVec2 m_position;     // Window position in opened state
         ImVec2 m_drawPosition; // Window position used for drawing (used for animations)
         ImVec2 m_size;         // Window size
 
-        Function<void()> m_drawCallback; // Callback which will be called when the window is drawn
+        bool m_isOpen;       // Whether the window is collapsed or not
     };
-
-    void to_json(nlohmann::json& j, Window const& e);
-    void from_json(nlohmann::json const& j, Window& e);
-
 }
+
+template <>
+struct matjson::Serialize<eclipse::gui::imgui::Window> {
+    static Value toJson(eclipse::gui::imgui::Window const& window);
+    static geode::Result<eclipse::gui::imgui::Window> fromJson(Value const& value);
+};

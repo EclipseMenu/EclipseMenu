@@ -87,7 +87,7 @@ namespace eclipse::gui::cocos {
             cocos->unregisterModal(this);
     }
 
-    cocos2d::CCNode* ModalPopup::createButtonSprite(std::string_view text) const {
+    cocos2d::CCNode* ModalPopup::createButtonSprite(geode::ZStringView text) const {
         auto label = TranslatedLabel::createRaw(text);
         label->setScale(0.9f);
         auto bg = geode::NineSlice::create("geode.loader/GE_button_05.png");

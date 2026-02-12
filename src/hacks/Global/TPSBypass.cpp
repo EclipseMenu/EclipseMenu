@@ -203,9 +203,9 @@ namespace eclipse::hacks::Global {
         template <typename T>
         [[nodiscard]] static std::vector<uint8_t> TPStoBytes() {
             if constexpr (std::is_same_v<T, float>) {
-                return geode::toBytes(1.f / config::get<"global.tpsbypass", float>(240.f));
+                return geode::toBytes(1.f / float(config::get<"global.tpsbypass", double>(240.f)));
             } else if constexpr (std::is_same_v<T, double>) {
-                return geode::toBytes<double>(1.0 / config::get<"global.tpsbypass", float>(240.f));
+                return geode::toBytes<double>(1.0 / config::get<"global.tpsbypass", double>(240.f));
             } else {
                 static_assert(alwaysFalse<T>, "TPStoBytes only supports float and double");
             }
@@ -216,13 +216,13 @@ namespace eclipse::hacks::Global {
             if constexpr (std::is_same_v<T, float>) {
                 auto bytes = assembler::arm64::mov_float(
                     assembler::arm64::Register::w9,
-                    1.f / config::get<"global.tpsbypass", float>(240.f)
+                    1.f / config::get<"global.tpsbypass", double>(240.f)
                 );
                 return std::vector(bytes.begin(), bytes.end());
             } else if constexpr (std::is_same_v<T, double>) {
                 auto bytes = assembler::arm64::mov_double(
                     assembler::arm64::Register::x9,
-                    1.0 / config::get<"global.tpsbypass", float>(240.f)
+                    1.0 / config::get<"global.tpsbypass", double>(240.f)
                 );
                 return std::vector(bytes.begin(), bytes.end());
             } else {
@@ -315,7 +315,7 @@ namespace eclipse::hacks::Global {
 
         [[nodiscard]] bool isCheating() const override {
             auto toggle = config::get<"global.tpsbypass.toggle", bool>();
-            auto tps = config::get<"global.tpsbypass", float>(240.f);
+            auto tps = config::get<"global.tpsbypass", double>(240.f);
             return toggle && tps != 240.f;
         }
     };
@@ -355,7 +355,7 @@ namespace eclipse::hacks::Global {
             #ifdef GEODE_IS_IOS
             return getCustomDelta(dt, utils::getTPS());
             #else
-            return getCustomDelta(dt, config::get<"global.tpsbypass", float>(240.f));
+            return getCustomDelta(dt, config::get<"global.tpsbypass", double>(240.f));
             #endif
         }
         #endif
@@ -371,7 +371,7 @@ namespace eclipse::hacks::Global {
             // on iOS, since the hook is always active, we also check if tpsbypass is enabled
             auto newTPS = utils::getTPS() / timeWarp;
             #else
-            auto newTPS = config::get<"global.tpsbypass", float>(240.f) / timeWarp;
+            auto newTPS = config::get<"global.tpsbypass", double>(240.f) / timeWarp;
             #endif
 
             auto spt = 1.0 / newTPS;
@@ -396,7 +396,7 @@ namespace eclipse::hacks::Global {
             auto timestamp = m_level->m_timestamp;
             auto currentProgress = m_gameState.m_currentProgress;
             // this is only an issue for 2.2+ levels (with TPS greater than 240)
-            if (timestamp > 0 && config::get<"global.tpsbypass", float>(240.f) != 240.f) {
+            if (timestamp > 0 && config::get<"global.tpsbypass", double>(240.f) != 240.f) {
                 // recalculate m_currentProgress based on the actual time passed
                 auto progress = utils::getActualProgress(this);
                 m_gameState.m_currentProgress = timestamp * progress / 100.f;
@@ -420,7 +420,7 @@ namespace eclipse::hacks::Global {
             // levelComplete uses m_gameState.m_unkUint2 to store the timestamp
             // also we can't rely on m_level->m_timestamp, because it might not be updated yet
             auto oldTimestamp = m_gameState.m_commandIndex;
-            if (config::get<"global.tpsbypass", float>(240.f) != 240.f) {
+            if (config::get<"global.tpsbypass", double>(240.f) != 240.f) {
                 auto ticks = static_cast<uint32_t>(std::round(m_gameState.m_levelTime * 240));
                 m_gameState.m_commandIndex = ticks;
             }
