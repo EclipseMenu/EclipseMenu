@@ -20,14 +20,8 @@ if (NOT ANDROID AND NOT IOS)
     CPMAddPackage("gh:EclipseMenu/discord-presence#01b3ebc")
 endif()
 
-#CPMAddPackage(
-#    NAME nlohmann_json
-#    GITHUB_REPOSITORY nlohmann/json
-#    VERSION 3.12.0
-#)
-
 CPMAddPackage("gh:matcool/gd-imgui-cocos#9764333")
-CPMAddPackage("gh:maxnut/GDR-converter#55c5321")
+CPMAddPackage("gh:maxnut/GDR-converter#71104a9")
 CPMAddPackage("gh:EclipseMenu/rift@2.0.2")
 CPMAddPackage("gh:prevter/AdvancedLabel#a800983")
 CPMAddPackage("gh:prevter/sinaps#7d2f7b1")
@@ -48,7 +42,6 @@ target_link_libraries(third_party INTERFACE
     libGDR
     imgui
     imgui-cocos
-    # nlohmann_json::nlohmann_json
     rift
     advanced_label
     sinaps
