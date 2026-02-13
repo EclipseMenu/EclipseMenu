@@ -32,7 +32,7 @@ namespace eclipse::hacks::Global {
     #ifdef GEODE_IS_IOS
     // iOS launcher has a secret space to store data, and it's located at 0x8b8000
     // 8 bytes are reserved for geode itself, so we can just skip 8 bytes
-    constexpr uintptr_t g_jitlessSpace = 0x8b8008; // omg boob :o
+    constexpr uintptr_t g_jitlessSpace = 0x8c4008; // omg boob :o
     static TicksType* g_expectedTicksPtr = &g_expectedTicks;
 
     TicksType& expectedTicks() { return *g_expectedTicksPtr; }
