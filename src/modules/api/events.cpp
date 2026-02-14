@@ -48,26 +48,9 @@ StringMap<Function<bool()>>& getCheats() { return g_cheats; }
 //     new EventListener<EventFilter<events::GetRiftVariableEvent<T>>>(+[](events::GetRiftVariableEvent<T>* e) {
 //         auto val = labels::VariableManager::get().getVariable(std::string(e->getName()));
 //
-// #define HANDLE_CASE(type) \
-// if (val.is##type()) { e->setResult(Ok(val.get##type())); }\
-// else { e->setResult(Err("Value is not a " #type)); }
+
 //
-//         if constexpr (std::same_as<T, std::string>) {
-//             HANDLE_CASE(String)
-//         } else if constexpr (std::same_as<T, bool>) {
-//             HANDLE_CASE(Boolean)
-//         } else if constexpr (std::same_as<T, int64_t>) {
-//             HANDLE_CASE(Integer)
-//         } else if constexpr (std::same_as<T, double>) {
-//             HANDLE_CASE(Float)
-//         } else if constexpr (std::same_as<T, label::null_t>) {
-//             if (val.isNull()) e->setResult(Ok(std::monostate{}));
-//             else e->setResult(Err("Value is not null"));
-//         } else if constexpr (std::same_as<T, matjson::Value>) {
-//             e->setResult(Ok(val.toJson()));
-//         } else {
-//             e->setResult(Err("Unsupported type"));
-//         }
+
 //
 // #undef HANDLE_CASE
 //
@@ -203,6 +186,51 @@ StringMap<Function<bool()>>& getCheats() { return g_cheats; }
 //     });
 // }
 
+std::string formatRiftString(std::string_view source) {
+    auto res = rift::format(source, labels::VariableManager::get().getVariables());
+    if (res.isErr()) {
+        return std::string(res.unwrapErr().message());
+    }
+    return std::move(res).unwrap();
+}
+
+template <config::SupportedType T>
+void setRiftVariable(std::string name, T value) {
+    if constexpr (std::same_as<T, label::null_t>) {
+         labels::VariableManager::get().removeVariable(std::move(name));
+    } else {
+        labels::VariableManager::get().setVariable(std::move(name), std::move(value));
+    }
+}
+
+template <config::SupportedType T>
+geode::Result<T> getRiftVariable(std::string_view name) {
+    auto val = labels::VariableManager::get().getVariable(std::string(name));
+
+    #define HANDLE_CASE(type) \
+    if (val.is##type()) { return geode::Ok(val.get##type()); } \
+    else { return geode::Err("Value is not of type " #type); }
+
+    if constexpr (std::same_as<T, std::string>) {
+        HANDLE_CASE(String)
+    } else if constexpr (std::same_as<T, bool>) {
+        HANDLE_CASE(Boolean)
+    } else if constexpr (std::same_as<T, int64_t>) {
+        HANDLE_CASE(Integer)
+    } else if constexpr (std::same_as<T, double>) {
+        HANDLE_CASE(Float)
+    } else if constexpr (std::same_as<T, label::null_t>) {
+        if (val.isNull()) return Ok(std::nullptr_t{});
+        return Err("Value is not null");
+    } else if constexpr (std::same_as<T, matjson::Value>) {
+        return Ok(val.toJson());
+    } else {
+        return Err("Unsupported type");
+    }
+
+    #undef HANDLE_CASE
+}
+
 $execute {
     __internal__::FetchVTableEvent().listen([](__internal__::VTable& vtable) {
         // config
@@ -226,6 +254,22 @@ $execute {
         vtable.Config_setDoubleInternal = &config::set<double>;
         vtable.Config_setStringInternal = &config::set<std::string>;
         vtable.Config_setStringViewInternal = &config::set<std::string_view>;
+
+        // label
+        vtable.FormatRiftString = &formatRiftString;
+        vtable.GetRiftVariableNull = &getRiftVariable<label::null_t>;
+        vtable.GetRiftVariableBool = &getRiftVariable<bool>;
+        vtable.GetRiftVariableInt = &getRiftVariable<int64_t>;
+        vtable.GetRiftVariableDouble = &getRiftVariable<double>;
+        vtable.GetRiftVariableString = &getRiftVariable<std::string>;
+        vtable.GetRiftVariableObject = &getRiftVariable<matjson::Value>;
+        vtable.SetRiftVariableNull = &setRiftVariable<label::null_t>;
+        vtable.SetRiftVariableBool = &setRiftVariable<bool>;
+        vtable.SetRiftVariableInt = &setRiftVariable<int64_t>;
+        vtable.SetRiftVariableDouble = &setRiftVariable<double>;
+        vtable.SetRiftVariableString = &setRiftVariable<std::string>;
+        vtable.SetRiftVariableObject = &setRiftVariable<matjson::Value>;
+
 
         return ListenerResult::Stop;
     }).leak();
