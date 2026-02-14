@@ -33,24 +33,6 @@ namespace eclipse::hacks::Global {
     // Whether the last attempt had tripped any cheats
     bool s_trippedLastAttempt = false;
 
-    // TODO: geode v5
-    // $execute {
-    //     new geode::EventListener<geode::EventFilter<events::GetHackingModulesEvent>>(+[](events::GetHackingModulesEvent* e) {
-    //         std::vector<events::HackingModule> modules;
-    //         modules.reserve(s_attemptCheats.size());
-    //
-    //         for (auto const& [name, state] : s_attemptCheats) {
-    //             modules.push_back(events::HackingModule {
-    //                 .name = name,
-    //                 .state = state ? events::HackingModule::State::Enabled : events::HackingModule::State::Tripped
-    //             });
-    //         }
-    //
-    //         e->setModules(std::move(modules));
-    //         return geode::ListenerResult::Stop;
-    //     });
-    // }
-
     class $hack(AutoSafeMode) {
         static bool hasCheats() {
             for (auto& callback : api::getCheats() | std::views::values) {

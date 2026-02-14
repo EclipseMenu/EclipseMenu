@@ -24,6 +24,7 @@ using namespace geode::prelude;
 namespace eclipse::hacks::Bot {
     static bot::Bot s_bot;
     static bool s_respawning = false;
+    bot::Bot& getBot() { return s_bot; }
 
     void newReplay() {
         Popup::prompt(
@@ -283,18 +284,6 @@ namespace eclipse::hacks::Bot {
     };
 
     REGISTER_HACK(Bot)
-
-    // TODO: geode v5
-    // $execute {
-    //     new EventListener<EventFilter<events::LoadReplayEvent>>(+[](events::LoadReplayEvent* e) {
-    //         if (auto* path = e->getPath()) {
-    //             e->setResult(s_bot.load(*path));
-    //         } else {
-    //             e->setResult(s_bot.load(e->getData()));
-    //         }
-    //         return ListenerResult::Stop;
-    //     });
-    // }
 
     class $modify(BotPLHook, PlayLayer) {
         bool init(GJGameLevel* gj, bool p1, bool p2) {

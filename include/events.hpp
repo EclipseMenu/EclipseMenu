@@ -16,6 +16,8 @@ namespace eclipse {
 }
 
 namespace eclipse::__internal__ {
+    constexpr size_t API_VERSION = 1;
+
     struct VTable {
         // config
         bool(*Config_getBool)(std::string_view, bool const&) = nullptr;
@@ -63,11 +65,18 @@ namespace eclipse::__internal__ {
         bool(*CheckCheatedInAttempt)() = nullptr;
         std::vector<HackingModule>(*GetHackingModules)() = nullptr;
 
-        // std::string(*MenuTab_find)(std::string_view) = nullptr;
-        // size_t(*MenuTab_addLabel)(std::string_view, std::string) = nullptr;
+        // components
+        void(*CreateMenuTab)(std::string_view) = nullptr;
+        size_t(*CreateLabel)(std::string_view, std::string) = nullptr;
+        size_t(*CreateToggle)(std::string_view, std::string, std::string, geode::Function<void(bool)>) = nullptr;
+        size_t(*CreateInputFloat)(std::string_view, std::string, std::string, geode::Function<void(float)>) = nullptr;
+        size_t(*CreateButton)(std::string_view, std::string, geode::Function<void()>) = nullptr;
+        void(*SetComponentDescription)(size_t, std::string) = nullptr;
+        void(*SetLabelText)(size_t, std::string) = nullptr;
+        void(*SetInputFloatParams)(size_t, std::optional<float>, std::optional<float>, std::optional<std::string>) = nullptr;
     };
 
-    struct FetchVTableEvent : geode::Event<FetchVTableEvent, bool(VTable&)> {
+    struct FetchVTableEvent : geode::Event<FetchVTableEvent, bool(VTable&, size_t)> {
         using Event::Event;
     };
 
@@ -75,7 +84,7 @@ namespace eclipse::__internal__ {
         static VTable vtable{};
         static bool initialized = false;
         if (!initialized) {
-            initialized = FetchVTableEvent().send(vtable);
+            initialized = FetchVTableEvent().send(vtable, API_VERSION);
         }
         return vtable;
     }
