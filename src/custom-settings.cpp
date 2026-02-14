@@ -107,11 +107,11 @@ SettingNodeV3* CustomButton::createNode(float width) {
     );
 }
 
-class KeybindSetting : public SettingV3 {
+class CustomKeybindSetting : public SettingV3 {
 public:
     static Result<std::shared_ptr<SettingV3>> parse(std::string const& key, std::string const& modID, matjson::Value const& json) {
-        auto res = std::make_shared<KeybindSetting>();
-        auto root = checkJson(json, "KeybindSetting");
+        auto res = std::make_shared<CustomKeybindSetting>();
+        auto root = checkJson(json, "CustomKeybindSetting");
 
         res->init(key, modID, root);
         res->parseNameAndDescription(root);
@@ -130,9 +130,9 @@ public:
     SettingNodeV3* createNode(float width) override;
 };
 
-class KeybindSettingNode : public SettingNodeV3 {
+class CustomKeybindSettingNode : public SettingNodeV3 {
 protected:
-    bool init(const std::shared_ptr<KeybindSetting>& setting, float width) {
+    bool init(const std::shared_ptr<CustomKeybindSetting>& setting, float width) {
         if (!SettingNodeV3::init(setting, width))
             return false;
 
@@ -156,8 +156,8 @@ protected:
     void onResetToDefault() override {}
 
 public:
-    static KeybindSettingNode* create(const std::shared_ptr<KeybindSetting>& setting, float width) {
-        auto ret = new KeybindSettingNode;
+    static CustomKeybindSettingNode* create(const std::shared_ptr<CustomKeybindSetting>& setting, float width) {
+        auto ret = new CustomKeybindSettingNode;
         if (ret->init(setting, width)) {
             ret->autorelease();
             return ret;
@@ -169,19 +169,19 @@ public:
     bool hasUncommittedChanges() const override { return false; }
     bool hasNonDefaultValue() const override { return false; }
 
-    std::shared_ptr<KeybindSetting> getSetting() const {
-        return std::static_pointer_cast<KeybindSetting>(SettingNodeV3::getSetting());
+    std::shared_ptr<CustomKeybindSetting> getSetting() const {
+        return std::static_pointer_cast<CustomKeybindSetting>(SettingNodeV3::getSetting());
     }
 };
 
-SettingNodeV3* KeybindSetting::createNode(float width) {
-    return KeybindSettingNode::create(
-        std::static_pointer_cast<KeybindSetting>(shared_from_this()),
+SettingNodeV3* CustomKeybindSetting::createNode(float width) {
+    return CustomKeybindSettingNode::create(
+        std::static_pointer_cast<CustomKeybindSetting>(shared_from_this()),
         width
     );
 }
 
 $execute {
     (void) Mod::get()->registerCustomSettingType("custom-btn", &CustomButton::parse);
-    (void) Mod::get()->registerCustomSettingType("keybind", &KeybindSetting::parse);
+    (void) Mod::get()->registerCustomSettingType("keybind", &CustomKeybindSetting::parse);
 }
