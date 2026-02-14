@@ -5,6 +5,16 @@
 #include <string>
 #include <Geode/loader/Event.hpp>
 
+namespace eclipse {
+    struct HackingModule {
+        std::string_view name;
+        enum class State {
+            Enabled,
+            Tripped
+        } state = State::Enabled;
+    };
+}
+
 namespace eclipse::__internal__ {
     struct VTable {
         // config
@@ -44,6 +54,14 @@ namespace eclipse::__internal__ {
         void(*SetRiftVariableDouble)(std::string, double) = nullptr;
         void(*SetRiftVariableString)(std::string, std::string) = nullptr;
         void(*SetRiftVariableObject)(std::string, matjson::Value) = nullptr;
+
+        // modules
+        void(*RegisterCheat)(std::string, geode::Function<bool()>) = nullptr;
+        geode::Result<>(*LoadReplay)(std::filesystem::path const&) = nullptr;
+        geode::Result<>(*LoadReplayFromData)(std::span<uint8_t>) = nullptr;
+        bool(*CheckCheatsEnabled)() = nullptr;
+        bool(*CheckCheatedInAttempt)() = nullptr;
+        std::vector<HackingModule>(*GetHackingModules)() = nullptr;
 
         // std::string(*MenuTab_find)(std::string_view) = nullptr;
         // size_t(*MenuTab_addLabel)(std::string_view, std::string) = nullptr;

@@ -10,8 +10,13 @@
 #include <modules/gui/components/toggle.hpp>
 
 #include <memory>
+#include <ranges>
 
 #include "mods.hpp"
+
+namespace eclipse::hacks::Global {
+    std::map<std::string_view, bool> const& getAttemptCheats();
+}
 
 namespace eclipse::api {
 using namespace geode::prelude;
@@ -270,6 +275,18 @@ $execute {
         vtable.SetRiftVariableString = &setRiftVariable<std::string>;
         vtable.SetRiftVariableObject = &setRiftVariable<matjson::Value>;
 
+        // modules
+        vtable.RegisterCheat = +[](std::string name, Function<bool()> callback) { g_cheats[std::move(name)] = std::move(callback); };
+        vtable.CheckCheatsEnabled = +[] { return config::getTemp<"hasCheats", bool>(false); };
+        vtable.CheckCheatedInAttempt = +[] { return config::getTemp<"trippedSafeMode", bool>(false); };
+        vtable.GetHackingModules = +[] {
+            return hacks::Global::getAttemptCheats() | std::views::transform([](auto& pair) {
+                return HackingModule {
+                    .name = pair.first,
+                    .state = pair.second ? HackingModule::State::Enabled : HackingModule::State::Tripped
+                };
+            }) | std::ranges::to<std::vector>();
+        };
 
         return ListenerResult::Stop;
     }).leak();

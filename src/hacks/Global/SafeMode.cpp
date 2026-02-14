@@ -28,6 +28,7 @@ namespace eclipse::hacks::Global {
 
     // Contains the state of activated hacks in an attempt
     std::map<std::string_view, bool> s_attemptCheats;
+    std::map<std::string_view, bool> const& getAttemptCheats() { return s_attemptCheats; }
 
     // Whether the last attempt had tripped any cheats
     bool s_trippedLastAttempt = false;
