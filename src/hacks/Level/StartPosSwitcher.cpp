@@ -23,8 +23,8 @@ namespace eclipse::hacks::Level {
         void init() override {
             config::setIfEmpty("level.startpos_switcher", false);
             config::setIfEmpty("level.startpos_switcher.reset_camera", false);
-            config::setIfEmpty("level.startpos_switcher.previous", keybinds::Keys::Q);
-            config::setIfEmpty("level.startpos_switcher.next", keybinds::Keys::E);
+            config::setIfEmpty<keybinds::KeybindProps>("level.startpos_switcher.previous", keybinds::Keys::Q);
+            config::setIfEmpty<keybinds::KeybindProps>("level.startpos_switcher.next", keybinds::Keys::E);
             config::setIfEmpty("level.startpos_switcher.label", true);
             config::setIfEmpty("label.startpos_switcher.scale", 0.7f);
             config::setIfEmpty("label.startpos_switcher.buttons", true);
@@ -52,15 +52,15 @@ namespace eclipse::hacks::Level {
                });
 
             auto manager = keybinds::Manager::get();
-            manager->addListener("level.startpos_switcher.previous", [](bool down) {
-                if (!down) return;
+            manager->addListener("level.startpos_switcher.previous", [](auto evt) {
+                if (!evt.down) return;
                 auto* playLayer = utils::get<PlayLayer>();
                 if (!playLayer) return;
                 if (!config::get<bool>("level.startpos_switcher", false)) return;
                 pickStartPos(playLayer, currentStartPosIndex - 1);
             });
-            manager->addListener("level.startpos_switcher.next", [](bool down) {
-                if (!down) return;
+            manager->addListener("level.startpos_switcher.next", [](auto evt) {
+                if (!evt.down) return;
                 auto* playLayer = utils::get<PlayLayer>();
                 if (!playLayer) return;
                 if (!config::get<bool>("level.startpos_switcher", false)) return;

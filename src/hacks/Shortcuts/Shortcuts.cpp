@@ -330,26 +330,26 @@ namespace eclipse::hacks::Shortcuts {
             }
         }
 
-        constexpr static bool isJumpKey(keybinds::Keys key) {
+        constexpr static bool isJumpKey(keybinds::KeybindProps key) {
             return key == keybinds::Keys::Space || key == keybinds::Keys::Up ||
                    key == keybinds::Keys::W || key == keybinds::Keys::MouseLeft;
         }
 
         void init() override {
-            config::setIfEmpty("shortcut.p1jump", keybinds::Keys::None);
-            config::setIfEmpty("shortcut.p2jump", keybinds::Keys::None);
+            config::setIfEmpty<keybinds::KeybindProps>("shortcut.p1jump", keybinds::Keys::None);
+            config::setIfEmpty<keybinds::KeybindProps>("shortcut.p2jump", keybinds::Keys::None);
 
             auto tab = gui::MenuTab::find("tab.shortcuts");
             #ifdef GEODE_IS_DESKTOP
-            if (isJumpKey(config::get<keybinds::Keys>("shortcut.p1jump", keybinds::Keys::None)))
-                config::set("shortcut.p1jump", keybinds::Keys::None);
-            if (isJumpKey(config::get<keybinds::Keys>("shortcut.p2jump", keybinds::Keys::None)))
-                config::set("shortcut.p2jump", keybinds::Keys::None);
+            if (isJumpKey(config::get<keybinds::KeybindProps>("shortcut.p1jump", keybinds::Keys::None)))
+                config::set<keybinds::KeybindProps>("shortcut.p1jump", keybinds::Keys::None);
+            if (isJumpKey(config::get<keybinds::KeybindProps>("shortcut.p2jump", keybinds::Keys::None)))
+                config::set<keybinds::KeybindProps>("shortcut.p2jump", keybinds::Keys::None);
             tab->addKeybind("shortcuts.p1jump", "shortcut.p1jump", true)->setInternal()->callback([](auto key) {
-                if (isJumpKey(key)) config::set("shortcut.p1jump", keybinds::Keys::None);
+                if (isJumpKey(key)) config::set<keybinds::KeybindProps>("shortcut.p1jump", keybinds::Keys::None);
             });
             tab->addKeybind("shortcuts.p2jump", "shortcut.p2jump", true)->setInternal()->callback([](auto key) {
-                if (isJumpKey(key)) config::set("shortcut.p2jump", keybinds::Keys::None);
+                if (isJumpKey(key)) config::set<keybinds::KeybindProps>("shortcut.p2jump", keybinds::Keys::None);
             });
             #endif
             tab->addButton("shortcuts.options")->setDescription()->callback(openSettings)->handleKeybinds();
@@ -371,15 +371,15 @@ namespace eclipse::hacks::Shortcuts {
             #endif
 
             auto manager = keybinds::Manager::get();
-            manager->addListener("shortcut.p1jump", [](bool down) {
+            manager->addListener("shortcut.p1jump", [](auto evt) {
                 auto gameLayer = utils::get<GJBaseGameLayer>();
                 if (!gameLayer) return;
-                gameLayer->queueButton(1, down, false, 0.0); // TODO: geode v5
+                gameLayer->queueButton(1, evt.down, false, evt.timestamp);
             });
-            manager->addListener("shortcut.p2jump", [](bool down) {
+            manager->addListener("shortcut.p2jump", [](auto evt) {
                 auto gameLayer = utils::get<GJBaseGameLayer>();
                 if (!gameLayer) return;
-                gameLayer->queueButton(1, down, true, 0.0); // TODO: geode v5
+                gameLayer->queueButton(1, evt.down, true, evt.timestamp);
             });
         }
 

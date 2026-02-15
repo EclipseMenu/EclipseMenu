@@ -31,7 +31,7 @@ using namespace eclipse;
 
 static bool s_isInitialized = false;
 
-static void toggleMenu(bool down = true) {
+static void toggleMenu(keybinds::KeyEvent evt = {}) {
     gui::Engine::get().toggle();
     config::save();
     gui::ThemeManager::get()->saveTheme();
@@ -80,8 +80,8 @@ class $modify(EclipseButtonMLHook, MenuLayer) {
 
         // Register the keybind
         auto& key = keybinds::Manager::get()->registerKeybind("menu.toggle", "Toggle UI", toggleMenu);
-        config::setIfEmpty("menu.toggleKey", keybinds::Keys::Tab);
-        key.setKey(config::get<keybinds::Keys>("menu.toggleKey", keybinds::Keys::Tab));
+        config::setIfEmpty<keybinds::KeybindProps>("menu.toggleKey", keybinds::Keys::Tab);
+        key.setKey(config::get<keybinds::KeybindProps>("menu.toggleKey", keybinds::Keys::Tab));
         key.setInitialized(true);
         hack::lateInitializeHacks();
 
@@ -308,6 +308,7 @@ $on_mod(Loaded) {
             }
         })->disableSaving();
 
+        auto autoFocus = config::get<bool>("interface.search-auto-focus", false);
         auto searchInput = tab->addInputText("interface.search", "search");
         searchInput->callback([](std::string input) {
             static bool hasSearched = false;
@@ -339,7 +340,18 @@ $on_mod(Loaded) {
                     tab.setSearchedFor(hasFoundComponent);
                 }
             }
-        })->disableSaving()->setFlags(ComponentFlags::DisableCocos | ComponentFlags::StartWithKeyboardFocus);
+        })->disableSaving()
+        ->setFlags(
+            autoFocus ? ComponentFlags::DisableCocos | ComponentFlags::StartWithKeyboardFocus
+                      : ComponentFlags::DisableCocos
+        );
+        tab->addToggle("interface.search-auto-focus")
+            ->setDescription()->callback([searchInput](bool value) {
+                searchInput->setFlags(
+                    value ? ComponentFlags::DisableCocos | ComponentFlags::StartWithKeyboardFocus
+                          : ComponentFlags::DisableCocos
+                );
+            });
     }
 
     // Schedule hack updates

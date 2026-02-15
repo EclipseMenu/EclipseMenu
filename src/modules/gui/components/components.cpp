@@ -125,8 +125,8 @@ namespace eclipse::gui {
 
     ButtonComponent* ButtonComponent::handleKeybinds() {
         keybinds::Manager::get()->registerKeybind(
-            fmt::format("button.{}", m_title), m_title, [this](bool down) {
-                if (!down) return;
+            fmt::format("button.{}", m_title), m_title, [this](keybinds::KeyEvent evt) {
+                if (!evt.down) return;
                 this->triggerCallback();
             }
         );
@@ -322,8 +322,8 @@ namespace eclipse::gui {
 
     FloatToggleComponent* FloatToggleComponent::handleKeybinds() {
         keybinds::Manager::get()->registerKeybind(
-            m_id, m_title, [this](bool down) {
-                if (!down) return;
+            m_id, m_title, [this](keybinds::KeyEvent evt) {
+                if (!evt.down) return;
                 bool value = !config::get<bool>(fmt::format("{}.toggle", this->getId()), false);
                 auto id = fmt::format("{}.toggle", this->getId());
                 m_noSave
@@ -510,8 +510,8 @@ namespace eclipse::gui {
 
     IntToggleComponent* IntToggleComponent::handleKeybinds() {
         keybinds::Manager::get()->registerKeybind(
-            m_id, m_title, [this](bool down) {
-                if (!down) return;
+            m_id, m_title, [this](keybinds::KeyEvent evt) {
+                if (!evt.down) return;
                 bool value = !config::get<bool>(fmt::format("{}.toggle", this->getId()), false);
                 auto id = fmt::format("{}.toggle", this->getId());
                 m_noSave
@@ -564,7 +564,7 @@ namespace eclipse::gui {
     }
 
     KeybindComponent* KeybindComponent::setInternal() {
-        m_callback = [this](keybinds::Keys key) {
+        m_callback = [this](keybinds::KeybindProps key) {
             auto keybind = keybinds::Manager::get()->getKeybind(m_id);
             if (!keybind.has_value()) return;
             auto& keybindRef = keybind->get();
@@ -573,7 +573,7 @@ namespace eclipse::gui {
         return this;
     }
 
-    KeybindComponent* KeybindComponent::setDefaultKey(keybinds::Keys key) {
+    KeybindComponent* KeybindComponent::setDefaultKey(keybinds::KeybindProps key) {
         m_defaultKey = key;
         return this;
     }
@@ -581,18 +581,18 @@ namespace eclipse::gui {
     std::string const& KeybindComponent::getId() const { return m_id; }
     std::string const& KeybindComponent::getTitle() const { return m_title; }
     bool KeybindComponent::canDelete() const { return m_canDelete; }
-    keybinds::Keys KeybindComponent::getDefaultKey() const { return m_defaultKey; }
+    keybinds::KeybindProps KeybindComponent::getDefaultKey() const { return m_defaultKey; }
 
     KeybindComponent* KeybindComponent::setDescription(std::string description) {
         m_description = std::move(description);
         return this;
     }
 
-    void KeybindComponent::triggerCallback(keybinds::Keys key) {
+    void KeybindComponent::triggerCallback(keybinds::KeybindProps key) {
         if (m_callback) m_callback(key);
     }
 
-    KeybindComponent* KeybindComponent::callback(Function<void(keybinds::Keys)>&& func) {
+    KeybindComponent* KeybindComponent::callback(Function<void(keybinds::KeybindProps)>&& func) {
         m_callback = std::move(func);
         return this;
     }
@@ -676,8 +676,8 @@ namespace eclipse::gui {
 
     LabelSettingsComponent* LabelSettingsComponent::handleKeybinds() {
         keybinds::Manager::get()->registerKeybind(
-            fmt::format("label.{}", m_settings->id), m_settings->name, [this](bool down) {
-                if (!down) return;
+            fmt::format("label.{}", m_settings->id), m_settings->name, [this](keybinds::KeyEvent evt) {
+                if (!evt.down) return;
                 this->m_settings->visible = !this->m_settings->visible;
                 this->triggerEditCallback();
             }
@@ -715,8 +715,8 @@ namespace eclipse::gui {
     RadioButtonComponent* RadioButtonComponent::handleKeybinds() {
         auto specialId = fmt::format("{}-{}", m_id, m_value);
         keybinds::Manager::get()->registerKeybind(
-            specialId, m_title, [this](bool down) {
-                if (!down) return;
+            specialId, m_title, [this](keybinds::KeyEvent evt) {
+                if (!evt.down) return;
                 auto value = getChoice();
                 setValue(value);
                 this->triggerCallback(value);
@@ -798,8 +798,8 @@ namespace eclipse::gui {
 
     ToggleComponent* ToggleComponent::handleKeybinds() {
         keybinds::Manager::get()->registerKeybind(
-            m_id, m_title, [this](bool down) {
-                if (!down) return;
+            m_id, m_title, [this](keybinds::KeyEvent evt) {
+                if (!evt.down) return;
                 bool value = !getValue();
                 setValue(value);
                 this->triggerCallback(value);

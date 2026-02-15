@@ -15,18 +15,18 @@ namespace eclipse::hacks::Player {
 
     class $hack(FrameStepper) {
         static bool isPressed() {
-            auto stepKey = config::get<"player.framestepper.step_key", keybinds::Keys>(keybinds::Keys::C);
+            auto stepKey = config::get<"player.framestepper.step_key", keybinds::KeybindProps>(keybinds::Keys::C);
             return s_frameStepperPressed || keybinds::isKeyPressed(stepKey);
         }
 
         static bool isDown() {
-            auto stepKey = config::get<"player.framestepper.step_key", keybinds::Keys>(keybinds::Keys::C);
+            auto stepKey = config::get<"player.framestepper.step_key", keybinds::KeybindProps>(keybinds::Keys::C);
             return s_frameStepperDown || keybinds::isKeyDown(stepKey);
         }
 
         void init() override {
             config::setIfEmpty("player.framestepper", false);
-            config::setIfEmpty("player.framestepper.step_key", keybinds::Keys::C);
+            config::setIfEmpty<keybinds::KeybindProps>("player.framestepper.step_key", keybinds::Keys::C);
             config::setIfEmpty("player.framestepper.hold", true);
             config::setIfEmpty("player.framestepper.hold_delay", 0.25f);
             config::setIfEmpty("player.framestepper.hold_speed", 5);

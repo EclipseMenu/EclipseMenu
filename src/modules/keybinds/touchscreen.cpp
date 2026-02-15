@@ -18,8 +18,16 @@ namespace eclipse::keybinds {
             if (!touch) return CCTouchDispatcher::touches(touches, event, type);
 
             auto manager = Manager::get();
-            if (type == cocos2d::CCTOUCHBEGAN) manager->registerKeyPress(Keys::MouseLeft);
-            else if (type == cocos2d::CCTOUCHENDED) manager->registerKeyRelease(Keys::MouseLeft);
+            if (type == cocos2d::CCTOUCHBEGAN) manager->registerKeyPress({
+                .timestamp = touch->getTimestamp(),
+                .props = {Keys::MouseLeft, KeybindProps::Mods_None},
+                .down = true
+            });
+            else if (type == cocos2d::CCTOUCHENDED) manager->registerKeyRelease({
+                .timestamp = touch->getTimestamp(),
+                .props = {Keys::MouseLeft, KeybindProps::Mods_None},
+                .down = false
+            });
 
             cocos2d::CCTouchDispatcher::touches(touches, event, type);
         }

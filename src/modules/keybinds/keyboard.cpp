@@ -116,10 +116,10 @@ namespace eclipse::keybinds {
             case KEY_Numlock: return Keys::NumLock;
             case KEY_PrintScreen: return Keys::PrintScreen;
             case KEY_Pause: return Keys::Pause;
-            case KEY_ArrowUp: return Keys::Up;
-            case KEY_ArrowDown: return Keys::Down;
-            case KEY_ArrowLeft: return Keys::Left;
-            case KEY_ArrowRight: return Keys::Right;
+            case KEY_Up: return Keys::Up;
+            case KEY_Down: return Keys::Down;
+            case KEY_Left: return Keys::Left;
+            case KEY_Right: return Keys::Right;
             case KEY_LeftShift: return Keys::LeftShift;
             case KEY_LeftControl: return Keys::LeftControl;
             case KEY_LeftMenu: return Keys::LeftAlt;
@@ -149,10 +149,21 @@ namespace eclipse::keybinds {
             auto manager = Manager::get();
             switch (event.action) {
                 case KeyboardInputData::Action::Press:
-                    manager->registerKeyPress(convertCocosKey(event.key));
+                    log::debug("{} pressed", keyToString({
+                        convertCocosKey(event.key), event.modifiers
+                    }));
+                    manager->registerKeyPress({
+                        .timestamp = event.timestamp,
+                        .props = {convertCocosKey(event.key), event.modifiers},
+                        .down = true
+                    });
                     break;
                 case KeyboardInputData::Action::Release:
-                    manager->registerKeyRelease(convertCocosKey(event.key));
+                    manager->registerKeyRelease({
+                        .timestamp = event.timestamp,
+                        .props = {convertCocosKey(event.key), event.modifiers},
+                        .down = false
+                    });
                     break;
                 case KeyboardInputData::Action::Repeat:
                     break;
@@ -164,10 +175,18 @@ namespace eclipse::keybinds {
             auto manager = Manager::get();
             switch (event.action) {
                 case MouseInputData::Action::Press:
-                    manager->registerKeyPress(convertMouseKey(event.button));
+                    manager->registerKeyPress({
+                        .timestamp = event.timestamp,
+                        .props = {convertMouseKey(event.button), KeyboardInputData::Mods_None},
+                        .down = true
+                    });
                     break;
                 case MouseInputData::Action::Release:
-                    manager->registerKeyRelease(convertMouseKey(event.button));
+                    manager->registerKeyRelease({
+                        .timestamp = event.timestamp,
+                        .props = {convertMouseKey(event.button), KeyboardInputData::Mods_None},
+                        .down = false
+                    });
                     break;
             }
             return ListenerResult::Propagate;
