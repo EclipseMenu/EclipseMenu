@@ -172,23 +172,11 @@ namespace eclipse::keybinds {
         }).leak();
 
         MouseInputEvent().listen([](MouseInputData& event) {
-            auto manager = Manager::get();
-            switch (event.action) {
-                case MouseInputData::Action::Press:
-                    manager->registerKeyPress({
-                        .timestamp = event.timestamp,
-                        .props = {convertMouseKey(event.button), KeyboardInputData::Mods_None},
-                        .down = true
-                    });
-                    break;
-                case MouseInputData::Action::Release:
-                    manager->registerKeyRelease({
-                        .timestamp = event.timestamp,
-                        .props = {convertMouseKey(event.button), KeyboardInputData::Mods_None},
-                        .down = false
-                    });
-                    break;
-            }
+            Manager::get()->registerKeyRelease({
+                .timestamp = event.timestamp,
+                .props = {convertMouseKey(event.button), event.modifiers},
+                .down = event.action == MouseInputData::Action::Press
+            });
             return ListenerResult::Propagate;
         }).leak();
     }

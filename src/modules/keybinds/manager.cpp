@@ -355,20 +355,20 @@ namespace eclipse::keybinds {
         StringBuffer<> buffer;
 
         #ifdef GEODE_IS_WINDOWS
-        if (key.key != Keys::LeftControl && key.key != Keys::RightControl && key.mods & KeybindProps::Mods_Control) buffer.append("Ctrl+");
-        if (key.key != Keys::LeftAlt && key.key != Keys::RightAlt && key.mods & KeybindProps::Mods_Alt) buffer.append("Alt+");
-        if (key.key != Keys::LeftShift && key.key != Keys::RightShift && key.mods & KeybindProps::Mods_Shift) buffer.append("Shift+");
-        if (key.key != Keys::LeftAlt && key.key != Keys::RightAlt && key.mods & KeybindProps::Mods_Super) buffer.append("Win+");
+        if (key.key != Keys::LeftControl && key.key != Keys::RightControl && static_cast<uint8_t>(key.mods) & KeyboardModifier::Control) buffer.append("Ctrl+");
+        if (key.key != Keys::LeftAlt && key.key != Keys::RightAlt && static_cast<uint8_t>(key.mods) & KeyboardModifier::Alt) buffer.append("Alt+");
+        if (key.key != Keys::LeftShift && key.key != Keys::RightShift && static_cast<uint8_t>(key.mods) & KeyboardModifier::Shift) buffer.append("Shift+");
+        if (key.key != Keys::LeftAlt && key.key != Keys::RightAlt && static_cast<uint8_t>(key.mods) & KeyboardModifier::Super) buffer.append("Win+");
         #elif defined(GEODE_IS_MACOS)
-        if (key.key != Keys::LeftControl && key.key != Keys::RightControl && key.mods & KeybindProps::Mods_Control) buffer.append("Control+");
-        if (key.key != Keys::LeftAlt && key.key != Keys::RightAlt && key.mods & KeybindProps::Mods_Alt) buffer.append("Option+");
-        if (key.key != Keys::LeftShift && key.key != Keys::RightShift && key.mods & KeybindProps::Mods_Shift) buffer.append("Shift+");
-        if (key.key != Keys::LeftSuper && key.key != Keys::RightSuper && key.mods & KeybindProps::Mods_Super) buffer.append("Command+");
+        if (key.key != Keys::LeftControl && key.key != Keys::RightControl && static_cast<uint8_t>(key.mods) & KeyboardModifier::Control) buffer.append("Control+");
+        if (key.key != Keys::LeftAlt && key.key != Keys::RightAlt && static_cast<uint8_t>(key.mods) & KeyboardModifier::Alt) buffer.append("Option+");
+        if (key.key != Keys::LeftShift && key.key != Keys::RightShift && static_cast<uint8_t>(key.mods) & KeyboardModifier::Shift) buffer.append("Shift+");
+        if (key.key != Keys::LeftSuper && key.key != Keys::RightSuper && static_cast<uint8_t>(key.mods) & KeyboardModifier::Super) buffer.append("Command+");
         #else
-        if (key.key != Keys::LeftControl && key.key != Keys::RightControl && key.mods & KeybindProps::Mods_Control) buffer.append("Ctrl+");
-        if (key.key != Keys::LeftAlt && key.key != Keys::RightAlt && key.mods & KeybindProps::Mods_Alt) buffer.append("Alt+");
-        if (key.key != Keys::LeftShift && key.key != Keys::RightShift && key.mods & KeybindProps::Mods_Shift) buffer.append("Shift+");
-        if (key.key != Keys::LeftSuper && key.key != Keys::RightSuper && key.mods & KeybindProps::Mods_Super) buffer.append("Super+");
+        if (key.key != Keys::LeftControl && key.key != Keys::RightControl && static_cast<uint8_t>(key.mods) & KeyboardModifier::Control) buffer.append("Ctrl+");
+        if (key.key != Keys::LeftAlt && key.key != Keys::RightAlt && static_cast<uint8_t>(key.mods) & KeyboardModifier::Alt) buffer.append("Alt+");
+        if (key.key != Keys::LeftShift && key.key != Keys::RightShift && static_cast<uint8_t>(key.mods) & KeyboardModifier::Shift) buffer.append("Shift+");
+        if (key.key != Keys::LeftSuper && key.key != Keys::RightSuper && static_cast<uint8_t>(key.mods) & KeyboardModifier::Super) buffer.append("Super+");
         #endif
 
         buffer.append(keyToString(key.key));
@@ -383,10 +383,10 @@ namespace eclipse::keybinds {
     bool isKeyDown(KeybindProps key) {
         auto manager = Manager::get();
         bool down = manager->m_keyStates[key.key];
-        if (key.mods & KeybindProps::Mods_Control) down &= (manager->m_keyStates[Keys::LeftControl] || manager->m_keyStates[Keys::RightControl]);
-        if (key.mods & KeybindProps::Mods_Alt) down &= (manager->m_keyStates[Keys::LeftAlt] || manager->m_keyStates[Keys::RightAlt]);
-        if (key.mods & KeybindProps::Mods_Shift) down &= (manager->m_keyStates[Keys::LeftShift] || manager->m_keyStates[Keys::RightShift]);
-        if (key.mods & KeybindProps::Mods_Super) down &= (manager->m_keyStates[Keys::LeftSuper] || manager->m_keyStates[Keys::RightSuper]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Control) down &= (manager->m_keyStates[Keys::LeftControl] || manager->m_keyStates[Keys::RightControl]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Alt)     down &= (manager->m_keyStates[Keys::LeftAlt] || manager->m_keyStates[Keys::RightAlt]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Shift)   down &= (manager->m_keyStates[Keys::LeftShift] || manager->m_keyStates[Keys::RightShift]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Super)   down &= (manager->m_keyStates[Keys::LeftSuper] || manager->m_keyStates[Keys::RightSuper]);
         return down;
     }
 
@@ -402,10 +402,10 @@ namespace eclipse::keybinds {
     bool isKeyPressed(KeybindProps key) {
         auto manager = Manager::get();
         bool pressed = manager->m_keyStates[key.key] && !manager->m_lastKeyStates[key.key];
-        if (key.mods & KeybindProps::Mods_Control) pressed &= (manager->m_keyStates[Keys::LeftControl] || manager->m_keyStates[Keys::RightControl]);
-        if (key.mods & KeybindProps::Mods_Alt) pressed &= (manager->m_keyStates[Keys::LeftAlt] || manager->m_keyStates[Keys::RightAlt]);
-        if (key.mods & KeybindProps::Mods_Shift) pressed &= (manager->m_keyStates[Keys::LeftShift] || manager->m_keyStates[Keys::RightShift]);
-        if (key.mods & KeybindProps::Mods_Super) pressed &= (manager->m_keyStates[Keys::LeftSuper] || manager->m_keyStates[Keys::RightSuper]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Control) pressed &= (manager->m_keyStates[Keys::LeftControl] || manager->m_keyStates[Keys::RightControl]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Alt)     pressed &= (manager->m_keyStates[Keys::LeftAlt] || manager->m_keyStates[Keys::RightAlt]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Shift)   pressed &= (manager->m_keyStates[Keys::LeftShift] || manager->m_keyStates[Keys::RightShift]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Super)   pressed &= (manager->m_keyStates[Keys::LeftSuper] || manager->m_keyStates[Keys::RightSuper]);
         return pressed;
     }
 
@@ -421,19 +421,19 @@ namespace eclipse::keybinds {
     bool isKeyReleased(KeybindProps key) {
         auto manager = Manager::get();
         bool released = !manager->m_keyStates[key.key] && manager->m_lastKeyStates[key.key];
-        if (key.mods & KeybindProps::Mods_Control) released &= (manager->m_keyStates[Keys::LeftControl] || manager->m_keyStates[Keys::RightControl]);
-        if (key.mods & KeybindProps::Mods_Alt) released &= (manager->m_keyStates[Keys::LeftAlt] || manager->m_keyStates[Keys::RightAlt]);
-        if (key.mods & KeybindProps::Mods_Shift) released &= (manager->m_keyStates[Keys::LeftShift] || manager->m_keyStates[Keys::RightShift]);
-        if (key.mods & KeybindProps::Mods_Super) released &= (manager->m_keyStates[Keys::LeftSuper] || manager->m_keyStates[Keys::RightSuper]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Control) released &= (manager->m_keyStates[Keys::LeftControl] || manager->m_keyStates[Keys::RightControl]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Alt)     released &= (manager->m_keyStates[Keys::LeftAlt] || manager->m_keyStates[Keys::RightAlt]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Shift)   released &= (manager->m_keyStates[Keys::LeftShift] || manager->m_keyStates[Keys::RightShift]);
+        if (static_cast<uint8_t>(key.mods) & KeyboardModifier::Super)   released &= (manager->m_keyStates[Keys::LeftSuper] || manager->m_keyStates[Keys::RightSuper]);
         return released;
     }
 
-    KeyboardInputData::Modifiers getCurrentModifiers() {
-        KeyboardInputData::Modifiers mods = KeybindProps::Mods_None;
-        if (isKeyDown(Keys::LeftControl) || isKeyDown(Keys::RightControl)) mods |= KeybindProps::Mods_Control;
-        if (isKeyDown(Keys::LeftAlt) || isKeyDown(Keys::RightAlt)) mods |= KeybindProps::Mods_Alt;
-        if (isKeyDown(Keys::LeftShift) || isKeyDown(Keys::RightShift)) mods |= KeybindProps::Mods_Shift;
-        if (isKeyDown(Keys::LeftSuper) || isKeyDown(Keys::RightSuper)) mods |= KeybindProps::Mods_Super;
+    KeyboardModifier getCurrentModifiers() {
+        KeyboardModifier mods = KeyboardModifier::None;
+        if (isKeyDown(Keys::LeftControl) || isKeyDown(Keys::RightControl)) mods |= KeyboardModifier::Control;
+        if (isKeyDown(Keys::LeftAlt) || isKeyDown(Keys::RightAlt)) mods |= KeyboardModifier::Alt;
+        if (isKeyDown(Keys::LeftShift) || isKeyDown(Keys::RightShift)) mods |= KeyboardModifier::Shift;
+        if (isKeyDown(Keys::LeftSuper) || isKeyDown(Keys::RightSuper)) mods |= KeyboardModifier::Super;
         return mods;
     }
 

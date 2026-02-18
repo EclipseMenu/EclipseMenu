@@ -61,10 +61,9 @@ namespace eclipse::keybinds {
 
     struct KeybindProps {
         Keys key;
-        using enum geode::KeyboardInputData::Modifiers;
-        geode::KeyboardInputData::Modifiers mods;
+        geode::KeyboardModifier mods;
 
-        constexpr KeybindProps(Keys key = Keys::None, geode::KeyboardInputData::Modifiers mods = Mods_None) noexcept
+        constexpr KeybindProps(Keys key = Keys::None, geode::KeyboardModifier mods = {}) noexcept
             : key(key), mods(mods) {}
 
         constexpr bool operator==(KeybindProps const& other) const noexcept {
@@ -112,7 +111,7 @@ namespace eclipse::keybinds {
 
     /// @brief Get the current modifiers state.
     /// @return The current modifiers state.
-    geode::KeyboardInputData::Modifiers getCurrentModifiers();
+    geode::KeyboardModifier getCurrentModifiers();
 
     /// @brief A keybind that can be used to execute a callback when a key is pressed.
     class Keybind {
@@ -256,7 +255,7 @@ struct matjson::Serialize<eclipse::keybinds::KeybindProps> {
         GEODE_UNWRAP_INTO(int keyInt, value.as<int>());
         eclipse::keybinds::KeybindProps props;
         props.key = static_cast<eclipse::keybinds::Keys>(keyInt & 0xFF);
-        props.mods = static_cast<geode::KeyboardInputData::Modifiers>((keyInt >> 8) & 0xFF);
+        props.mods = (keyInt >> 8) & 0xFF;
         return geode::Ok(props);
     }
 };

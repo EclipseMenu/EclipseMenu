@@ -31,7 +31,7 @@ namespace eclipse::gui {
     private:
         std::string m_id;
         std::string m_title;
-        keybinds::KeybindProps m_defaultKey = {keybinds::Keys::None, keybinds::KeybindProps::Mods_None};
+        keybinds::KeybindProps m_defaultKey = {keybinds::Keys::None, geode::KeyboardModifier::None};
         bool m_canDelete;
         Function<void(keybinds::KeybindProps)> m_callback;
     };
