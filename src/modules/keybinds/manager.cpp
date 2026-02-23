@@ -82,6 +82,14 @@ namespace eclipse::keybinds {
             { Keys::MouseLeft, "LMB" }, { Keys::MouseRight, "RMB" }, { Keys::MouseMiddle, "MMB" },
             { Keys::MouseButton4, "Mouse 4" }, { Keys::MouseButton5, "Mouse 5" },
 
+            { Keys::GamepadButtonA, "Gamepad A" }, { Keys::GamepadButtonB, "Gamepad B" },
+            { Keys::GamepadButtonX, "Gamepad X" }, { Keys::GamepadButtonY, "Gamepad Y" },
+            { Keys::GamepadButtonUp, "Gamepad Up" }, { Keys::GamepadButtonDown, "Gamepad Down" },
+            { Keys::GamepadButtonLeft, "Gamepad Left" }, { Keys::GamepadButtonRight, "Gamepad Right" },
+            { Keys::GamepadButtonLeftBumper, "Gamepad LB" }, { Keys::GamepadButtonRightBumper, "Gamepad RB" },
+            { Keys::GamepadButtonLeftTrigger, "Gamepad LT" }, { Keys::GamepadButtonRightTrigger, "Gamepad RT" },
+            { Keys::GamepadButtonBack, "Gamepad Back" }, { Keys::GamepadButtonStart, "Gamepad Start" },
+
             { Keys::MenuKey, "Menu Key" }, { Keys::LastKey, "Last Key" },
             { Keys::Unknown, "Unknown" }
         };

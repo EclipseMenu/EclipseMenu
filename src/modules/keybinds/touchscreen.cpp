@@ -20,12 +20,12 @@ namespace eclipse::keybinds {
             auto manager = Manager::get();
             if (type == cocos2d::CCTOUCHBEGAN) manager->registerKeyPress({
                 .timestamp = touch->getTimestamp(),
-                .props = {Keys::MouseLeft, KeybindProps::Mods_None},
+                .props = {Keys::MouseLeft, geode::KeyboardModifier::None},
                 .down = true
             });
             else if (type == cocos2d::CCTOUCHENDED) manager->registerKeyRelease({
                 .timestamp = touch->getTimestamp(),
-                .props = {Keys::MouseLeft, KeybindProps::Mods_None},
+                .props = {Keys::MouseLeft, geode::KeyboardModifier::None},
                 .down = false
             });
 

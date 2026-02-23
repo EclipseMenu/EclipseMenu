@@ -128,6 +128,20 @@ namespace eclipse::keybinds {
             case KEY_RightControl: return Keys::RightControl;
             case KEY_RightMenu: return Keys::RightAlt;
             case KEY_RightWindowsKey: return Keys::RightSuper;
+            case CONTROLLER_A: return Keys::GamepadButtonA;
+            case CONTROLLER_B: return Keys::GamepadButtonB;
+            case CONTROLLER_X: return Keys::GamepadButtonX;
+            case CONTROLLER_Y: return Keys::GamepadButtonY;
+            case CONTROLLER_LB: return Keys::GamepadButtonLeftBumper;
+            case CONTROLLER_RB: return Keys::GamepadButtonRightBumper;
+            case CONTROLLER_LT: return Keys::GamepadButtonLeftTrigger;
+            case CONTROLLER_RT: return Keys::GamepadButtonRightTrigger;
+            case CONTROLLER_Back: return Keys::GamepadButtonBack;
+            case CONTROLLER_Start: return Keys::GamepadButtonStart;
+            case CONTROLLER_Up: return Keys::GamepadButtonUp;
+            case CONTROLLER_Down: return Keys::GamepadButtonDown;
+            case CONTROLLER_Left: return Keys::GamepadButtonLeft;
+            case CONTROLLER_Right: return Keys::GamepadButtonRight;
             default: return Keys::Unknown;
         }
     }

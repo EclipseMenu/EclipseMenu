@@ -47,6 +47,13 @@ namespace eclipse::keybinds {
         // Mouse buttons
         MouseLeft, MouseRight, MouseMiddle, MouseButton4, MouseButton5,
 
+        // Controller buttons
+        GamepadButtonA, GamepadButtonB, GamepadButtonX, GamepadButtonY,
+        GamepadButtonUp, GamepadButtonDown, GamepadButtonLeft, GamepadButtonRight,
+        GamepadButtonLeftBumper, GamepadButtonRightBumper,
+        GamepadButtonLeftTrigger,GamepadButtonRightTrigger,
+        GamepadButtonBack, GamepadButtonStart,
+
         // System keys
         MenuKey, LastKey,
 
