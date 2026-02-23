@@ -66,7 +66,7 @@ namespace eclipse::hacks::Global {
 
     REGISTER_HACK(CBFToggle)
 
-    class $modify(FPSBypassGMHook, GameManager) {
+    class $modify(CBSCOSGMHook, GameManager) {
         void setGameVariable(char const* key, bool value) {
             GameManager::setGameVariable(key, value);
             if (strcmp(key, GameVar::ClickBetweenSteps) == 0) {
