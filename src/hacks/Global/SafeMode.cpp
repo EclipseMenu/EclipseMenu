@@ -296,6 +296,10 @@ namespace eclipse::hacks::Global {
             s_attemptCheats["Noclip"] = false;
         }
 
+        if (config::get<"level.showhitboxes", bool>()) {
+            s_attemptCheats["Show Hitboxes"] = true;
+        }
+
         if (s_attemptCheats.empty() ) {
             FLAlertLayer::create(
                 nullptr,
@@ -341,6 +345,10 @@ namespace eclipse::hacks::Global {
         // edge case: noclip is only considered a cheat if you die while using it
         if (config::get<"player.noclip", bool>()) {
             s_attemptCheats["Noclip"] = false;
+        }
+
+        if (config::get<"level.showhitboxes", bool>()) {
+            s_attemptCheats["Show Hitboxes"] = true;
         }
 
         if (s_attemptCheats.empty() ) {

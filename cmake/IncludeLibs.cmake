@@ -17,14 +17,14 @@ set(HAS_IMGUI ON)
 set(IMGUI_HOOK_EARLY OFF)
 
 if (NOT ANDROID AND NOT IOS)
-    CPMAddPackage("gh:EclipseMenu/discord-presence#01b3ebc")
+    CPMAddPackage("gh:EclipseMenu/discord-presence#6462112")
 endif()
 
 CPMAddPackage("gh:matcool/gd-imgui-cocos#9764333")
 CPMAddPackage("gh:prevter/msgpack-for-matjson#16a7957")
 CPMAddPackage("gh:maxnut/GDR-converter#71104a9")
 CPMAddPackage("gh:EclipseMenu/rift@2.0.2")
-CPMAddPackage("gh:prevter/AdvancedLabel#a800983")
+CPMAddPackage("gh:prevter/AdvancedLabel#0c702d6")
 CPMAddPackage("gh:prevter/sinaps#7d2f7b1")
 
 if (WIN32)
