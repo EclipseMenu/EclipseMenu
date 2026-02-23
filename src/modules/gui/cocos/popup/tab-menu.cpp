@@ -128,7 +128,8 @@ namespace eclipse::gui::cocos {
                       ->setGap(0.5f)
                       ->setAxisAlignment(geode::AxisAlignment::End)
                       ->setCrossAxisAlignment(geode::AxisAlignment::Start)
-                      ->setCrossAxisLineAlignment(geode::AxisAlignment::Center);
+                      ->setCrossAxisLineAlignment(geode::AxisAlignment::Center)
+                      ->ignoreInvisibleChildren(false);
         this->setAnchorPoint({0.5f, 0.5f});
         this->setContentHeight(260.f);
         this->setLayout(layout, true);

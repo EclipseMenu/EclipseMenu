@@ -149,9 +149,6 @@ namespace eclipse::keybinds {
             auto manager = Manager::get();
             switch (event.action) {
                 case KeyboardInputData::Action::Press:
-                    log::debug("{} pressed", keyToString({
-                        convertCocosKey(event.key), event.modifiers
-                    }));
                     manager->registerKeyPress({
                         .timestamp = event.timestamp,
                         .props = {convertCocosKey(event.key), event.modifiers},

@@ -67,7 +67,7 @@ namespace eclipse::gui::cocos {
         m_tabMenu->setPosition(7.5f, 270.f);
         m_tabMenu->setActiveTab(currentTab);
         m_tabMenu->regenTabs();
-        bgTab->addChildAtPosition(m_tabMenu, geode::Anchor::Center, {0, -25});
+        bgTab->addChildAtPosition(m_tabMenu, geode::Anchor::Center, {0, -20});
 
         // Content view
         m_contentMenu = ContentView::create({345.f, 260.f}, tabs[currentTab]);

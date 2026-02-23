@@ -116,6 +116,7 @@ namespace eclipse::gui::cocos {
                             ->setGrowCrossAxis(false)
                             ->setCrossAxisOverflow(false)
                             ->setAxisAlignment(geode::AxisAlignment::Center)
+                            ->ignoreInvisibleChildren(false)
                             ->setGap(2.5f)
                     );
                     layer->addChild(menu);
@@ -147,6 +148,7 @@ namespace eclipse::gui::cocos {
                             ->setAxisReverse(true)
                             ->setAutoGrowAxis(std::nullopt)
                             ->setAxisAlignment(geode::AxisAlignment::Start)
+                            ->ignoreInvisibleChildren(false)
                             ->setGap(1.5f)
                     );
                     layer->addChild(list);
@@ -188,6 +190,7 @@ namespace eclipse::gui::cocos {
                 ->setAxisReverse(true)
                 ->setAutoGrowAxis(this->getContentHeight())
                 ->setAxisAlignment(geode::AxisAlignment::End)
+                ->ignoreInvisibleChildren(false)
                 ->setGap(0),
             false
         );
