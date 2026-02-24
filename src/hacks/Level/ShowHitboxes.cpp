@@ -316,9 +316,7 @@ namespace eclipse::hacks::Level {
             }
         }
 
-        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
-            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
-
+        void updateHitboxes(bool isHalfTick) {
             if (s_isDead || !config::get<"level.showhitboxes.traillength.toggle", bool>(false))
                 return;
 
@@ -346,6 +344,18 @@ namespace eclipse::hacks::Level {
                 );
             }
         }
+
+        #ifndef GEODE_IS_MACOS
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
+            this->updateHitboxes(isHalfTick);
+        }
+        #else
+        void processQueuedButtons(float dt, bool clearInputQueue) {
+            GJBaseGameLayer::processQueuedButtons(dt, clearInputQueue);
+            this->updateHitboxes(m_isBetweenSteps);
+        }
+        #endif
     };
 
     #define $hitbox static_cast<ShowHitboxesGJBGLHook*>(static_cast<GJBaseGameLayer*>(this))

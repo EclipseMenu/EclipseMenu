@@ -170,9 +170,7 @@ namespace eclipse::hacks::Player {
     };
 
     class $modify(NoClipGJBGLHook, GJBaseGameLayer) {
-        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
-            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
-
+        void processNoclipDeaths() {
             if (!utils::get<PlayLayer>()) {
                 config::setTemp<int>("noclipDeaths", 0);
                 config::setTemp<float>("noclipAccuracy", 100.f);
@@ -205,6 +203,18 @@ namespace eclipse::hacks::Player {
                 //utils::get<PlayLayer>()->destroyPlayer(m_player1, (GameObject*)((int*)1));
             }
         }
+
+        #ifndef GEODE_IS_MACOS
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
+            this->processNoclipDeaths();
+        }
+        #else
+        void processQueuedButtons(float dt, bool clearInputQueue) {
+            GJBaseGameLayer::processQueuedButtons(dt, clearInputQueue);
+            this->processNoclipDeaths();
+        }
+        #endif
     };
 }
 

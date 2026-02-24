@@ -88,22 +88,22 @@ namespace eclipse::assembler {
 
         class Builder {
         public:
-            Builder() = default;
-            explicit Builder(uintptr_t baseAddress) : m_baseAddress(baseAddress) {}
+            constexpr Builder() = default;
+            explicit constexpr Builder(uintptr_t baseAddress) : m_baseAddress(baseAddress) {}
 
-            Builder& movabs(Register64 dst, uint64_t imm) {
+            constexpr Builder& movabs(Register64 dst, uint64_t imm) {
                 auto bytes = x86_64::movabs(dst, imm);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            Builder& mov(Register32 dst, Register64 src) {
+            constexpr Builder& mov(Register32 dst, Register64 src) {
                 auto bytes = x86_64::mov(dst, src);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            Builder& jmp(int32_t offset, bool relative = false) {
+            constexpr Builder& jmp(int32_t offset, bool relative = false) {
                 // If relative is true, offset is the absolute address, and we calculate the relative jump.
                 if (relative) offset -= m_baseAddress + m_bytes.size() + 5; // 5 is the size of the jmp instruction
                 auto bytes = x86_64::jmp(offset);
@@ -111,18 +111,27 @@ namespace eclipse::assembler {
                 return *this;
             }
 
-            Builder& nop(size_t count = 1) {
+            constexpr Builder& nop(size_t count = 1) {
                 m_bytes.insert(m_bytes.end(), count, 0x90);
                 return *this;
             }
 
-            Builder& movss(XmmRegister dst, Register64 src) {
+            constexpr Builder& movss(XmmRegister dst, Register64 src) {
                 auto bytes = x86_64::movss(dst, src);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            std::vector<uint8_t> build() { return std::move(m_bytes); }
+            constexpr std::vector<uint8_t> build() { return std::move(m_bytes); }
+
+            template <size_t N>
+            consteval std::array<uint8_t, N> build_array() {
+                if (m_bytes.size() != N) throw std::runtime_error("Size mismatch!");
+
+                std::array<uint8_t, N> result{};
+                std::copy(m_bytes.begin(), m_bytes.end(), result.begin());
+                return result;
+            }
 
         private:
             uintptr_t m_baseAddress = 0;
@@ -560,10 +569,10 @@ namespace eclipse::assembler {
 
         class Builder {
         public:
-            Builder() = default;
-            explicit Builder(uintptr_t baseAddress) : m_baseAddress(baseAddress) {}
+            constexpr Builder() = default;
+            constexpr explicit Builder(uintptr_t baseAddress) : m_baseAddress(baseAddress) {}
 
-            Builder& mov(Register dst, uint32_t imm) {
+            constexpr Builder& mov(Register dst, uint32_t imm) {
                 auto bytes = armv7::movw(dst, static_cast<uint16_t>(imm & 0xFFFF));
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 if (imm > 0xFFFF) {
@@ -573,13 +582,13 @@ namespace eclipse::assembler {
                 return *this;
             }
 
-            Builder& ldr_t(Register rt, Register rn, uint16_t imm = 0) {
+            constexpr Builder& ldr_t(Register rt, Register rn, uint16_t imm = 0) {
                 auto bytes = armv7::ldr(rt, rn);
                 m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
                 return *this;
             }
 
-            Builder& nop(size_t count = 1) {
+            constexpr Builder& nop(size_t count = 1) {
                 for (size_t i = 0; i < count; ++i) {
                     auto bytes = armv7::nop();
                     m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());
@@ -587,7 +596,7 @@ namespace eclipse::assembler {
                 return *this;
             }
 
-            Builder& nop_t(size_t count = 1) {
+            constexpr Builder& nop_t(size_t count = 1) {
                 for (size_t i = 0; i < count; ++i) {
                     auto bytes = armv7::nop_t();
                     m_bytes.insert(m_bytes.end(), bytes.begin(), bytes.end());

@@ -374,8 +374,7 @@ namespace eclipse::hacks::Bot {
             }
         }
 
-        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
-            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
+        void processBot() {
             if(s_respawning) s_respawning = false;
 
             if (s_bot.getState() != bot::State::PLAYBACK)
@@ -387,6 +386,19 @@ namespace eclipse::hacks::Bot {
                 this->simulateClick((PlayerButton) input->button, input->down, input->player2);
             }
         }
+
+        // processCommands is inlined on macos platforms since 2.208
+        #ifndef GEODE_IS_MACOS
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
+            this->processBot();
+        }
+        #else
+        void processQueuedButtons(float dt, bool clearInputQueue) {
+            GJBaseGameLayer::processQueuedButtons(dt, clearInputQueue);
+            this->processBot();
+        }
+        #endif
 
         void handleButton(bool down, int button, bool player1) {
             if (s_bot.getState() == bot::State::PLAYBACK && s_bot.getInputCount() && config::get<bool>("bot.ignore-inputs", false))

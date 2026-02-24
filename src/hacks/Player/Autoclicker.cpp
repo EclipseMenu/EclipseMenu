@@ -39,9 +39,7 @@ namespace eclipse::hacks::Player {
 
         ADD_HOOKS_DELEGATE("player.autoclick")
 
-        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
-            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
-
+        void updateAutoClicker() {
             auto clickInterval = config::get<"player.autoclick.intervalhold", int>(1);
             auto releaseInterval = config::get<"player.autoclick.intervalrelease", int>(1);
             auto fields = m_fields.self();
@@ -54,5 +52,17 @@ namespace eclipse::hacks::Player {
                 fields->timer = 0.f;
             }
         }
+
+        #ifndef GEODE_IS_MACOS
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
+            this->updateAutoClicker();
+        }
+        #else
+        void processQueuedButtons(float dt, bool clearInputQueue) {
+            GJBaseGameLayer::processQueuedButtons(dt, clearInputQueue);
+            this->updateAutoClicker();
+        }
+        #endif
     };
 }

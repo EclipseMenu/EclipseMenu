@@ -710,9 +710,7 @@ namespace eclipse::labels {
     }
 
     class $modify(LabelsGJBGLHook, GJBaseGameLayer) {
-        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
-            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
-
+        static void updateTPS() {
             static time_t s_lastUpdate = utils::getTimestamp();
             static size_t s_frames = 0;
             s_frames++;
@@ -726,6 +724,18 @@ namespace eclipse::labels {
                 s_frames = 0;
             }
         }
+
+        #ifndef GEODE_IS_MACOS
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
+            this->updateTPS();
+        }
+        #else
+        void processQueuedButtons(float dt, bool clearInputQueue) {
+            GJBaseGameLayer::processQueuedButtons(dt, clearInputQueue);
+            this->updateTPS();
+        }
+        #endif
     };
 
     class $modify(VariablesPLHook, PlayLayer) {

@@ -41,7 +41,12 @@ namespace eclipse::hacks::Level {
         static void onModify(auto& self) {
             SAFE_HOOKS_ALL();
 
+            #ifndef GEODE_IS_MACOS
             s_hook = self.getHook("GJBaseGameLayer::processCommands").unwrapOrDefault();
+            #else
+            s_hook = self.getHook("GJBaseGameLayer::processQueuedButtons").unwrapOrDefault();
+            #endif
+
             if (!s_hook) return;
 
             auto value = config::get("level.randomseed", false);
@@ -51,10 +56,17 @@ namespace eclipse::hacks::Level {
             config::addDelegate("level.randomseed.constantseed", handleToggle, true);
         }
 
+        #ifndef GEODE_IS_MACOS
         void processCommands(float dt, bool isHalfTick, bool isLastTick) {
             GameToolbox::fast_srand(config::get<"level.randomseed.seed", int>(1));
             GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
         }
+        #else
+        void processQueuedButtons(float dt, bool clearInputQueue) {
+            GameToolbox::fast_srand(config::get<"level.randomseed.seed", int>(1));
+            GJBaseGameLayer::processQueuedButtons(dt, clearInputQueue);
+        }
+        #endif
     };
 
     class $modify(RandomSeedPLHook, PlayLayer) {
