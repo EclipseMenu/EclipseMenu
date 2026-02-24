@@ -320,7 +320,7 @@ namespace eclipse::assembler {
             return {
                 static_cast<uint8_t>(rt_bits | ((rn_bits & 0b111) << 5)),
                 static_cast<uint8_t>((rn_bits >> 3) | ((imm12 & 0b1111111) << 2)),
-                static_cast<uint8_t>(0b01000000 | ((imm12 >> 7) & 0b11111)),
+                static_cast<uint8_t>(0b01000000 | ((imm12 >> 6) & 0b111111)),
                 static_cast<uint8_t>((size << 6) | 0b111000 | (opc << 2) | 0b1)
             };
         }
@@ -351,7 +351,7 @@ namespace eclipse::assembler {
             return {
                 static_cast<uint8_t>(rt_bits | ((rn_bits & 0b111) << 5)),
                 static_cast<uint8_t>((rn_bits >> 3) | ((imm12 & 0b1111111) << 2)),
-                static_cast<uint8_t>(0b01000000 | ((imm12 >> 7) & 0b11111)),
+                static_cast<uint8_t>(0b01000000 | ((imm12 >> 6) & 0b111111)),
                 static_cast<uint8_t>((size << 6) | 0b111000 | (opc << 2) | 0b1)
             };
         }
