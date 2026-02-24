@@ -50,19 +50,19 @@ namespace eclipse::hacks::Global {
         }
 
         void init() override {
-            config::setIfEmpty("global.tpsbypass", 240.f);
+            config::setIfEmpty("global.tpsbypass", 240.0);
 
         #ifdef GEODE_IS_IOS
             if (geode::Loader::get()->isPatchless()) {
                 using namespace assembler::arm64;
                 g_expectedTicksPtr = std::bit_cast<TicksType*>(geode::base::get() + g_jitlessSpace);
-                static_assert(GEODE_COMP_GD_VERSION == 22074, "TPS Bypass: JIT-less patch is only supported for GD 2.2074");
-                #define PATCH_ADDR 0x200C30
+                static_assert(GEODE_COMP_GD_VERSION == 22081, "TPS Bypass: JIT-less patch is only supported for GD 2.2081");
+                #define PATCH_ADDR 0x1fe724
                 GEODE_MOD_STATIC_PATCH(PATCH_ADDR, Builder()
                     .adrp(Register::x9, g_jitlessSpace - ((PATCH_ADDR >> 12) << 12))
                     .ldr(FloatRegister::s0, Register::x9, 0x8)
-                    .pad_nops(20)
-                    .build_array<20>());
+                    .pad_nops(40)
+                    .build_array<40>());
             } else {
                 // we can do normal patches with JIT
         #endif
@@ -123,14 +123,14 @@ namespace eclipse::hacks::Global {
             #elif defined(GEODE_IS_IOS) || defined(GEODE_IS_ARM_MAC) // lucky me, they're virtually the same
             {
                 using namespace assembler::arm64;
-                // 2.2074: 0x200C30 (iOS) / 0x119454 (macOS)
-                static_assert(false, "TODO: fix for 2.2081");
-                addr = sinaps::find<"00 19 20 1E 02 10 22 1E">(base, baseSize);
+                // 2.2074: 0x200c30 (iOS) / 0x119454 (macOS)
+                // 2.2081: 0x1fe724 (iOS) / 0x122d44 (macOS)
+                addr = sinaps::find<"01 10 2E 1E 00 20 21 1E 20 AC 20 1E">(base, baseSize);
                 if (addr != sinaps::not_found) {
                     bytes = Builder(addr)
                         .mov(Register::x9, std::bit_cast<uint64_t>(&g_expectedTicks))
                         .ldr(FloatRegister::s0, Register::x9)
-                        .pad_nops(20) // we need to replace 20 bytes, but mov can take 3-4 instructions depending on address
+                        .pad_nops(40) // we need to replace 40 bytes, but mov can take 3-4 instructions depending on address
                         .build();
                 }
             }
@@ -298,8 +298,8 @@ namespace eclipse::hacks::Global {
             double m_extraDelta = 0.0;
         };
 
-        float getCustomDelta(float dt, float tps, bool applyExtraDelta = true) {
-            auto spt = 1.f / tps;
+        double getCustomDelta(float dt, double tps, bool applyExtraDelta = true) {
+            auto spt = 1.0 / tps;
 
             if (applyExtraDelta && m_resumeTimer > 0) {
                 --m_resumeTimer;
@@ -311,11 +311,11 @@ namespace eclipse::hacks::Global {
             auto steps = std::round(totalDelta / timestep);
             auto newDelta = steps * timestep;
             if (applyExtraDelta) m_extraDelta = totalDelta - newDelta;
-            return static_cast<float>(newDelta);
+            return newDelta;
         }
 
         #ifndef REQUIRE_MODIFIED_DELTA_PATCH
-        float getModifiedDelta(float dt) {
+        double getModifiedDelta(float dt) {
             #ifdef GEODE_IS_IOS
             return getCustomDelta(dt, utils::getTPS());
             #else
@@ -339,7 +339,7 @@ namespace eclipse::hacks::Global {
             #endif
 
             auto spt = 1.0 / newTPS;
-            auto steps = std::floor(fields->m_extraDelta / spt);
+            auto steps = std::round(fields->m_extraDelta / spt);
             auto totalDelta = steps * spt;
             fields->m_extraDelta -= totalDelta;
             expectedTicks() = steps;
