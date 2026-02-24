@@ -1,5 +1,33 @@
 # Eclipse Menu
 
+## v1.8.0
+This update adds **<cg>Geometry Dash v2.2081</c>** support
+
+**Additions**:
+* Added <cg>Wave Trail On Death</c>
+* Added <cg>Persist Trail</c>
+* Added <cg>Composite Keybinds</c> (e.g. Ctrl + Key) for shortcuts
+* Added <cg>Click On Steps</c> and <cg>Click Between Steps</c> toggles
+* Added <cg>Show Spam Comments</c> (#314 by @Beat)
+* Added <cg>Search Auto Focus</c> toggle and disabled it by default
+* Added a warning popup on level enter when <co>Auto Safe Mode</c> or <co>Safe Mode</c> are active
+* <co>FPS Bypass</c> and <co>Vertical Sync</c> now mutually disable each other
+* <co>Replay Bot</c> can now playback in editor
+* <co>Random Seed</c> is now supported on all platforms and has more options
+* <co>Stop Triggers on Death</c> can be toggled for platformer mode
+* <co>Hitbox Trail</c> now shows CBS ticks
+* Optimized <co>Hitbox Trail</c> memory usage
+* Increased max length of <co>Hitbox Trails</c>
+* Increased max TPS value
+
+** Fixes**:
+* <cg>Fixed</c> a <co>Replay Bot</c> input check that could cause recording issues
+* <cg>Fixed</c> replay picker showing `.DS_Store` files on macOS (#292 by XblazeGMD)
+* <cg>Fixed</c> multiple issues with <co>Discord RPC</c> not showing status
+* <cg>Fixed</c> <co>Path Unlocker</c> also unlocking other items (#306 by km7dev)
+* <cg>Fixed</c> <co>Auto Song Download</c> not downloading songs for daily/weekly levels
+* <co>Stop Triggers on Death</c> is now considered a cheat in platformer mode
+
 ## v1.7.0
 **Additions**:
 * Added <cg>No Music Fade Out</c> (#273 by @Beat)

@@ -351,7 +351,8 @@ $on_mod(Loaded) {
                     value ? ComponentFlags::DisableCocos | ComponentFlags::StartWithKeyboardFocus
                           : ComponentFlags::DisableCocos
                 );
-            });
+            })
+            ->setFlags(ComponentFlags::DisableCocos);
     }
 
     // Schedule hack updates
