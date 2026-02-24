@@ -1,4 +1,3 @@
-#if 0
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
 #include <modules/gui/components/button.hpp>
@@ -291,7 +290,7 @@ namespace eclipse::hacks::Recorder {
                 if (framerate < 1)
                     framerate = 1;
 
-                float tps = utils::getTPS();
+                double tps = utils::getTPS();
 
                 dt = 1.f / framerate;
                 dt *= framerate / tps;
@@ -378,4 +377,3 @@ namespace eclipse::hacks::Recorder {
         }
     };
 };
-#endif

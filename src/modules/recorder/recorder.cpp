@@ -1,4 +1,3 @@
-#if 0
 #include "recorder.hpp"
 
 #include <memory>
@@ -150,4 +149,3 @@ namespace eclipse::recorder {
         return ffmpeg::Recorder::getAvailableCodecs();
     }
 }
-#endif
