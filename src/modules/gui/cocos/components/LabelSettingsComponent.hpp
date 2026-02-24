@@ -23,7 +23,7 @@ namespace eclipse::gui::cocos {
             this->setID(fmt::format("setting-{}"_spr, m_component->getId()));
             this->setContentSize({width, height});
 
-            auto bg = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+            auto bg = geode::NineSlice::create("square02b_001.png");
             bg->setScale(0.5f);
             bg->setContentSize({width * 2 - 10.f, height * 2});
             bg->setColor(tm->getFrameBackground().toCCColor3B());
@@ -79,7 +79,7 @@ namespace eclipse::gui::cocos {
                 return arrow;
             };
 
-            auto moveBg = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+            auto moveBg = geode::NineSlice::create("square02b_001.png");
             moveBg->setScale(0.475f);
             moveBg->setContentSize({120.f, height * 2 - 10.f});
             moveBg->setColor(tm->getFrameBackground().toCCColor3B());

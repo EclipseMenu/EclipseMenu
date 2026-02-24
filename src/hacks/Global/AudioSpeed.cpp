@@ -12,11 +12,11 @@ namespace eclipse::hacks::Global {
     //
     //     if (config::get<bool>("global.audiospeed.sync", false)) {
     //         bool speedhack = config::get<bool>("global.speedhack.toggle", false);
-    //         speed = speedhack ? config::get<float>("global.speedhack", 1.f) : 1.f;
+    //         speed = speedhack ? config::get<double>("global.speedhack", 1.f) : 1.f;
     //     }
     //
     //     if (config::get<bool>("global.audiospeed.toggle", false))
-    //         speed = config::get<float>("global.audiospeed", 1.f);
+    //         speed = config::get<double>("global.audiospeed", 1.f);
     //
     //     FMOD::Sound* sound;
     //     channel->getCurrentSound(&sound);
@@ -71,11 +71,11 @@ namespace eclipse::hacks::Global {
 
         static float getSpeed() {
             if (config::get<"global.audiospeed.toggle", bool>()) {
-                return config::get<"global.audiospeed", float>(1.f);
+                return config::get<"global.audiospeed", double>(1.f);
             }
 
             if (config::get<"global.audiospeed.sync", bool>()) {
-                auto speedhack = config::get<"global.speedhack", float>(1.f);
+                auto speedhack = config::get<"global.speedhack", double>(1.f);
                 auto speedhackToggle = config::get<"global.speedhack.toggle", bool>();
                 return speedhackToggle ? speedhack : 1.f;
             }

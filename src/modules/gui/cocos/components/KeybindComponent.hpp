@@ -18,11 +18,11 @@ namespace eclipse::gui::cocos {
         void onDelete(CCObject*);
     };
 
-    class SelectKeybindPopup : public geode::Popup<keybinds::Keys, KeybindComponentNode*> {
+    class SelectKeybindPopup : public geode::Popup {
     public:
-        static SelectKeybindPopup* create(keybinds::Keys initialKey, KeybindComponentNode* btn) {
+        static SelectKeybindPopup* create(keybinds::KeybindProps initialKey, KeybindComponentNode* btn) {
             auto ret = new SelectKeybindPopup();
-            if (ret->initAnchored(260.f, 120.f, initialKey, btn, "GJ_square02.png")) {
+            if (ret->init(initialKey, btn)) {
                 ret->autorelease();
                 return ret;
             }
@@ -31,7 +31,9 @@ namespace eclipse::gui::cocos {
         }
 
     private:
-        bool setup(keybinds::Keys initialKey, KeybindComponentNode* btn) override {
+        bool init(keybinds::KeybindProps initialKey, KeybindComponentNode* btn) {
+            if (!Popup::init(260.f, 120.f, "GJ_square02.png")) return false;
+
             m_keybindNode = btn;
             m_initialKey = initialKey;
 
@@ -45,13 +47,13 @@ namespace eclipse::gui::cocos {
             return true;
         }
 
-        void triggerChange(keybinds::Keys key) const {
+        void triggerChange(keybinds::KeybindProps key) const {
             auto& component = m_keybindNode->m_component;
             config::set(component->getId(), key);
             component->triggerCallback(key);
 
             // some callbacks might change the key, so just fetch it again
-            key = config::get<keybinds::Keys>(component->getId(), keybinds::Keys::None);
+            key = config::get<keybinds::KeybindProps>(component->getId(), keybinds::Keys::None);
             m_keybindNode->m_keyName->setString(keybinds::keyToString(key));
 
             if (m_keybindNode->m_resetBtn) {
@@ -79,23 +81,38 @@ namespace eclipse::gui::cocos {
                 return;
             }
 
-            auto from = keybinds::Keys::A;
-            auto to = keybinds::Keys::LastKey;
-            for (auto i = from; i < to; ++i) {
-                // touchscreen users probably don't want to bind left mouse button (a.k.a. any screen tap)
-                GEODE_MOBILE(if (i == keybinds::Keys::MouseLeft) continue;)
+            static std::string activeKeybindId;
+            static keybinds::KeybindProps releasedKey;
+            static bool listenerRegistered = false;
 
-                if (keybinds::isKeyDown(i)) {
-                    m_waitingForInput = false;
-                    this->triggerChange(i);
-                    this->onClose(nullptr);
-                    break;
-                }
+            if (!listenerRegistered) {
+                keybinds::Manager::get()->registerGlobalListener([](keybinds::KeyEvent event) {
+                    if (activeKeybindId.empty()) return false;
+                    if (!event.down) {
+                        releasedKey = event.props;
+                    }
+                    return true;
+                });
+                listenerRegistered = true;
+            }
+
+            activeKeybindId = m_keybindNode->m_component->getId();
+
+            if (keybinds::isKeyDown(keybinds::Keys::Escape)) {
+                this->onClose(nullptr);
+                releasedKey = {};
+                activeKeybindId.clear();
+            } else if (releasedKey.key != keybinds::Keys::None) {
+                m_waitingForInput = false;
+                this->triggerChange(releasedKey);
+                this->onClose(nullptr);
+                releasedKey = {};
+                activeKeybindId.clear();
             }
         }
 
         geode::Ref<KeybindComponentNode> m_keybindNode;
-        keybinds::Keys m_initialKey = keybinds::Keys::None;
+        keybinds::KeybindProps m_initialKey = keybinds::Keys::None;
         bool m_waitingForInput = false;
         bool m_ignoreInput = false;
     };
@@ -123,15 +140,16 @@ namespace eclipse::gui::cocos {
             offset = offset * 2 - 5.f;
         }
 
-        auto key = config::get<keybinds::Keys>(m_component->getId(), keybinds::Keys::None);
+        auto key = config::get<keybinds::KeybindProps>(m_component->getId(), keybinds::Keys::None);
         m_keyName = TranslatedLabel::createRaw(keybinds::keyToString(key));
         m_keyName->setScale(1.2f);
 
         auto btnWidth = width * 0.3f;
-        auto btnSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", { 0.0f, 0.0f, 80.0f, 80.0f });
+        auto btnSprite = geode::NineSlice::create("square02b_001.png", { 0.0f, 0.0f, 80.0f, 80.0f });
         btnSprite->setContentSize({ btnWidth * (1.f / 0.75f), 36.f });
         btnSprite->setScale(0.6f);
         btnSprite->addChildAtPosition(m_keyName, geode::Anchor::Center);
+        m_keyName->limitLabelWidth(btnWidth * (1.f / 0.75f) * 0.9f, 1.2f, 0.1f);
 
         auto tm = ThemeManager::get();
         btnSprite->setColor(tm->getButtonBackgroundColor().toCCColor3B());
@@ -143,7 +161,7 @@ namespace eclipse::gui::cocos {
             btnSprite,
             [this](auto) {
                 SelectKeybindPopup::create(
-                    config::get<keybinds::Keys>(m_component->getId(), keybinds::Keys::None),
+                    config::get<keybinds::KeybindProps>(m_component->getId(), keybinds::Keys::None),
                     this
                 )->show();
             }
@@ -173,7 +191,7 @@ namespace eclipse::gui::cocos {
     }
 
     inline void KeybindComponentNode::onDelete(CCObject*) {
-        config::set(m_component->getId(), keybinds::Keys::None);
+        config::set<keybinds::KeybindProps>(m_component->getId(), keybinds::Keys::None);
         m_keyName->setString(keybinds::keyToString(keybinds::Keys::None));
         m_component->triggerCallback(keybinds::Keys::None);
     }

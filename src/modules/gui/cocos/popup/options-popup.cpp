@@ -8,7 +8,11 @@
 #include "content-view.hpp"
 
 namespace eclipse::gui::cocos {
-    bool OptionsPopup::setup(MenuTab const& tab) {
+    bool OptionsPopup::init(MenuTab const& tab) {
+        if (!Popup::init(400.f, 240.f)) {
+            return false;
+        }
+
         auto const tm = ThemeManager::get();
 
         auto title = TranslatedLabel::create(tab.getTitle());
@@ -17,21 +21,21 @@ namespace eclipse::gui::cocos {
         m_mainLayer->addChild(title, 2);
 
         // The behind background for the entire popup to get the outline
-        auto bgBehind = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        auto bgBehind = geode::NineSlice::create("square02b_001.png");
         bgBehind->setContentSize(m_mainLayer->getContentSize() * std::clamp(tm->getBorderSize(), 0.F, 1.F));
         m_bgSprite->setColor(tm->getBorderColor().toCCColor3B());
         bgBehind->setID("bg-behind"_spr);
         m_mainLayer->addChildAtPosition(bgBehind, geode::Anchor::Center);
 
         // Background for the entire popup
-        m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        m_bgSprite = geode::NineSlice::create("square02b_001.png");
         m_bgSprite->setContentSize(m_mainLayer->getContentSize() - 3);
         m_bgSprite->setColor(tm->getTitleBackgroundColor().toCCColor3B());
         m_bgSprite->setID("main-bg"_spr);
         m_mainLayer->addChildAtPosition(m_bgSprite, geode::Anchor::Center);
 
         // Background for content
-        m_contentBG = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        m_contentBG = geode::NineSlice::create("square02b_001.png");
         m_contentBG->setAnchorPoint({0, 1});
         m_contentBG->setPosition(7.5f, 210.f);
         m_contentBG->setColor(tm->getBackgroundColor().toCCColor3B());
@@ -59,7 +63,7 @@ namespace eclipse::gui::cocos {
 
     OptionsPopup* OptionsPopup::create(MenuTab const& tab) {
         auto ret = new OptionsPopup;
-        if (ret->initAnchored(400.f, 240.f, tab)) {
+        if (ret->init(tab)) {
             ret->autorelease();
             return ret;
         }

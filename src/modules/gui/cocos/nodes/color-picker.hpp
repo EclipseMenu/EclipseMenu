@@ -4,11 +4,11 @@
 #include <modules/gui/cocos/cocos.hpp>
 
 namespace eclipse::gui::cocos {
-    class ColorPicker : public CCMenuItemSpriteExtra, geode::ColorPickPopupDelegate {
+    class ColorPicker : public CCMenuItemSpriteExtra {
     public:
-        static ColorPicker* create(gui::Color const& original, bool useAlpha, Function<void(gui::Color const&)>&& callback) {
+        static ColorPicker* create(Color const& original, bool useAlpha, Function<void(Color)>&& callback) {
             auto ret = new ColorPicker();
-            if (ret->init(original, useAlpha, std::move(callback))) {
+            if (ret->init(original, useAlpha, std::forward<Function<void(Color)>>(callback))) {
                 ret->autorelease();
                 return ret;
             }
@@ -22,13 +22,13 @@ namespace eclipse::gui::cocos {
         }
 
     protected:
-        bool init(gui::Color const& original, bool useAlpha, Function<void(gui::Color const&)>&& callback);
+        bool init(gui::Color const& original, bool useAlpha, Function<void(Color)> callback);
         void onClicked(CCObject*);
-        void updateColor(cocos2d::ccColor4B const& color) override;
+        void updateColor(cocos2d::ccColor4B const& color);
 
     protected:
         cocos2d::CCSprite* m_colorSprite = nullptr;
-        Function<void(gui::Color const&)> m_callback;
+        Function<void(Color)> m_callback;
         gui::Color m_color;
         bool m_useAlpha = false;
         geode::ColorPickPopup* m_popup = nullptr;
@@ -43,7 +43,7 @@ namespace eclipse::gui::cocos {
     public:
         static ColorPopup* create(cocos2d::ccColor4B const& color, bool isRGBA) {
             auto ret = new ColorPopup();
-            if (ret->initAnchored(400.f, (isRGBA ? 290.f : 240.f), color, isRGBA)) {
+            if (ret->init(color, isRGBA)) {
                 ret->autorelease();
                 return ret;
             }

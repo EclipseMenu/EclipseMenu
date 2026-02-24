@@ -25,14 +25,14 @@ namespace eclipse::gui::imgui {
 
         // Load saved window states
         {
-            auto windowStates = config::get("windows", std::vector<nlohmann::json>());
+            auto windowStates = config::get("windows", std::vector<matjson::Value>());
             for (auto &windowState: windowStates) {
-                auto title = windowState.at("title").get<std::string_view>();
+                auto title = windowState["title"].as<std::string>().unwrapOrDefault();
                 auto window = std::ranges::find_if(m_windows, [&title](Window const& w) {
                     return w.getTitle() == title;
                 });
                 if (window != m_windows.end()) {
-                    from_json(windowState, *window);
+                    window->applyJson(windowState);
                     window->setDrawPosition(window->getPosition());
                 }
             }
@@ -60,14 +60,15 @@ namespace eclipse::gui::imgui {
                 }
                 // Load saved window states
                 {
-                    auto windowStates = config::get("windows", std::vector<nlohmann::json>());
+                    auto windowStates = config::get("windows", std::vector<matjson::Value>());
                     for (auto& windowState: windowStates) {
-                        auto title = windowState.at("title").get<std::string_view>();
+                        auto title = windowState["title"].as<std::string>().unwrapOrDefault();
                         auto window = std::ranges::find_if(m_windows, [&title](Window const& window) {
                             return window.getTitle() == title;
                         });
-                        if (window != m_windows.end())
-                            from_json(windowState, *window);
+                        if (window != m_windows.end()) {
+                            window->applyJson(windowState);
+                        }
                     }
                 }
                 m_preloadStep = 1;
@@ -121,11 +122,9 @@ namespace eclipse::gui::imgui {
 
         if (!state) {
             // Save window states
-            std::vector<nlohmann::json> windowStates;
+            std::vector<matjson::Value> windowStates;
             for (auto& window : m_windows) {
-                nlohmann::json windowState;
-                to_json(windowState, window);
-                windowStates.push_back(windowState);
+                windowStates.push_back(window);
             }
             config::set("windows", windowStates);
         }
@@ -233,7 +232,7 @@ namespace eclipse::gui::imgui {
     }
 
     void TabbedLayout::stackWindows() {
-        double duration = config::get<"menu.animationDuration", float>(0.3);
+        double duration = config::get<"menu.animationDuration", double>(0.3);
         auto easingType = config::get<"menu.animationEasingType", animation::Easing>(animation::Easing::Quadratic);
         auto easingMode = config::get<"menu.animationEasingMode", animation::EasingMode>(animation::EasingMode::EaseInOut);
         auto easing = animation::getEasingFunction(easingType, easingMode);

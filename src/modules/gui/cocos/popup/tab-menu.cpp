@@ -16,7 +16,7 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    TabButton* TabButton::create(std::string_view name, cocos2d::CCSize const& size) {
+    TabButton* TabButton::create(geode::ZStringView name, cocos2d::CCSize const& size) {
         auto ret = new TabButton();
         if (ret->init(name, size)) {
             ret->autorelease();
@@ -128,7 +128,8 @@ namespace eclipse::gui::cocos {
                       ->setGap(0.5f)
                       ->setAxisAlignment(geode::AxisAlignment::End)
                       ->setCrossAxisAlignment(geode::AxisAlignment::Start)
-                      ->setCrossAxisLineAlignment(geode::AxisAlignment::Center);
+                      ->setCrossAxisLineAlignment(geode::AxisAlignment::Center)
+                      ->ignoreInvisibleChildren(false);
         this->setAnchorPoint({0.5f, 0.5f});
         this->setContentHeight(260.f);
         this->setLayout(layout, true);
@@ -161,7 +162,7 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    bool TabButton::init(std::string_view name, cocos2d::CCSize size) {
+    bool TabButton::init(geode::ZStringView name, cocos2d::CCSize size) {
         if (!CCNode::init()) return false;
         this->setScale(0.9F);
         this->setID(fmt::format("tab-button-{}"_spr, name));
@@ -177,7 +178,7 @@ namespace eclipse::gui::cocos {
         m_label = TranslatedLabel::create(name);
         m_label->limitLabelWidth(m_icon ? 75 : 100, 1.f, .2f);
 
-        m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0.0f, 0.0f, 80.0f, 80.0f});
+        m_bgSprite = geode::NineSlice::create("square02b_001.png", {0.0f, 0.0f, 80.0f, 80.0f});
         m_bgSprite->setContentSize({size.width, size.height + 8.F}); // minimum 36
         m_bgSprite->setScaleY(.75F);
 

@@ -15,18 +15,18 @@ namespace eclipse::hacks::Player {
 
     class $hack(FrameStepper) {
         static bool isPressed() {
-            auto stepKey = config::get<"player.framestepper.step_key", keybinds::Keys>(keybinds::Keys::C);
+            auto stepKey = config::get<"player.framestepper.step_key", keybinds::KeybindProps>(keybinds::Keys::C);
             return s_frameStepperPressed || keybinds::isKeyPressed(stepKey);
         }
 
         static bool isDown() {
-            auto stepKey = config::get<"player.framestepper.step_key", keybinds::Keys>(keybinds::Keys::C);
+            auto stepKey = config::get<"player.framestepper.step_key", keybinds::KeybindProps>(keybinds::Keys::C);
             return s_frameStepperDown || keybinds::isKeyDown(stepKey);
         }
 
         void init() override {
             config::setIfEmpty("player.framestepper", false);
-            config::setIfEmpty("player.framestepper.step_key", keybinds::Keys::C);
+            config::setIfEmpty<keybinds::KeybindProps>("player.framestepper.step_key", keybinds::Keys::C);
             config::setIfEmpty("player.framestepper.hold", true);
             config::setIfEmpty("player.framestepper.hold_delay", 0.25f);
             config::setIfEmpty("player.framestepper.hold_speed", 5);
@@ -85,7 +85,7 @@ namespace eclipse::hacks::Player {
                     s_holdDelayTimer = 0;
 
                 // Add a grace period after the first press to allow for holding
-                auto delay = config::get<float>("player.framestepper.hold_delay", 0.25f);
+                auto delay = config::get<double>("player.framestepper.hold_delay", 0.25f);
                 if (FrameStepper::isDown()) {
                     shouldStep = firstPress;
                     s_holdAdvanceTimer++;

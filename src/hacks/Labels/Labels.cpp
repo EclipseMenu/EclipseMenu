@@ -402,42 +402,39 @@ namespace eclipse::hacks::Labels {
                       ->setDescription();
                });
             tab->addButton("labels.import")->callback([this] {
-                geode::utils::file::FilePickOptions::Filter filter;
-                filter.description = "Eclipse Label (*.ecl)";
-                filter.files.insert("*.ecl");
+                geode::async::runtime().spawn([this]() -> arc::Future<> {
+                    geode::utils::file::FilePickOptions::Filter filter;
+                    filter.description = "Eclipse Label (*.ecl)";
+                    filter.files.insert("*.ecl");
 
-                geode::utils::file::pick(
-                    geode::utils::file::PickMode::OpenFile,
-                    {geode::Mod::get()->getSaveDir(), {filter}}
-                ).listen([this](geode::Result<std::filesystem::path>* value) {
-                    if (!value) return;
-                    auto path = value->unwrapOr("");
-                    if (path.empty()) return;
+                    auto value = co_await geode::utils::file::pick(
+                        geode::utils::file::PickMode::OpenFile,
+                        {geode::Mod::get()->getSaveDir(), {std::move(filter)}}
+                    );
 
+                    if (!value) co_return;
+                    auto pathOpt = std::move(value).unwrapOr(std::nullopt);
+                    if (!pathOpt.has_value()) co_return;
+
+                    auto path = std::move(pathOpt).value();
                     std::error_code ec;
-                    if (!std::filesystem::exists(path, ec))
-                        return;
+                    if (!std::filesystem::exists(path, ec)) co_return;
 
-                    gui::Engine::queueAfterDrawing([this, path] {
-                        std::ifstream file(path);
-
-                        nlohmann::json json = nlohmann::json::parse(file, nullptr, false);
-                        file.close();
-
-                        if (json.is_discarded()) {
+                    gui::Engine::queueAfterDrawing([this, path = std::move(path)] {
+                        auto res = geode::utils::file::readFromJson<labels::LabelSettings>(path);
+                        if (!res) {
                             return Popup::create(
                                 i18n::get_("labels.import-failed"),
                                 i18n::get_("labels.import-failed.msg")
                             );
                         }
 
-                        s_labels.emplace_back(json.get<labels::LabelSettings>());
+                        s_labels.emplace_back(std::move(res).unwrap());
                         config::set("labels", s_labels);
                         updateLabels(true);
                         createLabelComponent();
                     });
                 });
-
             });
             tab->addButton("labels.add-new")->callback([this] {
                 gui::Engine::queueAfterDrawing([this] {

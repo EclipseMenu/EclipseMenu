@@ -1,7 +1,7 @@
 #pragma once
 #include <functional.hpp>
 #include <Geode/platform/platform.hpp>
-#include "ffmpeg-api/events.hpp"
+#include <ffmpeg-api/events.hpp>
 
 #include "rendertexture.hpp"
 #include "spinlock.hpp"

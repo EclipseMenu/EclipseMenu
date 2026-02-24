@@ -3,27 +3,37 @@
 #include <Geode/utils/web.hpp>
 #include <modules/config/config.hpp>
 #include <modules/labels/setting.hpp>
-#include <nlohmann/json.hpp>
 #include <utils.hpp>
 
 namespace eclipse::i18n {
-    nlohmann::json g_fallback = {
-        {"language-code", "null"},
-    };
-    nlohmann::json g_translations = {
-        {"language-code", "en_US"},
-        {"language-name", "English"}
-    };
+    using Map = geode::utils::StringMap<std::string>;
+    Map g_fallback = {{"language-code", "null"}};
+    Map g_translations = {{"language-code", "en_US"}, {"language-name", "English"}};
 
-    std::string_view get(std::string_view key) {
-        if (!g_translations.contains(key)) {
-            return g_fallback.value(key, key);
+    geode::ZStringView get(geode::ZStringView key) {
+        auto it = g_translations.find(key);
+        if (it != g_translations.end()) {
+            return it->second;
         }
-        return g_translations.value(key, key);
+        auto fallbackIt = g_fallback.find(key);
+        if (fallbackIt != g_fallback.end()) {
+            return fallbackIt->second;
+        }
+        return key;
     }
 
-    std::string get_(std::string_view key) {
-        return std::string(get(key));
+    std::string const& get_(geode::ZStringView key) {
+        auto it = g_translations.find(key);
+        if (it != g_translations.end()) {
+            return it->second;
+        }
+        auto fallbackIt = g_fallback.find(key);
+        if (fallbackIt != g_fallback.end()) {
+            return fallbackIt->second;
+        }
+        static std::string keyStr;
+        keyStr = key;
+        return keyStr;
     }
 
     static std::string stringExtension(std::filesystem::path const& filename) {
@@ -33,8 +43,8 @@ namespace eclipse::i18n {
         return filenameStr.substr(0, pos);
     }
 
-    static void updateLanguageCode(nlohmann::json& json, std::filesystem::path const& filename) {
-        json["language-code"] = stringExtension(filename);
+    static void updateLanguageCode(Map& json, std::filesystem::path const& filename) {
+        json.insert_or_assign("language-code", stringExtension(filename));
     }
 
     // Dirty hack to refresh constant strings
@@ -70,13 +80,12 @@ namespace eclipse::i18n {
 
         if (it == langs.end()) return;
 
-        std::ifstream file(it->path);
-        if (!file) return;
+        auto res = geode::utils::file::readJson(it->path);
+        if (res.isErr()) return;
 
-        auto json = nlohmann::json::parse(file, nullptr, false);
-        if (json.is_discarded()) return;
-
-        g_fallback = json;
+        auto res2 = res.unwrap().as<Map>();
+        if (res2.isErr()) return;
+        g_fallback = std::move(res2.unwrap());
         updateLanguageCode(g_fallback, it->path.filename());
     }
 
@@ -88,18 +97,17 @@ namespace eclipse::i18n {
 
         if (it == langs.end()) return false;
 
-        std::ifstream file(it->path);
-        if (!file) return false;
+        auto res = geode::utils::file::readJson(it->path);
+        if (res.isErr()) return false;
+        auto map = res.unwrap().as<Map>();
+        if (map.isErr()) return false;
 
-        auto json = nlohmann::json::parse(file, nullptr, false);
-        if (json.is_discarded()) return false;
-
-        g_translations = json;
+        g_translations = std::move(map.unwrap());
         updateLanguageCode(g_translations, it->path.filename());
         config::setTemp<uint64_t>("language.index", std::distance(langs.begin(), it));
 
         // check if current fallback is the same as the new language
-        if (g_fallback["language-code"].get<std::string>() != it->fallback)
+        if (g_fallback["language-code"] != it->fallback)
             loadFallback(it->fallback);
 
         refreshStaticArrays();
@@ -132,22 +140,20 @@ namespace eclipse::i18n {
     }
 
     std::optional<LanguageMetadata> getLanguageName(std::filesystem::path const& path) {
-        std::ifstream file(path);
-        if (!file) return std::nullopt;
-
-        auto json = nlohmann::json::parse(file, nullptr, false);
-        if (json.is_discarded()) return std::nullopt;
+        auto res = geode::utils::file::readJson(path);
+        if (res.isErr()) return std::nullopt;
+        auto json = res.unwrap();
 
         if (!json.contains("language-name") || !json.contains("language-native")) return std::nullopt;
 
-        auto fallback = json.contains("language-fallback") ? json["language-fallback"].get<std::string>() : DEFAULT_LANGUAGE;
-        auto charset = json.contains("language-charset") ? json["language-charset"].get<std::string>() : "default";
+        auto fallback = json["language-fallback"].asString().unwrapOr(DEFAULT_LANGUAGE);
+        auto charset = json["language-charset"].asString().unwrapOr("default");
 
         return LanguageMetadata{
-            json["language-name"].get<std::string>(),
+            json["language-name"].asString().unwrapOrDefault(),
             std::string(stringExtension(path.filename())),
-            fallback,
-            charset,
+            std::move(fallback),
+            std::move(charset),
             path
         };
     }
@@ -204,39 +210,39 @@ namespace eclipse::i18n {
         return true;
     }
 
-    void downloadLanguage(std::string const& code) {
+    void downloadLanguage(std::string code) {
         static auto langsPath = geode::Mod::get()->getSaveDir() / "languages";
 
         using namespace geode::utils;
-        web::WebRequest()
-            .get(fmt::format("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/main/translations/{}.lang.json", code))
-            .listen([code](web::WebResponse* value) {
-                if (!value->ok()) {
-                    return;
-                }
+        geode::async::runtime().spawn([](std::string code) -> arc::Future<> {
+            auto res = co_await web::WebRequest()
+                .get(fmt::format("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/main/translations/{}.lang.json", code));
 
-                auto content = value->string().unwrapOrDefault();
-                if (content.empty()) {
-                    geode::log::warn("Failed to download language file: {}", code);
-                    return;
-                }
+            if (!res.ok()) {
+                co_return;
+            }
 
-                std::error_code ec;
-                std::filesystem::create_directories(langsPath, ec);
-                if (ec) {
-                    geode::log::warn("Failed to create languages directory: {}", ec.message());
-                    return;
-                }
+            if (res.data().empty()) {
+                geode::log::warn("Failed to download language file: {}", code);
+                co_return;
+            }
 
-                auto path = langsPath / fmt::format("{}.lang.json", code);
-                auto res = file::writeString(path, content);
-                if (!res) {
-                    geode::log::warn("Failed to save language file: {}", path);
-                    return;
-                }
+            std::error_code ec;
+            std::filesystem::create_directories(langsPath, ec);
+            if (ec) {
+                geode::log::warn("Failed to create languages directory: {}", ec.message());
+                co_return;
+            }
 
-                geode::log::debug("Downloaded language file: {}", code);
-            });
+            auto path = langsPath / fmt::format("{}.lang.json", code);
+            auto writeRes = res.into(path);
+            if (writeRes.isErr()) {
+                geode::log::warn("Failed to save language file: {}", path);
+                co_return;
+            }
+
+            geode::log::debug("Downloaded language file: {}", code);
+        }(std::move(code)));
     }
 
     geode::Result<> handleLanguageMetadata(matjson::Value metadata) {
@@ -281,21 +287,22 @@ namespace eclipse::i18n {
         geode::log::info("Checking for language updates...");
 
         using namespace geode::utils;
-        web::WebRequest()
-            .get("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/metadata/metadata.json")
-            .listen([](web::WebResponse* value) {
-                if (!value->ok()) {
-                    return;
-                }
+        geode::async::runtime().spawn([]() -> arc::Future<> {
+            auto res = co_await web::WebRequest()
+                .get("https://raw.githubusercontent.com/EclipseMenu/translations/refs/heads/metadata/metadata.json");
 
-                auto res = value->json();
-                if (!res) {
-                    geode::log::warn("Failed to parse language metadata");
-                    return;
-                }
+            if (!res.ok()) {
+                co_return;
+            }
 
-                (void) handleLanguageMetadata(*res);
-            });
+            auto jsonRes = res.json();
+            if (jsonRes.isErr()) {
+                geode::log::warn("Failed to parse language metadata");
+                co_return;
+            }
+
+            (void) handleLanguageMetadata(std::move(jsonRes).unwrap());
+        }());
     }
 
     size_t getLanguageIndex() {
@@ -313,12 +320,12 @@ namespace eclipse::i18n {
     }
 
     GlyphRange getRequiredGlyphRanges() {
-        if (!g_translations.contains("language-charset")) {
+        auto it = g_translations.find("language-charset");
+        if (it == g_translations.end()) {
             return GlyphRange::Default;
         }
 
-        auto charset = g_translations["language-charset"].get<std::string>();
-
+        auto& charset = it->second;
         if (charset == "greek") return GlyphRange::Greek;
         if (charset == "korean") return GlyphRange::Korean;
         if (charset == "japanese") return GlyphRange::Japanese;
@@ -332,8 +339,11 @@ namespace eclipse::i18n {
     }
 
     std::string_view getRequiredGlyphRangesString() {
-        if (!g_translations.contains("language-charset")) { return "default"; }
-        return g_translations["language-charset"].get<std::string_view>();
+        auto it = g_translations.find("language-charset");
+        if (it == g_translations.end()) {
+            return "default";
+        }
+        return it->second;
     }
 
     std::vector<std::string> getAvailableLanguages() {

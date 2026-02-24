@@ -2,21 +2,30 @@
 #include <modules/config/config.hpp>
 #include <modules/gui/color.hpp>
 #include <modules/gui/gui.hpp>
+#include <modules/gui/components/float-toggle.hpp>
 #include <modules/gui/components/toggle.hpp>
 #include <modules/hack/hack.hpp>
+#include <modules/utils/RingBuffer.hpp>
 
-#include <Geode/modify/CCDrawNode.hpp>
-#include <Geode/modify/GameObject.hpp>
+#include <Geode/modify/EditorUI.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/PlayLayer.hpp>
-#include <Geode/modify/EditorUI.hpp>
 
 namespace eclipse::hacks::Level {
     static bool s_isDead = false;
     static GameObject* s_collisionObject = nullptr;
-    static std::deque<std::pair<cocos2d::CCRect, cocos2d::CCRect>> s_playerTrail1, s_playerTrail2;
+
+    struct PlayerTrailEntry {
+        cocos2d::CCPoint hitboxPos;
+        float hitboxSize;
+        cocos2d::CCPoint innerHitboxPos;
+        float innerHitboxSize;
+        bool isSubtick;
+    };
+
+    static RingBuffer<PlayerTrailEntry> s_playerTrail1(100), s_playerTrail2(100);
 
     static void forEachObject(GJBaseGameLayer const* game, auto&& callback) {
         int count = game->m_sections.empty() ? -1 : game->m_sections.size();
@@ -109,9 +118,9 @@ namespace eclipse::hacks::Level {
             auto playerColorInner = config::get<"level.showhitboxes.player_color_inner", gui::Color>(gui::Color(0, 1, 0.2f));
             auto playerColorRotated = config::get<"level.showhitboxes.player_color_rotated", gui::Color>(gui::Color(1, 1, 0));
 
-            auto fillAlpha = config::get<"level.showhitboxes.fillalpha", float>(0.25f);
+            auto fillAlpha = config::get<"level.showhitboxes.fillalpha", double>(0.25f);
             auto fillAlphaToggle = config::get<"level.showhitboxes.fillalpha.toggle", bool>(true);
-            auto borderSize = config::get<"level.showhitboxes.bordersize", float>(0.25f);
+            auto borderSize = config::get<"level.showhitboxes.bordersize", double>(0.25f);
             auto renderTriggers = config::get<"level.showhitboxes.showtriggers", bool>(false);
 
             auto solidColorFill = gui::Color(solidColor, fillAlphaToggle ? fillAlpha : 0.f);
@@ -249,34 +258,45 @@ namespace eclipse::hacks::Level {
             }
 
             // draw player trails
-            if (config::get<bool>("level.showhitboxes.traillength.toggle", false)) {
-                for (auto const& rect : s_playerTrail1 | std::views::keys) drawRect(
-                    drawNode, rect,
-                    playerColorFill, borderSize,
+            if (config::get<"level.showhitboxes.traillength.toggle", bool>(false)) {
+                auto ligherPlayerColorFill = playerColorFill.lighten(0.5f);
+                auto ligherPlayerColorInnerFill = playerColorInnerFill.lighten(0.5f);
+
+                // P1 trail
+                for (auto const& entry : s_playerTrail1) drawRect(
+                    drawNode, cocos2d::CCRect{entry.hitboxPos, {entry.hitboxSize, entry.hitboxSize}},
+                    entry.isSubtick ? ligherPlayerColorFill : playerColorFill,
+                    borderSize,
                     playerColor
                 );
 
-                for (auto const& rect : s_playerTrail2 | std::views::keys) drawRect(
-                    drawNode, rect,
-                    playerColorFill, borderSize,
-                    playerColor
-                );
-
-                for (auto const& rect : s_playerTrail1 | std::views::values) drawRect(
-                    drawNode, rect,
-                    playerColorInnerFill, borderSize,
+                // P2 trail
+                for (auto const& entry : s_playerTrail1) drawRect(
+                    drawNode, cocos2d::CCRect{entry.innerHitboxPos, {entry.innerHitboxSize, entry.innerHitboxSize}},
+                    entry.isSubtick ? ligherPlayerColorFill : playerColorInnerFill,
+                    borderSize,
                     playerColorInner
                 );
 
-                for (auto const& rect : s_playerTrail2 | std::views::values) drawRect(
-                    drawNode, rect,
-                    playerColorInnerFill, borderSize,
+                // P1 inner trail
+                for (auto const& entry : s_playerTrail2) drawRect(
+                    drawNode, cocos2d::CCRect{entry.hitboxPos, {entry.hitboxSize, entry.hitboxSize}},
+                    entry.isSubtick ? ligherPlayerColorFill : playerColorFill,
+                    borderSize,
+                    playerColor
+                );
+
+                // P2 inner trail
+                for (auto const& entry : s_playerTrail2) drawRect(
+                    drawNode, cocos2d::CCRect{entry.innerHitboxPos, {entry.innerHitboxSize, entry.innerHitboxSize}},
+                    entry.isSubtick ? ligherPlayerColorInnerFill : playerColorInnerFill,
+                    borderSize,
                     playerColorInner
                 );
             }
 
             // draw player hitboxes
-            const auto drawPlayer = [&](PlayerObject* player) {
+            auto const drawPlayer = [&](PlayerObject* player) {
                 if (!player) return;
 
                 auto rect1 = player->getObjectRect();
@@ -296,32 +316,46 @@ namespace eclipse::hacks::Level {
             }
         }
 
-        void processCommands(float dt) {
-            GJBaseGameLayer::processCommands(dt);
-
+        void updateHitboxes(bool isHalfTick) {
             if (s_isDead || !config::get<"level.showhitboxes.traillength.toggle", bool>(false))
                 return;
 
+            auto p1Rect = m_player1->getObjectRect();
+            auto p1InnerRect = m_player1->getObjectRect(0.3f, 0.3f);
+
             s_playerTrail1.emplace_back(
-                m_player1->getObjectRect(),
-                m_player1->getObjectRect(0.3f, 0.3f)
+                p1Rect.origin,
+                p1Rect.size.width,
+                p1InnerRect.origin,
+                p1InnerRect.size.width,
+                isHalfTick
             );
 
             if (m_gameState.m_isDualMode) {
+                auto p2Rect = m_player2->getObjectRect();
+                auto p2InnerRect = m_player2->getObjectRect(0.3f, 0.3f);
+
                 s_playerTrail2.emplace_back(
-                    m_player2->getObjectRect(),
-                    m_player2->getObjectRect(0.3f, 0.3f)
+                    p2Rect.origin,
+                    p2Rect.size.width,
+                    p2InnerRect.origin,
+                    p2InnerRect.size.width,
+                    isHalfTick
                 );
             }
-
-            auto max = static_cast<int>(config::get<"level.showhitboxes.traillength", float>(240.f));
-
-            while (s_playerTrail1.size() > max)
-                s_playerTrail1.pop_front();
-
-            while (s_playerTrail2.size() > max)
-                s_playerTrail2.pop_front();
         }
+
+        #ifndef GEODE_IS_MACOS
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
+            this->updateHitboxes(isHalfTick);
+        }
+        #else
+        void processQueuedButtons(float dt, bool clearInputQueue) {
+            GJBaseGameLayer::processQueuedButtons(dt, clearInputQueue);
+            this->updateHitboxes(m_isBetweenSteps);
+        }
+        #endif
     };
 
     #define $hitbox static_cast<ShowHitboxesGJBGLHook*>(static_cast<GJBaseGameLayer*>(this))
@@ -338,7 +372,7 @@ namespace eclipse::hacks::Level {
             $hitbox->visitHitboxes();
         }
 
-        void resetLevel() {
+        void resetLevel() override {
             PlayLayer::resetLevel();
 
             s_isDead = false;
@@ -419,6 +453,10 @@ namespace eclipse::hacks::Level {
             config::setIfEmpty("level.showhitboxes.passable_color", gui::Color(0, 1, 1));
             config::setIfEmpty("level.showhitboxes.triggers_color", gui::Color(1, 0, 0.9f));
 
+            size_t size = static_cast<size_t>(config::get<"level.showhitboxes.traillength", double>(240.0));
+            s_playerTrail1.resize(size);
+            s_playerTrail2.resize(size);
+
             toggle->addOptions([](auto options) {
                 options->addToggle("level.showhitboxes.editor");
                 options->addToggle("level.showhitboxes.hideplayer");
@@ -435,7 +473,12 @@ namespace eclipse::hacks::Level {
                 });
                 options->addInputFloat("level.showhitboxes.bordersize", 0.f, 10.f, "%.2f");
                 options->addFloatToggle("level.showhitboxes.fillalpha", 0.f, 1.f);
-                options->addFloatToggle("level.showhitboxes.traillength", 1.f, 65535.f, "%.0f");
+                options->addFloatToggle("level.showhitboxes.traillength", 1.f, 65535.f, "%.0f")
+                    ->valueCallback([](float value) {
+                        size_t size = value;
+                        s_playerTrail1.resize(size);
+                        s_playerTrail2.resize(size);
+                    });
             });
 
             tab->addToggle("level.showhitboxes.ondeath")->handleKeybinds()->addOptions([](auto optionsOnDeath) {

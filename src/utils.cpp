@@ -28,16 +28,17 @@
 #endif
 
 namespace eclipse::utils {
+#if 0
     std::mt19937_64& getRng() {
         static std::mt19937_64 rng{std::random_device{}()};
         return rng;
     }
+#endif
 
     std::string getClock(bool useTwelveHours) {
-        auto now = std::chrono::system_clock::now();
-        auto time = std::chrono::system_clock::to_time_t(now);
-        auto tm = fmt::localtime(time);
-        return useTwelveHours ? fmt::format("{:%I:%M:%S %p}", tm) : fmt::format("{:%H:%M:%S}", tm);
+        auto lt = geode::localtime(std::time(nullptr));
+        return useTwelveHours ? fmt::format("{:%I:%M:%S %p}", lt)
+                              : fmt::format("{:%H:%M:%S}", lt);
     }
 
     bool hasOpenGLExtension(std::string_view extension) {
@@ -182,9 +183,9 @@ namespace eclipse::utils {
         return 1;
     }
 
-    float getTPS() {
+    double getTPS() {
         return config::get<"global.tpsbypass.toggle", bool>(false)
-            ? config::get<"global.tpsbypass", float>(240.f) : 240.f;
+            ? config::get<"global.tpsbypass", double>(240.f) : 240.f;
     }
 
     cocos2d::CCMenu* getEclipseUILayer() {

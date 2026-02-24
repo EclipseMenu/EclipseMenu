@@ -25,8 +25,8 @@ static bool isTracingPopupOpen = false;
 void showTracingPopup() {
     using namespace eclipse;
     static auto _ = [] {
-        auto& keybind = keybinds::Manager::get()->addListener("debug.tracing", [](bool down) {
-            if (down) {
+        auto& keybind = keybinds::Manager::get()->addListener("debug.tracing", [](auto evt) {
+            if (evt.down) {
                 isTracingPopupOpen = !isTracingPopupOpen;
                 if (auto imgui = gui::imgui::ImGuiRenderer::get())
                     imgui->refreshDisplayState();

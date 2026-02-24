@@ -8,7 +8,7 @@ namespace eclipse::gui::cocos {
     protected:
         TranslatedLabel* m_label = nullptr;
         CCMenuItemSpriteExtra* m_infoButton = nullptr;
-        cocos2d::extension::CCScale9Sprite* m_background = nullptr;
+        geode::NineSlice* m_background = nullptr;
         TranslatedLabel* m_valueLabel = nullptr;
 
         int m_index = 0;
@@ -66,7 +66,7 @@ namespace eclipse::gui::cocos {
             m_label->limitLabelWidth(labelSize, 1.f, 0.25f);
             this->addChildAtPosition(m_label, geode::Anchor::Left, { 15.f, 0.f });
 
-            m_background = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+            m_background = geode::NineSlice::create("square02b_001.png");
             m_background->setID("background");
             m_background->setAnchorPoint({ 0.5f, 0.5f });
             m_background->setScale(0.3f);

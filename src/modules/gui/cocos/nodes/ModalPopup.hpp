@@ -3,11 +3,11 @@
 
 namespace eclipse::gui::cocos {
 
-    class ModalPopup : public geode::Popup<eclipse::Popup&&> {
+    class ModalPopup : public geode::Popup {
     protected:
-        bool setup(eclipse::Popup&& settings) override;
+        bool init(eclipse::Popup settings);
         void onExit() override;
-        cocos2d::CCNode* createButtonSprite(std::string_view text) const;
+        cocos2d::CCNode* createButtonSprite(geode::ZStringView text) const;
         void keyBackClicked() override;
 
         void onBtn1(cocos2d::CCObject* sender);

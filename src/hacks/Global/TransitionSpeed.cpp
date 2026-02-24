@@ -26,11 +26,11 @@ namespace eclipse::hacks::Global {
 
         #ifdef GEODE_IS_ANDROID
         static CCTransitionFade* create(float duration, CCScene* scene, cocos2d::ccColor3B const& color) {
-            return CCTransitionFade::create(config::get<float>("global.transitionspeed", 0.5f), scene, color);
+            return CCTransitionFade::create(config::get<double>("global.transitionspeed", 0.5f), scene, color);
         }
         #else
         static CCTransitionFade* create(float duration, CCScene* scene) {
-            return CCTransitionFade::create(config::get<float>("global.transitionspeed", 0.5f), scene);
+            return CCTransitionFade::create(config::get<double>("global.transitionspeed", 0.5f), scene);
         }
         #endif
     };

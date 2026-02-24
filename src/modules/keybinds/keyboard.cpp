@@ -1,13 +1,13 @@
 #include <Geode/platform/platform.hpp>
-#ifdef GEODE_IS_ANDROID
-#include <modules/keybinds/manager.hpp>
 #include <modules/hack/hack.hpp>
 
-#include <Geode/modify/CCKeyboardDispatcher.hpp>
+#include <Geode/utils/Keyboard.hpp>
+#include <modules/keybinds/manager.hpp>
+
+using namespace geode::prelude;
 
 namespace eclipse::keybinds {
-    Keys convertCocosKey(cocos2d::enumKeyCodes key) {
-        using namespace cocos2d;
+    static Keys convertCocosKey(enumKeyCodes key) {
         switch (key) {
             case KEY_A: return Keys::A;
             case KEY_B: return Keys::B;
@@ -36,19 +36,19 @@ namespace eclipse::keybinds {
             case KEY_Y: return Keys::Y;
             case KEY_Z: return Keys::Z;
             case KEY_Space: return Keys::Space;
-            //case KEY_Apostrophe: return Keys::Apostrophe;
+            case KEY_Apostrophe: return Keys::Apostrophe;
             case KEY_OEMComma: return Keys::Comma;
             case KEY_OEMMinus: return Keys::Minus;
             case KEY_OEMPeriod: return Keys::Period;
-            //case KEY_Slash: return Keys::Slash;
-            //case KEY_Semicolon: return Keys::Semicolon;
-            //case KEY_Equal: return Keys::Equal;
-            //case KEY_LeftBracket: return Keys::LeftBracket;
-            //case KEY_BACKSLASH: return Keys::Backslash;
-            //case KEY_RIGHT_BRACKET: return Keys::RightBracket;
-            //case KEY_GRAVE_ACCENT: return Keys::GraveAccent;
-            //case KEY_WORLD_1: return Keys::World1;
-            //case KEY_WORLD_2: return Keys::World2;
+            case KEY_Slash: return Keys::Slash;
+            case KEY_Semicolon: return Keys::Semicolon;
+            case KEY_Equal: return Keys::Equal;
+            case KEY_LeftBracket: return Keys::LeftBracket;
+            case KEY_Backslash: return Keys::Backslash;
+            case KEY_RightBracket: return Keys::RightBracket;
+            case KEY_GraveAccent: return Keys::GraveAccent;
+            case KEY_World1: return Keys::World1;
+            case KEY_World2: return Keys::World2;
             case KEY_Zero: return Keys::Num0;
             case KEY_One: return Keys::Num1;
             case KEY_Two: return Keys::Num2;
@@ -83,7 +83,6 @@ namespace eclipse::keybinds {
             case KEY_F22: return Keys::F22;
             case KEY_F23: return Keys::F23;
             case KEY_F24: return Keys::F24;
-            //case KEY_F25: return Keys::F25;
             case KEY_NumPad0: return Keys::NumPad0;
             case KEY_NumPad1: return Keys::NumPad1;
             case KEY_NumPad2: return Keys::NumPad2;
@@ -99,9 +98,9 @@ namespace eclipse::keybinds {
             case KEY_Multiply: return Keys::NumPadMultiply;
             case KEY_Subtract: return Keys::NumPadSubtract;
             case KEY_Add: return Keys::NumPadAdd;
-            //case KEY_KP_ENTER: return Keys::NumPadEnter;
-            //case KEY_Equal: return Keys::NumPadEqual;
-            //case KEY_Menu: return Keys::Menu;
+            case KEY_NumEnter: return Keys::NumPadEnter;
+            case KEY_OEMEqual: return Keys::NumPadEqual;
+            case KEY_ApplicationsKey: return Keys::Menu;
             case KEY_Escape: return Keys::Escape;
             case KEY_Enter: return Keys::Enter;
             case KEY_Tab: return Keys::Tab;
@@ -117,33 +116,79 @@ namespace eclipse::keybinds {
             case KEY_Numlock: return Keys::NumLock;
             case KEY_PrintScreen: return Keys::PrintScreen;
             case KEY_Pause: return Keys::Pause;
-            case KEY_ArrowUp: return Keys::Up;
-            case KEY_ArrowDown: return Keys::Down;
-            case KEY_ArrowLeft: return Keys::Left;
-            case KEY_ArrowRight: return Keys::Right;
+            case KEY_Up: return Keys::Up;
+            case KEY_Down: return Keys::Down;
+            case KEY_Left: return Keys::Left;
+            case KEY_Right: return Keys::Right;
             case KEY_LeftShift: return Keys::LeftShift;
             case KEY_LeftControl: return Keys::LeftControl;
-            //case KEY_LeftAlt: return Keys::LeftAlt;
-            //case KEY_LeftSuper: return Keys::LeftSuper;
+            case KEY_LeftMenu: return Keys::LeftAlt;
+            case KEY_LeftWindowsKey: return Keys::LeftSuper;
             case KEY_RightShift: return Keys::RightShift;
-            case KEY_RightContol: return Keys::RightControl;
-            //case KEY_RightAlt: return Keys::RightAlt;
-            //case KEY_RightSuper: return Keys::RightSuper;
+            case KEY_RightControl: return Keys::RightControl;
+            case KEY_RightMenu: return Keys::RightAlt;
+            case KEY_RightWindowsKey: return Keys::RightSuper;
+            case CONTROLLER_A: return Keys::GamepadButtonA;
+            case CONTROLLER_B: return Keys::GamepadButtonB;
+            case CONTROLLER_X: return Keys::GamepadButtonX;
+            case CONTROLLER_Y: return Keys::GamepadButtonY;
+            case CONTROLLER_LB: return Keys::GamepadButtonLeftBumper;
+            case CONTROLLER_RB: return Keys::GamepadButtonRightBumper;
+            case CONTROLLER_LT: return Keys::GamepadButtonLeftTrigger;
+            case CONTROLLER_RT: return Keys::GamepadButtonRightTrigger;
+            case CONTROLLER_Back: return Keys::GamepadButtonBack;
+            case CONTROLLER_Start: return Keys::GamepadButtonStart;
+            case CONTROLLER_Up: return Keys::GamepadButtonUp;
+            case CONTROLLER_Down: return Keys::GamepadButtonDown;
+            case CONTROLLER_Left: return Keys::GamepadButtonLeft;
+            case CONTROLLER_Right: return Keys::GamepadButtonRight;
             default: return Keys::Unknown;
         }
     }
 
-    class $modify(KeybindingsManagerCCKDHook, cocos2d::CCKeyboardDispatcher) {
-        ENABLE_FIRST_HOOKS_ALL()
-
-        bool dispatchKeyboardMSG(cocos2d::enumKeyCodes key, bool down, bool repeat) {
-            if (!repeat) {
-                if (down) Manager::get()->registerKeyPress(convertCocosKey(key));
-                else if (!down) Manager::get()->registerKeyRelease(convertCocosKey(key));
-            }
-
-            return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat);
+    static Keys convertMouseKey(MouseInputData::Button button) {
+        using enum MouseInputData::Button;
+        switch (button) {
+            case Left: return Keys::MouseLeft;
+            case Right: return Keys::MouseRight;
+            case Middle: return Keys::MouseMiddle;
+            case Button4: return Keys::MouseButton4;
+            case Button5: return Keys::MouseButton5;
+            default: return Keys::None;
         }
-    };
+    }
+
+    $execute {
+        KeyboardInputEvent().listen([](KeyboardInputData& event) {
+            auto manager = Manager::get();
+            switch (event.action) {
+                case KeyboardInputData::Action::Press:
+                    manager->registerKeyPress({
+                        .timestamp = event.timestamp,
+                        .props = {convertCocosKey(event.key), event.modifiers},
+                        .down = true
+                    });
+                    break;
+                case KeyboardInputData::Action::Release:
+                    manager->registerKeyRelease({
+                        .timestamp = event.timestamp,
+                        .props = {convertCocosKey(event.key), event.modifiers},
+                        .down = false
+                    });
+                    break;
+                case KeyboardInputData::Action::Repeat:
+                    break;
+            }
+            return ListenerResult::Propagate;
+        }).leak();
+
+        MouseInputEvent().listen([](MouseInputData& event) {
+            Manager::get()->registerKeyRelease({
+                .timestamp = event.timestamp,
+                .props = {convertMouseKey(event.button), event.modifiers},
+                .down = event.action == MouseInputData::Action::Press
+            });
+            return ListenerResult::Propagate;
+        }).leak();
+    }
 }
-#endif

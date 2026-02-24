@@ -322,7 +322,7 @@ struct RenderSettings {
     HardwareAccelerationType m_hardwareAccelerationType = HardwareAccelerationType::NONE;
     PixelFormat m_pixelFormat = PixelFormat::RGB0;
     std::string m_codec;
-    std::string m_colorspaceFilters = "";
+    std::string m_colorspaceFilters;
     bool m_doVerticalFlip = true;
     int64_t m_bitrate = 30000000;
     uint32_t m_width = 1920;

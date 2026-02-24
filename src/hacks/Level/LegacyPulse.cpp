@@ -89,7 +89,7 @@ namespace eclipse::hacks::Level {
             bool forceFPS = config::get<"level.legacypulse.force_fps", bool>();
 
             if (forceFPS) {
-                float fixedTimestep = 1.0f / config::get<float>("level.legacypulse.fps", 60.f);
+                float fixedTimestep = 1.0f / config::get<double>("level.legacypulse.fps", 60.f);
 
                 accumulatedTime += deltaTime;
                 while (accumulatedTime >= fixedTimestep) {

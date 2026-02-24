@@ -520,7 +520,7 @@ namespace eclipse::gui::imgui {
         auto title = i18n::get(keybind->getTitle());
         auto canDelete = keybind->canDelete();
 
-        ImGui::PushID(title.data());
+        ImGui::PushID(title.c_str());
         ImGui::PushItemWidth(-1);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
@@ -536,10 +536,10 @@ namespace eclipse::gui::imgui {
         // truncate title if it's too long
         auto const& [truncatedLabel, maxWidth] = truncateString(title, availWidth, canDelete);
         if (!truncatedLabel.has_value()) {
-            ImGui::Button(title.data(), ImVec2(maxWidth, 0));
+            ImGui::Button(title.c_str(), ImVec2(maxWidth, 0));
         } else {
             ImGui::Button(truncatedLabel.value().c_str(), ImVec2(maxWidth, 0));
-            handleTooltip(std::string(title));
+            handleTooltip(title);
         }
 
         ImGui::SameLine(0, 2);
@@ -551,7 +551,7 @@ namespace eclipse::gui::imgui {
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.5f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.04f, 0.04f, 0.04f, 0.5f));
 
-        auto key = config::get<keybinds::Keys>(keybind->getId(), keybinds::Keys::None);
+        auto key = config::get<keybinds::KeybindProps>(keybind->getId(), keybinds::Keys::None);
         auto keyName = keybinds::keyToString(key);
         bool changed = ImGui::Button(keyName.c_str(), ImVec2(availWidth * 0.38f, 0));
         ImGui::PopStyleColor(3);
@@ -562,24 +562,39 @@ namespace eclipse::gui::imgui {
 
         if (ImGui::BeginPopup(popupName.c_str())) {
             ImGuiCocos::get().setInputMode(ImGuiCocos::InputMode::Blocking);
-            ImGui::Text("%s", i18n::get("keybinds.press-key").data());
+            ImGui::Text("%s", i18n::get("keybinds.press-key").c_str());
             ImGui::Separator();
 
-            ImGui::Text("%s", i18n::get("keybinds.press-esc").data());
+            ImGui::Text("%s", i18n::get("keybinds.press-esc").c_str());
+
+            static std::string activeKeybindId;
+            static keybinds::KeybindProps releasedKey;
+            static bool listenerRegistered = false;
+
+            if (!listenerRegistered) {
+                listenerRegistered = true;
+                keybinds::Manager::get()->registerGlobalListener([](keybinds::KeyEvent event) {
+                    if (activeKeybindId.empty()) return false;
+                    if (!event.down) {
+                        releasedKey = event.props;
+                    }
+
+                    return true;
+                });
+            }
+
+            activeKeybindId = keybind->getId();
 
             if (keybinds::isKeyDown(keybinds::Keys::Escape)) {
                 ImGui::CloseCurrentPopup();
-            } else {
-                auto from = keybinds::Keys::A;
-                auto to = keybinds::Keys::LastKey;
-                for (auto i = from; i < to; ++i) {
-                    if (keybinds::isKeyDown(i)) {
-                        config::set(keybind->getId(), i);
-                        keybind->triggerCallback(i);
-                        ImGui::CloseCurrentPopup();
-                        break;
-                    }
-                }
+                activeKeybindId.clear();
+                releasedKey = {};
+            } else if (releasedKey.key != keybinds::Keys::None) {
+                config::set<keybinds::KeybindProps>(keybind->getId(), releasedKey);
+                keybind->triggerCallback(releasedKey);
+                ImGui::CloseCurrentPopup();
+                releasedKey = {};
+                activeKeybindId.clear();
             }
 
             ImGui::EndPopup();
@@ -595,7 +610,7 @@ namespace eclipse::gui::imgui {
             ImGui::PopStyleColor(3);
             ImGui::PopStyleVar();
             if (deleteClicked) {
-                config::set(keybind->getId(), keybinds::Keys::None);
+                config::set<keybinds::KeybindProps>(keybind->getId(), keybinds::Keys::None);
                 keybind->triggerCallback(keybinds::Keys::None);
                 ImGui::CloseCurrentPopup();
             }

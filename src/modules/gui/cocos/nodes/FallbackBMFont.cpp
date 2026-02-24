@@ -102,29 +102,29 @@ namespace eclipse::gui::cocos {
         return i18n::getRequiredGlyphRangesString() == "default";
     }
 
-    bool TranslatedLabel::init(std::string_view key) {
+    bool TranslatedLabel::init(geode::ZStringView key) {
         return initRaw(i18n::get(key));
     }
 
-    bool TranslatedLabel::initWrapped(std::string_view key, float wrapWidth, float scale) {
+    bool TranslatedLabel::initWrapped(geode::ZStringView key, float wrapWidth, float scale) {
         return initWrappedRaw(i18n::get(key), wrapWidth, scale);
     }
 
-    bool TranslatedLabel::initRaw(std::string_view text) {
+    bool TranslatedLabel::initRaw(geode::ZStringView text) {
         if (!isDefaultAtlas()) {
             this->addFont("font_default.fnt"_spr);
         }
         return Label::init(text, getCurrentAtlas(), BMFontAlignment::Left, 1.f);
     }
 
-    bool TranslatedLabel::initWrappedRaw(std::string_view text, float wrapWidth, float scale) {
+    bool TranslatedLabel::initWrappedRaw(geode::ZStringView text, float wrapWidth, float scale) {
         if (!isDefaultAtlas()) {
             this->addFont("font_default.fnt"_spr);
         }
         return Label::initWrapped(text, getCurrentAtlas(), BMFontAlignment::Left, scale, wrapWidth);
     }
 
-    bool EmojiLabel::init(std::string_view text, std::string const& font) {
+    bool EmojiLabel::init(geode::ZStringView text, std::string const& font) {
         this->enableEmojis("emojis.png"_spr, &g_emojis);
         return Label::init(text, font, BMFontAlignment::Left, 1.f);
     }

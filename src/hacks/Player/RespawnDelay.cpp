@@ -29,7 +29,7 @@ namespace eclipse::hacks::Player {
         void destroyPlayer(PlayerObject* player, GameObject* object) override {
             PlayLayer::destroyPlayer(player, object);
 
-            auto delay = config::get<float>("player.respawndelay", 1.f);
+            auto delay = config::get<double>("player.respawndelay", 1.f);
             if (auto* respawnSequence = this->getActionByTag(0x10)) {
                 // Recreate the sequence with the new delay
                 this->stopAction(respawnSequence);

@@ -15,6 +15,7 @@ namespace eclipse::gui {
 }
 
 namespace eclipse::utils {
+#if 0 // deprecated since Geode v5
     /// @brief Returns a random device.
     /// @return Random device.
     std::mt19937_64& getRng();
@@ -45,6 +46,15 @@ namespace eclipse::utils {
     T random(T max) {
         return random<T>(0, max);
     }
+#else
+    auto random(auto min, auto max) {
+        return geode::utils::random::generate(min, max);
+    }
+
+    auto random(auto max) {
+        return geode::utils::random::generate(0, max);
+    }
+#endif
 
     /// @brief Allows to access a member of a struct by offset.
     /// @tparam T Type of the member.
@@ -115,7 +125,7 @@ namespace eclipse::utils {
     int getPlayerIcon(PlayerMode mode);
 
     /// @brief Get current chosen TPS.
-    float getTPS();
+    double getTPS();
 
     /// @brief Get custom CCMenu created in UILayer.
     class cocos2d::CCMenu* getEclipseUILayer();

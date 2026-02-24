@@ -10,7 +10,11 @@
 #include "tab-menu.hpp"
 
 namespace eclipse::gui::cocos {
-    bool Popup::setup(Tabs const& tabs) {
+    bool Popup::init(Tabs const& tabs) {
+        if (!geode::Popup::init(480.f, 280.f)) {
+            return false;
+        }
+
         auto const tm = ThemeManager::get();
         auto winSize = utils::get<cocos2d::CCDirector>()->getWinSize();
         this->setTitle("");
@@ -19,7 +23,7 @@ namespace eclipse::gui::cocos {
         m_bgSprite->removeMeAndCleanup();
 
         // The behind background for the entire popup to get the outline
-        auto bgBehind = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        auto bgBehind = geode::NineSlice::create("square02b_001.png");
         bgBehind->setContentSize(m_mainLayer->getContentSize() * std::clamp(tm->getBorderSize(), 0.F, 1.F));
         bgBehind->setColor(tm->getBorderColor().toCCColor3B());
         bgBehind->setOpacity(tm->getBorderColor().getAlphaByte());
@@ -27,7 +31,7 @@ namespace eclipse::gui::cocos {
         m_mainLayer->addChildAtPosition(bgBehind, geode::Anchor::Center);
 
         // Background for the entire popup
-        m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        m_bgSprite = geode::NineSlice::create("square02b_001.png");
         m_bgSprite->setContentSize(m_mainLayer->getContentSize() - 3);
         m_bgSprite->setColor(tm->getTitleBackgroundColor().toCCColor3B());
         m_bgSprite->setOpacity(tm->getTitleBackgroundColor().getAlphaByte());
@@ -35,7 +39,7 @@ namespace eclipse::gui::cocos {
         m_mainLayer->addChildAtPosition(m_bgSprite, geode::Anchor::Center);
 
         // Background for content
-        m_contentBG = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        m_contentBG = geode::NineSlice::create("square02b_001.png");
         m_contentBG->setAnchorPoint({0, 1});
         m_contentBG->setPosition(125.f, 270.f);
         m_contentBG->setColor(tm->getBackgroundColor().toCCColor3B());
@@ -45,7 +49,7 @@ namespace eclipse::gui::cocos {
         m_mainLayer->addChild(m_contentBG);
 
         // Tab menu BG
-        auto bgTab = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        auto bgTab = geode::NineSlice::create("square02b_001.png");
         bgTab->setAnchorPoint({0, 0.5});
         bgTab->setContentSize({115, 260});
         bgTab->setColor({155,155,155});
@@ -63,7 +67,7 @@ namespace eclipse::gui::cocos {
         m_tabMenu->setPosition(7.5f, 270.f);
         m_tabMenu->setActiveTab(currentTab);
         m_tabMenu->regenTabs();
-        bgTab->addChildAtPosition(m_tabMenu, geode::Anchor::Center, {0, -25});
+        bgTab->addChildAtPosition(m_tabMenu, geode::Anchor::Center, {0, -20});
 
         // Content view
         m_contentMenu = ContentView::create({345.f, 260.f}, tabs[currentTab]);
@@ -76,7 +80,7 @@ namespace eclipse::gui::cocos {
 
     Popup* Popup::create(Tabs const& tabs) {
         auto ret = new Popup;
-        if (ret->initAnchored(480.f, 280.f, std::move(tabs))) {
+        if (ret->init(tabs)) {
             ret->autorelease();
             return ret;
         }

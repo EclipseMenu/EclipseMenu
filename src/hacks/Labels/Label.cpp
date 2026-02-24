@@ -39,9 +39,9 @@ namespace eclipse::hacks::Labels {
         }
 
         label->setVisible(true);
-        label->setScale(config::get<"labels.cheat-indicator.scale", float>(0.5f));
+        label->setScale(config::get<"labels.cheat-indicator.scale", double>(0.5f));
         label->setOpacity(
-            static_cast<GLubyte>(config::get<"labels.cheat-indicator.opacity", float>(0.35f) * 255)
+            static_cast<GLubyte>(config::get<"labels.cheat-indicator.opacity", double>(0.35f) * 255)
         );
 
         // Cheating - Red, Tripped - Orange, Normal - Green

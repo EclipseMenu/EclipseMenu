@@ -44,7 +44,7 @@ namespace eclipse::hacks::Level {
 
         bool init() override {
             if (!CCLayerColor::initWithColor(ccc4(50, 50, 50, 100))) return false;
-            m_totaldt = config::get<float>("level.pausecount.time", 3.f);
+            m_totaldt = config::get<double>("level.pausecount.time", 3.f);
             m_countdown = CCLabelBMFont::create(fmt::to_string(static_cast<int>(m_totaldt)).c_str(), "goldFont.fnt");
             m_countdown->setScale(1.5);
             m_countdown->setPosition(utils::get<CCDirector>()->getWinSize() / 2);
@@ -89,7 +89,7 @@ namespace eclipse::hacks::Level {
                 if (!utils::get<PlayLayer>() || !bg) return;
                 if (bg->m_gameState.m_currentProgress == 0) return;
 
-                bg->m_fields->pausedt = config::get<float>("level.pausecount.time", 3.f);
+                bg->m_fields->pausedt = config::get<double>("level.pausecount.time", 3.f);
 
                 if (config::get<bool>("level.pausecount", false))
                     bg->addChild(PauseCountdown::create());

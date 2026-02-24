@@ -3,10 +3,6 @@
 #include <string>
 #include <Geode/cocos/include/ccTypes.h>
 
-#ifndef INCLUDE_NLOHMANN_JSON_HPP_
-#include <nlohmann/json_fwd.hpp>
-#endif
-
 struct ImVec4;
 using ImU32 = unsigned int;
 
@@ -123,7 +119,7 @@ namespace eclipse::gui {
             static HSL fromColor(Color const& color);
             static Color toColor(HSL const& hsl);
 
-            constexpr operator Color() const { return toColor(*this); }
+            operator Color() const { return toColor(*this); }
         };
 
         [[nodiscard]] HSL toHSL() const;
@@ -146,7 +142,10 @@ namespace eclipse::gui {
         constexpr Color CYAN = {0, 1, 1};
         constexpr Color MAGENTA = {1, 0, 1};
     }
-
-    void to_json(nlohmann::json& j, Color const& e);
-    void from_json(nlohmann::json const& j, Color& e);
 }
+
+template <>
+struct matjson::Serialize<eclipse::gui::Color> {
+    static Value toJson(eclipse::gui::Color const& color);
+    static geode::Result<eclipse::gui::Color> fromJson(Value const& value);
+};

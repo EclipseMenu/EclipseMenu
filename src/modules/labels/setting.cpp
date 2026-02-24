@@ -73,89 +73,99 @@ namespace eclipse::labels {
         filter.description = "Eclipse Label (*.ecl)";
         filter.files.insert("*.ecl");
 
-        geode::utils::file::pick(
-            geode::utils::file::PickMode::SaveFile,
-            { geode::Mod::get()->getSaveDir(), { filter }}
-        ).listen([this](geode::Result<std::filesystem::path>* value) {
-            if (!value) return;
-            auto path = value->unwrapOr("");
-            if (path.empty()) return;
+        geode::async::spawn(
+            geode::utils::file::pick(
+                geode::utils::file::PickMode::SaveFile,
+                { geode::Mod::get()->getSaveDir(), { std::move(filter) }}
+            ),
+            [this](geode::utils::file::PickResult res) {
+                if (!res) return;
+                auto pathOpt = std::move(res).unwrap();
+                if (!pathOpt) return;
 
-            // ensure the file has the correct extension
-            if (path.extension() != ".ecl") path.replace_extension(".ecl");
+                auto path = std::move(*pathOpt);
+                if (path.extension() != ".ecl") path.replace_extension(".ecl");
 
-            auto data = nlohmann::json(*this).dump(4, ' ', false, nlohmann::detail::error_handler_t::ignore);
-            auto res = geode::utils::file::writeString(path, data);
-            if (res.isErr()) {
-                geode::log::error("Failed to save label file: {}", res.unwrapErr());
+                auto res2 = geode::utils::file::writeToJson(path, *this);
+                if (res2.isErr()) {
+                    geode::log::error("Failed to save label file: {}", res2.unwrapErr());
+                }
             }
-        });
+        );
     }
+}
 
-    void from_json(nlohmann::json const& json, LabelSettings& settings) {
-        settings.name = json.value("name", fmt::format("New label {}", settings.id));
-        settings.text = json.value("text", "");
-        settings.font = json.value("font", "bigFont.fnt");
-        settings.scale = json.value("scale", 0.6f);
-        settings.color = json.value("color", gui::Colors::WHITE);
-        settings.visible = json.value("visible", true);
-        settings.absolutePosition = json.value("absolutePosition", false);
-        settings.offset.x = json.value("offset-x", 0.f);
-        settings.offset.y = json.value("offset-y", 0.f);
-        settings.alignment = static_cast<LabelsContainer::Alignment>(json.value("alignment", 0));
-        settings.fontAlignment = static_cast<BMFontAlignment>(json.value("fontAlignment", 0));
-        settings.events = json.value("events", std::vector<LabelEvent>());
-    }
+matjson::Value matjson::Serialize<eclipse::labels::LabelSettings>::toJson(
+    eclipse::labels::LabelSettings const& settings
+) {
+    return makeObject({
+        {"name", settings.name},
+        {"text", settings.text},
+        {"font", settings.font},
+        {"scale", settings.scale},
+        {"color", settings.color},
+        {"visible", settings.visible},
+        {"absolutePosition", settings.absolutePosition},
+        {"offset-x", settings.offset.x},
+        {"offset-y", settings.offset.y},
+        {"alignment", static_cast<int>(settings.alignment)},
+        {"fontAlignment", static_cast<int>(settings.fontAlignment)},
+        {"events", settings.events}
+    });
+}
 
-    void to_json(nlohmann::json& json, LabelSettings const& settings) {
-        json = nlohmann::json{
-            {"name", settings.name},
-            {"text", settings.text},
-            {"font", settings.font},
-            {"scale", settings.scale},
-            {"color", settings.color},
-            {"visible", settings.visible},
-            {"absolutePosition", settings.absolutePosition},
-            {"offset-x", settings.offset.x},
-            {"offset-y", settings.offset.y},
-            {"alignment", static_cast<int>(settings.alignment)},
-            {"fontAlignment", static_cast<int>(settings.fontAlignment)},
-            {"events", settings.events}
-        };
-    }
+geode::Result<eclipse::labels::LabelSettings> matjson::Serialize<eclipse::labels::LabelSettings>::fromJson(
+    Value const& value
+) {
+    eclipse::labels::LabelSettings settings;
+    GEODE_UNWRAP_INTO(settings.name, value["name"].as<std::string>());
+    GEODE_UNWRAP_INTO(settings.text, value["text"].as<std::string>());
+    GEODE_UNWRAP_INTO(settings.font, value["font"].as<std::string>());
+    GEODE_UNWRAP_INTO(settings.scale, value["scale"].as<float>());
+    GEODE_UNWRAP_INTO(settings.color, value["color"].as<eclipse::gui::Color>());
+    GEODE_UNWRAP_INTO(settings.visible, value["visible"].as<bool>());
+    GEODE_UNWRAP_INTO(settings.absolutePosition, value["absolutePosition"].as<bool>());
+    GEODE_UNWRAP_INTO(settings.offset.x, value["offset-x"].as<float>());
+    GEODE_UNWRAP_INTO(settings.offset.y, value["offset-y"].as<float>());
+    GEODE_UNWRAP_INTO(int alignment, value["alignment"].as<int>());
+    GEODE_UNWRAP_INTO(int fontAlignment, value["fontAlignment"].as<int>());
+    GEODE_UNWRAP_INTO(settings.events, value["events"].as<std::vector<eclipse::labels::LabelEvent>>());
+    settings.alignment = static_cast<eclipse::labels::LabelsContainer::Alignment>(alignment);
+    settings.fontAlignment = static_cast<BMFontAlignment>(fontAlignment);
+    return geode::Ok(std::move(settings));
+}
 
-    #define READ_OPTIONAL(key) if (json.contains(#key)) event.key = json.at(#key).get<decltype(event.key)::value_type>()
-    #define STORE_OPTIONAL(key) if (event.key.has_value()) json[#key] = event.key.value()
+matjson::Value matjson::Serialize<eclipse::labels::LabelEvent>::toJson(eclipse::labels::LabelEvent const& event) {
+    Value json = makeObject({
+        {"enabled", event.enabled},
+        {"type", static_cast<int>(event.type)},
+        {"condition", event.condition},
+        {"delay", event.delay},
+        {"duration", event.duration},
+        {"easing", event.easing}
+    });
 
-    void from_json(nlohmann::json const& json, LabelEvent& event) {
-        event.enabled = json.value("enabled", true);
-        event.type = static_cast<LabelEvent::Type>(json.value("type", 1));
-        event.condition = json.value("condition", "");
-        event.delay = json.value("delay", 0.f);
-        event.duration = json.value("duration", 0.f);
-        event.easing = json.value("easing", 0.f);
+    if (event.visible.has_value()) json["visible"] = event.visible.value();
+    if (event.scale.has_value()) json["scale"] = event.scale.value();
+    if (event.color.has_value()) json["color"] = event.color.value();
+    if (event.opacity.has_value()) json["opacity"] = event.opacity.value();
+    if (event.font.has_value()) json["font"] = event.font.value();
 
-        READ_OPTIONAL(visible);
-        READ_OPTIONAL(scale);
-        READ_OPTIONAL(color);
-        READ_OPTIONAL(opacity);
-        READ_OPTIONAL(font);
-    }
+    return json;
+}
 
-    void to_json(nlohmann::json& json, LabelEvent const& event) {
-        json = nlohmann::json{
-            {"enabled", event.enabled},
-            {"type", static_cast<int>(event.type)},
-            {"condition", event.condition},
-            {"delay", event.delay},
-            {"duration", event.duration},
-            {"easing", event.easing}
-        };
-
-        STORE_OPTIONAL(visible);
-        STORE_OPTIONAL(scale);
-        STORE_OPTIONAL(color);
-        STORE_OPTIONAL(opacity);
-        STORE_OPTIONAL(font);
-    }
+geode::Result<eclipse::labels::LabelEvent> matjson::Serialize<eclipse::labels::LabelEvent>::fromJson(Value const& value) {
+    eclipse::labels::LabelEvent event;
+    GEODE_UNWRAP_INTO(event.enabled, value["enabled"].as<bool>());
+    GEODE_UNWRAP_INTO(event.type, value["type"].as<eclipse::labels::LabelEvent::Type>());
+    GEODE_UNWRAP_INTO(event.condition, value["condition"].as<std::string>());
+    GEODE_UNWRAP_INTO(event.delay, value["delay"].as<float>());
+    GEODE_UNWRAP_INTO(event.duration, value["duration"].as<float>());
+    GEODE_UNWRAP_INTO(event.easing, value["easing"].as<float>());
+    GEODE_UNWRAP_INTO(event.visible, value["visible"].as<std::optional<bool>>());
+    GEODE_UNWRAP_INTO(event.scale, value["scale"].as<std::optional<float>>());
+    GEODE_UNWRAP_INTO(event.color, value["color"].as<std::optional<eclipse::gui::Color>>());
+    GEODE_UNWRAP_INTO(event.opacity, value["opacity"].as<std::optional<float>>());
+    GEODE_UNWRAP_INTO(event.font, value["font"].as<std::optional<std::string>>());
+    return geode::Ok(std::move(event));
 }

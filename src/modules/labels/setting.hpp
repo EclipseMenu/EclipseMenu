@@ -1,7 +1,6 @@
 #pragma once
 #include <hacks/Labels/LabelContainer.hpp>
 #include <modules/gui/color.hpp>
-#include <nlohmann/json.hpp>
 #include "events.hpp"
 
 enum class BMFontAlignment;
@@ -90,9 +89,16 @@ namespace eclipse::labels {
 
         void promptSave() const;
     };
-
-    void from_json(nlohmann::json const& json, LabelSettings& settings);
-    void to_json(nlohmann::json& json, LabelSettings const& settings);
-    void from_json(nlohmann::json const& json, LabelEvent& event);
-    void to_json(nlohmann::json& json, LabelEvent const& event);
 }
+
+template <>
+struct matjson::Serialize<eclipse::labels::LabelSettings> {
+    static Value toJson(eclipse::labels::LabelSettings const& settings);
+    static geode::Result<eclipse::labels::LabelSettings> fromJson(Value const& value);
+};
+
+template <>
+struct matjson::Serialize<eclipse::labels::LabelEvent> {
+    static Value toJson(eclipse::labels::LabelEvent const& event);
+    static geode::Result<eclipse::labels::LabelEvent> fromJson(Value const& value);
+};

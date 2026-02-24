@@ -28,30 +28,14 @@ namespace eclipse::hacks::Global {
 
     // Contains the state of activated hacks in an attempt
     std::map<std::string_view, bool> s_attemptCheats;
+    std::map<std::string_view, bool> const& getAttemptCheats() { return s_attemptCheats; }
 
     // Whether the last attempt had tripped any cheats
     bool s_trippedLastAttempt = false;
 
-    $execute {
-        new geode::EventListener<geode::EventFilter<events::GetHackingModulesEvent>>(+[](events::GetHackingModulesEvent* e) {
-            std::vector<events::HackingModule> modules;
-            modules.reserve(s_attemptCheats.size());
-
-            for (auto const& [name, state] : s_attemptCheats) {
-                modules.push_back(events::HackingModule {
-                    .name = name,
-                    .state = state ? events::HackingModule::State::Enabled : events::HackingModule::State::Tripped
-                });
-            }
-
-            e->setModules(std::move(modules));
-            return geode::ListenerResult::Stop;
-        });
-    }
-
     class $hack(AutoSafeMode) {
         static bool hasCheats() {
-            for (auto const& callback : api::getCheats() | std::views::values) {
+            for (auto& callback : api::getCheats() | std::views::values) {
                 if (callback()) return true;
             }
 
@@ -76,7 +60,7 @@ namespace eclipse::hacks::Global {
                     s_attemptCheats[hack->getId()] = false;
                 }
             }
-            for (auto const& [id, active] : api::getCheats()) {
+            for (auto& [id, active] : api::getCheats()) {
                 if (active()) {
                     s_attemptCheats[id] = true;
                 } else if (s_attemptCheats.contains(id)) {
@@ -196,7 +180,7 @@ namespace eclipse::hacks::Global {
             this->m_isTestMode = original;
         }
 
-        void resetLevel() {
+        void resetLevel() override {
             bool safeMode = config::get<bool>("global.safemode", false);
 
             if ((safeMode || AutoSafeMode::shouldEnable()) && config::get<bool>("global.safemode.freeze_attempts", true))
@@ -312,6 +296,10 @@ namespace eclipse::hacks::Global {
             s_attemptCheats["Noclip"] = false;
         }
 
+        if (config::get<"level.showhitboxes", bool>()) {
+            s_attemptCheats["Show Hitboxes"] = true;
+        }
+
         if (s_attemptCheats.empty() ) {
             FLAlertLayer::create(
                 nullptr,
@@ -359,6 +347,10 @@ namespace eclipse::hacks::Global {
             s_attemptCheats["Noclip"] = false;
         }
 
+        if (config::get<"level.showhitboxes", bool>()) {
+            s_attemptCheats["Show Hitboxes"] = true;
+        }
+
         if (s_attemptCheats.empty() ) {
             return false;
         }
@@ -367,7 +359,7 @@ namespace eclipse::hacks::Global {
             nullptr,
             "Auto-Safe Mode (Eclipse)",
             fmt::format(
-                "<cr>Progress saving is disabled for this level.</c>\n\n"
+                "<cr>Progress saving is disabled.</c>\n\n"
                 "<cy>Auto-Safe Mode is active because cheats are enabled.</c>\n"
                 "While this is active, progress will <cr>NOT</c> be saved.\n\n"
                 "<cy>Active cheats ({}):</c>\n{}",

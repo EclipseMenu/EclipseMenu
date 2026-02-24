@@ -52,7 +52,7 @@ namespace eclipse::gui::cocos {
         this->setContentSize({100.f, 28.f});
         this->setID("oneof-picker"_spr);
 
-        m_background = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        m_background = geode::NineSlice::create("square02b_001.png");
         m_background->setID("background");
         m_background->setScale(0.3f);
         m_background->setColor(tm->getButtonBackgroundColor().toCCColor3B());

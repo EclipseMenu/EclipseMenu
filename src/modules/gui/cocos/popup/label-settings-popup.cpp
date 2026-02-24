@@ -17,7 +17,7 @@ namespace eclipse::gui::cocos {
 
     class PopupTab : public CCMenuItemSpriteExtra {
     public:
-        static PopupTab* create(std::string_view text, size_t page, LabelSettingsPopup* popup) {
+        static PopupTab* create(geode::ZStringView text, size_t page, LabelSettingsPopup* popup) {
             auto ret = new PopupTab();
             if (ret->init(text, page, popup)) {
                 ret->autorelease();
@@ -41,10 +41,10 @@ namespace eclipse::gui::cocos {
             m_popup->selectTab(m_page);
         }
 
-        bool init(std::string_view text, size_t page, LabelSettingsPopup* popup) {
+        bool init(geode::ZStringView text, size_t page, LabelSettingsPopup* popup) {
             auto const tm = ThemeManager::get();
 
-            m_background = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+            m_background = geode::NineSlice::create("square02b_001.png");
             m_background->setContentSize({ 100.f, 32.f });
             m_background->setScale(0.7f);
             m_background->setColor(tm->getButtonActivatedBackground().toCCColor3B());
@@ -79,7 +79,7 @@ namespace eclipse::gui::cocos {
     protected:
         LabelSettingsPopup* m_popup = nullptr;
         size_t m_page = 0;
-        cocos2d::extension::CCScale9Sprite* m_background = nullptr;
+        geode::NineSlice* m_background = nullptr;
     };
 
     class FontPicker : public cocos2d::CCMenu {
@@ -183,27 +183,30 @@ namespace eclipse::gui::cocos {
         size_t m_page = 0;
     };
 
-    bool LabelSettingsPopup::setup(LabelSettingsComponent* component) {
+    bool LabelSettingsPopup::init(LabelSettingsComponent* component) {
+        if (!Popup::init(400.f, 240.f))
+            return false;
+
         auto const tm = ThemeManager::get();
 
         m_component = component;
 
         // The behind background for the entire popup to get the outline
-        auto bgBehind = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        auto bgBehind = geode::NineSlice::create("square02b_001.png");
         bgBehind->setContentSize(m_mainLayer->getContentSize() * std::clamp(tm->getBorderSize(), 0.F, 1.F));
         m_bgSprite->setColor(tm->getBorderColor().toCCColor3B());
         bgBehind->setID("bg-behind"_spr);
         m_mainLayer->addChildAtPosition(bgBehind, geode::Anchor::Center);
 
         // Background for the entire popup
-        m_bgSprite = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        m_bgSprite = geode::NineSlice::create("square02b_001.png");
         m_bgSprite->setContentSize(m_mainLayer->getContentSize() - 3);
         m_bgSprite->setColor(tm->getTitleBackgroundColor().toCCColor3B());
         m_bgSprite->setID("main-bg"_spr);
         m_mainLayer->addChildAtPosition(m_bgSprite, geode::Anchor::Center);
 
         // Background for content
-        m_contentBG = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        m_contentBG = geode::NineSlice::create("square02b_001.png");
         m_contentBG->setAnchorPoint({0, 1});
         m_contentBG->setPosition(7.5f, 210.f);
         m_contentBG->setColor(tm->getBackgroundColor().toCCColor3B());
@@ -387,7 +390,7 @@ namespace eclipse::gui::cocos {
         auto label = TranslatedLabel::create(text);
         label->limitLabelWidth(width * 0.8f, 1.f, 0.1f);
         label->setColor(tm->getButtonForegroundColor().toCCColor3B());
-        auto bg = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        auto bg = geode::NineSlice::create("square02b_001.png");
         bg->setContentSize({ width, 36.f });
         bg->setColor(tm->getButtonBackgroundColor().toCCColor3B());
         bg->addChildAtPosition(label, geode::Anchor::Center);
@@ -463,7 +466,7 @@ namespace eclipse::gui::cocos {
 
         auto column2 = cocos2d::CCMenu::create();
 
-        column2->addChild(ColorPicker::create(settings->color, false, [this](gui::Color const& color) {
+        column2->addChild(ColorPicker::create(settings->color, false, [this](Color color) {
             m_component->getSettings()->color = { color.r, color.g, color.b, m_component->getSettings()->color.a };
             m_component->triggerEditCallback();
         }));
@@ -592,7 +595,7 @@ namespace eclipse::gui::cocos {
         menu->setContentSize({ CARD_WIDTH, CARD_HEIGHT });
         menu->setID("event-card"_spr);
 
-        auto cardBackground = cocos2d::extension::CCScale9Sprite::create("square02b_001.png");
+        auto cardBackground = geode::NineSlice::create("square02b_001.png");
         cardBackground->setContentSize({ CARD_WIDTH, CARD_HEIGHT });
         cardBackground->setColor(ThemeManager::get()->getBackgroundColor().lighten(0.25f).toCCColor3B());
         cardBackground->setOpacity(32);
@@ -602,7 +605,7 @@ namespace eclipse::gui::cocos {
         // Pickers
         auto colorPicker = ColorPicker::create(
             event.color.value_or(Color{1.f, 1.f, 1.f}), false,
-            [&](Color const& color) {
+            [this, &event](Color color) {
                 event.color = color;
                 m_component->triggerEditCallback();
             }
@@ -613,7 +616,7 @@ namespace eclipse::gui::cocos {
 
         auto fontPicker = FontPicker::create(
             event.font.value_or("bigFont.fnt"),
-            [&](std::string const& font) {
+            [this, &event](std::string const& font) {
                 event.font = font;
                 m_component->triggerEditCallback();
             }
@@ -628,7 +631,7 @@ namespace eclipse::gui::cocos {
 
         auto conditionPicker = OneOfPicker::create(
             labels::eventNames,
-            [&](int i) {
+            [this, &event](int i) {
                 event.type = static_cast<labels::LabelEvent::Type>(i);
                 m_component->triggerEditCallback();
             },
@@ -660,7 +663,7 @@ namespace eclipse::gui::cocos {
         customConditionInput->setCommonFilter(geode::CommonFilter::Any);
         customConditionInput->setString(event.condition);
         customConditionInput->setScale(0.9f);
-        customConditionInput->setCallback([&](std::string const& text) {
+        customConditionInput->setCallback([this, &event](std::string const& text) {
             event.condition = text;
             m_component->triggerEditCallback();
         });
@@ -671,7 +674,7 @@ namespace eclipse::gui::cocos {
         durationInput->setCommonFilter(geode::CommonFilter::Float);
         durationInput->setString(fmt::to_string(event.duration));
         durationInput->setScale(0.9f);
-        durationInput->setCallback([&](std::string const& text) {
+        durationInput->setCallback([this, &event](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
             event.duration = res.unwrap();
@@ -684,7 +687,7 @@ namespace eclipse::gui::cocos {
         modifyScaleInput->setCommonFilter(geode::CommonFilter::Float);
         modifyScaleInput->setString(fmt::to_string(event.scale.value_or(1.f)));
         modifyScaleInput->setScale(0.9f);
-        modifyScaleInput->setCallback([&](std::string const& text) {
+        modifyScaleInput->setCallback([this, &event](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
             event.scale = res.unwrap();
@@ -698,7 +701,7 @@ namespace eclipse::gui::cocos {
         modifyOpacityInput->setCommonFilter(geode::CommonFilter::Float);
         modifyOpacityInput->setString(fmt::to_string(event.opacity.value_or(1.f)));
         modifyOpacityInput->setScale(0.9f);
-        modifyOpacityInput->setCallback([&](std::string const& text) {
+        modifyOpacityInput->setCallback([this, &event](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
             event.opacity = res.unwrap();
@@ -712,7 +715,7 @@ namespace eclipse::gui::cocos {
         delayInput->setCommonFilter(geode::CommonFilter::Float);
         delayInput->setString(fmt::to_string(event.delay));
         delayInput->setScale(0.9f);
-        delayInput->setCallback([&](std::string const& text) {
+        delayInput->setCallback([this, &event](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
             event.delay = res.unwrap();
@@ -725,7 +728,7 @@ namespace eclipse::gui::cocos {
         easingInput->setCommonFilter(geode::CommonFilter::Float);
         easingInput->setString(fmt::to_string(event.easing));
         easingInput->setScale(0.9f);
-        easingInput->setCallback([&](std::string const& text) {
+        easingInput->setCallback([this, &event](std::string const& text) {
             auto res = geode::utils::numFromString<float>(text);
             if (!res) { return; }
             event.easing = res.unwrap();
@@ -738,7 +741,7 @@ namespace eclipse::gui::cocos {
         auto enableToggle = createToggler(
             createToggle("checkmark.png"_spr),
             createToggle(nullptr),
-            [&](auto) {
+            [this, &event](auto) {
                 event.enabled = !event.enabled;
                 m_component->triggerEditCallback();
             }
@@ -749,7 +752,7 @@ namespace eclipse::gui::cocos {
 
         auto modifyColorToggle = createToggler(
             createToggle("checkmark.png"_spr), createToggle(nullptr),
-            [&, colorPicker](auto) {
+            [this, &event, colorPicker](auto) {
                 if (!event.color.has_value()) event.color = {1.f, 1.f, 1.f};
                 else event.color.reset();
                 colorPicker->setVisible(event.color.has_value());
@@ -763,7 +766,7 @@ namespace eclipse::gui::cocos {
 
         auto modifyFontToggle = createToggler(
             createToggle("checkmark.png"_spr), createToggle(nullptr),
-            [&, fontPicker](auto) {
+            [this, &event, fontPicker](auto) {
                 if (!event.font.has_value()) event.font = "bigFont.fnt";
                 else event.font.reset();
                 fontPicker->setVisible(event.font.has_value());
@@ -778,7 +781,7 @@ namespace eclipse::gui::cocos {
         auto modifyScaleToggle = createToggler(
             createToggle("checkmark.png"_spr),
             createToggle(nullptr),
-            [&, modifyScaleInput](auto) {
+            [this, &event, modifyScaleInput](auto) {
                 if (!event.scale.has_value()) event.scale = 1.f;
                 else event.scale.reset();
                 modifyScaleInput->setString(fmt::to_string(event.scale.value_or(1.f)));
@@ -793,7 +796,7 @@ namespace eclipse::gui::cocos {
         auto modifyOpacityToggle = createToggler(
             createToggle("checkmark.png"_spr),
             createToggle(nullptr),
-            [&, modifyOpacityInput](auto) {
+            [this, &event, modifyOpacityInput](auto) {
                 if (!event.opacity.has_value()) event.opacity = 1.f;
                 else event.opacity.reset();
                 modifyOpacityInput->setString(fmt::to_string(event.opacity.value_or(1.f)));
@@ -968,7 +971,7 @@ namespace eclipse::gui::cocos {
 
     LabelSettingsPopup* LabelSettingsPopup::create(LabelSettingsComponent* component) {
         auto ret = new LabelSettingsPopup;
-        if (ret->initAnchored(400.f, 240.f, component)) {
+        if (ret->init(component)) {
             ret->autorelease();
             return ret;
         }

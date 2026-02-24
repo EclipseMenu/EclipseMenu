@@ -4,7 +4,6 @@
 #include <string>
 #include <functional>
 #include <imgui.h>
-#include <nlohmann/json.hpp>
 
 namespace eclipse::gui::imgui {
 

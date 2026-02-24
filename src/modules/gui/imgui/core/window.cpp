@@ -83,6 +83,22 @@ namespace eclipse::gui::imgui {
 
     void Window::setSize(ImVec2 const& size) { m_size = size; }
 
+    void Window::applyJson(matjson::Value const& json) {
+        if (json.contains("position")) {
+            auto& pos = json["position"];
+            setPosition({
+                pos["x"].as<float>().unwrapOrDefault(),
+                pos["y"].as<float>().unwrapOrDefault()
+            });
+        }
+        if (json.contains("open")) {
+            setOpen(json["open"].as<bool>().unwrapOrDefault());
+        }
+        if (json.contains("title")) {
+            setTitle(json["title"].as<std::string>().unwrapOrDefault());
+        }
+    }
+
     std::unique_ptr<animation::MoveAction> Window::animateTo(ImVec2 const& target, double duration, animation::EasingFunction easing, bool useRealPosition) {
         auto action = animation::MoveAction::create(duration, &m_drawPosition, target, easing);
 
@@ -91,24 +107,19 @@ namespace eclipse::gui::imgui {
 
         return std::move(action);
     }
+}
 
-    void to_json(nlohmann::json& j, Window const& e) {
-        auto pos = nlohmann::json{
-            {"x", e.getPosition().x},
-            {"y", e.getPosition().y}
-        };
-        j = nlohmann::json{
-            {"pos",   std::move(pos)},
-            {"open",  e.isOpen()},
-            {"title", e.getTitle()}
-        };
-    }
+matjson::Value matjson::Serialize<eclipse::gui::imgui::Window>::toJson(eclipse::gui::imgui::Window const& window) {
+    return makeObject({
+        {"position", makeObject({
+            {"x", window.getPosition().x},
+            {"y", window.getPosition().y}
+        })},
+        {"open", window.isOpen()},
+        {"title", window.getTitle()}
+    });
+}
 
-    void from_json(nlohmann::json const& j, Window& e) {
-        auto pos = j.at("pos");
-        e.setPosition({pos.at("x").get<float>(), pos.at("y").get<float>()});
-        e.setOpen(j.at("open").get<bool>());
-        e.setTitle(j.at("title").get<std::string>());
-    }
-
+geode::Result<eclipse::gui::imgui::Window> matjson::Serialize<eclipse::gui::imgui::Window>::fromJson(Value const& value) {
+    return geode::Err("Use Window::applyJson() instead of deserializing directly");
 }

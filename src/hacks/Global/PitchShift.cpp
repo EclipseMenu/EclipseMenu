@@ -42,7 +42,7 @@ namespace eclipse::hacks::Global {
                ->setDescription()
                ->toggleCallback([] {
                    if (config::get<bool>("global.pitchshift.toggle", false))
-                       setPitch(config::get<float>("global.pitchshift", 1.f));
+                       setPitch(config::get<double>("global.pitchshift", 1.f));
                    else
                        setPitch(1.f);
                });
@@ -50,7 +50,7 @@ namespace eclipse::hacks::Global {
 
         void lateInit() override {
             if (config::get<bool>("global.pitchshift.toggle", false))
-                setPitch(config::get<float>("global.pitchshift", 1.f));
+                setPitch(config::get<double>("global.pitchshift", 1.f));
         }
 
         [[nodiscard]] const char* getId() const override { return "Pitch Shift"; }

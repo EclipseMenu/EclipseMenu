@@ -24,6 +24,7 @@ using namespace geode::prelude;
 namespace eclipse::hacks::Bot {
     static bot::Bot s_bot;
     static bool s_respawning = false;
+    bot::Bot& getBot() { return s_bot; }
 
     void newReplay() {
         Popup::prompt(
@@ -192,7 +193,7 @@ namespace eclipse::hacks::Bot {
                         );
                     }
                     // apparently i cannot put the Popup below here otherwise some memory corruption happens, WHY? its not even a pointer!!
-                    config::set("bot.selectedreplay", "");
+                    config::set<std::string_view>("bot.selectedreplay", "");
 
                     // refresh cocos ui page
                     if (auto cocos = gui::cocos::CocosRenderer::get())
@@ -284,17 +285,6 @@ namespace eclipse::hacks::Bot {
 
     REGISTER_HACK(Bot)
 
-    $execute {
-        new EventListener<EventFilter<events::LoadReplayEvent>>(+[](events::LoadReplayEvent* e) {
-            if (auto* path = e->getPath()) {
-                e->setResult(s_bot.load(*path));
-            } else {
-                e->setResult(s_bot.load(e->getData()));
-            }
-            return ListenerResult::Stop;
-        });
-    }
-
     class $modify(BotPLHook, PlayLayer) {
         bool init(GJGameLevel* gj, bool p1, bool p2) {
             bool result = PlayLayer::init(gj, p1, p2);
@@ -384,8 +374,7 @@ namespace eclipse::hacks::Bot {
             }
         }
 
-        void processCommands(float dt) {
-            GJBaseGameLayer::processCommands(dt);
+        void processBot() {
             if(s_respawning) s_respawning = false;
 
             if (s_bot.getState() != bot::State::PLAYBACK)
@@ -397,6 +386,19 @@ namespace eclipse::hacks::Bot {
                 this->simulateClick((PlayerButton) input->button, input->down, input->player2);
             }
         }
+
+        // processCommands is inlined on macos platforms since 2.208
+        #ifndef GEODE_IS_MACOS
+        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
+            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
+            this->processBot();
+        }
+        #else
+        void processQueuedButtons(float dt, bool clearInputQueue) {
+            GJBaseGameLayer::processQueuedButtons(dt, clearInputQueue);
+            this->processBot();
+        }
+        #endif
 
         void handleButton(bool down, int button, bool player1) {
             if (s_bot.getState() == bot::State::PLAYBACK && s_bot.getInputCount() && config::get<bool>("bot.ignore-inputs", false))

@@ -1,12 +1,12 @@
 {
-	"geode": "4.10.0",
+	"geode": "5.0.0",
 	"gd": {
-		"win": "2.2074",
-		"mac": "2.2074",
-		"android": "2.2074",
-		"ios": "2.2074"
+		"win": "2.2081",
+		"mac": "2.2081",
+		"android": "2.2081",
+		"ios": "2.2081"
 	},
-	"version": "v1.7.0",
+	"version": "v1.8.0-beta.1",
 	"id": "eclipse.eclipse-menu",
 	"name": "Eclipse",
 	"links": {
@@ -19,19 +19,6 @@
 	"developers": ["Eclipse Team", "ninXout", "Prevter", "maxnu", "Firee", "SpaghettDev"],
 	"description": "A next-generation mod menu for Geometry Dash.",
 	"early-load": true,
-	"incompatibilities": [{
-		"id": "prevter.openhack",
-		"version": "*",
-		"importance": "superseded"
-	}, {
-		"id": "maxnu.gd_mega_overlay",
-		"version": "*",
-		"importance": "superseded"
-	}, {
-		"id": "ninxout.crystal_client",
-		"version": "*",
-		"importance": "superseded"
-	}],
 	"resources": {
 		"files": [
 			"resources/Blur/*.glsl",
@@ -49,15 +36,16 @@
 			"UISheet": [ "resources/UISheet/*.png" ]
 		}
 	},
-	"dependencies": [{
-		"id": "eclipse.ffmpeg-api",
-		"version": ">=1.2.0",
-		"importance": "suggested"
-	}, {
-		"id": "dankmeme.globed2",
-		"version": ">=1.8.5",
-		"importance": "suggested"
-	}],
+	"dependencies": {
+		"eclipse.ffmpeg-api": {
+			"version": ">=1.2.0",
+			"required": false
+		},
+		"dankmeme.globed2": {
+			"version": ">=1.8.5",
+			"required": false
+		}
+	},
 	"settings": {
 		"legacy-render": {
 			"name": "Use Legacy rendering",

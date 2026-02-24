@@ -15,9 +15,9 @@ namespace eclipse::hacks::Labels {
 }
 
 namespace eclipse::gui::cocos {
-    class LabelSettingsPopup : public geode::Popup<LabelSettingsComponent*> {
+    class LabelSettingsPopup : public geode::Popup {
     protected:
-        bool setup(LabelSettingsComponent* component) override;
+        bool init(LabelSettingsComponent* component);
 
         CCLayer* createSettingsTab();
         CCLayer* createTextTab();
@@ -43,7 +43,7 @@ namespace eclipse::gui::cocos {
         LabelSettingsComponent* m_component{};
         std::array<class PopupTab*, 4> m_tabs{};
         CCLayer* m_currentTab = nullptr;
-        cocos2d::extension::CCScale9Sprite* m_contentBG = nullptr;
+        geode::NineSlice* m_contentBG = nullptr;
         hacks::Labels::SmartLabel* m_previewLabel = nullptr;
         CCContentLayer* m_eventsContentLayer = nullptr;
         std::array<cocos2d::CCSprite*, 9> m_alignButtons{};

@@ -8,7 +8,7 @@ namespace eclipse::gui::cocos {
 
     ModalPopup* ModalPopup::create(eclipse::Popup&& settings) {
         auto ret = new ModalPopup();
-        if (ret->initAnchored(260.f, 160.f, std::move(settings), "GJ_square04.png")) {
+        if (ret->init(std::forward<eclipse::Popup>(settings))) {
             ret->autorelease();
             return ret;
         }
@@ -16,7 +16,10 @@ namespace eclipse::gui::cocos {
         return nullptr;
     }
 
-    bool ModalPopup::setup(eclipse::Popup&& settings) {
+    bool ModalPopup::init(eclipse::Popup settings) {
+        if (!Popup::init(260.f, 160.f, "GJ_square04.png"))
+            return false;
+
         m_closeBtn->setVisible(false);
 
         m_settings = std::move(settings);
@@ -84,10 +87,10 @@ namespace eclipse::gui::cocos {
             cocos->unregisterModal(this);
     }
 
-    cocos2d::CCNode* ModalPopup::createButtonSprite(std::string_view text) const {
+    cocos2d::CCNode* ModalPopup::createButtonSprite(geode::ZStringView text) const {
         auto label = TranslatedLabel::createRaw(text);
         label->setScale(0.9f);
-        auto bg = cocos2d::extension::CCScale9Sprite::create("geode.loader/GE_button_05.png");
+        auto bg = geode::NineSlice::create("geode.loader/GE_button_05.png");
         bg->setContentSize({ label->getContentSize().width + 20.f, 28.f });
         bg->setID("bg"_spr);
         bg->setAnchorPoint({ 0.5f, 0.5f });

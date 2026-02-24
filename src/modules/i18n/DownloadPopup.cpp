@@ -4,11 +4,15 @@
 #include "translations.hpp"
 
 namespace eclipse::i18n {
-    bool DownloadPopup::setup(std::string const& charset) {
+    bool DownloadPopup::init(std::string charset) {
+        if (!Popup::init(240.f, 120.f)) {
+            return false;
+        }
+
         this->setID("download-popup"_spr);
         m_closeBtn->setVisible(false);
 
-        m_charset = charset;
+        m_charset = std::move(charset);
 
         auto label = gui::cocos::TranslatedLabel::create("interface.font-download");
         label->setID("title"_spr);
@@ -45,18 +49,24 @@ namespace eclipse::i18n {
         });
     }
 
-    void DownloadPopup::startDownloadFile(std::filesystem::path const& path, std::string const& url) {
+    void DownloadPopup::startDownloadFile(std::filesystem::path path, std::string url) {
         using namespace geode::utils;
 
-        m_listener.bind([this, path](web::WebTask::Event* e) {
-            if (web::WebResponse* value = e->getValue()) {
-                if (!value->ok()) {
-                    this->handleError(value->code());
+        m_listener.spawn(
+            web::WebRequest()
+                .onProgress([this](web::WebProgress const& progress) {
+                    auto p = progress.downloadProgress().value_or(0.f);
+                    auto totalProgress = (m_filesDownloaded * 100.f + p) / m_totalFiles;
+                    this->setProgress(totalProgress / 100.f);
+                })
+                .get(std::move(url)),
+            [this, path = std::move(path)](web::WebResponse response) {
+                if (!response.ok()) {
+                    this->handleError(response.code());
                     return;
                 }
 
-                auto data = value->data();
-                auto res = file::writeBinary(path, data);
+                auto res = response.into(path);
                 if (res.isErr()) {
                     this->handleError(-1);
                     return;
@@ -64,14 +74,8 @@ namespace eclipse::i18n {
 
                 this->m_filesDownloaded++;
                 this->handleFileDownloaded(); // begin next download or close
-            } else if (web::WebProgress* progress = e->getProgress()) {
-                auto p = progress->downloadProgress().value_or(0.f);
-                auto totalProgress = (m_filesDownloaded * 100.f + p) / m_totalFiles;
-                this->setProgress(totalProgress / 100.f);
             }
-        });
-
-        m_listener.setFilter(web::WebRequest().get(url));
+        );
     }
 
 
@@ -89,7 +93,7 @@ namespace eclipse::i18n {
             "https://raw.githubusercontent.com/EclipseMenu/EclipseMenu/refs/heads/main/resources/BitmapFonts/{}",
             path.filename()
         );
-        this->startDownloadFile(path, url);
+        this->startDownloadFile(std::move(path), std::move(url));
     }
 
     void DownloadPopup::handleError(int code) {
@@ -109,9 +113,9 @@ namespace eclipse::i18n {
         m_mainLayer->addChildAtPosition(menu, geode::Anchor::Bottom, {0, 25});
     }
 
-    DownloadPopup* DownloadPopup::create(std::string const& charset) {
+    DownloadPopup* DownloadPopup::create(std::string charset) {
         auto ret = new DownloadPopup();
-        if (ret->initAnchored(240.f, 120.f, charset)) {
+        if (ret->init(std::move(charset))) {
             ret->autorelease();
             return ret;
         }

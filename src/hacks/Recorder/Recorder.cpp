@@ -140,8 +140,8 @@ namespace eclipse::hacks::Recorder {
             }
         }
 
-        s_recorder.m_renderSettings.m_bitrate = static_cast<int>(config::get<float>("recorder.bitrate", 30.f)) * 1000000;
-        s_recorder.m_renderSettings.m_fps = static_cast<int>(config::get<float>("recorder.fps", 60.f));
+        s_recorder.m_renderSettings.m_bitrate = static_cast<int>(config::get<double>("recorder.bitrate", 30.f)) * 1000000;
+        s_recorder.m_renderSettings.m_fps = static_cast<int>(config::get<double>("recorder.fps", 60.f));
         s_recorder.m_renderSettings.m_width = config::get<int>("recorder.resolution.x", 1920);
         s_recorder.m_renderSettings.m_height = config::get<int>("recorder.resolution.y", 1080);
         s_recorder.m_renderSettings.m_codec = config::get<std::string>("recorder.codecString", "libx264");
@@ -285,12 +285,12 @@ namespace eclipse::hacks::Recorder {
 
         void update(float dt) {
             if (s_recorder.isRecording()) {
-                float framerate = config::get<"recorder.fps", float>(60.f);
+                float framerate = config::get<"recorder.fps", double>(60.f);
 
                 if (framerate < 1)
                     framerate = 1;
 
-                float tps = utils::getTPS();
+                double tps = utils::getTPS();
 
                 dt = 1.f / framerate;
                 dt *= framerate / tps;
@@ -315,7 +315,7 @@ namespace eclipse::hacks::Recorder {
         void update(float dt) override {
             if (!s_recorder.isRecording() || m_gameState.m_currentProgress <= 0) return GJBaseGameLayer::update(dt);
 
-            float endscreen = config::get<"recorder.endscreen", float>(5.f);
+            float endscreen = config::get<"recorder.endscreen", double>(5.f);
             eclipse::config::set<bool>("global.tpsbypass.toggle", true);
 
             if (levelDone) {
@@ -331,7 +331,7 @@ namespace eclipse::hacks::Recorder {
             if (!s_recorder.isRecording())
                 return GJBaseGameLayer::update(dt);
 
-            float fps = config::get<"recorder.fps", float>(60.f);
+            float fps = config::get<"recorder.fps", double>(60.f);
             float timewarp = m_gameState.m_timeWarp;
 
             totalTime += dt;

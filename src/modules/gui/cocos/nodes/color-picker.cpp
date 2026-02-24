@@ -1,7 +1,7 @@
 #include "color-picker.hpp"
 
 namespace eclipse::gui::cocos {
-    bool ColorPicker::init(gui::Color const& original, bool useAlpha, Function<void(gui::Color const&)>&& callback) {
+    bool ColorPicker::init(Color const& original, bool useAlpha, Function<void(Color)> callback) {
         m_useAlpha = useAlpha;
         m_callback = std::move(callback);
         m_color = original;
@@ -27,7 +27,11 @@ namespace eclipse::gui::cocos {
             m_popup = ColorPopup::create(m_color.toCCColor3B());
         }
 
-        m_popup->setDelegate(this);
+        m_popup->setCallback([self = geode::WeakRef(this)](cocos2d::ccColor4B const& color) {
+            if (auto s = self.lock()) {
+                s->updateColor(color);
+            }
+        });
         m_popup->show();
 
         if (auto cocos = CocosRenderer::get()) {

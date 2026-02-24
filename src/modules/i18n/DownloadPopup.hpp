@@ -6,14 +6,14 @@ namespace eclipse::gui::cocos {
 }
 
 namespace eclipse::i18n {
-    class DownloadPopup : public geode::Popup<std::string const&> {
+    class DownloadPopup : public geode::Popup {
     protected:
-        bool setup(std::string const& charset) override;
+        bool init(std::string charset);
         void keyBackClicked() override {}
-        void keyDown(cocos2d::enumKeyCodes key) override {}
+        void keyDown(cocos2d::enumKeyCodes key, double) override {}
 
         void setProgress(float progress);
-        void startDownloadFile(std::filesystem::path const& path, std::string const& url);
+        void startDownloadFile(std::filesystem::path path, std::string url);
         void handleFileDownloaded();
         void handleError(int code);
 
@@ -24,9 +24,9 @@ namespace eclipse::i18n {
         cocos2d::CCSprite* m_progressBar = nullptr;
         cocos2d::CCSprite* m_progressBarBG = nullptr;
 
-        geode::EventListener<geode::utils::web::WebTask> m_listener;
+        geode::async::TaskHolder<geode::utils::web::WebResponse> m_listener;
 
     public:
-        static DownloadPopup* create(std::string const& charset);
+        static DownloadPopup* create(std::string charset);
     };
 }

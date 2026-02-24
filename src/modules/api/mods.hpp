@@ -4,5 +4,5 @@
 #include <string>
 
 namespace eclipse::api {
-    std::map<std::string, StdFunction<bool()>> const& getCheats();
+    geode::utils::StringMap<geode::Function<bool()>>& getCheats();
 }
