@@ -119,7 +119,7 @@ namespace eclipse::gui {
             static HSL fromColor(Color const& color);
             static Color toColor(HSL const& hsl);
 
-            constexpr operator Color() const { return toColor(*this); }
+            operator Color() const { return toColor(*this); }
         };
 
         [[nodiscard]] HSL toHSL() const;
