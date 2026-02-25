@@ -264,7 +264,7 @@ namespace eclipse::hacks::Bot {
             };
 
 #ifdef GEODE_IS_WINDOWS
-            config::set("bot.practice-fix-mode", 1);
+            config::set("bot.practice-fix-mode", 0); // TODO: change to 1 when memory practice fix is fixed
 #else
             config::set("bot.practice-fix-mode", 0);
 #endif
@@ -321,10 +321,16 @@ namespace eclipse::hacks::Bot {
 
             if (s_bot.getState() == bot::State::RECORD) {
                 //gd does this automatically for holding but not releases so we do it manually
-                s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, false, false);
+                s_bot.recordInput(
+                    (m_gameState.m_currentProgress / 2) + 1,
+                    PlayerButton::Jump, false, false
+                );
                 if(practiceFixMode == 0) m_player1->m_isDashing = false; // temporary, find better way to fix dash orbs
                 if (m_gameState.m_isDualMode && m_levelSettings->m_twoPlayerMode) {
-                    s_bot.recordInput(m_gameState.m_currentProgress + 1, PlayerButton::Jump, true, false);
+                    s_bot.recordInput(
+                        (m_gameState.m_currentProgress / 2) + 1,
+                        PlayerButton::Jump, true, false
+                    );
                     if(practiceFixMode == 0) m_player2->m_isDashing = false;
                 }
             }
@@ -351,7 +357,7 @@ namespace eclipse::hacks::Bot {
             if (s_bot.getState() != bot::State::RECORD || !playLayer)
                 return PlayLayer::loadFromCheckpoint(checkpoint);
 
-            s_bot.removeInputsAfter(checkpoint->m_gameState.m_currentProgress);
+            s_bot.removeInputsAfter(checkpoint->m_gameState.m_currentProgress / 2);
 
             PlayLayer::loadFromCheckpoint(checkpoint);
         }
