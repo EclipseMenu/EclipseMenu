@@ -6,6 +6,8 @@
 * <cg>Fixed</c> not being able to bind keys to any toggles
 * <cg>Fixed</c> <co>Click Teleport</c> not triggering on mouse click
 * <cg>Fixed</c> incompatibility with pre-2.208 replays
+* Temporarily made <co>Memory-based</c> Practice Fix not the default option
+* Auto disable <cl>Click Between Steps</c> when recording a replay
 
 ## v1.8.0
 This update adds **<cg>Geometry Dash v2.2081</c>** support

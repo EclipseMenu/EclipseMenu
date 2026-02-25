@@ -394,7 +394,7 @@ namespace eclipse::hacks::Global {
             // levelComplete uses m_gameState.m_unkUint2 to store the timestamp
             // also we can't rely on m_level->m_timestamp, because it might not be updated yet
             auto oldTimestamp = m_gameState.m_commandIndex;
-            if (config::get<"global.tpsbypass", double>(240.f) != 240.f) {
+            if (config::get<"global.tpsbypass", double>(240.0) != 240.0) {
                 auto ticks = static_cast<uint32_t>(std::round(m_gameState.m_levelTime * 240));
                 m_gameState.m_commandIndex = ticks;
             }

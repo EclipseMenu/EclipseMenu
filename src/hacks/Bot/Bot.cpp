@@ -240,6 +240,12 @@ namespace eclipse::hacks::Bot {
             config::set("global.tpsbypass.toggle", true);
             if (s_bot.getState() == bot::State::RECORD) {
                 s_bot.setFramerate(utils::getTPS());
+
+                // disable Click Between Steps
+                GameManager::get()->setGameVariable(GameVar::ClickBetweenSteps, false);
+                if (auto gl = utils::get<GJBaseGameLayer>()) {
+                    gl->m_clickBetweenSteps = false;
+                }
             } else {
                 config::set<float>("global.tpsbypass", s_bot.getFramerate());
             }
@@ -444,7 +450,10 @@ namespace eclipse::hacks::Bot {
             if (s_bot.getState() != bot::State::RECORD)
                 return;
 
-            s_bot.recordInput(m_gameState.m_currentProgress / 2, (PlayerButton) button, !player1, down);
+            s_bot.recordInput(
+                m_gameState.m_currentProgress / 2,
+                (PlayerButton) button, !player1, down
+            );
         }
     };
 
