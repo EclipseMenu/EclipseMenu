@@ -16,8 +16,8 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Global {
-    std::chrono::time_point<std::chrono::steady_clock> s_lastDiscordUpdate;
-    geode::utils::StringMap<std::unique_ptr<rift::Script>> s_discordScripts;
+    static std::chrono::time_point<std::chrono::steady_clock> s_lastDiscordUpdate;
+    static geode::utils::StringMap<std::unique_ptr<rift::Script>> s_discordScripts;
     static time_t s_startTimestamp, s_levelTimestamp;
 
     class $hack(DiscordRPC) {

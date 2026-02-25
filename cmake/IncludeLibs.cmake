@@ -17,7 +17,7 @@ set(HAS_IMGUI ON)
 set(IMGUI_HOOK_EARLY OFF)
 
 if (NOT ANDROID AND NOT IOS)
-    CPMAddPackage("gh:EclipseMenu/discord-presence#6462112")
+    CPMAddPackage("gh:EclipseMenu/discord-presence#3b50b08")
 endif()
 
 CPMAddPackage("gh:matcool/gd-imgui-cocos#9764333")
