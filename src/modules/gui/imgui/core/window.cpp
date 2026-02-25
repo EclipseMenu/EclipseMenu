@@ -84,8 +84,8 @@ namespace eclipse::gui::imgui {
     void Window::setSize(ImVec2 const& size) { m_size = size; }
 
     void Window::applyJson(matjson::Value const& json) {
-        if (json.contains("position")) {
-            auto& pos = json["position"];
+        if (json.contains("pos")) {
+            auto& pos = json["pos"];
             setPosition({
                 pos["x"].as<float>().unwrapOrDefault(),
                 pos["y"].as<float>().unwrapOrDefault()
@@ -111,7 +111,7 @@ namespace eclipse::gui::imgui {
 
 matjson::Value matjson::Serialize<eclipse::gui::imgui::Window>::toJson(eclipse::gui::imgui::Window const& window) {
     return makeObject({
-        {"position", makeObject({
+        {"pos", makeObject({
             {"x", window.getPosition().x},
             {"y", window.getPosition().y}
         })},
