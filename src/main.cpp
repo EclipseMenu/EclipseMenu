@@ -110,16 +110,6 @@ public:
         for (const auto& hack : hack::getUpdatedHacks())
             hack->update();
 
-        // Add ability for ImGui to capture right click
-        if (s_isInitialized && gui::Engine::getRendererType() == gui::RendererType::ImGui) {
-            auto& io = ImGui::GetIO();
-            if (keybinds::isKeyPressed(keybinds::Keys::MouseRight)) {
-                io.AddMouseButtonEvent(1, true);
-            } else if (keybinds::isKeyReleased(keybinds::Keys::MouseRight)) {
-                io.AddMouseButtonEvent(1, false);
-            }
-        }
-
         keybinds::Manager::get()->update();
         gui::blur::update(dt);
     }

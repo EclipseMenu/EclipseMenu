@@ -108,7 +108,10 @@ namespace eclipse::gui::imgui {
 
     void Theme::handleKeybindMenu(std::string_view id) {
         auto popupId = fmt::format("##context-menu-{}", id);
-        if (ImGui::IsItemClicked(1) || (ImGui::IsItemClicked(0) && ImGui::GetIO().KeyShift)) {
+        if (
+            ImGui::IsItemClicked(1) ||
+            (ImGui::IsItemClicked(0) && (keybinds::getCurrentModifiers() & geode::KeyboardModifier::Shift))
+        ) {
             ImGui::OpenPopup(popupId.c_str());
         }
 

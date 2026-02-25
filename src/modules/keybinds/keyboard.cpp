@@ -1,7 +1,9 @@
+#include <imgui.h>
 #include <Geode/platform/platform.hpp>
 #include <modules/hack/hack.hpp>
 
 #include <Geode/utils/Keyboard.hpp>
+#include <modules/gui/gui.hpp>
 #include <modules/keybinds/manager.hpp>
 
 using namespace geode::prelude;
@@ -183,6 +185,13 @@ namespace eclipse::keybinds {
         }).leak();
 
         MouseInputEvent().listen([](MouseInputData& event) {
+            if (event.button != MouseInputData::Button::Left && gui::Engine::getRendererType() == gui::RendererType::ImGui) {
+                ImGui::GetIO().AddMouseButtonEvent(
+                    static_cast<int>(event.button),
+                    event.action == MouseInputData::Action::Press
+                );
+            }
+
             Manager::get()->registerKeyRelease({
                 .timestamp = event.timestamp,
                 .props = {convertMouseKey(event.button), event.modifiers},
