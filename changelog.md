@@ -1,5 +1,12 @@
 # Eclipse Menu
 
+## v1.8.1
+**Fixes**:
+* <cg>Fixed</c> an invisible crash on game close
+* <cg>Fixed</c> not being able to bind keys to any toggles
+* <cg>Fixed</c> <co>Click Teleport</c> not triggering on mouse click
+* <cg>Fixed</c> incompatibility with pre-2.208 replays
+
 ## v1.8.0
 This update adds **<cg>Geometry Dash v2.2081</c>** support
 

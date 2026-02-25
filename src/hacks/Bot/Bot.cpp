@@ -400,7 +400,11 @@ namespace eclipse::hacks::Bot {
 
             std::optional<gdr::Input<>> input = std::nullopt;
 
-            while ((input = s_bot.poll(m_gameState.m_currentProgress)) != std::nullopt) {
+            // TODO: 2.208 made m_currentProgress count twice as fast, for now we just divide it by 2
+            // to avoid breaking existing replays. Find a better solution later
+            auto progress = m_gameState.m_currentProgress / 2;
+
+            while ((input = s_bot.poll(progress)) != std::nullopt) {
                 this->simulateClick((PlayerButton) input->button, input->down, input->player2);
             }
         }
@@ -434,7 +438,7 @@ namespace eclipse::hacks::Bot {
             if (s_bot.getState() != bot::State::RECORD)
                 return;
 
-            s_bot.recordInput(m_gameState.m_currentProgress, (PlayerButton) button, !player1, down);
+            s_bot.recordInput(m_gameState.m_currentProgress / 2, (PlayerButton) button, !player1, down);
         }
     };
 
