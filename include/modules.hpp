@@ -2,7 +2,7 @@
 #ifndef ECLIPSE_MODULES_HPP
 #define ECLIPSE_MODULES_HPP
 
-#include <events.hpp>
+#include "events.hpp"
 #include <functional>
 #include <memory>
 #include <string>
