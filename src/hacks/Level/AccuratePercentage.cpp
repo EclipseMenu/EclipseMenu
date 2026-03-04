@@ -59,7 +59,7 @@ namespace eclipse::hacks::Global {
                 if (!config::get<"level.accuratepercentage.bugfix", bool>(true)) return;
                 m_progressFill->setTextureRect({
                     0, 0,
-                    (m_progressBar->getTextureRect().getMaxX() - 5) * percent / 100.f,
+                    (m_progressBar->getTextureRect().getMaxX() - 4) * percent / 100.f,
                     m_progressBar->getTextureRect().getMaxY() / 2
                 });
             }
