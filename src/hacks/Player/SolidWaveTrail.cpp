@@ -31,6 +31,11 @@ namespace eclipse::hacks::Player {
             PlayerObject::setupStreak();
             this->toggle(true);
         }
+
+        void updateStreakBlend(bool blend) {
+            PlayerObject::updateStreakBlend(blend);
+            this->toggle(true);
+        }
     };
 
     class $hack(SolidWaveTrail) {
