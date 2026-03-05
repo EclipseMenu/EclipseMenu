@@ -93,7 +93,7 @@ namespace eclipse::utils {
     /// @brief Bugfixed version of getCurrentPercent.
     /// @param game GJBaseGameLayer to get the progress from.
     /// @return Actual progress of the level.
-    float getActualProgress(class GJBaseGameLayer* game);
+    double getActualProgress(class GJBaseGameLayer* game);
 
     /// @brief Make the cursor visible/hidden under certain conditions
     void updateCursorState(bool visible);

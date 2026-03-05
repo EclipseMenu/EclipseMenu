@@ -370,10 +370,11 @@ namespace eclipse::hacks::Global {
             auto timestamp = m_level->m_timestamp;
             auto currentProgress = m_gameState.m_currentProgress;
             // this is only an issue for 2.2+ levels (with TPS greater than 240)
-            if (timestamp > 0 && config::get<"global.tpsbypass", double>(240.f) != 240.f) {
+            if (timestamp > 0 && config::get<"global.tpsbypass", double>(240.0) != 240.0) {
                 // recalculate m_currentProgress based on the actual time passed
                 auto progress = utils::getActualProgress(this);
-                m_gameState.m_currentProgress = timestamp * progress / 100.f;
+                // 2.208+: current progress is now doubled
+                m_gameState.m_currentProgress = timestamp * progress * 2 / 100.0;
             }
             return currentProgress;
         }
@@ -395,7 +396,7 @@ namespace eclipse::hacks::Global {
             // also we can't rely on m_level->m_timestamp, because it might not be updated yet
             auto oldTimestamp = m_gameState.m_commandIndex;
             if (config::get<"global.tpsbypass", double>(240.0) != 240.0) {
-                auto ticks = static_cast<uint32_t>(std::round(m_gameState.m_levelTime * 240));
+                auto ticks = static_cast<uint32_t>(std::round(m_gameState.m_levelTime * 480)); // 480 because of the progress doubling in 2.208+
                 m_gameState.m_commandIndex = ticks;
             }
             PlayLayer::levelComplete();

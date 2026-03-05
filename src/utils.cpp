@@ -75,14 +75,14 @@ namespace eclipse::utils {
         return fmt::format("{}", seconds);
     }
 
-    float getActualProgress(GJBaseGameLayer* game) {
-        float percent;
+    double getActualProgress(GJBaseGameLayer* game) {
+        double percent;
         if (game->m_level->m_timestamp > 0) {
-            percent = static_cast<float>(game->m_gameState.m_levelTime * 240.f) / game->m_level->m_timestamp * 100.f;
+            percent = game->m_gameState.m_levelTime * 240.0 / game->m_level->m_timestamp * 100.0;
         } else {
-            percent = game->m_player1->getPositionX() / game->m_levelLength * 100.f;
+            percent = game->m_player1->getPositionX() * 100.0 / game->m_levelLength;
         }
-        return std::clamp(percent, 0.f, 100.f);
+        return std::clamp(percent, 0.0, 100.0);
     }
 
     void updateCursorState(bool visible) {

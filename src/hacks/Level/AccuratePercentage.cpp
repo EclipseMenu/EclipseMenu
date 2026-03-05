@@ -32,7 +32,7 @@ namespace eclipse::hacks::Global {
     class $modify(AccuratePercentagePLHook, PlayLayer) {
         ADD_HOOKS_DELEGATE("level.accuratepercentage")
 
-        float customGetProgress() {
+        double customGetProgress() {
             if (config::get<"level.accuratepercentage.bugfix", bool>(true))
                 return utils::getActualProgress(this);
             return this->getCurrentPercent();
@@ -47,7 +47,7 @@ namespace eclipse::hacks::Global {
                 auto time = utils::formatTime(m_timePlayed);
                 m_percentageLabel->setString(time.c_str());
             } else if (config::get<"level.accuratepercentage.normal_mode", bool>(true)) {
-                float percent = customGetProgress();
+                auto percent = customGetProgress();
                 auto numDigits = config::get<int>("level.accuratepercentage.amount", 4);
                 if (numDigits > 0) {
                     m_percentageLabel->setString(fmt::format("{:.{}f}%", percent, numDigits).c_str());
@@ -59,7 +59,7 @@ namespace eclipse::hacks::Global {
                 if (!config::get<"level.accuratepercentage.bugfix", bool>(true)) return;
                 m_progressFill->setTextureRect({
                     0, 0,
-                    m_progressWidth * percent / 100.f,
+                    static_cast<float>(m_progressWidth * percent / 100.0),
                     m_progressHeight
                 });
             }
