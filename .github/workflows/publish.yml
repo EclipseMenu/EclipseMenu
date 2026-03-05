@@ -77,7 +77,7 @@ jobs:
           import re, sys, os
 
           version = "${{ github.event.inputs.version }}"
-          changelog_path = "CHANGELOG.md"import re, sys, os
+          changelog_path = "changelog.md"
 
           with open(changelog_path, "r", encoding="utf-8") as f:
             changelog = f.read()
