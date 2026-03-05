@@ -1,5 +1,10 @@
 # Eclipse Menu
 
+## v1.8.2
+**Fixes**:
+* <cg>Fixed</c> <co>Solid Wave Trail</c> not working sometimes
+* <cg>Fixed</c> percentage calculation to match 2.208 changes
+
 ## v1.8.1
 **Fixes**:
 * <cg>Fixed</c> an invisible crash on game close
