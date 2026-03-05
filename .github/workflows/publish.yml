@@ -1,0 +1,110 @@
+name: Publish Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. v1.2.3)'
+        required: true
+        default: ''
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: Windows
+            os: windows-latest
+            build-type: RelWithDebInfo
+
+          - name: macOS
+            os: macos-latest
+
+          - name: Android32
+            os: ubuntu-latest
+            target: Android32
+
+          - name: Android64
+            os: ubuntu-latest
+            target: Android64
+
+          - name: iOS
+            os: macos-latest
+            target: iOS
+
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Build the mod
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          bindings: EclipseMenu/bindings
+          bindings-ref: main
+          combine: true
+          export-pdb: true
+          export-symbols: true
+          target: ${{ matrix.config.target }}
+          build-config: ${{ matrix.config.build-type || 'Release' }}
+
+  package:
+    name: Package builds
+    runs-on: ubuntu-latest
+    needs: [ 'build' ]
+
+    steps:
+      - name: Combine builds
+        uses: geode-sdk/build-geode-mod/combine@main
+        id: build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: ${{ steps.build.outputs.build-output }}
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Prepare changelog
+        id: changelog
+        run: |
+          python3 - <<'EOF'
+          import re, sys, os
+
+          version = "${{ github.event.inputs.version }}"
+          changelog_path = "CHANGELOG.md"import re, sys, os
+
+          with open(changelog_path, "r", encoding="utf-8") as f:
+            changelog = f.read()
+
+          pattern = rf"(?m)^## {re.escape(version)}\n(.*?)(?=^## |\Z)"
+          match = re.search(pattern, changelog, re.DOTALL)
+
+          if not match:
+            print(f"::error::Changelog entry for '{version}' not found.")
+            sys.exit(1)
+
+          section = match.group(1).strip()
+          section = re.sub(r"<c[a-zA-Z]>", "**", section)
+          section = re.sub(r"</c>", "**", section)
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+            f.write(f"changelog<<__CHANGELOG_EOF__\n{section}\n__CHANGELOG_EOF__\n")
+          EOF
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.event.inputs.version }}
+          tag_name: ${{ github.event.inputs.version }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          files: |
+            ${{ steps.build.outputs.build-output }}/*.geode
+            ${{ steps.build.outputs.build-output }}/*.pdb
+            ${{ steps.build.outputs.build-output }}/*.sym
+            ${{ steps.build.outputs.build-output }}/*.dSym

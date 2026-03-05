@@ -38,7 +38,8 @@ jobs:
     runs-on: ${{ matrix.config.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v6
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
@@ -51,7 +52,6 @@ jobs:
           export-symbols: true
           target: ${{ matrix.config.target }}
           build-config: ${{ matrix.config.build-type || 'Release' }}
-          ccache-variant: ${{ matrix.config.os != 'macos-latest' && 'sccache' || '' }}
 
   package:
     name: Package builds
@@ -59,20 +59,18 @@ jobs:
     needs: ['build']
 
     steps:
-      - uses: geode-sdk/build-geode-mod/combine@main
+      - name: Combine builds
+        uses: geode-sdk/build-geode-mod/combine@main
         id: build
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
         with:
-          name: Build Output
+          archive: false
           path: ${{ steps.build.outputs.build-output }}
 
-      - name: Check if has nightly webhook
-        id: check
-        if: github.ref == 'refs/heads/main'
-        run: echo "has-nightly-webhook=${{ secrets.NIGHTLY_WEBHOOK != '' }}" >> $GITHUB_OUTPUT
-
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v6
         if: ${{ steps.check.outputs.has-nightly-webhook == 'true' }}
 
       - name: Get latest release tag
