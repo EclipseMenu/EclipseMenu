@@ -423,7 +423,8 @@ class $modify(MPFPlayLayer, PlayLayer) {
             REGION(m_player1, unk_584, m_rotateObjectsRelated);
             REGION(m_player1, m_rotationSpeed, m_ghostTrail);
             REGION(m_player1, m_speedMultiplier, m_ringRelatedSet);
-            REGION(m_player1, m_objectSnappedTo, m_jumpBuffered);
+            REGION(m_player1, m_objectSnappedTo, m_pendingCheckpoint);
+            REGION(m_player1, m_onFlyCheckpointTries, m_jumpBuffered);
             REGION(m_player1, m_stateRingJump, m_holdingButtons);
             REGION(m_player1, m_inputsLocked, m_enable22Changes);
 
@@ -433,7 +434,8 @@ class $modify(MPFPlayLayer, PlayLayer) {
             REGION(m_player2, unk_584, m_rotateObjectsRelated);
             REGION(m_player2, m_rotationSpeed, m_ghostTrail);
             REGION(m_player2, m_speedMultiplier, m_ringRelatedSet);
-            REGION(m_player2, m_objectSnappedTo, m_jumpBuffered);
+            REGION(m_player2, m_objectSnappedTo, m_pendingCheckpoint);
+            REGION(m_player2, m_onFlyCheckpointTries, m_jumpBuffered);
             REGION(m_player2, m_stateRingJump, m_holdingButtons);
             REGION(m_player2, m_inputsLocked, m_enable22Changes);
             #pragma GCC diagnostic pop
