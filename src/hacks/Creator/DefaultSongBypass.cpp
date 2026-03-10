@@ -22,12 +22,14 @@ namespace eclipse::hacks::Creator {
         ALL_DELEGATES_AND_SAFE_PRIO("creator.defaultsongbypass")
 
         void audioPrevious(cocos2d::CCObject* sender) {
-            this->m_selectedSongID = std::max(0, this->m_selectedSongID - 1);
+            this->m_songChanged = true;
+            this->m_selectedSongID = std::max(-1, this->m_selectedSongID - 1);
             this->updateAudioLabel();
         }
 
         void audioNext(cocos2d::CCObject* sender) {
-            this->m_selectedSongID = std::max(0, this->m_selectedSongID + 1);
+            this->m_songChanged = true;
+            this->m_selectedSongID = std::max(-1, this->m_selectedSongID + 1);
             this->updateAudioLabel();
         }
     };
@@ -37,16 +39,16 @@ namespace eclipse::hacks::Creator {
 
         void audioPrevious(cocos2d::CCObject* sender) {
             auto song = utils::get<GameLevelManager>()->getIntForKey("song_filter");
-            MoreSearchLayer::selectSong(std::max(1, song - 1));
+            MoreSearchLayer::selectSong(std::max(0, song - 1));
         }
 
         void audioNext(cocos2d::CCObject* sender) {
             auto song = utils::get<GameLevelManager>()->getIntForKey("song_filter");
-            MoreSearchLayer::selectSong(std::max(1, song + 1));
+            MoreSearchLayer::selectSong(std::max(0, song + 1));
         }
 
         void selectSong(int songID) {
-            songID = std::max(1, songID);
+            songID = std::max(0, songID);
             utils::get<GameLevelManager>()->setIntForKey(songID, "song_filter");
             this->updateAudioLabel();
         }
