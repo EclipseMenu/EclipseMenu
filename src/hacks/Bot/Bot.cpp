@@ -1,5 +1,3 @@
-#include <Geode/Result.hpp>
-
 #include <modules.hpp>
 #include <modules/bot/bot.hpp>
 #include <modules/config/config.hpp>
@@ -24,6 +22,7 @@ using namespace geode::prelude;
 namespace eclipse::hacks::Bot {
     static bot::Bot s_bot;
     // static bool s_respawning = false;
+    static bool s_dontPlaceAuto = false;
     bot::Bot& getBot() { return s_bot; }
 
     void newReplay() {
@@ -349,10 +348,76 @@ namespace eclipse::hacks::Bot {
         }
     };
 
+    class $modify(BotPlayerHook, PlayerObject) {
+        struct Fields {
+            bool m_triedPlacingCheckpoint = false;
+        };
+
+        static void onModify(auto& self) {
+            int value = config::get("bot.state", 0);
+            geode::Hook* hookPtr = nullptr;
+            auto it = self.m_hooks.find("PlayerObject::tryPlaceCheckpoint");
+            if (it != self.m_hooks.end()) {
+                it->second->setAutoEnable(value == (int)bot::State::RECORD);
+                it->second->setPriority(SAFE_HOOK_PRIORITY);
+                hookPtr = it->second.get();
+            } else {
+                geode::log::warn("Hook 'tryPlaceCheckpoint' not found in class 'PlayerObject'");
+            }
+            config::addDelegate("bot.state", [hookPtr] {
+                int value = config::get("bot.state", 0);
+                (void) hookPtr->toggle(value == (int)bot::State::RECORD);
+            });
+        }
+
+        void tryPlaceCheckpoint() {
+            if(s_dontPlaceAuto) {
+                m_fields->m_triedPlacingCheckpoint = true;
+                return;
+            }
+            PlayerObject::tryPlaceCheckpoint();
+        }
+    };
+
     class $modify(BotBGLHook, GJBaseGameLayer) {
 
         static void onModify(auto& self) {
             SAFE_HOOKS(GJBaseGameLayer, "processQueuedButtons");
+            
+            int value = config::get("bot.state", 0);
+            geode::Hook* hookPtr = nullptr;
+            auto it = self.m_hooks.find("GJBaseGameLayer::update");
+            if (it != self.m_hooks.end()) {
+                it->second->setAutoEnable(value == (int)bot::State::RECORD);
+                it->second->setPriority(SAFE_HOOK_PRIORITY);
+                hookPtr = it->second.get();
+            } else {
+                geode::log::warn("Hook 'update' not found in class 'GJBaseGameLayer'");
+            }
+            config::addDelegate("bot.state", [hookPtr] {
+                int value = config::get("bot.state", 0);
+                (void) hookPtr->toggle(value == (int)bot::State::RECORD);
+            });
+        }
+
+        void update(float dt) {
+            auto player1Fields = reinterpret_cast<BotPlayerHook*>(m_player1)->m_fields.self();
+            auto player2Fields = reinterpret_cast<BotPlayerHook*>(m_player2)->m_fields.self();
+
+            player1Fields->m_triedPlacingCheckpoint = false;
+            player2Fields->m_triedPlacingCheckpoint = false;
+            s_dontPlaceAuto = true;
+            GJBaseGameLayer::update(dt);
+            s_dontPlaceAuto = false;
+
+            if(player1Fields->m_triedPlacingCheckpoint) {
+                m_player1->m_shouldTryPlacingCheckpoint = true;
+                m_player1->tryPlaceCheckpoint();
+            }
+            if(player2Fields->m_triedPlacingCheckpoint) {
+                m_player2->m_shouldTryPlacingCheckpoint = true;
+                m_player2->tryPlaceCheckpoint();
+            }
         }
 
         void simulateClick(PlayerButton button, bool down, bool player2) {
