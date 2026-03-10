@@ -23,7 +23,7 @@ using namespace geode::prelude;
 
 namespace eclipse::hacks::Bot {
     static bot::Bot s_bot;
-    static bool s_respawning = false;
+    // static bool s_respawning = false;
     bot::Bot& getBot() { return s_bot; }
 
     void newReplay() {
@@ -314,40 +314,20 @@ namespace eclipse::hacks::Bot {
             bool result = PlayLayer::init(gj, p1, p2);
             s_bot.setLevelInfo(gdr::Level(gj->m_levelName, gj->m_levelID.value()));
             s_bot.setPlatformer(gj->isPlatformer());
-            s_respawning = false;
+            // s_respawning = false;
             return result;
         }
 
         void resetLevel() {
-            s_respawning = true;
+            // s_respawning = true;
             PlayLayer::resetLevel();
             Bot::applySettings();
-
-            int practiceFixMode = config::get<int>("bot.practice-fix-mode", 0);
-
-            if (s_bot.getState() == bot::State::RECORD) {
-                //gd does this automatically for holding but not releases so we do it manually
-                s_bot.recordInput(
-                    (m_gameState.m_currentProgress / 2) + 1,
-                    PlayerButton::Jump, false, false
-                );
-                if(practiceFixMode == 0) m_player1->m_isDashing = false; // temporary, find better way to fix dash orbs
-                if (m_gameState.m_isDualMode && m_levelSettings->m_twoPlayerMode) {
-                    s_bot.recordInput(
-                        (m_gameState.m_currentProgress / 2) + 1,
-                        PlayerButton::Jump, true, false
-                    );
-                    if(practiceFixMode == 0) m_player2->m_isDashing = false;
-                }
+            
+            if (m_checkpointArray->count() == 0) {
+                if(s_bot.getState() != bot::State::PLAYBACK)
+                    s_bot.clearInputs();
+                s_bot.restart();
             }
-
-            if (m_checkpointArray->count() > 0) return;
-
-            s_bot.restart();
-
-            if (s_bot.getState() == bot::State::PLAYBACK) return;
-
-            s_bot.clearInputs();
         }
 
         CheckpointObject* markCheckpoint() {
@@ -372,7 +352,7 @@ namespace eclipse::hacks::Bot {
     class $modify(BotBGLHook, GJBaseGameLayer) {
 
         static void onModify(auto& self) {
-            SAFE_HOOKS(GJBaseGameLayer, "processCommands");
+            SAFE_HOOKS(GJBaseGameLayer, "processQueuedButtons");
         }
 
         void simulateClick(PlayerButton button, bool down, bool player2) {
@@ -405,7 +385,7 @@ namespace eclipse::hacks::Bot {
         }
 
         void processBot() {
-            if(s_respawning) s_respawning = false;
+            // if(s_respawning) s_respawning = false;
 
             if (s_bot.getState() != bot::State::PLAYBACK)
                 return;
@@ -421,29 +401,22 @@ namespace eclipse::hacks::Bot {
             }
         }
 
-        // processCommands is inlined on macos platforms since 2.208
-        #ifndef GEODE_IS_MACOS
-        void processCommands(float dt, bool isHalfTick, bool isLastTick) {
-            GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
-            this->processBot();
-        }
-        #else
         void processQueuedButtons(float dt, bool clearInputQueue) {
             GJBaseGameLayer::processQueuedButtons(dt, clearInputQueue);
             this->processBot();
         }
-        #endif
 
         void handleButton(bool down, int button, bool player1) {
             if (s_bot.getState() == bot::State::PLAYBACK && s_bot.getInputCount() && config::get<bool>("bot.ignore-inputs", false))
                 return;
 
-            if (s_bot.getState() == bot::State::RECORD && s_respawning) { // somethow this avoid a weird bug where an orb buffered if you press down while respawning doesn't register
-                bool swapControls = GameManager::get()->getGameVariable("0010");
-                bool player2 = swapControls ? player1 : !player1;
-                PlayerObject* checkPlayer = player2 ? m_player2 : m_player1;
-                if(checkPlayer->m_touchedRings.size() > 0) return;
-            }
+            // does not seem to be happening anymore in 2.208. leaving this here in case it pops up again
+            // if (s_bot.getState() == bot::State::RECORD && s_respawning) { // somehow this avoid a weird bug where an orb buffered if you press down while respawning doesn't register
+            //     bool swapControls = GameManager::get()->getGameVariable("0010");
+            //     bool player2 = swapControls ? player1 : !player1;
+            //     PlayerObject* checkPlayer = player2 ? m_player2 : m_player1;
+            //     if(checkPlayer->m_touchedRings.size() > 0) return;
+            // }
 
             GJBaseGameLayer::handleButton(down, button, player1);
 

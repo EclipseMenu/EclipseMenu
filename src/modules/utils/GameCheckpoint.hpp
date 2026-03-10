@@ -302,6 +302,19 @@ namespace eclipse::utils {
             m_position = player->m_position;
             m_rotation = player->getRotation();
 
+            m_positionX = player->m_positionX;
+            m_positionY = player->m_positionY;
+            m_unmodifiedPositionX = player->m_unmodifiedPositionX;
+            m_unmodifiedPositionY = player->m_unmodifiedPositionY;
+
+            m_rotationXOffset = player->m_rotationXOffset;
+            m_rotationYOffset = player->m_rotationYOffset;
+            m_fRotationX = player->m_fRotationX;
+            m_fRotationY = player->m_fRotationY;
+            m_isRotationAligned = player->m_isRotationAligned;
+            m_startRotationX = player->m_startRotationX;
+            m_startRotationY = player->m_startRotationY;
+
             #ifndef GEODE_IS_ANDROID
 
             m_rotateObjectsRelated = player->m_rotateObjectsRelated; // unordered_map<int, GJPointDouble>
@@ -560,6 +573,18 @@ namespace eclipse::utils {
             player->m_position = m_position;
             player->setPosition(m_position);
             player->setRotation(m_rotation);
+            player->m_positionX = m_positionX;
+            player->m_positionY = m_positionY;
+            player->m_unmodifiedPositionX = m_unmodifiedPositionX;
+            player->m_unmodifiedPositionY = m_unmodifiedPositionY;
+
+            player->m_rotationXOffset = m_rotationXOffset;
+            player->m_rotationYOffset = m_rotationYOffset;
+            player->m_fRotationX = m_fRotationX;
+            player->m_fRotationY = m_fRotationY;
+            player->m_isRotationAligned = m_isRotationAligned;
+            player->m_startRotationX = m_startRotationX;
+            player->m_startRotationY = m_startRotationY;
 
             #ifndef GEODE_IS_ANDROID
 
@@ -818,6 +843,18 @@ namespace eclipse::utils {
         bool m_robotAnimation1Enabled;
         bool m_robotAnimation2Enabled;
         bool m_spiderAnimationEnabled;
+
+        double m_positionX;
+        double m_positionY;
+        float m_unmodifiedPositionX;
+        float m_unmodifiedPositionY;
+        float m_rotationXOffset;
+        float m_rotationYOffset;
+        float m_fRotationX;
+        float m_fRotationY;
+        bool m_isRotationAligned;
+        float m_startRotationX;
+        float m_startRotationY;
 
         // these dont work well on android
         // (P.S. robtop pls update NDK)
