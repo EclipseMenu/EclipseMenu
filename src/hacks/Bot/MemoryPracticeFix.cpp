@@ -418,9 +418,7 @@ class $modify(MPFPlayLayer, PlayLayer) {
             #pragma GCC diagnostic push
             #pragma GCC diagnostic ignored "-Winvalid-offsetof"
             s_memoryTracker.addWatchedRegion((uintptr_t)m_player1 + offsetof(cocos2d::CCNode, m_fRotationX), (uintptr_t)m_player1 + offsetof(cocos2d::CCNode, m_pCamera));
-            REGION(m_player1, m_mainLayer, m_currentSlope2);
-            REGION(m_player1, m_preLastGroundObject, m_currentPotentialSlope);
-            REGION(m_player1, unk_584, m_rotateObjectsRelated);
+            REGION(m_player1, m_mainLayer, m_rotateObjectsRelated);
             REGION(m_player1, m_rotationSpeed, m_ghostTrail);
             REGION(m_player1, m_speedMultiplier, m_ringRelatedSet);
             REGION(m_player1, m_objectSnappedTo, m_pendingCheckpoint);
@@ -429,9 +427,7 @@ class $modify(MPFPlayLayer, PlayLayer) {
             REGION(m_player1, m_inputsLocked, m_enable22Changes);
 
             s_memoryTracker.addWatchedRegion((uintptr_t)m_player2 + offsetof(cocos2d::CCNode, m_fRotationX), (uintptr_t)m_player2 + offsetof(cocos2d::CCNode, m_pCamera));
-            REGION(m_player2, m_mainLayer, m_currentSlope2);
-            REGION(m_player2, m_preLastGroundObject, m_currentPotentialSlope);
-            REGION(m_player2, unk_584, m_rotateObjectsRelated);
+            REGION(m_player2, m_mainLayer, m_rotateObjectsRelated);
             REGION(m_player2, m_rotationSpeed, m_ghostTrail);
             REGION(m_player2, m_speedMultiplier, m_ringRelatedSet);
             REGION(m_player2, m_objectSnappedTo, m_pendingCheckpoint);
