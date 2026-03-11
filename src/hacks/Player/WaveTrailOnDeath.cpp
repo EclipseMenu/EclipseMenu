@@ -21,18 +21,32 @@ namespace eclipse::hacks::Player {
 
     class $modify(WaveTrailOnDeathPOHook, PlayerObject) {
         ALL_DELEGATES_AND_SAFE_PRIO("player.wavetrailondeath")
+
         void playerDestroyed(bool p0) {
-            if (auto* pl = utils::get<PlayLayer>())
-                s_isDead = this == pl->m_player1 || this == pl->m_player2;
+            if (auto* gjbgl = m_gameLayer)
+                s_isDead = this == gjbgl->m_player1 || this == gjbgl->m_player2;
+
             PlayerObject::playerDestroyed(p0);
+            m_waveTrail->stopActionByTag(8);
+
             s_isDead = false;
         }
+
+        #ifdef GEODE_IS_MACOS
+        void deactivateStreak(bool stop) {
+            PlayerObject::deactivateStreak(stop);
+            if (s_isDead || config::get<"player.wavetrailondeath.persist-trail", bool>(false)) return;
+                m_waveTrail->stopActionByTag(8);
+        }
+        #endif
+
         void fadeOutStreak2(float duration) {
-            if (s_isDead || config::get<bool>("player.wavetrailondeath.persist-trail", false)) return;
+            if (s_isDead || config::get<"player.wavetrailondeath.persist-trail", bool>(false)) return;
             PlayerObject::fadeOutStreak2(duration);
         }
+
         void createFadeOutDartStreak() {
-            if (s_isDead || config::get<bool>("player.wavetrailondeath.persist-trail", false)) return;
+            if (s_isDead || config::get<"player.wavetrailondeath.persist-trail", bool>(false)) return;
             PlayerObject::createFadeOutDartStreak();
         }
     };
