@@ -5,6 +5,7 @@
 #include <modules/gui/popup.hpp>
 #include <modules/gui/cocos/cocos.hpp>
 #include <modules/gui/components/button.hpp>
+#include <modules/gui/components/combo.hpp>
 #include <modules/gui/components/filesystem-combo.hpp>
 #include <modules/gui/components/radio.hpp>
 #include <modules/gui/components/toggle.hpp>
@@ -285,7 +286,7 @@ namespace eclipse::hacks::Bot {
 
             tab->addFilesystemCombo("bot.replays", "bot.selectedreplay", Mod::get()->getSaveDir() / "replays");
 #ifdef GEODE_IS_WINDOWS
-            tab->addCombo("bot.practice-fix-mode", {"Checkpoint", "Memory"}, 0);
+            tab->addCombo("bot.practice-fix-mode", {"Checkpoint", "Memory"}, 0)->setDescription();
 #endif
 
             tab->addToggle("bot.ignore-inputs")->handleKeybinds()->setDescription();

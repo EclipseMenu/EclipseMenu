@@ -293,6 +293,8 @@ namespace eclipse::gui::imgui {
 
         if (combo->getFlags() & ComponentFlags::SearchedFor)
             ImGui::PopStyleColor();
+
+        handleTooltip(combo->getDescription());
     }
 
     void Theme::visitFilesystemCombo(FilesystemComboComponent* combo) const {
