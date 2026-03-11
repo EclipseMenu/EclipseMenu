@@ -1,5 +1,14 @@
 # Eclipse Menu
 
+## v1.8.3
+**Fixes**:
+* <cg>Fixed</c> <co>Replay Bot</c> accuracy after 2.208 changes
+* <cg>Fixed</c> <co>Practice Fix</c> not properly saving auto-checkpoints
+* <cg>Fixed</c> some <cl>Memory-based</c> <co>Practice Fix</c> crashes
+* <cg>Fixed</c> <co>Default Song Bypass</c> not saving the song choice
+* <cg>Fixed</c> label file picker crashes on Android
+* <cg>Fixed</c> <co>Wave Trail On Death</c> not working on <cl>macOS</c>
+
 ## v1.8.2
 **Fixes**:
 * <cg>Fixed</c> <co>Solid Wave Trail</c> not working sometimes
