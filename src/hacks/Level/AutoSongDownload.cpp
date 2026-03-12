@@ -21,7 +21,7 @@ namespace eclipse::hacks::Level {
         ADD_HOOKS_DELEGATE("level.autosongdownload")
 
         void tryDownload() {
-            if (!utils::get<GameManager>()->getGameVariable(GameVar::ShownNewgroundsDisclaimer))
+            if (!utils::get<GameManager>()->getGameVariable(GameVar::ShownMusicTOS))
                 return;
             if (m_songWidget->m_downloadBtn->isVisible())
                 m_songWidget->m_downloadBtn->activate();
