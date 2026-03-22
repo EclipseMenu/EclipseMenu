@@ -111,6 +111,7 @@ namespace eclipse::gui::cocos {
 
         this->setMouseEnabled(true);
         this->setTouchEnabled(true);
+        this->setUserFlag("alk.better-touch-prio/steals-touch");
 
         utils::get<cocos2d::CCTouchDispatcher>()->registerForcePrio(this, 2);
     }
