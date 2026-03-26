@@ -3,6 +3,8 @@
 #include <modules/gui/components/toggle.hpp>
 #include <modules/hack/hack.hpp>
 
+#include <Geode/Enums.hpp>
+#include <Geode/modify/EditorUI.hpp>
 #include <Geode/modify/GJScaleControl.hpp>
 #include <Geode/modify/SliderTouchLogic.hpp>
 
@@ -49,19 +51,97 @@ namespace eclipse::hacks::Creator {
         ADD_HOOKS_DELEGATE("creator.sliderlimit")
 
         void ccTouchMoved(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) override {
-            GJScaleControl::ccTouchMoved(touch, event);
+            if (touch->m_nId != m_touchID) return;
 
-            if (m_sliderXY && m_sliderXY->m_touchLogic->m_activateThumb) {
-                m_sliderXY->getThumb()->setPositionX(this->convertToNodeSpace(touch->getLocation()).x);
-                m_sliderXY->updateBar();
+            Slider* slider = m_sliderXY;
+            auto labelFunc = &GJScaleControl::updateLabelXY;
+            auto delegateFunc = +[](GJScaleControlDelegate* delegate, float x, float y, bool locked) {
+                delegate->scaleXYChanged(x, y, locked);
+            };
+            switch (m_scaleButtonType) {
+                case ScaleButtonType::X:
+                    slider = m_sliderX;
+                    labelFunc = &GJScaleControl::updateLabelX;
+                    delegateFunc = +[](GJScaleControlDelegate* delegate, float x, float y, bool locked) {
+                        delegate->scaleXChanged(x, locked);
+                    };
+                    break;
+                case ScaleButtonType::Y:
+                    slider = m_sliderY;
+                    labelFunc = &GJScaleControl::updateLabelY;
+                    delegateFunc = +[](GJScaleControlDelegate* delegate, float x, float y, bool locked) {
+                        delegate->scaleYChanged(y, locked);
+                    };
+                    break;
+                default:
+                    break;
+            };
 
-                float value = m_sliderXY->getThumb()->getValue();
+            if (slider && slider->m_touchLogic->m_activateThumb) {
+                slider->getThumb()->setPositionX(this->convertToNodeSpace(touch->getLocation()).x);
+                slider->updateBar();
 
-                updateLabelXY(value);
-                this->sliderChanged(m_sliderXY->getThumb());
+                auto const thumbValue = slider->getThumb()->getValue();
+                auto const scaleValue = m_lowerBound + thumbValue * (m_upperBound - m_lowerBound);
+                auto const roundedValue = std::round(scaleValue * 100.f) / 100.f;
+                auto xValue = roundedValue;
+                auto yValue = roundedValue;
 
-                if (auto editorUI = utils::get<EditorUI>())
-                    editorUI->scaleXYChanged(value, value, m_scaleLocked);
+                // this is the ratio preserving code that i stole from ai :D
+                if (m_scaleButtonType == ScaleButtonType::XY) {
+                    if (m_valueX != m_valueY) {
+                        if (m_valueX <= m_valueY) {
+                            xValue = (roundedValue / m_valueY) * m_valueX;
+                        } else {
+                            yValue = (roundedValue / m_valueX) * m_valueY;
+                        }
+                    }
+                }
+
+                m_changedValueX = xValue;
+                m_changedValueY = yValue;
+                std::invoke(labelFunc, this, roundedValue);
+                this->sliderChanged(slider->getThumb());
+
+                if (m_delegate) {
+                    std::invoke(delegateFunc, m_delegate, xValue, yValue, m_scaleLocked);
+                }
+            }
+        }
+    };
+
+    class $modify(SliderLimitEUIHook, EditorUI) {
+        ADD_HOOKS_DELEGATE("creator.sliderlimit")
+
+        void scaleObjects(cocos2d::CCArray* objects, float scaleX, float scaleY, cocos2d::CCPoint pivotPoint, ObjectScaleType type, bool lockMove) {
+            if (pivotPoint == cocos2d::CCPoint{0.f, 0.f}) {
+                pivotPoint = this->getGroupCenter(objects, false);
+            }
+
+            for (auto obj : geode::cocos::CCArrayExt<GameObject*>(objects)) {
+                // i hope you like the variable names this is how i handle math (scary)
+                auto const& savedValues = m_objectEditorStates[obj->m_uniqueID];
+                auto const newX = std::max(savedValues.m_scaleX * scaleX * obj->m_pixelScaleX, 0.01f);
+                auto const newY = std::max(savedValues.m_scaleY * scaleY * obj->m_pixelScaleY, 0.01f);
+                auto const pos = obj->getPosition();
+
+                auto const currentOffset = (pos - pivotPoint);
+                auto const normalizedOffset = currentOffset / cocos2d::CCPoint{obj->m_scaleX, obj->m_scaleY};
+                auto const newOffset = normalizedOffset * cocos2d::CCPoint{newX, newY};
+
+                auto moveOffset = cocos2d::CCPoint{0.f, 0.f};
+
+                if (type != ObjectScaleType::Y) {
+                    obj->updateCustomScaleX(newX);
+                    moveOffset.x = (newOffset - currentOffset).x;
+                }
+                if (type != ObjectScaleType::X) {
+                    obj->updateCustomScaleY(newY);
+                    moveOffset.y = (newOffset - currentOffset).y;
+                }
+                if (!lockMove) {
+                    this->moveObject(obj, moveOffset);
+                }
             }
         }
     };
