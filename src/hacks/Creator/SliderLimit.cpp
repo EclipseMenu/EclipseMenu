@@ -3,6 +3,7 @@
 #include <modules/gui/components/toggle.hpp>
 #include <modules/hack/hack.hpp>
 
+#include <Geode/Enums.hpp>
 #include <Geode/modify/EditorUI.hpp>
 #include <Geode/modify/GJScaleControl.hpp>
 #include <Geode/modify/SliderTouchLogic.hpp>
