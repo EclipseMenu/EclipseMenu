@@ -97,6 +97,8 @@ namespace eclipse::hacks::Creator {
                     }
                 }
 
+                m_changedValueX = xValue;
+                m_changedValueY = yValue;
                 std::invoke(labelFunc, this, roundedValue);
                 this->sliderChanged(slider->getThumb());
 
