@@ -61,6 +61,10 @@ namespace eclipse::hacks::Player {
         }
 
         void update(float dt) override {
+            #ifdef GEODE_IS_MOBILE // force the swift click bypass
+            if (!config::get<"bypass.swiftclick", bool>(false)) config::set("bypass.swiftclick", true);
+            #endif
+            
             // for playlayer, check if the level is not paused/finished (maybe add loading check later?)
             bool usable = false;
             if (auto playLayer = utils::get<PlayLayer>())
