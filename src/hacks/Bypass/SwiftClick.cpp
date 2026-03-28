@@ -13,7 +13,7 @@ namespace eclipse::hacks::Bypass {
             auto tab = gui::MenuTab::find("tab.bypass");
             tab->addToggle("bypass.swiftclick")->handleKeybinds()->setDescription();
         }
-
+        [[nodiscard]] bool isCheating() const override { return config::get<"bypass.swiftclick", bool>(); }
         [[nodiscard]] const char* getId() const override { return "Swift Click"; }
     };
 
