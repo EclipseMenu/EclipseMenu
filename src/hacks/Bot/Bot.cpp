@@ -232,12 +232,13 @@ namespace eclipse::hacks::Bot {
         }
 
         static void applySettings() {
-            if (s_bot.getState() == bot::State::DISABLED) {
-                return;
-            }
+            if (s_bot.getState() == bot::State::DISABLED) return;
 
             config::set("level.checkpointdelay", true);
             config::set("global.tpsbypass.toggle", true);
+            #ifdef GEODE_IS_MOBILE // force the swift click bypass
+            if (!config::get<"bypass.swiftclick", bool>(false)) config::set("bypass.swiftclick", true);
+            #endif
             if (s_bot.getState() == bot::State::RECORD) {
                 s_bot.setFramerate(utils::getTPS());
 
