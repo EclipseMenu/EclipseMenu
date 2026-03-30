@@ -607,7 +607,7 @@ namespace eclipse::labels {
         m_variables["isDead"] = gameLayer->m_player1->m_isDead;
         m_variables["isDualMode"] = gameLayer->m_player2 != nullptr && gameLayer->m_player2->isRunning();
         m_variables["noclipDeaths"] = config::getTemp("noclipDeaths", 0);
-        m_variables["noclipAccuracy"] = config::getTemp("noclipAccuracy", 100.f);
+        m_variables["noclipAccuracy"] = config::getTemp("noclipAccuracy", 100.0);
         m_variables["progress"] = utils::getActualProgress(gameLayer);
         m_variables["timeWarp"] = gameLayer->m_gameState.m_timeWarp;
         m_variables["gravity"] = gameLayer->m_player1->m_gravityMod;
@@ -777,8 +777,8 @@ namespace eclipse::labels {
 
             if(config::get<"player.noclip", bool>(false) && !m_levelEndAnimationStarted && !m_hasCompletedLevel) {
                 if (config::get<"player.noclip.acclimit.toggle", bool>(false)) {
-                    float acc = config::getTemp<float>("noclipAccuracy", 100.f);
-                    float limit = config::get<"player.noclip.acclimit", double>(95.f);
+                    double acc = config::getTemp<double>("noclipAccuracy", 100.0);
+                    double limit = config::get<"player.noclip.acclimit", double>(95.0);
                     if (acc >= limit)
                         return false;
                 }

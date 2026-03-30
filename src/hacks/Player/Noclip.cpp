@@ -66,8 +66,8 @@ namespace eclipse::hacks::Player {
                 return PlayLayer::destroyPlayer(player, object);
 
             if (config::get<bool>("player.noclip.acclimit.toggle", false)) {
-                auto acc = config::getTemp<float>("noclipAccuracy", 100.f);
-                auto limit = config::get<double>("player.noclip.acclimit", 95.f);
+                auto acc = config::getTemp<double>("noclipAccuracy", 100.0);
+                auto limit = config::get<double>("player.noclip.acclimit", 95.0);
                 if (acc < limit)
                     return PlayLayer::destroyPlayer(player, object);
             }
@@ -173,7 +173,7 @@ namespace eclipse::hacks::Player {
         void processNoclipDeaths() {
             if (!utils::get<PlayLayer>()) {
                 config::setTemp<int>("noclipDeaths", 0);
-                config::setTemp<float>("noclipAccuracy", 100.f);
+                config::setTemp<double>("noclipAccuracy", 100.0);
                 return;
             }
 
@@ -196,7 +196,7 @@ namespace eclipse::hacks::Player {
 
             auto frame = m_gameState.m_currentProgress;
             if (frame > 0) {
-                float acc = static_cast<float>(frame - fields->m_deadFrames) / static_cast<float>(frame) * 100.f;
+                double acc = static_cast<double>(frame - fields->m_deadFrames) * 100.0 / frame;
                 config::setTemp("noclipAccuracy", acc);
                 bool dead = (m_player1 && m_player1->m_isDead) || (m_player2 && m_player2->m_isDead);
                 //if (config::get<bool>("player.noclip.acclimit.toggle", false) && acc <= config::get<double>("player.noclip.acclimit", 95.f) && !dead)
