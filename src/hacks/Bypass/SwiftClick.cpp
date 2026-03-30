@@ -35,7 +35,7 @@ namespace eclipse::hacks::Bypass {
 
             for (auto toggle : autotoggles) {
                 config::addDelegate(toggle, [hook] {
-                    hook->setEnabled(std::ranges::any_of(autotoggles, [](auto toggle) {
+                    (void) hook->toggle(std::ranges::any_of(autotoggles, [](auto toggle) {
                         return config::get<bool>(toggle, false);
                     }));
                 });
