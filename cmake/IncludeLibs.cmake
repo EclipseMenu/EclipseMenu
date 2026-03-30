@@ -3,7 +3,7 @@ add_library(third_party INTERFACE)
 
 # Include libraries
 add_library(imgui INTERFACE)
-CPMAddPackage("gh:EclipseMenu/imgui#6cd1915")
+CPMAddPackage("gh:EclipseMenu/imgui#8cf1bfc")
 target_include_directories(imgui INTERFACE ${imgui_SOURCE_DIR})
 target_sources(imgui INTERFACE
     ${imgui_SOURCE_DIR}/imgui.cpp
@@ -20,11 +20,11 @@ if (NOT ANDROID AND NOT IOS)
     CPMAddPackage("gh:EclipseMenu/discord-presence#3b50b08")
 endif()
 
-CPMAddPackage("gh:matcool/gd-imgui-cocos#9764333")
-CPMAddPackage("gh:prevter/msgpack-for-matjson#16a7957")
+CPMAddPackage("gh:prevter/gd-imgui-cocos#23cb75c")
+CPMAddPackage("gh:prevter/msgpack-for-matjson#12edd5a")
 CPMAddPackage("gh:maxnut/GDR-converter#71104a9")
 CPMAddPackage("gh:EclipseMenu/rift@2.0.2")
-CPMAddPackage("gh:prevter/AdvancedLabel#7e0eff9")
+CPMAddPackage("gh:prevter/AdvancedLabel#17ed1c1")
 CPMAddPackage("gh:prevter/sinaps#7d2f7b1")
 
 if (WIN32)
