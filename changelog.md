@@ -1,5 +1,19 @@
 # Eclipse Menu
 
+## v1.9.0
+**Additions**:
+* Added <cg>Swift Click</c> on mobile (by @slideglide)
+
+**Fixes**:
+* <cg>Fixed</c> scroll layer incompatibility with <co>Better Touch Prio</c> mod (#356 by @km7dev)
+* <cg>Fixed</c> <co>Auto Song Download</c> not working
+* <cg>Fixed</c> several issues with <co>Slider Bypass</c> in editor (#361 by @alk)
+* <cg>Improved</c> precision of <co>Noclip Accuracy</c> (uses double-precision floating point now)
+* <cg>Fixed</c> readonly editor getting bypassed even without <co>Level Edit</c> enabled
+* <cg>Fixed</c> arrows keys typing 'a' in textboxes with <cl>ImGui</c> UI mode
+* <cg>Fixed</c> clipboard not working with <cl>ImGui</c> UI mode
+* <cg>Fixed</c> autoclicker and frame stepper on mobile (forces swift click when using them)
+
 ## v1.8.3
 **Fixes**:
 * <cg>Fixed</c> <co>Replay Bot</c> accuracy after 2.208 changes
@@ -44,7 +58,7 @@ This update adds **<cg>Geometry Dash v2.2081</c>** support
 * Increased max length of <co>Hitbox Trails</c>
 * Increased max TPS value
 
-** Fixes**:
+**Fixes**:
 * <cg>Fixed</c> a <co>Replay Bot</c> input check that could cause recording issues
 * <cg>Fixed</c> replay picker showing `.DS_Store` files on macOS (#292 by @XblazeGMD)
 * <cg>Fixed</c> multiple issues with <co>Discord RPC</c> not showing status
