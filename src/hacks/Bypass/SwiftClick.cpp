@@ -24,7 +24,7 @@ namespace eclipse::hacks::Bypass {
 
     class $modify(SwiftClickGJBGLHook, GJBaseGameLayer) {
         static void onModify(auto& self) {
-            constexpr std::array autotoggles = std::to_array<std::string_view>({
+            static constexpr std::array autotoggles = std::to_array<std::string_view>({
                 "bypass.swiftclick",
                 "player.autoclick",
                 "player.framestepper"
