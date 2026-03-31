@@ -1,5 +1,7 @@
 #include "Entities.hpp"
 
+#include <Geode/utils/general.hpp>
+
 #include <algorithm>
 #include <cctype>
 #include <numeric>
@@ -41,6 +43,31 @@ namespace eclipse::ai {
 
         end = pos;
         return true;
+    }
+
+    static std::string_view numberPrefix(std::string_view input) {
+        if (input.empty() || !std::isdigit(static_cast<uint8_t>(input.front()))) {
+            return {};
+        }
+
+        size_t end = 0;
+        while (end < input.size() && std::isdigit(static_cast<uint8_t>(input[end]))) {
+            ++end;
+        }
+
+        // include decimal part
+        if (end < input.size() && input[end] == '.') {
+            size_t fracStart = end + 1;
+            size_t fracEnd = fracStart;
+            while (fracEnd < input.size() && std::isdigit(static_cast<uint8_t>(input[fracEnd]))) {
+                ++fracEnd;
+            }
+            if (fracEnd > fracStart) {
+                end = fracEnd;
+            }
+        }
+
+        return input.substr(0, end);
     }
 
     static bool parseBinaryMath(std::string const& input, size_t start, size_t& end) {
@@ -231,13 +258,13 @@ namespace eclipse::ai {
             }
 
             auto raw = input.substr(i, end - i);
-            double val;
-            auto [ptr, ec] = std::from_chars(raw.data(), raw.data() + raw.size(), val);
-            if (ec != std::errc()) {
+            auto numericView = numberPrefix(raw);
+            auto parsed = geode::utils::numFromString<double>(numericView);
+            if (!parsed) {
                 i = end;
                 continue;
             }
-            out.push_back({ std::move(raw), val, 1.0f, EntityType::NUMBER });
+            out.push_back({ std::move(raw), parsed.unwrap(), 1.0f, EntityType::NUMBER });
             i = end;
         }
         return out;
