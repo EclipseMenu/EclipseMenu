@@ -2,6 +2,7 @@
 
 ## v1.9.0
 **Additions**:
+* Added <cg>Clipsy</c> - AI companion/chatbot
 * Added <cg>Swift Click</c> on mobile (by @slideglide)
 
 **Fixes**:

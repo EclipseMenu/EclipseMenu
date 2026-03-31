@@ -26,6 +26,7 @@ CPMAddPackage("gh:maxnut/GDR-converter#71104a9")
 CPMAddPackage("gh:EclipseMenu/rift@2.0.2")
 CPMAddPackage("gh:prevter/AdvancedLabel#17ed1c1")
 CPMAddPackage("gh:prevter/sinaps#7d2f7b1")
+CPMAddPackage("gh:prevter/rock#6a2d29e")
 
 if (WIN32)
     CPMAddPackage("gh:zyantific/zydis#ae12a09")
@@ -46,6 +47,7 @@ target_link_libraries(third_party INTERFACE
     rift
     advanced_label
     sinaps
+    rock
 )
 
 if (NOT ANDROID AND NOT IOS)

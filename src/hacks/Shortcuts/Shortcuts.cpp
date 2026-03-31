@@ -1,3 +1,4 @@
+#include <modules/chatbot/ui/ChatboxPopup.hpp>
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
 #include <modules/gui/components/button.hpp>
@@ -381,6 +382,17 @@ namespace eclipse::hacks::Shortcuts {
                 if (!gameLayer) return;
                 gameLayer->queueButton(1, evt.down, true, evt.timestamp);
             });
+
+            tab->addButton("shortcuts.clipsy")->setDescription()->callback([] {
+                auto scene = utils::get<cocos2d::CCScene>();
+                if (!scene) return;
+
+                if (!scene->getChildByType<ai::ChatboxPopup>(0)) {
+                    auto popup = ai::ChatboxPopup::create();
+                    if (!popup) return;
+                    popup->show();
+                }
+             })->handleKeybinds();
         }
 
         void lateInit() override {
