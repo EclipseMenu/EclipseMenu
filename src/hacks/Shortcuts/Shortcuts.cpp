@@ -353,6 +353,18 @@ namespace eclipse::hacks::Shortcuts {
                 if (isJumpKey(key)) config::set<keybinds::KeybindProps>("shortcut.p2jump", keybinds::Keys::None);
             });
             #endif
+
+            tab->addButton("shortcuts.clipsy")->setDescription()->callback([] {
+                auto scene = utils::get<cocos2d::CCScene>();
+                if (!scene) return;
+
+                if (!scene->getChildByType<ai::ChatboxPopup>(0)) {
+                    auto popup = ai::ChatboxPopup::create();
+                    if (!popup) return;
+                    popup->show();
+                }
+            })->handleKeybinds();
+
             tab->addButton("shortcuts.options")->setDescription()->callback(openSettings)->handleKeybinds();
             tab->addButton("shortcuts.uncomplete-level")->setDescription()->callback(uncompleteLevel)->handleKeybinds();
             tab->addButton("shortcuts.restart-level")->setDescription()->callback(restartLevel)->handleKeybinds();
@@ -382,17 +394,6 @@ namespace eclipse::hacks::Shortcuts {
                 if (!gameLayer) return;
                 gameLayer->queueButton(1, evt.down, true, evt.timestamp);
             });
-
-            tab->addButton("shortcuts.clipsy")->setDescription()->callback([] {
-                auto scene = utils::get<cocos2d::CCScene>();
-                if (!scene) return;
-
-                if (!scene->getChildByType<ai::ChatboxPopup>(0)) {
-                    auto popup = ai::ChatboxPopup::create();
-                    if (!popup) return;
-                    popup->show();
-                }
-             })->handleKeybinds();
         }
 
         void lateInit() override {
