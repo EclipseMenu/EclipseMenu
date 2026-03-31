@@ -4,6 +4,8 @@
 **Additions**:
 * Added <cg>Clipsy</c> - AI companion/chatbot
 * Added <cg>Swift Click</c> on mobile (by @slideglide)
+* Added <cg>28 new emojis</c> for labels
+* Added <cg>VSync</c> and <cg>FPS Bypass</c> toggles on <cl>macOS</c> (requires SDL Mod to be installed)
 
 **Fixes**:
 * <cg>Fixed</c> scroll layer incompatibility with <co>Better Touch Prio</c> mod (#356 by @km7dev)
