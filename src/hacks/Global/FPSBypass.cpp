@@ -87,7 +87,7 @@ namespace eclipse::hacks::Global {
             config::set("global.fpsbypass", static_cast<float>(fpsBypassValue));
             config::set("global.fpsbypass.toggle", fpsBypassEnabled);
 
-            geode::listenForSettingChanges<bool>("uncap-framerate", [](bool enabled) {
+            geode::listenForSettingChanges<bool>("uncap-framerate", [sdl](bool enabled) {
                 config::set("global.fpsbypass.toggle", enabled);
                 if (enabled) {
                     config::setTemp("global.vsync", false);
