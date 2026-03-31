@@ -124,6 +124,35 @@ namespace eclipse::labels {
         m_variables["crownEmoji"] = "👑";
         m_variables["prayEmoji"] = "🙏";
 
+        m_variables["thinkingEmoji"] = "🤔";
+        m_variables["gearEmoji"] = "⚙️";
+        m_variables["muteEmoji"] = "🔇";
+        m_variables["pensiveEmoji"] = "😔";
+        m_variables["sweatSmileEmoji"] = "😅";
+        m_variables["muscleEmoji"] = "💪";
+        m_variables["rocketEmoji"] = "🚀";
+        m_variables["blushEmoji"] = "😊";
+        m_variables["raisedHandsEmoji"] = "🙌";
+        m_variables["smirkEmoji"] = "😏";
+        m_variables["vEmoji"] = "✌️";
+        m_variables["smileEmoji"] = "😄";
+        m_variables["relievedEmoji"] = "😌";
+        m_variables["blueHeartEmoji"] = "💙";
+        m_variables["sleepingEmoji"] = "😴";
+        m_variables["waveEmoji"] = "👋";
+        m_variables["cryEmoji"] = "😢";
+        m_variables["oceanEmoji"] = "🌊";
+        m_variables["triumphEmoji"] = "😤";
+        m_variables["grimacingEmoji"] = "😬";
+        m_variables["confusedEmoji"] = "😕";
+        m_variables["dartEmoji"] = "🎯";
+        m_variables["earEmoji"] = "👂";
+        m_variables["thoughtEmoji"] = "💭";
+        m_variables["eyesEmoji"] = "👀";
+        m_variables["bulbEmoji"] = "💡";
+        m_variables["videoGameEmoji"] = "🎮";
+        m_variables["nailsEmoji"] = "💅";
+
         // special emojis
         m_variables["emojis"] = rift::Object{
             {"userCoin", rift::Array{"🛞", "🔵"}},

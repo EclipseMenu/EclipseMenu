@@ -66,6 +66,14 @@ namespace eclipse::gui::cocos {
         U"🐷"_emoji, U"🌚"_emoji, U"🌞"_emoji, U"🌝"_emoji, U"🐵"_emoji,
         U"🙈"_emoji, U"🙉"_emoji, U"🙊"_emoji, U"👑"_emoji, U"🙏"_emoji,
         U"❓"_emoji, U"😎"_emoji, U"😍"_emoji,
+
+        U"🤔"_emoji, U"⚙️"_emoji, U"🔇"_emoji, U"😔"_emoji, U"😅"_emoji,
+        U"💪"_emoji, U"🚀"_emoji, U"😊"_emoji, U"🙌"_emoji, U"😏"_emoji,
+        U"✌️"_emoji, U"😄"_emoji, U"😌"_emoji, U"💙"_emoji, U"😴"_emoji,
+        U"👋"_emoji, U"😢"_emoji, U"🌊"_emoji, U"😤"_emoji, U"😬"_emoji,
+        U"😕"_emoji, U"🎯"_emoji, U"👂"_emoji, U"💭"_emoji, U"👀"_emoji,
+        U"💡"_emoji, U"🎮"_emoji, U"💅"_emoji,
+
         U"🇦"_emoji, U"🇧"_emoji, U"🇨"_emoji, U"🇩"_emoji,
         U"🇪"_emoji, U"🇫"_emoji, U"🇬"_emoji, U"🇭"_emoji,
         U"🇮"_emoji, U"🇯"_emoji, U"🇰"_emoji, U"🇱"_emoji,
