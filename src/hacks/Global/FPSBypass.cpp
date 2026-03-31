@@ -37,7 +37,7 @@ namespace eclipse::hacks::Global {
             bool fpsBypassEnabled = config::get<bool>("global.fpsbypass.toggle", false);
             auto fpsBypassValue = config::get<float>("global.fpsbypass", static_cast<float>(sdl->getSettingValue<int64_t>("framerate-limit")));
             int actualFPS = static_cast<int>(std::clamp(fpsBypassValue, MIN_FPS, MAX_FPS)); // sometimes the value can be 0
-            sdl->setSettingValue("uncap-framerate", fpsBypassEnabled);
+            sdl->setSettingValue("uncap-framerate", !fpsBypassEnabled);
             sdl->setSettingValue("framerate-limit", actualFPS);
         }
         #endif
@@ -81,18 +81,14 @@ namespace eclipse::hacks::Global {
             auto sdl = geode::Loader::get()->getInstalledMod("zmx.sdl");
             if (!sdl || !sdl->isLoaded()) return;
 
-            auto fpsBypassEnabled = sdl->getSettingValue<bool>("uncap-framerate");
+            auto fpsBypassEnabled = !sdl->getSettingValue<bool>("uncap-framerate");
             auto fpsBypassValue = sdl->getSettingValue<int64_t>("framerate-limit");
 
             config::set("global.fpsbypass", static_cast<float>(fpsBypassValue));
             config::set("global.fpsbypass.toggle", fpsBypassEnabled);
 
             geode::listenForSettingChanges<bool>("uncap-framerate", [sdl](bool enabled) {
-                config::set("global.fpsbypass.toggle", enabled);
-                if (enabled) {
-                    config::setTemp("global.vsync", false);
-                    sdl->setSettingValue("disable-vsync", true);
-                }
+                config::set("global.fpsbypass.toggle", !enabled);
             }, sdl);
             geode::listenForSettingChanges<int64_t>("framerate-limit", [](int64_t value) {
                 config::set("global.fpsbypass", static_cast<float>(value));
