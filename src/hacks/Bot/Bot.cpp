@@ -347,15 +347,6 @@ namespace eclipse::hacks::Bot {
 
             PlayLayer::loadFromCheckpoint(checkpoint);
         }
-
-        // fix for follow player y bug. seems sketchy but have no other ideas
-        void saveDynamicSaveObjects(gd::vector<SavedObjectStateRef>& dynamicObjects) {
-            PlayLayer::saveDynamicSaveObjects(dynamicObjects);
-            for(auto& obj : dynamicObjects) {
-                obj.m_positionX = obj.m_gameObject->getPositionX();
-                obj.m_positionY = obj.m_gameObject->getPositionY();
-            }
-        }
     };
 
     class $modify(BotPlayerHook, PlayerObject) {
@@ -371,13 +362,13 @@ namespace eclipse::hacks::Bot {
                 it->second->setAutoEnable(value == (int)bot::State::RECORD);
                 it->second->setPriority(SAFE_HOOK_PRIORITY);
                 hookPtr = it->second.get();
-                config::addDelegate("bot.state", [hookPtr] {
-                    int value = config::get("bot.state", 0);
-                    (void) hookPtr->toggle(value == (int)bot::State::RECORD);
-                });
             } else {
                 geode::log::warn("Hook 'tryPlaceCheckpoint' not found in class 'PlayerObject'");
             }
+            config::addDelegate("bot.state", [hookPtr] {
+                int value = config::get("bot.state", 0);
+                (void) hookPtr->toggle(value == (int)bot::State::RECORD);
+            });
         }
 
         void tryPlaceCheckpoint() {
