@@ -1,7 +1,6 @@
 #include "theme.hpp"
 
 #include <imgui-cocos.hpp>
-#include <imgui_internal.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <modules/config/config.hpp>
 #include <modules/gui/gui.hpp>
@@ -148,6 +147,13 @@ namespace eclipse::gui::imgui {
 
         ImGui::GetIO().FontGlobalScale = tm->getGlobalScale() * INV_DEFAULT_SCALE;
 
+        style = ImGuiStyle();
+        ImGui::StyleColorsDark(&style);
+
+        style.WindowMenuButtonPosition = ImGuiDir_Left;
+        style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
+        style.DisplaySafeAreaPadding = ImVec2(0, 0);
+
         // Sizes
         style.WindowPadding = ImVec2(tm->getWindowPadding(), tm->getWindowPadding());
         style.WindowRounding = tm->getWindowRounding();
@@ -211,8 +217,6 @@ namespace eclipse::gui::imgui {
     }
 
     void Theme::visitToggle(ToggleComponent* toggle) const {
-        auto tm = ThemeManager::get();
-
         bool toggled = false;
         bool value = toggle->getValue();
         auto title = i18n::get_(toggle->getTitle());
@@ -405,7 +409,6 @@ namespace eclipse::gui::imgui {
     void Theme::visitIntToggle(IntToggleComponent* intToggle) const {
         auto value = intToggle->getValue();
         auto state = intToggle->getState();
-        auto tm = ThemeManager::get();
         auto title = i18n::get_(intToggle->getTitle());
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
@@ -431,7 +434,6 @@ namespace eclipse::gui::imgui {
     void Theme::visitFloatToggle(FloatToggleComponent* floatToggle) const {
         auto value = floatToggle->getValue();
         auto state = floatToggle->getState();
-        auto tm = ThemeManager::get();
         auto title = i18n::get_(floatToggle->getTitle());
 
         ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
