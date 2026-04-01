@@ -1,5 +1,10 @@
 # Eclipse Menu
 
+## v1.9.1
+**Fixes**:
+* <cg>Fixed</c> physics breaks on levels with dynamic objects
+* <cg>Fixed</c> graphical glitches happening in <cl>ImGui</c> mode for some users
+
 ## v1.9.0
 **Additions**:
 * Added <cg>Clipsy</c> - AI companion/chatbot
