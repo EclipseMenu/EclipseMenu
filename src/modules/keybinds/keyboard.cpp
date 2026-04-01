@@ -182,7 +182,7 @@ namespace eclipse::keybinds {
                     break;
             }
             return ListenerResult::Propagate;
-        }).leak();
+        }, -1).leak();
 
         MouseInputEvent().listen([](MouseInputData& event) {
             if (event.button != MouseInputData::Button::Left && gui::Engine::getRendererType() == gui::RendererType::ImGui) {
