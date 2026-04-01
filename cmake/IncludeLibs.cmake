@@ -20,7 +20,7 @@ if (NOT ANDROID AND NOT IOS)
     CPMAddPackage("gh:EclipseMenu/discord-presence#3b50b08")
 endif()
 
-CPMAddPackage("gh:prevter/gd-imgui-cocos#8044cf0")
+CPMAddPackage("gh:prevter/gd-imgui-cocos#e66d02b")
 CPMAddPackage("gh:prevter/msgpack-for-matjson#12edd5a")
 CPMAddPackage("gh:maxnut/GDR-converter#71104a9")
 CPMAddPackage("gh:EclipseMenu/rift@2.0.2")
