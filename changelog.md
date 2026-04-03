@@ -1,5 +1,9 @@
 # Eclipse Menu
 
+## v1.9.2
+**Fixes**:
+* <cg>Fixed</c> multiple keybinds regressions
+
 ## v1.9.1
 **Fixes**:
 * <cg>Fixed</c> physics breaks on levels with dynamic objects
