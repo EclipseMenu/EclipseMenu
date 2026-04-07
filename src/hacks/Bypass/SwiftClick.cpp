@@ -1,9 +1,10 @@
+#ifdef GEODE_IS_MOBILE
+
 #include <modules/config/config.hpp>
+#include <modules/bot/bot.hpp>
 #include <modules/gui/gui.hpp>
 #include <modules/gui/components/toggle.hpp>
 #include <modules/hack/hack.hpp>
-
-#ifdef GEODE_IS_MOBILE
 
 #include <Geode/modify/GJBaseGameLayer.hpp>
 
@@ -33,13 +34,19 @@ namespace eclipse::hacks::Bypass {
             auto hook = self.getHook("GJBaseGameLayer::handleButton").unwrapOrDefault();
             if (!hook) return;
 
-            for (auto toggle : autotoggles) {
-                config::addDelegate(toggle, [hook] {
-                    (void) hook->toggle(std::ranges::any_of(autotoggles, [](auto toggle) {
-                        return config::get<bool>(toggle, false);
-                    }));
+            auto evaluate = [hook]() {
+                bool enabled = std::ranges::any_of(autotoggles, [](auto toggle) {
+                    return config::get<bool>(toggle, false);
                 });
-            }
+
+                int botState = config::get("bot.state", 0);
+                enabled = enabled || (botState != (int)bot::State::DISABLED);
+
+                (void)hook->toggle(enabled);
+            };
+
+            for (auto toggle : autotoggles) config::addDelegate(toggle, evaluate);
+            config::addDelegate("bot.state", evaluate);
         }
 
         void handleButton(bool down, int button, bool isPlayer1) {

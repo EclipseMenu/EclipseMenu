@@ -463,6 +463,7 @@ namespace eclipse::hacks::Bot {
             auto progress = m_gameState.m_currentProgress / 2;
 
             while ((input = s_bot.poll(progress)) != std::nullopt) {
+                m_allowedButtons.clear();
                 this->simulateClick((PlayerButton) input->button, input->down, input->player2);
             }
         }
