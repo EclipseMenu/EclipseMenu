@@ -347,6 +347,24 @@ namespace eclipse::hacks::Bot {
 
             PlayLayer::loadFromCheckpoint(checkpoint);
         }
+
+        void pauseGame(bool unfocused) {
+            PlayLayer::pauseGame(unfocused);
+            if (s_bot.getState() != bot::State::RECORD)
+                return;
+
+            // here robtop calls releaseAllButtons on player1 twice. i'm assuming this is a bug and will be fixed in the next versions.
+            // if that's the case, then add this for player2 as well.
+            bool swapControls = GameManager::get()->getGameVariable(GameVar::Flip2PlayerControls);
+            for(int button = 1; button <= 3; button++) {
+                s_bot.recordInput(
+                    // + 1 because while the input happens on this frame, it will only get processed on the next frame
+                    // because of pausing. since we don't pause on playback simulate this by adding one frame
+                    (m_gameState.m_currentProgress / 2) + 1,
+                    (PlayerButton)button, swapControls, false
+                );
+            }
+        }
     };
 
     class $modify(BotPlayerHook, PlayerObject) {
@@ -427,7 +445,7 @@ namespace eclipse::hacks::Bot {
             player2 = swapControls ? !player2 : player2;
 
             // in two player mode, only one player should be controlled
-            if (m_levelSettings->m_twoPlayerMode && m_gameState.m_isDualMode) {
+            if (m_levelSettings->m_twoPlayerMode) {
                 PlayerObject* player = player2 ? m_player2 : m_player1;
                 (player->*performButton)(button);
             } else {
