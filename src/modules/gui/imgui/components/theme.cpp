@@ -582,6 +582,7 @@ namespace eclipse::gui::imgui {
                 listenerRegistered = true;
                 keybinds::Manager::get()->registerGlobalListener([](keybinds::KeyEvent event) {
                     if (activeKeybindId.empty()) return false;
+                    if (event.props.key == keybinds::Keys::MouseLeft) return false; // ignore mouse clicks
                     if (!event.down) {
                         releasedKey = event.props;
                     }
