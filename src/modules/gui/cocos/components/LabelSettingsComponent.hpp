@@ -22,7 +22,6 @@ namespace eclipse::gui::cocos {
 
             this->setID(fmt::format("setting-{}"_spr, m_component->getId()));
             this->setContentSize({width, height});
-            this->setTouchMode(cocos2d::kCCTouchesOneByOne);
 
             auto bg = geode::NineSlice::create("square02b_001.png");
             bg->setScale(0.5f);
