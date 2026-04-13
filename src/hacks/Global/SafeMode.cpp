@@ -45,8 +45,17 @@ namespace eclipse::hacks::Global {
             });
         }
 
+        static bool amionstartpos() {
+            auto* playLayer = utils::get<PlayLayer>();
+            if (!playLayer) return false;
+            return playLayer->m_isTestMode;
+        }
+
         static bool shouldEnable() {
             if (!config::get<bool>("global.autosafemode", false))
+                return false;
+
+            if (amionstartpos())
                 return false;
 
             return s_trippedLastAttempt || hasCheats();
