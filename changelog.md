@@ -1,5 +1,17 @@
 # Eclipse Menu
 
+## v1.9.3
+**Fixes**:
+* <cg>Fixed</c> <co>Swift Click</c> not working in bot replay mode
+* <cg>Fixed</c> a pause related bug in <co>Replay Bot</c>
+* <cg>Fixed</c> a two player mode bug in <co>Replay Bot</c>
+* <cg>Fixed</c> replay saving bug if macro contains multiple actions in the same frame
+* <cg>Re-enabled</c> <cy>Globed</c> label variables (player count is currently unavailable and requires a Globed update)
+* <cr>Removed</c> ability to bind keys to <cl>Left Mouse Button</c> due to having more issues than benefits
+* <cg>Fixed</c> text in the <co>Auto Safe Mode</c> warning popup not being centered
+* <cg>Fixed</c> <co>Auto Safe Mode</c> warning popup showing on "Coming Soon" and "The Tower" pages
+* <cg>Fixed</c> a crash that happens with <cl>Cocos UI</c> if you press any button and close button at the same time
+
 ## v1.9.2
 **Fixes**:
 * <cg>Fixed</c> multiple keybinds regressions
