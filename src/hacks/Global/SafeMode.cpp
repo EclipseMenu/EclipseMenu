@@ -113,7 +113,7 @@ namespace eclipse::hacks::Global {
             tab->addToggle("global.autosafemode")->handleKeybinds()->setDescription()->addOptions([](auto options) {
                 options->addToggle("global.autosafemode.warn-popup")->setDescription();
                 options->addToggle("Disable on StartPos", "global.autosafemode.disable-on-startpos")
-                    ->setDescription("Disables safe mode when you are playing from a start position --miskaa");
+                    ->setDescription("Disables safe mode when you are playing from a start position\n(Created by miskaa)");
             });
         }
 
