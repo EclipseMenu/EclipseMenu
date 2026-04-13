@@ -22,6 +22,8 @@ namespace eclipse::gui::cocos {
         m_closeBtn->setPosition(20.f, winSize.height - 20.f);
         m_bgSprite->removeMeAndCleanup();
 
+        m_buttonMenu->setTouchMode(cocos2d::kCCTouchesOneByOne);
+
         // The behind background for the entire popup to get the outline
         auto bgBehind = geode::NineSlice::create("square02b_001.png");
         bgBehind->setContentSize(m_mainLayer->getContentSize() * std::clamp(tm->getBorderSize(), 0.F, 1.F));

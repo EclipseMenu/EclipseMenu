@@ -78,6 +78,7 @@ namespace eclipse::gui::cocos {
         if (!CCMenu::init()) return false;
         auto const tm = ThemeManager::get();
         this->setID("tab-menu"_spr);
+        this->setTouchMode(cocos2d::kCCTouchesOneByOne);
 
         m_callback = std::move(callback);
 
