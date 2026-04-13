@@ -379,14 +379,14 @@ namespace eclipse::hacks::Global {
         return true;
     }
 
-#define DEFINE_WARN_HOOK(name, cls)                \
+#define DEFINE_WARN_HOOK(name, cls, ...)           \
     class $modify(name, cls) {                     \
         ENABLE_FIRST_HOOKS_ALL()                   \
         struct Fields {                            \
             bool m_shownCheatWarn = false;         \
         };                                         \
         void onPlay(CCObject* sender) {            \
-            if (!m_fields->m_shownCheatWarn) {     \
+            if (!m_fields->m_shownCheatWarn __VA_ARGS__) { \
                 m_fields->m_shownCheatWarn = true; \
                 if (showCheatWarn()) return;       \
             }                                      \
@@ -394,7 +394,7 @@ namespace eclipse::hacks::Global {
         }                                          \
     }
 
-    DEFINE_WARN_HOOK(CheatsEnabledWarnLPHook, LevelPage);
+    DEFINE_WARN_HOOK(CheatsEnabledWarnLPHook, LevelPage, && m_level->m_levelID >= 0);
     DEFINE_WARN_HOOK(CheatsEnabledWarnELLHook, EditLevelLayer);
     DEFINE_WARN_HOOK(CheatsEnabledWarnLILHook, LevelInfoLayer);
 }
