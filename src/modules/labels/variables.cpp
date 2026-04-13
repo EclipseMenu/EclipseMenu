@@ -606,7 +606,7 @@ namespace eclipse::labels {
     void VariableManager::fetchGameplayData(GJBaseGameLayer* gameLayer) {
         if (!gameLayer) {
             // Reset all gameplay variables
-            constexpr std::array keys = {
+            static constexpr std::array keys = {
                 "attempt", "isTestMode", "isPracticeMode", "isPlatformer",
                 "levelTime", "levelLength", "levelDuration", "time", "frame",
                 "isDead", "isDualMode", "noclipDeaths", "noclipAccuracy", "progress",

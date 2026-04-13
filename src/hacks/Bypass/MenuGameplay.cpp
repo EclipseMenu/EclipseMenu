@@ -26,12 +26,11 @@ namespace eclipse::hacks::Bypass {
         void update(float dt) override {
             // Spider crashes the game
             if (m_playerObject && !m_playerObject->m_isSpider) {
-                constexpr std::array keys = {
+                for (auto key : {
                     keybinds::Keys::Up,
                     keybinds::Keys::W,
                     keybinds::Keys::MouseLeft
-                };
-                for (auto key : keys) {
+                }) {
                     if (keybinds::isKeyPressed(key)) {
                         m_playerObject->pushButton(PlayerButton::Jump);
                     } else if (keybinds::isKeyReleased(key)) {

@@ -99,7 +99,7 @@ namespace eclipse::utils {
     }
 
     std::string_view getMonthName(int month) {
-        constexpr std::array months = std::to_array<std::string_view>({
+        static constexpr std::array months = std::to_array<std::string_view>({
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         });
