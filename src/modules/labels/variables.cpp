@@ -16,7 +16,7 @@
 
 #include <rift/config.hpp>
 
-// #include <dankmeme.globed2/include/globed.hpp>
+#include <dankmeme.globed2/include/globed/soft-link/Wrappers.hpp>
 
 namespace eclipse::labels {
     static std::vector<EffectGameObject*> s_coins;
@@ -705,20 +705,23 @@ namespace eclipse::labels {
         auto enabled = geode::Loader::get()->isModLoaded("dankmeme.globed2");
         globed[std::string("enabled")] = enabled;
 
-        // if (enabled) {
-        //     // net
-        //     globed[std::string("isConnected")] = globed::net::isConnected().unwrapOrDefault();
-        //     globed[std::string("ping")] = (int64_t)globed::net::getPing().unwrapOrDefault();
-        //     globed[std::string("tps")] = (int64_t)globed::net::getServerTps().unwrapOrDefault();
-        //
-        //     // suggestion for daniel meme to add:
-        //     // serverName
-        //     // roomName
-        //     // roomId
-        //     // other room things
-        //     globed[std::string("playersOnline")] = (int64_t)globed::player::playersOnline().unwrapOrDefault();
-        //     globed[std::string("playersOnLevel")] = (int64_t)globed::player::playersOnLevel().unwrapOrDefault();
-        // }
+        if (enabled) {
+            // net
+            globed[std::string("isConnected")] = globed::api::net::isConnected();
+            globed[std::string("ping")] = (int64_t)globed::api::net::getGamePingMs();
+            globed[std::string("centralPing")] = (int64_t)globed::api::net::getCentralPingMs();
+            globed[std::string("tps")] = (int64_t)globed::api::net::getGameTickrate();
+
+            // suggestion for daniel meme to add:
+            // serverName
+            // roomName
+            // roomId
+            // other room things
+
+            // these are missing now :(
+            // globed[std::string("playersOnline")] = (int64_t)globed::api::player::playersOnline();
+            // globed[std::string("playersOnLevel")] = (int64_t)globed::api::player::playersOnLevel();
+        }
     }
 
     void VariableManager::refetch() {
