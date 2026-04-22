@@ -324,8 +324,10 @@ namespace eclipse::hacks::Global {
             );
         }
 
-        popup->m_scrollingLayer->m_contentLayer->setPositionY(0.f);
-        popup->show();
+        if (popup->m_scrollingLayer) {
+            popup->m_scrollingLayer->m_contentLayer->setPositionY(0.f);
+        }
+	    popup->show();
 
         return true;
     }
@@ -373,7 +375,9 @@ namespace eclipse::hacks::Global {
             nullptr, 400, true, 0, 1
         );
 
-        popup->m_scrollingLayer->m_contentLayer->setPositionY(0.f);
+        if (popup->m_scrollingLayer) {
+            popup->m_scrollingLayer->m_contentLayer->setPositionY(0.f);
+        }
         popup->show();
 
         return true;
