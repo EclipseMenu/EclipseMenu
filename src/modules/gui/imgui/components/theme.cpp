@@ -311,7 +311,7 @@ namespace eclipse::gui::imgui {
             ImGui::InputText("##search", combo->getSearchBuffer());
             for (int n = 0; n < items.size(); n++) {
                 std::string option = geode::utils::string::pathToString(items[n].filename().stem());
-                if(option.find(*combo->getSearchBuffer()) != std::string::npos) {
+                if(geode::utils::string::toLower(option).find(geode::utils::string::toLower(*combo->getSearchBuffer())) != std::string::npos) {
                     bool const is_selected = (value == items[n]);
                     if (ImGui::Selectable(option.c_str(), is_selected)) {
                         combo->setValue(n);
