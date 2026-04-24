@@ -718,9 +718,8 @@ namespace eclipse::labels {
             // roomId
             // other room things
 
-            // these are missing now :(
             // globed[std::string("playersOnline")] = (int64_t)globed::api::player::playersOnline();
-            // globed[std::string("playersOnLevel")] = (int64_t)globed::api::player::playersOnLevel();
+            globed[std::string("playersOnLevel")] = (int64_t)globed::api::game::getPlayerCount();
         }
     }
 
