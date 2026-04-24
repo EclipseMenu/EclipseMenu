@@ -1,5 +1,11 @@
 # Eclipse Menu
 
+## v1.9.4
+**Fixes**:
+* <cg>Fixed</c> an incompatibility with <cl>Deltarune Textboxes</c> that caused crashes on level launch
+* <cg>Fixed</c> replay search bar not being <cl>case-insensitive</c>
+* <cg>Re-added</c> `globed.playersOnLevel` variable
+
 ## v1.9.3
 **Fixes**:
 * <cg>Fixed</c> <co>Swift Click</c> not working in bot replay mode
