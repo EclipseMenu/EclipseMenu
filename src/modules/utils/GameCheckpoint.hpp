@@ -211,7 +211,7 @@ namespace eclipse::utils {
             m_maybeReverseAcceleration = player->m_maybeReverseAcceleration;
             m_xVelocityRelated2 = player->m_xVelocityRelated2;
             m_isDashing = player->m_isDashing;
-            m_unk9e8 = player->m_unk9e8;
+            m_dashFireFrame = player->m_dashFireFrame;
             m_groundObjectMaterial = player->m_groundObjectMaterial;
             m_vehicleSize = player->m_vehicleSize;
             m_playerSpeed = player->m_playerSpeed;
@@ -483,7 +483,7 @@ namespace eclipse::utils {
             player->m_maybeReverseAcceleration = m_maybeReverseAcceleration;
             player->m_xVelocityRelated2 = m_xVelocityRelated2;
             player->m_isDashing = m_isDashing;
-            player->m_unk9e8 = m_unk9e8;
+            player->m_dashFireFrame = m_dashFireFrame;
             player->m_groundObjectMaterial = m_groundObjectMaterial;
             player->m_vehicleSize = m_vehicleSize;
             player->m_playerSpeed = m_playerSpeed;
@@ -756,7 +756,7 @@ namespace eclipse::utils {
         double m_maybeReverseAcceleration;
         float m_xVelocityRelated2;
         bool m_isDashing;
-        int m_unk9e8;
+        int m_dashFireFrame;
         int m_groundObjectMaterial;
         float m_vehicleSize;
         float m_playerSpeed;
