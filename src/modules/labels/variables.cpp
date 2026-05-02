@@ -590,12 +590,25 @@ namespace eclipse::labels {
             return;
         }
 
+		// position
         m_variables[isPlayer2 ? "player2X" : "playerX"] = player->m_position.x;
         m_variables[isPlayer2 ? "player2Y" : "playerY"] = player->m_position.y;
 
-        m_variables[isPlayer2 ? "player2XVelocity" : "playerXVelocity"] = player->m_isPlatformer ? player->m_platformerXVelocity : player->m_playerSpeed;
-        m_variables[isPlayer2 ? "player2YVelocity" : "playerYVelocity"] = player->m_yVelocity;
+		// velocity
+		double velX = player->m_playerSpeed * player->m_speedMultiplier * 2.0;
+        m_variables[isPlayer2 ? "player2XVelocity" : "playerXVelocity"] = velX;
 
+		double velY = player->m_yVelocity * 1.8;
+		if (player->m_isDashing) {
+			velY = player->m_dashY * velX;
+		} else if (player->m_isDart) {
+			velY = (player->m_jumpBuffered ? 1.0 : -1.0) * velX;
+			if (player->m_vehicleSize != 1.0f) velY *= 2.0;
+		}
+
+        m_variables[isPlayer2 ? "player2YVelocity" : "playerYVelocity"] = velY;
+
+		// gamemode
         if (!isPlayer2) {
             auto gamemode = utils::getGameMode(player);
             m_variables["gamemode"] = utils::gameModeName(gamemode);
