@@ -87,11 +87,15 @@ namespace eclipse::Hacks::Level {
         };
 
         void resetLevel() {
-            bool hadCheckpoints = m_checkpointArray->count() > 0;
+            if (!PracticeFix::shouldEnable()) {
+                m_fields->m_checkpoints.clear();
+                brokenPracticeObjects().clear();
 
-            bool shouldRestoreHeldButtons =
-                PracticeFix::shouldEnable() &&
-                hadCheckpoints;
+                PlayLayer::resetLevel();
+                return;
+            }
+
+            bool hadCheckpoints = m_checkpointArray->count() > 0;
 
             bool p1Holding = false;
             bool p2Holding = false;
@@ -102,7 +106,7 @@ namespace eclipse::Hacks::Level {
             bool p2Left = false;
             bool p2Right = false;
 
-            if (shouldRestoreHeldButtons && m_uiLayer) {
+            if (m_uiLayer) {
                 p1Holding = m_uiLayer->m_p1Jumping || m_uiLayer->m_p1TouchId != -1;
                 p2Holding = m_uiLayer->m_p2Jumping || m_uiLayer->m_p2TouchId != -1;
 
@@ -131,33 +135,31 @@ namespace eclipse::Hacks::Level {
                     m_queuedButtons.pop_back();
             }
 
-            if (shouldRestoreHeldButtons) {
-                auto queueIfChanged = [this](int button, bool down, bool player2) {
-                    auto* player = player2 ? m_player2 : m_player1;
+            auto queueIfChanged = [this](int button, bool down, bool player2) {
+                auto* player = player2 ? m_player2 : m_player1;
 
-                    if (!player)
-                        return;
+                if (!player)
+                    return;
 
-                    if (player->m_holdingButtons[button] == down)
-                        return;
+                if (player->m_holdingButtons[button] == down)
+                    return;
 
-                    this->queueButton(button, down, player2, 0.0);
-                };
+                this->queueButton(button, down, player2, 0.0);
+            };
 
-                queueIfChanged(1, p1Holding, false);
+            queueIfChanged(1, p1Holding, false);
+
+            if (m_isPlatformer) {
+                queueIfChanged(2, p1Left, false);
+                queueIfChanged(3, p1Right, false);
+            }
+
+            if (m_gameState.m_isDualMode && m_levelSettings->m_twoPlayerMode) {
+                queueIfChanged(1, p2Holding, true);
 
                 if (m_isPlatformer) {
-                    queueIfChanged(2, p1Left, false);
-                    queueIfChanged(3, p1Right, false);
-                }
-
-                if (m_gameState.m_isDualMode && m_levelSettings->m_twoPlayerMode) {
-                    queueIfChanged(1, p2Holding, true);
-
-                    if (m_isPlatformer) {
-                        queueIfChanged(2, p2Left, true);
-                        queueIfChanged(3, p2Right, true);
-                    }
+                    queueIfChanged(2, p2Left, true);
+                    queueIfChanged(3, p2Right, true);
                 }
             }
         }
@@ -249,8 +251,9 @@ namespace eclipse::Hacks::Level {
 
     class $modify(FixGJBaseGameLayer, GJBaseGameLayer) {
         void destroyObject(GameObject* obj) {
-            if (PracticeFix::shouldEnable() && m_isPracticeMode)
+            if (PracticeFix::shouldEnable() && m_isPracticeMode) {
                 brokenPracticeObjects().push_back(obj);
+            }
 
             GJBaseGameLayer::destroyObject(obj);
         }
@@ -258,7 +261,12 @@ namespace eclipse::Hacks::Level {
 
     class $modify(FixPlayerObject, PlayerObject) {
         void releaseAllButtons() {
-            auto* pl = PlayLayer::get();
+            if (!PracticeFix::shouldEnable()) {
+                PlayerObject::releaseAllButtons();
+                return;
+            }
+
+            auto* pl = utils::get<PlayLayer>();
 
             if (!pl) {
                 PlayerObject::releaseAllButtons();
@@ -301,7 +309,14 @@ namespace eclipse::Hacks::Level {
                 PracticeFix::shouldEnable() &&
                 down &&
                 key == enumKeyCodes::KEY_R &&
-                pl->m_checkpointArray->count() > 0;
+                pl->m_isPracticeMode &&
+                pl->m_checkpointArray->count() > 0 &&
+                (
+                    m_p1Jumping ||
+                    m_p2Jumping ||
+                    m_p1TouchId != -1 ||
+                    m_p2TouchId != -1
+                );
 
             bool p1Jumping = m_p1Jumping;
             bool p2Jumping = m_p2Jumping;
@@ -311,13 +326,14 @@ namespace eclipse::Hacks::Level {
 
             UILayer::handleKeypress(key, down, timestamp);
 
-            if (shouldPreserve) {
-                m_p1Jumping = p1Jumping;
-                m_p2Jumping = p2Jumping;
+            if (!shouldPreserve)
+                return;
 
-                m_p1TouchId = p1TouchId;
-                m_p2TouchId = p2TouchId;
-            }
+            m_p1Jumping = p1Jumping;
+            m_p2Jumping = p2Jumping;
+
+            m_p1TouchId = p1TouchId;
+            m_p2TouchId = p2TouchId;
         }
     };
 }
