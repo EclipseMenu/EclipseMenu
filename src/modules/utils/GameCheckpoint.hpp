@@ -27,7 +27,7 @@ namespace eclipse::utils {
 
         void apply(PlayLayer* playLayer) {
             //GJBaseGameLayer
-         
+
             playLayer->m_player1CollisionBlock = m_player1CollisionBlock;
             playLayer->m_player2CollisionBlock = m_player2CollisionBlock;
             playLayer->m_extraDelta = m_extraDelta;
@@ -176,7 +176,7 @@ namespace eclipse::utils {
             m_hasCustomGlowColor = player->m_hasCustomGlowColor>m_hasCustomGlowColor;
             m_glowColor = player->m_glowColor;
             m_maybeIsColliding = player->m_maybeIsColliding;
-            // m_jumpBuffered = player->m_jumpBuffered; (breaking)
+            m_jumpBuffered = player->m_jumpBuffered;
             m_stateRingJump = player->m_stateRingJump;
             m_wasJumpBuffered = player->m_wasJumpBuffered;
             m_wasRobotJump = player->m_wasRobotJump;
@@ -287,7 +287,7 @@ namespace eclipse::utils {
             m_somethingPlayerSpeedTime = player->m_somethingPlayerSpeedTime;
             m_playerSpeedAC = player->m_playerSpeedAC;
             m_fixRobotJump = player->m_fixRobotJump;
-            // m_holdingButtons = player->m_holdingButtons; // map<int, bool>
+            m_holdingButtons = player->m_holdingButtons; // map<int, bool>
             m_inputsLocked = player->m_inputsLocked;
             m_gv0123 = player->m_gv0123;
             m_iconRequestID = player->m_iconRequestID;
