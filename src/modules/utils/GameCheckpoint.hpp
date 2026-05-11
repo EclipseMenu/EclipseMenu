@@ -287,7 +287,8 @@ namespace eclipse::utils {
             m_somethingPlayerSpeedTime = player->m_somethingPlayerSpeedTime;
             m_playerSpeedAC = player->m_playerSpeedAC;
             m_fixRobotJump = player->m_fixRobotJump;
-            m_holdingButtons = player->m_holdingButtons; // map<int, bool>
+            for (size_t i = 1; i < m_holdingButtons.size(); i++)
+                m_holdingButtons[i] = p->m_holdingButtons[i];
             m_inputsLocked = player->m_inputsLocked;
             m_gv0123 = player->m_gv0123;
             m_iconRequestID = player->m_iconRequestID;
@@ -379,6 +380,8 @@ namespace eclipse::utils {
             player->m_slopeFlipGravityRelated = m_slopeFlipGravityRelated;
             player->m_slopeAngleRadians = m_slopeAngleRadians;
             player->m_rotationSpeed = m_rotationSpeed;
+            for (size_t i = 1; i < m_holdingButtons.size(); i++)
+                player->m_holdingButtons[i] = m_holdingButtons[i];
             player->m_rotateSpeed = m_rotateSpeed;
             player->m_isRotating = m_isRotating;
             player->m_isBallRotating2 = m_isBallRotating2;
@@ -832,7 +835,7 @@ namespace eclipse::utils {
         float m_somethingPlayerSpeedTime;
         float m_playerSpeedAC;
         bool m_fixRobotJump;
-        gd::map<int, bool> m_holdingButtons;
+        std::array<bool, 4> m_holdingButtons = {};
         bool m_inputsLocked;
         bool m_gv0123;
         int m_iconRequestID;
