@@ -448,7 +448,7 @@ namespace eclipse::utils {
             player->m_hasCustomGlowColor = m_hasCustomGlowColor;
             player->m_glowColor = m_glowColor;
             player->m_maybeIsColliding = m_maybeIsColliding;
-            // player->m_jumpBuffered = m_jumpBuffered; (breaking)
+            player->m_jumpBuffered = m_jumpBuffered;
             player->m_stateRingJump = m_stateRingJump;
             player->m_wasJumpBuffered = m_wasJumpBuffered;
             player->m_wasRobotJump = m_wasRobotJump;
@@ -721,7 +721,7 @@ namespace eclipse::utils {
         bool m_hasCustomGlowColor;
         cocos2d::ccColor3B m_glowColor;
         bool m_maybeIsColliding;
-        // bool m_jumpBuffered; (breaking)
+        bool m_jumpBuffered;
         bool m_stateRingJump;
         bool m_wasJumpBuffered;
         bool m_wasRobotJump;
@@ -832,7 +832,7 @@ namespace eclipse::utils {
         float m_somethingPlayerSpeedTime;
         float m_playerSpeedAC;
         bool m_fixRobotJump;
-        // gd::map<int, bool> m_holdingButtons; (breaking)
+        gd::map<int, bool> m_holdingButtons;
         bool m_inputsLocked;
         bool m_gv0123;
         int m_iconRequestID;
