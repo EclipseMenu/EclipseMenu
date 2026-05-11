@@ -288,7 +288,7 @@ namespace eclipse::utils {
             m_playerSpeedAC = player->m_playerSpeedAC;
             m_fixRobotJump = player->m_fixRobotJump;
             for (size_t i = 1; i < m_holdingButtons.size(); i++)
-                m_holdingButtons[i] = p->m_holdingButtons[i];
+                m_holdingButtons[i] = player->m_holdingButtons[i];
             m_inputsLocked = player->m_inputsLocked;
             m_gv0123 = player->m_gv0123;
             m_iconRequestID = player->m_iconRequestID;
