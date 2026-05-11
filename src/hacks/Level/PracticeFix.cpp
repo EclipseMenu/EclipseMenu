@@ -265,7 +265,7 @@ namespace eclipse::Hacks::Level {
                 return;
             }
 
-            auto* gjbgl = GJBaseGameLayer::get();
+            auto* gjbgl = utils::get<GJBaseGameLayer>();
 
             if (
                 this == gjbgl->m_player2 &&
@@ -294,7 +294,7 @@ namespace eclipse::Hacks::Level {
 
     class $modify(FixUILayer, UILayer) {
         void handleKeypress(enumKeyCodes key, bool down, double timestamp) {
-            auto* pl = PlayLayer::get();
+            auto* pl = utils::get<PlayLayer>();
 
             bool shouldPreserve =
                 pl &&
