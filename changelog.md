@@ -1,4 +1,7 @@
 # Eclipse Menu
+## v.1.9.5
+**additions**:
+* added Auto diasble Shake
 
 ## v1.9.4
 **Fixes**:
