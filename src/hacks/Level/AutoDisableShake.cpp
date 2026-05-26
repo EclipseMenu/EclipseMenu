@@ -2,7 +2,7 @@
 #include <modules/gui/gui.hpp>
 #include <modules/gui/components/toggle.hpp>
 #include <modules/hack/hack.hpp>
-#include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
 
 namespace eclipse::hacks::Level {
     class $hack(AutoDisableShake) {
@@ -14,13 +14,10 @@ namespace eclipse::hacks::Level {
     };
     REGISTER_HACK(AutoDisableShake)
 
-    class $modify(AutoDisableShakeHook, PlayLayer) {
+    class $modify(AutoDisableShakeHook, GJBaseGameLayer) {
         ADD_HOOKS_DELEGATE("level.autodisableshake")
-        bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
-            if (!PlayLayer::init(level, useReplay, dontCreateObjects))
-                return false;
-            m_gameState.m_disableShake = true;
-            return true;
+        void shakeCamera(float strength, float duration, float interval) {
+            // do nothing lmao
         }
     };
 }
