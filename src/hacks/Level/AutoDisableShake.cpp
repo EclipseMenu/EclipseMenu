@@ -1,44 +1,26 @@
-#include <Geode/Geode.hpp>
+#include <modules/config/config.hpp>
+#include <modules/gui/gui.hpp>
+#include <modules/gui/components/toggle.hpp>
+#include <modules/hack/hack.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 
-#include "../../hack.hpp"   
-
-using namespace geode::prelude;
-
 namespace eclipse::hacks::Level {
-
-    class AutoDisableShake : public Hack {
-    public:
-        // ---- Hack metadata ----
-        std::string getId() const override {
-            return "level.auto-disable-shake";
+    class $hack(AutoDisableShake) {
+        void init() override {
+            auto tab = gui::MenuTab::find("tab.level");
+            tab->addToggle("level.autodisableshake")->handleKeybinds()->setDescription();
         }
-
-        // ---- UI registration (called once on menu build) ----
-        void onInit(MenuTab& tab) override {
-            tab.addToggle(getId(), "Auto Disable Shake", [](bool) {})
-               .setDescription(
-                   "Automatically disables screen shake when a level starts."
-               );
-        }
+        [[nodiscard]] const char* getId() const override { return "Auto Disable Shake"; }
     };
-
-   
     REGISTER_HACK(AutoDisableShake)
 
-
     class $modify(AutoDisableShakeHook, PlayLayer) {
+        ADD_HOOKS_DELEGATE("level.autodisableshake")
         bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
             if (!PlayLayer::init(level, useReplay, dontCreateObjects))
                 return false;
-
-            if (config::get<bool>("level.auto-disable-shake", false)) {
-              
-                this->m_gameState.m_disableShake = true;
-            }
-
+            m_gameState.m_disableShake = true;
             return true;
         }
     };
-
 }
