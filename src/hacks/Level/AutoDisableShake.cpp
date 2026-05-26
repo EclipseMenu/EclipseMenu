@@ -8,16 +8,16 @@ namespace eclipse::hacks::Level {
     class $hack(AutoDisableShake) {
         void init() override {
             auto tab = gui::MenuTab::find("tab.level");
-            tab->addToggle("level.autodisableshake")->handleKeybinds()->setDescription();
+            tab->addToggle("Auto Disable Shake")->handleKeybinds()->setDescription();
         }
         [[nodiscard]] const char* getId() const override { return "Auto Disable Shake"; }
     };
     REGISTER_HACK(AutoDisableShake)
 
     class $modify(AutoDisableShakeHook, GJBaseGameLayer) {
-        ADD_HOOKS_DELEGATE("level.autodisableshake")
+        ADD_HOOKS_DELEGATE("Auto Disable Shake")
         void shakeCamera(float strength, float duration, float interval) {
-            // do nothing lmao
+            // do nothing
         }
     };
 }
