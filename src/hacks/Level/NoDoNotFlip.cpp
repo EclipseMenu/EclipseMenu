@@ -36,7 +36,7 @@ namespace eclipse::hacks::Level {
             EndLevelLayer::customSetup();
 
             if (this->m_playLayer->m_doNot) {
-                cocos2d::CCSprite *levelCompleteText = static_cast<cocos2d::CCSprite *>(this->m_mainLayer->getChildByID("level-complete-text"));
+                cocos2d::CCSprite *levelCompleteText = this->m_mainLayer->getChildByType<cocos2d::CCSprite>(2);
                 levelCompleteText->setFlipX(false);
             }
         }
