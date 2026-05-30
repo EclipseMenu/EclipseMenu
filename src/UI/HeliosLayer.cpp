@@ -48,7 +48,7 @@ namespace eclipse {
     };
 
     static Helios::Vec2 cocosToFrame(CCPoint const& pos) {
-        auto frameSize = CCEGLView::get()->m_obScreenSize * geode::utils::getDisplayFactor();
+        auto frameSize = CCEGLView::get()->m_obScreenSize * utils::getDisplayFactor();
         auto winSize = CCDirector::get()->m_obWinSizeInPoints;
         return Helios::Vec2{
             pos.x / winSize.width * frameSize.width,
@@ -92,6 +92,8 @@ namespace eclipse {
         )) {
             return false;
         }
+
+        this->setToggled(false);
 
         Helios::Director::get()
             .setCursorCallback([](Helios::MouseCursor cursor) {

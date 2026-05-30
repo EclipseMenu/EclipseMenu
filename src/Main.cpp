@@ -45,4 +45,33 @@ $on_game(Loaded) {
             return false;
         }
     );
+
+    // temporary
+    inputManager->setDefaultKeybind("player.noclip", KEY_N);
+    inputManager->registerListener(
+        "player.noclip",
+        [](KeybindMode mode, bool isDown, double) -> bool {
+            switch (mode) {
+                case KeybindMode::Toggle:
+                    if (isDown) config::set<bool, "player.noclip">(!config::get<bool, "player.noclip">());
+                    break;
+                case KeybindMode::Enable:
+                    if (isDown) config::set<bool, "player.noclip">(true);
+                    break;
+                case KeybindMode::Disable:
+                    if (isDown) config::set<bool, "player.noclip">(false);
+                    break;
+                case KeybindMode::HoldOn:
+                    config::set<bool, "player.noclip">(isDown);
+                    break;
+                case KeybindMode::HoldOff:
+                    config::set<bool, "player.noclip">(!isDown);
+                    break;
+                default:
+                    break;
+            }
+
+            return false;
+        }
+    );
 }

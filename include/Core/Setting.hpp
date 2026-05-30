@@ -29,6 +29,15 @@ namespace eclipse {
             this->notify();
         }
 
+        void set(T const& value) {
+            if constexpr (requires{ m_value == value; }) {
+                if (m_value == value) return;
+            }
+
+            m_value = value;
+            this->notify();
+        }
+
         void notify() {
             for (auto& obs : m_observers) {
                 obs.fn(m_value);
