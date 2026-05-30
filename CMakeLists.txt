@@ -33,7 +33,7 @@ endif()
 
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
-CPMAddPackage("gh:prevter/HeliosUI#bf49a83")
+CPMAddPackage("gh:prevter/HeliosUI#49c6864")
 target_compile_definitions(HeliosUI PUBLIC HELIOS_OPENGL_LOADER_INCLUDE="Geode/cocos/platform/CCGL.h")
 target_link_libraries(HeliosUI PRIVATE geode-sdk)
 target_link_libraries(${PROJECT_NAME} Helios::UI)
