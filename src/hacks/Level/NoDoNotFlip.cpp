@@ -24,8 +24,8 @@ namespace eclipse::hacks::Level {
 		void setupHasCompleted() {
 			PlayLayer::setupHasCompleted();
 
-            if (this->m_doNot)
-			    this->m_attemptLabel->setScaleY(1.0);
+            if (m_doNot)
+			    m_attemptLabel->setScaleY(1.0);
 		}
     };
 
@@ -35,9 +35,13 @@ namespace eclipse::hacks::Level {
         void customSetup() {
             EndLevelLayer::customSetup();
 
-            if (this->m_playLayer->m_doNot) {
-                cocos2d::CCSprite *levelCompleteText = this->m_mainLayer->getChildByType<cocos2d::CCSprite>(2);
-                levelCompleteText->setFlipX(false);
+            if (m_playLayer->m_doNot) {
+                cocos2d::CCSprite *levelCompleteText = m_mainLayer->getChildByType<cocos2d::CCSprite>(2);
+
+                if (levelCompleteText)
+                    levelCompleteText->setFlipX(false);
+                else
+                    geode::log::warn("Failed to find level-complete-text.");
             }
         }
     };
