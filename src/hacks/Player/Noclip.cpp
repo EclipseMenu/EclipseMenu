@@ -23,6 +23,8 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty("player.noclip.color", gui::Colors::RED);
             config::setIfEmpty("player.noclip.acclimit", 95.f);
             config::setIfEmpty("player.noclip.deathlimit", 2);
+            config::setIfEmpty("player.noclip.at", false);
+            config::setIfEmpty("player.noclip.at.percent", 50.f);
 
             tab->addToggle("player.noclip")
                ->setDescription()
@@ -32,6 +34,8 @@ namespace eclipse::hacks::Player {
                    options->addToggle("player.noclip.p2");
                    options->addFloatToggle("player.noclip.acclimit", 0.01f, 100.f, "%.2f")->handleKeybinds();
                    options->addIntToggle("player.noclip.deathlimit", 1, 100)->handleKeybinds();
+                   options->addToggle("player.noclip.at")->handleKeybinds();
+                   options->addInputFloat("player.noclip.at.percent", 0.f, 100.f, "%.2f%%");
                    options->addToggle("player.noclip.tint");
                    options->addColorComponent("player.noclip.color");
                    options->addInputFloat("player.noclip.opacity", 0.f, 100.f, "%.0f%");
@@ -57,6 +61,7 @@ namespace eclipse::hacks::Player {
             float m_tintTimer = 0.f;
             float m_tintOpacity = 0.f;
             size_t m_deadFrames = 0;
+            bool m_atActivated = false;
         };
 
         ENABLE_SAFE_HOOKS_ALL()
@@ -64,6 +69,21 @@ namespace eclipse::hacks::Player {
         void destroyPlayer(PlayerObject* player, GameObject* object) override {
             if (object == m_anticheatSpike)
                 return PlayLayer::destroyPlayer(player, object);
+
+            bool noclipActive = config::get<bool>("player.noclip", false);
+            if (!noclipActive) return PlayLayer::destroyPlayer(player, object);
+            auto fields = m_fields.self();
+            if (config::get<bool>("player.noclip.at", false)) {
+                if (!fields->m_atActivated) {
+                    auto progress = utils::getActualProgress(this);
+                    auto threshold = config::get<double>("player.noclip.at.percent", 50.0);
+                    if (progress >= threshold) {
+                        fields->m_atActivated = true;
+                    } else {
+                        return PlayLayer::destroyPlayer(player, object);
+                    }
+                }
+            } // MalikHw47
 
             if (config::get<bool>("player.noclip.acclimit.toggle", false)) {
                 auto acc = config::getTemp<double>("noclipAccuracy", 100.0);
@@ -77,8 +97,19 @@ namespace eclipse::hacks::Player {
                 if (deaths >= limit)
                     return PlayLayer::destroyPlayer(player, object);
             }
+            }
 
-            auto fields = m_fields.self();
+            if (config::get<bool>("player.noclip.tint", false)) {
+                auto color = config::get<gui::Color>("player.noclip.color", gui::Colors::RED).toCCColor3B();
+                fields->m_noclipTint = cocos2d::CCLayerColor::create(
+                    cocos2d::_ccColor4B{color.r, color.g, color.b, 0}
+                );
+                fields->m_noclipTint->setZOrder(1000);
+                fields->m_noclipTint->setID("nocliptint"_spr);
+                if (auto uiMenu = utils::getEclipseUILayer()) {
+                    uiMenu->addChild(fields->m_noclipTint);
+                } else {m_uiLayer->addChild(fields->m_noclipTint);} // fallback, im shit at coding - MalikHw47
+            }
 
             if (!fields->m_noclipTint && config::get<bool>("player.noclip.tint", false)) {
                 auto color = config::get<gui::Color>("player.noclip.color", gui::Colors::RED).toCCColor3B();
@@ -94,9 +125,6 @@ namespace eclipse::hacks::Player {
                 }
             }
 
-            bool noclipActive = config::get<bool>("player.noclip", false);
-            if (!noclipActive) return PlayLayer::destroyPlayer(player, object);
-
             bool player1 = config::get<bool>("player.noclip.p1", true) && player == m_player1;
             bool player2 = config::get<bool>("player.noclip.p2", true) && player == m_player2;
             if (player1 || player2) {
@@ -110,6 +138,15 @@ namespace eclipse::hacks::Player {
 
         void postUpdate(float dt) override {
             auto fields = m_fields.self();
+
+            if (config::get<bool>("player.noclip.at", false) && !fields->m_atActivated) {
+                auto progress = utils::getActualProgress(this);
+                auto threshold = config::get<double>("player.noclip.at.percent", 50.0);
+                if (progress >= threshold) {
+                    fields->m_atActivated = true;
+                }
+            } // MalikHw47
+
             config::setTemp<bool>("noclipDying", fields->m_wouldDieFrame || fields->m_deadLastFrame);
 
             if (config::get<bool>("player.noclip.tint", false) && fields->m_noclipTint && !m_hasCompletedLevel && !m_player1->m_isDead) {
@@ -160,6 +197,7 @@ namespace eclipse::hacks::Player {
             fields->m_wouldDie = false;
             fields->m_wouldDieFrame = false;
             fields->m_deadFrames = 0;
+            fields->m_atActivated = false;
             if (fields->m_noclipTint != nullptr) {
                 fields->m_noclipTint->setOpacity(0);
                 fields->m_tintTimer = 0.F;
