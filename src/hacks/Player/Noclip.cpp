@@ -34,8 +34,9 @@ namespace eclipse::hacks::Player {
                    options->addToggle("player.noclip.p2");
                    options->addFloatToggle("player.noclip.acclimit", 0.01f, 100.f, "%.2f")->handleKeybinds();
                    options->addIntToggle("player.noclip.deathlimit", 1, 100)->handleKeybinds();
+                   options->addLabel("Noclip At");
                    options->addToggle("player.noclip.at")->handleKeybinds();
-                   options->addInputFloat("player.noclip.at.percent", 0.f, 100.f, "%.2f%%");
+                   options->addSlider("player.noclip.at.percent", 0.f, 100.f, "%.2f%%");
                    options->addToggle("player.noclip.tint");
                    options->addColorComponent("player.noclip.color");
                    options->addInputFloat("player.noclip.opacity", 0.f, 100.f, "%.0f%");
@@ -137,7 +138,6 @@ namespace eclipse::hacks::Player {
 
         void postUpdate(float dt) override {
             auto fields = m_fields.self();
-
             if (config::get<bool>("player.noclip.at", false) && !fields->m_atActivated) {
                 auto progress = utils::getActualProgress(this);
                 auto threshold = config::get<double>("player.noclip.at.percent", 50.0);
