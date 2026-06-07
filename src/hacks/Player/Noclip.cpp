@@ -97,7 +97,6 @@ namespace eclipse::hacks::Player {
                 if (deaths >= limit)
                     return PlayLayer::destroyPlayer(player, object);
             }
-            }
 
             if (config::get<bool>("player.noclip.tint", false)) {
                 auto color = config::get<gui::Color>("player.noclip.color", gui::Colors::RED).toCCColor3B();
