@@ -27,6 +27,23 @@ namespace eclipse::hacks::Bot {
     bot::Bot& getBot() { return s_bot; }
 
     void newReplay() {
+        std::string defaultValue;
+        // TODO: turn all of this into a util func
+        if (auto scene = utils::get<cocos2d::CCScene>()) {
+            if (auto* pl = utils::get<PlayLayer>()) {
+                defaultValue = pl->m_level->m_levelName;
+            } else if (auto* lil = scene->getChildByType<LevelInfoLayer>(0)) {
+                defaultValue = lil->m_level->m_levelName;
+            } else if (auto* lil = scene->getChildByType<EditLevelLayer>(0)) {
+                defaultValue = lil->m_levelName;
+            } else if (auto* lil = scene->getChildByType<LevelEditorLayer>(0)) {
+                defaultValue = lil->m_level->m_levelName;
+            } else if (auto* lil = scene->getChildByType<LevelSelectLayer>(0)) {
+                if (auto lp = typeinfo_cast<LevelPage*>(lil->m_scrollLayer->getPage(lil->m_scrollLayer->m_page))) {
+                    defaultValue = lp->m_level->m_levelName;
+                }
+            }
+        }
         Popup::prompt(
             i18n::get_("bot.new-replay"),
             i18n::get_("bot.new-replay.msg"),
@@ -63,7 +80,7 @@ namespace eclipse::hacks::Bot {
             },
             i18n::get_("common.create"),
             i18n::get_("common.cancel"),
-            ""
+            defaultValue
         );
     }
 
