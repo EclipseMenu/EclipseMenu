@@ -45,8 +45,17 @@ namespace eclipse::hacks::Global {
             });
         }
 
+        static bool amionstartpos() {
+            auto* playLayer = utils::get<PlayLayer>();
+            if (!playLayer) return false;
+            return playLayer->m_isTestMode;
+        }
+
         static bool shouldEnable() {
             if (!config::get<bool>("global.autosafemode", false))
+                return false;
+
+            if (config::get<bool>("global.autosafemode.disable-on-startpos", true) && amionstartpos())
                 return false;
 
             return s_trippedLastAttempt || hasCheats();
@@ -99,9 +108,12 @@ namespace eclipse::hacks::Global {
 
             config::setIfEmpty("global.autosafemode", true);
             config::setIfEmpty("global.autosafemode.warn-popup", true);
+            config::setIfEmpty("global.autosafemode.disable-on-startpos", true);
 
             tab->addToggle("global.autosafemode")->handleKeybinds()->setDescription()->addOptions([](auto options) {
                 options->addToggle("global.autosafemode.warn-popup")->setDescription();
+                options->addToggle("Disable on StartPos", "global.autosafemode.disable-on-startpos")
+                    ->setDescription("Disables safe mode when you are playing from a start position\n(Created by miskaa)");
             });
         }
 
