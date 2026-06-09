@@ -15,14 +15,23 @@ namespace eclipse::hacks::Player {
             config::setIfEmpty<int>("player.autoclick.intervalrelease", 1);
 
             tab->addToggle("player.autoclick")
-               ->handleKeybinds()
-               ->setDescription()
-               ->addOptions([](auto options) {
-                   options->addToggle("player.autoclick.p1");
-                   options->addToggle("player.autoclick.p2");
-                   options->addInputInt("player.autoclick.intervalhold", 1, 1000);
-                   options->addInputInt("player.autoclick.intervalrelease", 1, 1000);
-               });
+                ->callback([](bool enabled) {
+                    if (!enabled) { // bug fix to make sure that it wont continue holding :D
+                        auto baseGameLayer = GJBaseGameLayer::get();
+                        if (baseGameLayer) {
+                            baseGameLayer->handleButton(false, 1, true);
+                            baseGameLayer->handleButton(false, 1, false);
+                        }
+                    }
+                })
+                ->handleKeybinds()
+                ->setDescription("Automatically clicks for you.")
+                ->addOptions([](auto options) {
+                    options->addToggle("player.autoclick.p1");
+                    options->addToggle("player.autoclick.p2");
+                    options->addInputInt("player.autoclick.intervalhold", 1, 1000);
+                    options->addInputInt("player.autoclick.intervalrelease", 1, 1000);
+                });
         }
 
         [[nodiscard]] bool isCheating() const override { return config::get<"player.autoclick", bool>(); }

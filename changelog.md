@@ -1,5 +1,10 @@
 # Eclipse Menu
 
+## v1.9.5
+**Fixes**:
+* <cg>Fixed</c> a bug with <cl>Autoclicker</c> that caused it to continue holding if you disable during a click
+
+
 ## v1.9.4
 **Fixes**:
 * <cg>Fixed</c> an incompatibility with <cl>Deltarune Textboxes</c> that caused crashes on level launch
